@@ -1,6 +1,6 @@
 ﻿namespace AppTrack.Application.Contracts.Persistance;
 
-public interface IApplicationRepository : IGenericRepository<Domain.Application>
+public interface IJobApplicationRepository : IGenericRepository<Domain.JobApplication>
 {
 
 }
