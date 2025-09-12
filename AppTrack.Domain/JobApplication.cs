@@ -1,0 +1,15 @@
+﻿using AppTrack.Domain.Common;
+using AppTrack.Domain.Enums;
+
+namespace AppTrack.Domain;
+public class JobApplication: BaseEntity
+{
+    public string Client { get; set; } = string.Empty;
+    public string Position { get; set; } =  string.Empty;
+    public ApplicationStatus Status { get; set; }
+    public DateTime AppliedDate { get; set; }
+    public DateTime? FollowUpDate { get; set; }
+    public string Notes { get; set; } = string.Empty;
+    public string Title { get; set; } = string.Empty;
+    public string ApplicationText { get; set; } = string.Empty;
+}
