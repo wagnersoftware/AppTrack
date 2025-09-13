@@ -30,6 +30,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppTrack.Application", "App
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppTrack.Persistance", "AppTrack.Persistance\AppTrack.Persistance.csproj", "{704DBCEA-B8BF-422B-8EF2-FA7E9C6637E8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppTrack.Infrastructure", "AppTrack.Infrastructure\AppTrack.Infrastructure.csproj", "{0D3896B8-808E-4F7B-901F-2EB7787D2E01}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,6 +50,10 @@ Global
 		{704DBCEA-B8BF-422B-8EF2-FA7E9C6637E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{704DBCEA-B8BF-422B-8EF2-FA7E9C6637E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{704DBCEA-B8BF-422B-8EF2-FA7E9C6637E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D3896B8-808E-4F7B-901F-2EB7787D2E01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D3896B8-808E-4F7B-901F-2EB7787D2E01}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D3896B8-808E-4F7B-901F-2EB7787D2E01}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D3896B8-808E-4F7B-901F-2EB7787D2E01}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -62,6 +68,7 @@ Global
 		{D5BB6857-E9E0-4B24-949D-8B262EEC1BE9} = {EA7B9F81-783D-428A-8AA9-83B7AC9E008E}
 		{2121EC3A-99BF-4C9F-BD5B-6B357AD6FED7} = {EA7B9F81-783D-428A-8AA9-83B7AC9E008E}
 		{704DBCEA-B8BF-422B-8EF2-FA7E9C6637E8} = {11EBD8F0-E3DD-4077-B28C-8C8E0D783327}
+		{0D3896B8-808E-4F7B-901F-2EB7787D2E01} = {11EBD8F0-E3DD-4077-B28C-8C8E0D783327}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EB8C5136-FE2C-4733-AEB3-ABE11FF82EDE}
