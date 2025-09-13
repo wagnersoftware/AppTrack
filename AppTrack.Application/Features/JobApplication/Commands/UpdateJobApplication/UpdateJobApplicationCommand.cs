@@ -1,15 +1,17 @@
-﻿using AppTrack.Domain.Common;
-using AppTrack.Domain.Enums;
+﻿using AppTrack.Domain.Enums;
+using MediatR;
 
-namespace AppTrack.Domain;
-public class JobApplication: BaseEntity
+namespace AppTrack.Application.Features.JobApplication.Commands.UpdateJobApplication;
+
+public  class UpdateJobApplicationCommand: IRequest<Unit>
 {
     public string Client { get; set; } = string.Empty;
-    public string Position { get; set; } =  string.Empty;
+    public string Position { get; set; } = string.Empty;
     public JobApplicationStatus Status { get; set; }
     public DateTime? AppliedDate { get; set; }
     public DateTime? FollowUpDate { get; set; }
     public string Notes { get; set; } = string.Empty;
     public string Title { get; set; } = string.Empty;
     public string ApplicationText { get; set; } = string.Empty;
+    public DateTime DateCreated { get; set; }
 }

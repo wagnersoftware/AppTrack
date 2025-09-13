@@ -1,7 +1,9 @@
-﻿namespace AppTrack.Application.Contracts.Persistance;
+﻿using AppTrack.Domain;
 
-public interface IJobApplicationRepository : IGenericRepository<Domain.JobApplication>
+namespace AppTrack.Application.Contracts.Persistance;
+
+public interface IJobApplicationRepository : IGenericRepository<JobApplication>
 {
-
+    Task<bool> IsClientUnique(string client);
 }
 
