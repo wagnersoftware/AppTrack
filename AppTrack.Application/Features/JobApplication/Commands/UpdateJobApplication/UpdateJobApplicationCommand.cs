@@ -5,6 +5,7 @@ namespace AppTrack.Application.Features.JobApplication.Commands.UpdateJobApplica
 
 public  class UpdateJobApplicationCommand: IRequest<Unit>
 {
+    public int Id { get; set; }
     public string Client { get; set; } = string.Empty;
     public string Position { get; set; } = string.Empty;
     public JobApplicationStatus Status { get; set; }
