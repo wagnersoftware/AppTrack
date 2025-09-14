@@ -13,8 +13,6 @@ public class JobApplicationConfiguration : IEntityTypeConfiguration<JobApplicati
             {
                 Id = 1,
                 Client = "TestClient1",
-                DateCreated = DateTime.Now,
-                DateModified = DateTime.Now,
             });
 
         builder.Property(x => x.Client)

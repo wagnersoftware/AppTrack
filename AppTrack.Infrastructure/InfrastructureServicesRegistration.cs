@@ -10,7 +10,7 @@ namespace AppTrack.Infrastructure
 {
     public static class InfrastructureServicesRegistration
     {
-        public static IServiceCollection RegisterServices(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<EmailSettings>(configuration.GetSection(nameof(EmailSettings)));
             services.AddTransient<IEmailSender, EmailSender>();
