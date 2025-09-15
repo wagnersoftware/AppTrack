@@ -34,6 +34,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppTrack.Infrastructure", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppTrack.Api", "AppTrack.Api\AppTrack.Api.csproj", "{0502C2C5-A7C3-4905-A9F8-1D71DB945F5E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppTrack.Application.UnitTests", "AppTrack.Application.UnitTests\AppTrack.Application.UnitTests.csproj", "{40261DE2-AC42-468F-8D85-415E6E7944D6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -60,6 +62,10 @@ Global
 		{0502C2C5-A7C3-4905-A9F8-1D71DB945F5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0502C2C5-A7C3-4905-A9F8-1D71DB945F5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0502C2C5-A7C3-4905-A9F8-1D71DB945F5E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{40261DE2-AC42-468F-8D85-415E6E7944D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40261DE2-AC42-468F-8D85-415E6E7944D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40261DE2-AC42-468F-8D85-415E6E7944D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40261DE2-AC42-468F-8D85-415E6E7944D6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -76,6 +82,7 @@ Global
 		{704DBCEA-B8BF-422B-8EF2-FA7E9C6637E8} = {11EBD8F0-E3DD-4077-B28C-8C8E0D783327}
 		{0D3896B8-808E-4F7B-901F-2EB7787D2E01} = {11EBD8F0-E3DD-4077-B28C-8C8E0D783327}
 		{0502C2C5-A7C3-4905-A9F8-1D71DB945F5E} = {2BBCFAEC-584D-450C-93EC-99E827A05921}
+		{40261DE2-AC42-468F-8D85-415E6E7944D6} = {742E3FC9-5B73-405C-879D-0C7466D91BF0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EB8C5136-FE2C-4733-AEB3-ABE11FF82EDE}

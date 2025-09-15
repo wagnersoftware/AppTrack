@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace AppTrack.Application.Features.JobApplication.Commands.DeleteJobApplication;
+namespace AppTrack.Application.Features.JobApplications.Commands.DeleteJobApplication;
 
 public class DeleteJobApplicationCommand: IRequest<Unit>
 {

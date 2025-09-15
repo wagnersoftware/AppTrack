@@ -3,7 +3,7 @@ using AppTrack.Application.Contracts.Persistance;
 using AutoMapper;
 using MediatR;
 
-namespace AppTrack.Application.Features.JobApplication.Queries.GetAllJobApplications;
+namespace AppTrack.Application.Features.JobApplications.Queries.GetAllJobApplications;
 public class GetJobApplicationsQueryHandler : IRequestHandler<GetJobApplicationsQuery, List<JobApplicationDto>>
 {
     private readonly IMapper _mapper;

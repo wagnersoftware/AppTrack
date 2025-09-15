@@ -2,7 +2,7 @@
 using AutoMapper;
 using MediatR;
 
-namespace AppTrack.Application.Features.JobApplication.Commands.UpdateJobApplication;
+namespace AppTrack.Application.Features.JobApplications.Commands.UpdateJobApplication;
 
 public class UpdateJobApplicationCommandHandler : IRequestHandler<UpdateJobApplicationCommand, Unit>
 {

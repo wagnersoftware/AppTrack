@@ -3,7 +3,7 @@ using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Exceptions;
 using MediatR;
 
-namespace AppTrack.Application.Features.JobApplication.Commands.DeleteJobApplication;
+namespace AppTrack.Application.Features.JobApplications.Commands.DeleteJobApplication;
 
 public class DeleteJobApplicationCommandHandler: IRequestHandler<DeleteJobApplicationCommand, Unit>
 {

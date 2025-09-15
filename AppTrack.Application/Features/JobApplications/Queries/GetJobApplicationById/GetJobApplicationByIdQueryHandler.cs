@@ -1,10 +1,10 @@
 ﻿using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Exceptions;
-using AppTrack.Application.Features.JobApplication.Queries.GetAllJobApplications;
+using AppTrack.Application.Features.JobApplications.Queries.GetAllJobApplications;
 using AutoMapper;
 using MediatR;
 
-namespace AppTrack.Application.Features.JobApplication.Queries.GetJobApplicationById;
+namespace AppTrack.Application.Features.JobApplications.Queries.GetJobApplicationById;
 
 public class GetJobApplicationByIdQueryHandler : IRequestHandler<GetJobApplicationByIdQuery, JobApplicationDto>
 {

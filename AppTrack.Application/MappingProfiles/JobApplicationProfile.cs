@@ -1,6 +1,6 @@
-﻿using AppTrack.Application.Features.JobApplication.Commands.CreateJobApplication;
-using AppTrack.Application.Features.JobApplication.Commands.UpdateJobApplication;
-using AppTrack.Application.Features.JobApplication.Queries.GetAllJobApplications;
+﻿using AppTrack.Application.Features.JobApplications.Commands.CreateJobApplication;
+using AppTrack.Application.Features.JobApplications.Commands.UpdateJobApplication;
+using AppTrack.Application.Features.JobApplications.Queries.GetAllJobApplications;
 using AppTrack.Domain;
 using AutoMapper;
 

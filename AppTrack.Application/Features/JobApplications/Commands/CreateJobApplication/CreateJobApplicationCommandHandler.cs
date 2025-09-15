@@ -3,7 +3,7 @@ using AppTrack.Application.Exceptions;
 using AutoMapper;
 using MediatR;
 
-namespace AppTrack.Application.Features.JobApplication.Commands.CreateJobApplication;
+namespace AppTrack.Application.Features.JobApplications.Commands.CreateJobApplication;
 public class CreateJobApplicationCommandHandler : IRequestHandler<CreateJobApplicationCommand, int>
 {
     private readonly IMapper _mapper;

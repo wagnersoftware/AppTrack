@@ -1,7 +1,7 @@
 ﻿using AppTrack.Application.Contracts.Persistance;
 using FluentValidation;
 
-namespace AppTrack.Application.Features.JobApplication.Commands.CreateJobApplication;
+namespace AppTrack.Application.Features.JobApplications.Commands.CreateJobApplication;
 
 public class CreateJobApplicationCommandValidator: AbstractValidator<CreateJobApplicationCommand>
 {
