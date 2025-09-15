@@ -1,3 +1,4 @@
+using AppTrack.Api.Middleware;
 using AppTrack.Application;
 using AppTrack.Infrastructure;
 using AppTrack.Persistance;
@@ -22,6 +23,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

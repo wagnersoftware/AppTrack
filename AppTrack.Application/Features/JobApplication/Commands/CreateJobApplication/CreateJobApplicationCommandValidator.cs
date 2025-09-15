@@ -18,7 +18,7 @@ public class CreateJobApplicationCommandValidator: AbstractValidator<CreateJobAp
 
         RuleFor(x => x)
             .MustAsync(ClientUnique)
-            .WithMessage("Cliane name already exists");
+            .WithMessage("Client name already exists");
         
     }
 

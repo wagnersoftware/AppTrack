@@ -22,10 +22,10 @@ namespace AppTrack.Api.Controllers
         }
         // GET: api/<JobApplicationsController>
         [HttpGet]
-        public async Task<List<JobApplicationDto>> Get()
+        public async Task<ActionResult<List<JobApplicationDto>>> Get()
         {
             var jobApplicationDtos = await _mediator.Send(new GetJobApplicationsQuery());
-            return jobApplicationDtos;
+            return Ok(jobApplicationDtos);
         }
 
         // GET api/<JobApplicationsController>/5
