@@ -26,7 +26,7 @@ public class AppTrackDatabaseContext : DbContext
         {
             entry.Entity.DateModified = DateTime.Now;
 
-            if(entry.State == EntityState.Added)
+            if (entry.State == EntityState.Added)
             {
                 entry.Entity.DateCreated = DateTime.Now;
             }

@@ -12,6 +12,5 @@ public class CreateJobApplicationCommand: IRequest<int>
     public string Notes { get; set; } = string.Empty;
     public string Title { get; set; } = string.Empty;
     public string ApplicationText { get; set; } = string.Empty;
-    public DateTime DateCreated { get; set; } = DateTime.UtcNow;
 }
 
