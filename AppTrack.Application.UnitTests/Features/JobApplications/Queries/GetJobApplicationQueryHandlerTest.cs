@@ -4,6 +4,7 @@ using AppTrack.Application.Features.JobApplications.Queries.GetAllJobApplication
 using AppTrack.Application.MappingProfiles;
 using AppTrack.Application.UnitTests.Mocks;
 using AutoMapper;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Shouldly;
 
@@ -18,11 +19,10 @@ public class GetJobApplicationQueryHandlerTest
     public GetJobApplicationQueryHandlerTest()
     {
         _mockRepo = MockJobApplicationRepository.GetJobApplicationRepository();
-
         var mapperConfig = new MapperConfiguration(cfg =>
         {
             cfg.AddProfile<JobApplicationProfile>();
-        });
+        }, NullLoggerFactory.Instance); 
 
         _mapper = mapperConfig.CreateMapper();
         _mockAppLogger = new Mock<IAppLogger<GetJobApplicationsQueryHandler>>();
