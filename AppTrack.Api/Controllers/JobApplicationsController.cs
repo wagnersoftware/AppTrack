@@ -30,7 +30,7 @@ namespace AppTrack.Api.Controllers
 
         // GET api/<JobApplicationsController>/5
         [HttpGet("{id}")]
-        public async Task<ActionResult> Get(int id)
+        public async Task<ActionResult<JobApplicationDto>> Get(int id)
         {
             var jobApplicationDto = await _mediator.Send(new GetJobApplicationByIdQuery() { Id = id});
             return Ok(jobApplicationDto);

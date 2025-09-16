@@ -38,6 +38,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppTrack.Application.UnitTe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppTrack.Persistance.IntegrationTests", "AppTrack.Persistance.IntegrationTests\AppTrack.Persistance.IntegrationTests.csproj", "{743580A1-0480-4003-92FC-2ACDBD4A4DE8}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Frontend-Blazor", "Frontend-Blazor", "{F94AA1BC-DF34-4E58-AD53-2A6C7097C15F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppTrack.BlazorUI", "AppTrack.BlazorUI\AppTrack.BlazorUI.csproj", "{1A35E4BB-F987-4B40-A0E3-780E8E539D29}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -72,6 +76,10 @@ Global
 		{743580A1-0480-4003-92FC-2ACDBD4A4DE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{743580A1-0480-4003-92FC-2ACDBD4A4DE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{743580A1-0480-4003-92FC-2ACDBD4A4DE8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A35E4BB-F987-4B40-A0E3-780E8E539D29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A35E4BB-F987-4B40-A0E3-780E8E539D29}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A35E4BB-F987-4B40-A0E3-780E8E539D29}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A35E4BB-F987-4B40-A0E3-780E8E539D29}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -90,6 +98,8 @@ Global
 		{0502C2C5-A7C3-4905-A9F8-1D71DB945F5E} = {2BBCFAEC-584D-450C-93EC-99E827A05921}
 		{40261DE2-AC42-468F-8D85-415E6E7944D6} = {742E3FC9-5B73-405C-879D-0C7466D91BF0}
 		{743580A1-0480-4003-92FC-2ACDBD4A4DE8} = {742E3FC9-5B73-405C-879D-0C7466D91BF0}
+		{F94AA1BC-DF34-4E58-AD53-2A6C7097C15F} = {B05952A2-1977-46F8-9B5B-F4647344A9F7}
+		{1A35E4BB-F987-4B40-A0E3-780E8E539D29} = {F94AA1BC-DF34-4E58-AD53-2A6C7097C15F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EB8C5136-FE2C-4733-AEB3-ABE11FF82EDE}
