@@ -1,0 +1,52 @@
+﻿@page "/jobapplications/";
+
+<h3>Job Applications</h3>
+<div class="m-2 d-flex justiy-content-end">
+    <button @onclick="CreateJobApplication" class="btn btn-success">Add JobApplication</button>
+</div>
+
+@if(string.IsNullOrEmpty(Message) == false)
+{
+    <div class="alert alert-danger">
+        @Message
+    </div>
+}
+
+@if(JobApplications == null)
+{
+    <p>Loading Data...</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    ID
+                </th>
+                <th>
+                    Client
+                </th>
+                <th>
+                    Position
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var jobApplication in JobApplications)
+            {
+                <tr>
+                    <td>@jobApplication.Id</td>
+                    <td>@jobApplication.Client</td>
+                    <td>@jobApplication.Position</td>
+                    <td>
+                        <button @onclick="@(() => AllocateJobApplication(jobApplication.Id))" class="btn btn-dark">Allocate</button>
+                        <button @onclick="@(() => EditJobApplication(jobApplication.Id))" class="btn btn-warning">Edit</button>
+                        <button @onclick="@(() => DeleteJobApplication(jobApplication.Id))" class="btn btn-danger">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

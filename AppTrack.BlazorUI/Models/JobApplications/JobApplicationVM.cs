@@ -12,8 +12,8 @@ namespace AppTrack.BlazorUI.Models.JobApplications
         [Required]
         public string Position { get; set; } = string.Empty;
         public JobApplicationStatus Status { get; set; }
-        public DateTime? AppliedDate { get; set; }
-        public DateTime? FollowUpDate { get; set; }
+        public DateTimeOffset? AppliedDate { get; set; }
+        public DateTimeOffset? FollowUpDate { get; set; }
         public string Notes { get; set; } = string.Empty;
         public string Title { get; set; } = string.Empty;
         public string ApplicationText { get; set; } = string.Empty;
