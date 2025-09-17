@@ -1,4 +1,4 @@
-﻿using AppTrack.Application.Models;
+﻿using AppTrack.Application.Models.Email;
 
 namespace AppTrack.Application.Contracts.Email;
 

@@ -1,6 +1,6 @@
 ﻿using AppTrack.Application.Contracts.Email;
 using AppTrack.Application.Contracts.Logging;
-using AppTrack.Application.Models;
+using AppTrack.Application.Models.Email;
 using AppTrack.Infrastructure.EmailService;
 using AppTrack.Infrastructure.Logging;
 using Microsoft.Extensions.Configuration;

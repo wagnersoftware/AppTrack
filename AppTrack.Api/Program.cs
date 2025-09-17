@@ -1,5 +1,6 @@
 using AppTrack.Api.Middleware;
 using AppTrack.Application;
+using AppTrack.Identity;
 using AppTrack.Infrastructure;
 using AppTrack.Persistance;
 
@@ -9,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddPersistanceServices(builder.Configuration);
+builder.Services.AddIdentityServices(builder.Configuration);
 
 builder.Services.AddControllers();
 
@@ -37,6 +39,7 @@ app.UseHttpsRedirection();
 
 app.UseCors("All");
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

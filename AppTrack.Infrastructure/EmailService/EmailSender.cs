@@ -1,5 +1,5 @@
 ﻿using AppTrack.Application.Contracts.Email;
-using AppTrack.Application.Models;
+using AppTrack.Application.Models.Email;
 using Microsoft.Extensions.Options;
 using SendGrid;
 using SendGrid.Helpers.Mail;

@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AppTrack.Application\AppTrack.Application.csproj" />
+    <ProjectReference Include="..\AppTrack.Identity\AppTrack.Identity.csproj" />
     <ProjectReference Include="..\AppTrack.Infrastructure\AppTrack.Infrastructure.csproj" />
     <ProjectReference Include="..\AppTrack.Persistance\AppTrack.Persistance.csproj" />
   </ItemGroup>

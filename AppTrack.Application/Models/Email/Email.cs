@@ -1,4 +1,4 @@
-﻿namespace AppTrack.Application.Models;
+﻿namespace AppTrack.Application.Models.Email;
 
 public class EmailMessage
 {

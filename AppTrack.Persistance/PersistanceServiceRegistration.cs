@@ -15,6 +15,7 @@ public static class PersistanceServiceRegistration
         services.AddDbContext<AppTrackDatabaseContext>(options => {
             options.UseSqlServer(configuration.GetConnectionString("AppTrackConnectionString"));
             });
+
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
         services.AddScoped<IJobApplicationRepository, JobApplicationRepository>();
 
