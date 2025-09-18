@@ -10,4 +10,10 @@ public class AppTrackIdentityDbContext : IdentityDbContext<ApplicationUser>
     {
         
     }
+
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);
+        builder.ApplyConfigurationsFromAssembly(typeof(AppTrackIdentityDbContext).Assembly);
+    }
 }

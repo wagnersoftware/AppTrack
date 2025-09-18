@@ -20,7 +20,10 @@ public class UserConfiguration : IEntityTypeConfiguration<ApplicationUser>
                 LastName = "Admin",
                 UserName = "admin@localhost.com",
                 NormalizedUserName = "ADMIN@LOCALHOST.COM",
-                PasswordHash = hasher.HashPassword(null, "P@ssword1"),
+                //PasswordHash = hasher.HashPassword(null, "P@ssword1"),
+                PasswordHash = "AQAAAAEAACcQAAAAEHN5z7FhDkT8QXG3J5J8t5g3gZl5V4kH2+XnH0+zE7R6b6Q7L8Z3yYdT0M9fP4YfA==",
+                SecurityStamp = "STATIC-SECURITYSTAMP-ADMIN",
+                ConcurrencyStamp = "STATIC-CONCURRENCYSTAMP-ADMIN",
                 EmailConfirmed = true
             },
             new ApplicationUser()
@@ -32,7 +35,10 @@ public class UserConfiguration : IEntityTypeConfiguration<ApplicationUser>
                 LastName = "User",
                 UserName = "user@localhost.com",
                 NormalizedUserName = "USER@LOCALHOST.COM",
-                PasswordHash = hasher.HashPassword(null, "P@ssword1"),
+                //PasswordHash = hasher.HashPassword(null, "P@ssword1"),
+                PasswordHash = "AQAAAAEAACcQAAAAEHN5z7FhDkT8QXG3J5J8t5g3gZl5V4kH2+XnH0+zE7R6b6Q7L8Z3yYdT0M9fP4YfA==",
+                SecurityStamp = "STATIC-SECURITYSTAMP-USER",
+                ConcurrencyStamp = "STATIC-CONCURRENCYSTAMP-USER",
                 EmailConfirmed = true
             });
     }
