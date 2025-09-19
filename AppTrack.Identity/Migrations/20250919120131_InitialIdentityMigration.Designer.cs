@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AppTrack.Identity.Migrations
 {
     [DbContext(typeof(AppTrackIdentityDbContext))]
-    [Migration("20250919091131_InitialIdentityMigration")]
+    [Migration("20250919120131_InitialIdentityMigration")]
     partial class InitialIdentityMigration
     {
         /// <inheritdoc />
