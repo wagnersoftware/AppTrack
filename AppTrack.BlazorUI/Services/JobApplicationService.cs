@@ -2,6 +2,7 @@
 using AppTrack.BlazorUI.Models.JobApplications;
 using AppTrack.BlazorUI.Services.Base;
 using AutoMapper;
+using Blazored.LocalStorage;
 
 namespace AppTrack.BlazorUI.Services
 {
@@ -9,7 +10,7 @@ namespace AppTrack.BlazorUI.Services
     {
         private readonly IMapper _mapper;
 
-        public JobApplicationService(IClient client, IMapper mapper) : base(client)
+        public JobApplicationService(IClient client, IMapper mapper, ILocalStorageService localStorageService) : base(client, localStorageService)
         {
             this._mapper = mapper;
         }
@@ -18,6 +19,7 @@ namespace AppTrack.BlazorUI.Services
         {
             try
             {
+                await AddBearerTokenAsync();
                 var createJobApplicationCommand = _mapper.Map<CreateJobApplicationCommand>(jobApplication);
                 await _client.JobApplicationsPOSTAsync(createJobApplicationCommand);
                 return new Response<Guid>() { Success = true };
@@ -33,6 +35,7 @@ namespace AppTrack.BlazorUI.Services
         {
             try
             {
+                await AddBearerTokenAsync();
                 await _client.JobApplicationsDELETEAsync(id);
                 return new Response<Guid>() { Success = true };
             }
@@ -44,12 +47,14 @@ namespace AppTrack.BlazorUI.Services
 
         public async Task<JobApplicationVM> GetJobApplicationById(int id)
         {
+            await AddBearerTokenAsync();
             var jobApplication = await _client.JobApplicationsGETAsync(id);
             return _mapper.Map<JobApplicationVM>(jobApplication);
         }
 
         public async Task<List<JobApplicationVM>> GetJobApplicationsAsync()
         {
+            await AddBearerTokenAsync();
             var jobApplicationDtos = await _client.JobApplicationsAllAsync();
             return _mapper.Map<List<JobApplicationVM>>(jobApplicationDtos);
         }
@@ -59,6 +64,7 @@ namespace AppTrack.BlazorUI.Services
             try
             {
                 var updateJobApplicationCommand = _mapper.Map<UpdateJobApplicationCommand>(jobApplication);
+                await AddBearerTokenAsync();
                 await _client.JobApplicationsPUTAsync(id.ToString(), updateJobApplicationCommand);
                 return new Response<Guid>() { Success = true };
             }
