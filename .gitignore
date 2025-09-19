@@ -38,8 +38,12 @@ _ReSharper*/
 secrets.json
 # Publish output
 publish/
-# Entity Framework migrations cache
-*Migrations/
+# Entity Framework Core
+# Ignore the database and build artifacts, but include migration code
+*.db
+*.mdf
+*.ldf
+
 
 ### React / Node.js Frontend ###
 frontend-web/node_modules/
