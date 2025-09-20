@@ -6,7 +6,20 @@
         xmlns:local="clr-namespace:AppTrack.Wpf"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Grid>
-
-    </Grid>
+    <StackPanel Margin="10">
+        <Label Content="AppTrack" FontSize="20"></Label>
+        <DataGrid>
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID"></DataGridTextColumn>
+                <DataGridTextColumn Header="Client Name"></DataGridTextColumn>
+                <DataGridTextColumn Header="Position"></DataGridTextColumn>
+                <DataGridTextColumn Header="URL"></DataGridTextColumn>
+                <DataGridTextColumn Header="Status"></DataGridTextColumn>
+                <DataGridTextColumn Header="Application Text"></DataGridTextColumn>
+                <DataGridTextColumn Header="Created"></DataGridTextColumn>
+                <DataGridTextColumn Header="Modified"></DataGridTextColumn>
+                <DataGridTextColumn Header="Functions"></DataGridTextColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+    </StackPanel>
 </Window>
