@@ -2,11 +2,11 @@
 using AppTrack.Frontend.Models;
 using AutoMapper;
 
-namespace AppTrack.BlazorUI.MappingProfiles;
+namespace AppTrack.Frontend.ApiService.MappingProfiles;
 
-public class MappingConfig : Profile
+public class MappingConfiguration: Profile
 {
-    public MappingConfig()
+    public MappingConfiguration()
     {
         CreateMap<JobApplicationDto, JobApplicationModel>().ReverseMap();
         CreateMap<CreateJobApplicationCommand, JobApplicationModel>().ReverseMap();

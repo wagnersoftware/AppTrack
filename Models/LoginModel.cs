@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace AppTrack.BlazorUI.Models;
+namespace AppTrack.Frontend.Models;
 
-public class LoginVM
+public class LoginModel
 {
     [Required]
     public string Email { get; set; } = string.Empty;

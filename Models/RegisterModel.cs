@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace AppTrack.BlazorUI.Models;
+namespace AppTrack.Frontend.Models;
 
-public class RegisterVM
+public class RegisterModel
 {
     [Required]
     public string FirstName { get; set; } = string.Empty;

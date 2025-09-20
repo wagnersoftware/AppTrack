@@ -1,5 +1,5 @@
-using AppTrack.BlazorUI.Contracts;
-using AppTrack.BlazorUI.Models.JobApplications;
+using AppTrack.Frontend.ApiService.Contracts;
+using AppTrack.Frontend.Models;
 using Microsoft.AspNetCore.Components;
 
 namespace AppTrack.BlazorUI.Pages.JobApplications
@@ -12,7 +12,7 @@ namespace AppTrack.BlazorUI.Pages.JobApplications
         [Inject]
         public IJobApplicationService JobApplicationService { get; set; }
 
-        public List<JobApplicationVM> JobApplications { get; private set; }
+        public List<JobApplicationModel> JobApplications { get; private set; }
 
         public string Message { get; set; }
 

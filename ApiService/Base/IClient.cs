@@ -1,4 +1,4 @@
-﻿namespace AppTrack.BlazorUI.Services.Base;
+﻿namespace AppTrack.Frontend.ApiService.Base;
 
 public partial interface IClient
 {

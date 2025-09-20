@@ -1,5 +1,5 @@
-﻿using AppTrack.BlazorUI.Contracts;
-using AppTrack.BlazorUI.Models;
+﻿using AppTrack.Frontend.ApiService.Contracts;
+using AppTrack.Frontend.Models;
 using Microsoft.AspNetCore.Components;
 
 namespace AppTrack.BlazorUI.Pages;
@@ -7,7 +7,7 @@ namespace AppTrack.BlazorUI.Pages;
 public partial class Register
 {
 
-    public RegisterVM Model { get; set; }
+    public RegisterModel Model { get; set; }
 
     [Inject]
     public NavigationManager NavigationManager { get; set; }
@@ -19,7 +19,7 @@ public partial class Register
 
     protected override void OnInitialized()
     {
-        Model = new RegisterVM();
+        Model = new RegisterModel();
     }
 
     protected async Task HandleRegister()
