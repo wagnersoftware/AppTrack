@@ -13,12 +13,12 @@ public class MockJobApplicationRepository
             new JobApplication()
             {
                 Id = 1,
-                Client = "TestClient1",
+                ClientName = "TestClient1",
             },
             new JobApplication()
             {
                 Id = 2,
-                Client = "TestClient2",
+                ClientName = "TestClient2",
             }
         };
 

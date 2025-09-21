@@ -1,4 +1,5 @@
 ﻿using AppTrack.Frontend.ApiService.Contracts;
+using AppTrack.Frontend.Models;
 
 namespace AppTrack.Frontend.ApiService.Base;
 
@@ -13,19 +14,19 @@ public class BaseHttpService
         this._tokenStorage = tokenStorage;
     }
 
-    protected Response<Guid> ConvertApiException(ApiException apiException)
+    protected Response<T> ConvertApiException<T>(ApiException apiException) where T : ModelBase
     {
         if (apiException.StatusCode == 400) // bad request
         {
-            return new Response<Guid> { Message = "Invalid data was submitted", ValidationErrors = apiException.Response, Success = false };
+            return new Response<T> { Message = "Invalid data was submitted", ValidationErrors = apiException.Response, Success = false };
         }
         else if (apiException.StatusCode == 404) // not found
         {
-            return new Response<Guid> { Message = "The record was not found", Success = false };
+            return new Response<T> { Message = "The record was not found", Success = false };
         }
         else
         {
-            return new Response<Guid> { Message = "Something went wrong, please try again", Success = false };
+            return new Response<T> { Message = "Something went wrong, please try again", Success = false };
         }
     }
 

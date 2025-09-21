@@ -56,12 +56,12 @@ namespace AppTrack.Frontend.ApiService.Base
 
         /// <returns>Created</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task JobApplicationsPOSTAsync(CreateJobApplicationCommand body);
+        System.Threading.Tasks.Task<JobApplicationDto> JobApplicationsPOSTAsync(CreateJobApplicationCommand body);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>Created</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task JobApplicationsPOSTAsync(CreateJobApplicationCommand body, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<JobApplicationDto> JobApplicationsPOSTAsync(CreateJobApplicationCommand body, System.Threading.CancellationToken cancellationToken);
 
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
@@ -368,7 +368,7 @@ namespace AppTrack.Frontend.ApiService.Base
 
         /// <returns>Created</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task JobApplicationsPOSTAsync(CreateJobApplicationCommand body)
+        public virtual System.Threading.Tasks.Task<JobApplicationDto> JobApplicationsPOSTAsync(CreateJobApplicationCommand body)
         {
             return JobApplicationsPOSTAsync(body, System.Threading.CancellationToken.None);
         }
@@ -376,7 +376,7 @@ namespace AppTrack.Frontend.ApiService.Base
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>Created</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task JobApplicationsPOSTAsync(CreateJobApplicationCommand body, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<JobApplicationDto> JobApplicationsPOSTAsync(CreateJobApplicationCommand body, System.Threading.CancellationToken cancellationToken)
         {
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -389,6 +389,7 @@ namespace AppTrack.Frontend.ApiService.Base
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
                     request_.Content = content_;
                     request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     var urlBuilder_ = new System.Text.StringBuilder();
                 
@@ -420,7 +421,12 @@ namespace AppTrack.Frontend.ApiService.Base
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 201)
                         {
-                            return;
+                            var objectResponse_ = await ReadObjectResponseAsync<JobApplicationDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
                         }
                         else
                         if (status_ == 400)
@@ -901,29 +907,32 @@ namespace AppTrack.Frontend.ApiService.Base
     public partial class CreateJobApplicationCommand
     {
 
-        [System.Text.Json.Serialization.JsonPropertyName("client")]
-        public string Client { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        public int Id { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("creationDate")]
+        public System.DateTime CreationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("modifiedDate")]
+        public System.DateTime ModifiedDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("clientName")]
+        public string ClientName { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("position")]
         public string Position { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("url")]
+        public string Url { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("applicationText")]
+        public string ApplicationText { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("status")]
         public JobApplicationStatus Status { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("appliedDate")]
-        public System.DateTimeOffset? AppliedDate { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("followUpDate")]
-        public System.DateTimeOffset? FollowUpDate { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("notes")]
-        public string Notes { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("title")]
-        public string Title { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("applicationText")]
-        public string ApplicationText { get; set; }
+        public System.DateTime AppliedDate { get; set; }
 
     }
 
@@ -931,38 +940,32 @@ namespace AppTrack.Frontend.ApiService.Base
     public partial class JobApplicationDto
     {
 
-        [System.Text.Json.Serialization.JsonPropertyName("client")]
-        public string Client { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        public int Id { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("clientName")]
+        public string ClientName { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("position")]
         public string Position { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("url")]
+        public string Url { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("applicationText")]
+        public string ApplicationText { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("creationDate")]
+        public System.DateTime CreationDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("modifiedDate")]
+        public System.DateTime ModifiedDate { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("status")]
         public JobApplicationStatus Status { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("appliedDate")]
-        public System.DateTimeOffset AppliedDate { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("followUpDate")]
-        public System.DateTimeOffset? FollowUpDate { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("notes")]
-        public string Notes { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("title")]
-        public string Title { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("applicationText")]
-        public string ApplicationText { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        public int Id { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("dateCreated")]
-        public System.DateTimeOffset DateCreated { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("dateModified")]
-        public System.DateTimeOffset DateModified { get; set; }
+        public System.DateTime AppliedDate { get; set; }
 
     }
 
@@ -1062,10 +1065,10 @@ namespace AppTrack.Frontend.ApiService.Base
         public JobApplicationStatus Status { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("appliedDate")]
-        public System.DateTimeOffset? AppliedDate { get; set; }
+        public System.DateTime? AppliedDate { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("followUpDate")]
-        public System.DateTimeOffset? FollowUpDate { get; set; }
+        public System.DateTime? FollowUpDate { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("notes")]
         public string Notes { get; set; }
@@ -1077,7 +1080,7 @@ namespace AppTrack.Frontend.ApiService.Base
         public string ApplicationText { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("dateCreated")]
-        public System.DateTimeOffset DateCreated { get; set; }
+        public System.DateTime DateCreated { get; set; }
 
     }
 

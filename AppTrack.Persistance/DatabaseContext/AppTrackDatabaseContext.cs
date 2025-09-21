@@ -1,7 +1,6 @@
 ﻿using AppTrack.Domain;
 using AppTrack.Domain.Common;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client;
 
 namespace AppTrack.Persistance.DatabaseContext;
 
@@ -24,11 +23,11 @@ public class AppTrackDatabaseContext : DbContext
     {
         foreach(var entry in base.ChangeTracker.Entries<BaseEntity>().Where((entry => entry.State == EntityState.Added || entry.State == EntityState.Modified )))
         {
-            entry.Entity.DateModified = DateTime.Now;
+            entry.Entity.ModifiedDate = DateTime.Now;
 
             if (entry.State == EntityState.Added)
             {
-                entry.Entity.DateCreated = DateTime.Now;
+                entry.Entity.CreationDate = DateTime.Now;
             }
         }
         return base.SaveChangesAsync(cancellationToken);

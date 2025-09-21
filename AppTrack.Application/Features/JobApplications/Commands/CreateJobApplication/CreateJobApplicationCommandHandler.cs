@@ -1,10 +1,11 @@
 ﻿using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Exceptions;
+using AppTrack.Domain;
 using AutoMapper;
 using MediatR;
 
 namespace AppTrack.Application.Features.JobApplications.Commands.CreateJobApplication;
-public class CreateJobApplicationCommandHandler : IRequestHandler<CreateJobApplicationCommand, int>
+public class CreateJobApplicationCommandHandler : IRequestHandler<CreateJobApplicationCommand, JobApplication>
 {
     private readonly IMapper _mapper;
     private readonly IJobApplicationRepository _jobApplicationRepository;
@@ -15,7 +16,7 @@ public class CreateJobApplicationCommandHandler : IRequestHandler<CreateJobAppli
         _jobApplicationRepository = jobApplicationRepository;
     }
 
-    public async Task<int> Handle(CreateJobApplicationCommand request, CancellationToken cancellationToken)
+    public async Task<JobApplication> Handle(CreateJobApplicationCommand request, CancellationToken cancellationToken)
     {
         var validator = new CreateJobApplicationCommandValidator(_jobApplicationRepository);
         var validationResult = await validator.ValidateAsync(request);
@@ -29,7 +30,7 @@ public class CreateJobApplicationCommandHandler : IRequestHandler<CreateJobAppli
 
         await _jobApplicationRepository.CreateAsync(jobApplicationToCreate);
 
-        return jobApplicationToCreate.Id;
+        return jobApplicationToCreate;
     }
 }
 

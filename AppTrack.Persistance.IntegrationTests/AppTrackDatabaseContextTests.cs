@@ -24,7 +24,7 @@ namespace AppTrack.Persistance.IntegrationTests
             var jobApplication = new JobApplication()
             {
                 Id = 1,
-                Client = "TestClient1",
+                ClientName = "TestClient1",
             };
 
             //Act
@@ -32,7 +32,7 @@ namespace AppTrack.Persistance.IntegrationTests
             await _appTrackDatabaseContext.SaveChangesAsync();
 
             //Assert
-            jobApplication.DateCreated.ShouldNotBeNull();
+            jobApplication.CreationDate.ShouldNotBeNull();
         }
 
         [Fact]
@@ -42,7 +42,7 @@ namespace AppTrack.Persistance.IntegrationTests
             var jobApplication = new JobApplication()
             {
                 Id = 1,
-                Client = "TestClient1",
+                ClientName = "TestClient1",
             };
 
             //Act
@@ -50,7 +50,7 @@ namespace AppTrack.Persistance.IntegrationTests
             await _appTrackDatabaseContext.SaveChangesAsync();
 
             //Assert
-            jobApplication.DateModified.ShouldNotBeNull();
+            jobApplication.ModifiedDate.ShouldNotBeNull();
         }
     }
 }

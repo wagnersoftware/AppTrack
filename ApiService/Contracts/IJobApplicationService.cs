@@ -7,7 +7,7 @@ public interface IJobApplicationService
 {
     Task<List<JobApplicationModel>> GetJobApplicationsAsync();
     Task<JobApplicationModel> GetJobApplicationById(int id);
-    Task<Response<Guid>> CreateJobApplication(JobApplicationModel jobApplication);
-    Task<Response<Guid>> UpdateJobApplication(int id, JobApplicationModel jobApplication);
-    Task<Response<Guid>> DeleteJobApplication(int id);
+    Task<Response<JobApplicationModel>> CreateJobApplication(JobApplicationModel jobApplicationModel);
+    Task<Response<JobApplicationModel>> UpdateJobApplication(int id, JobApplicationModel jobApplication);
+    Task<Response<JobApplicationModel>> DeleteJobApplication(int id);
 }

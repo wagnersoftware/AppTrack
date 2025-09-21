@@ -38,7 +38,7 @@ else
             {
                 <tr>
                     <td>@jobApplication.Id</td>
-                    <td>@jobApplication.Client</td>
+                    <td>@jobApplication.ClientName</td>
                     <td>@jobApplication.Position</td>
                     <td>
                         <button @onclick="@(() => AllocateJobApplication(jobApplication.Id))" class="btn btn-dark">Allocate</button>

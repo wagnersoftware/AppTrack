@@ -3,22 +3,44 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:AppTrack.Wpf"
+        xmlns:local="clr-namespace:AppTrack.Wpf" xmlns:viewmodel="clr-namespace:AppTrack.WpfUi.ViewModel"
+        xmlns:models="clr-namespace:AppTrack.Frontend.Models;assembly=AppTrack.Frontend.Models"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="800" Width="1500"
+        Loaded="Page_Loaded">
+    
     <StackPanel Margin="10">
         <Label Content="AppTrack" FontSize="20"></Label>
-        <DataGrid>
+        <Button Content="Create Job Application"
+                HorizontalAlignment="Right"
+                Margin="10"
+                Command="{Binding CreateJobApplicationCommand}">
+        </Button>
+        <DataGrid ItemsSource="{Binding JobApplications}"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  d:DataContext="{d:DesignInstance Type=models:JobApplicationModel, IsDesignTimeCreatable=True}">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="ID"></DataGridTextColumn>
-                <DataGridTextColumn Header="Client Name"></DataGridTextColumn>
-                <DataGridTextColumn Header="Position"></DataGridTextColumn>
-                <DataGridTextColumn Header="URL"></DataGridTextColumn>
-                <DataGridTextColumn Header="Status"></DataGridTextColumn>
-                <DataGridTextColumn Header="Application Text"></DataGridTextColumn>
-                <DataGridTextColumn Header="Created"></DataGridTextColumn>
-                <DataGridTextColumn Header="Modified"></DataGridTextColumn>
-                <DataGridTextColumn Header="Functions"></DataGridTextColumn>
+                <DataGridTextColumn Header="Id" Binding="{Binding Id}"></DataGridTextColumn>
+                <DataGridTextColumn Header="Client Name" Binding="{Binding ClientName}"></DataGridTextColumn>
+                <DataGridTextColumn Header="Position" Binding="{Binding Position}"></DataGridTextColumn>
+                <DataGridTextColumn Header="URL" Binding="{Binding URL}"></DataGridTextColumn>
+                <DataGridTextColumn Header="Status" Binding="{Binding Status}"></DataGridTextColumn>
+                <DataGridTextColumn Header="Application Text" Binding="{Binding ApplicationText}"></DataGridTextColumn>
+                <DataGridTextColumn Header="Created" Binding="{Binding CreationDate}"></DataGridTextColumn>
+                <DataGridTextColumn Header="Modified" Binding="{Binding ModifiedDate}"></DataGridTextColumn>
+                <DataGridTemplateColumn Header="Functions" Width="*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                <Button Content="Update" Margin="5,0,0,0"
+                                    Command="{Binding UpdateJobApplication, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+                                <Button Content="Delete" Margin="5,0,0,0"
+                                    Command="{Binding DeleteJobApplication, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
     </StackPanel>

@@ -14,33 +14,33 @@ public class JobApplicationService : BaseHttpService, IJobApplicationService
         this._mapper = mapper;
     }
 
-    public async Task<Response<Guid>> CreateJobApplication(JobApplicationModel jobApplicationModel)
+    public async Task<Response<JobApplicationModel>> CreateJobApplication(JobApplicationModel jobApplicationModel)
     {
         try
         {
             await AddBearerTokenAsync();
             var createJobApplicationCommand = _mapper.Map<CreateJobApplicationCommand>(jobApplicationModel);
-            await _client.JobApplicationsPOSTAsync(createJobApplicationCommand);
-            return new Response<Guid>() { Success = true };
+            var jobApplicationDto = await _client.JobApplicationsPOSTAsync(createJobApplicationCommand);
+            return new Response<JobApplicationModel>() { Success = true, Data = _mapper.Map<JobApplicationModel>(jobApplicationDto)};
         }
         catch (ApiException e)
         {
-            return ConvertApiException(e);
+            return ConvertApiException<JobApplicationModel>(e);
         }
 
     }
 
-    public async Task<Response<Guid>> DeleteJobApplication(int id)
+    public async Task<Response<JobApplicationModel>> DeleteJobApplication(int id)
     {
         try
         {
             await AddBearerTokenAsync();
             await _client.JobApplicationsDELETEAsync(id);
-            return new Response<Guid>() { Success = true };
+            return new Response<JobApplicationModel>() { Success = true };
         }
         catch (ApiException e)
         {
-            return ConvertApiException(e);
+            return ConvertApiException<JobApplicationModel>(e);
         }
     }
 
@@ -58,18 +58,18 @@ public class JobApplicationService : BaseHttpService, IJobApplicationService
         return _mapper.Map<List<JobApplicationModel>>(jobApplicationDtos);
     }
 
-    public async Task<Response<Guid>> UpdateJobApplication(int id, JobApplicationModel jobApplicationModel)
+    public async Task<Response<JobApplicationModel>> UpdateJobApplication(int id, JobApplicationModel jobApplicationModel)
     {
         try
         {
             var updateJobApplicationCommand = _mapper.Map<UpdateJobApplicationCommand>(jobApplicationModel);
             await AddBearerTokenAsync();
             await _client.JobApplicationsPUTAsync(id.ToString(), updateJobApplicationCommand);
-            return new Response<Guid>() { Success = true };
+            return new Response<JobApplicationModel>() { Success = true };
         }
         catch (ApiException e)
         {
-            return ConvertApiException(e);
+            return ConvertApiException<JobApplicationModel>(e);
         }
     }
 }
