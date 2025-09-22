@@ -4,6 +4,7 @@ using AppTrack.WpfUi.WindowService;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
+using System.Windows;
 
 namespace AppTrack.WpfUi.ViewModel
 {
@@ -33,11 +34,46 @@ namespace AppTrack.WpfUi.ViewModel
             var createJobApplicationViewModel = new CreateJobApplicationViewModel();
             var windowResult = _windowService.ShowWindow(createJobApplicationViewModel);
 
-            if(windowResult == true)
+            if(windowResult == false)
             {
-                var apiResponse = await _jobApplicationService.CreateJobApplication(createJobApplicationViewModel.JobApplication);
-                JobApplications.Add(apiResponse.Data);
+                return;
             }
+
+            var apiResponse = await _jobApplicationService.CreateJobApplication(createJobApplicationViewModel.JobApplication);
+
+            if(apiResponse.Success == false)
+            {
+                MessageBox.Show(apiResponse.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error); //MessageBoxService
+            }
+
+            JobApplications.Add(apiResponse.Data);
+            
+        }
+
+        [RelayCommand]
+        private async Task DeleteJobApplication(int id)
+        {
+            var dialogResult = MessageBox.Show($"Do you really want to delete application with id: {id}", "Delete application", MessageBoxButton.OKCancel, MessageBoxImage.Question); //MessageBoxService
+
+            if (dialogResult == MessageBoxResult.No || dialogResult == MessageBoxResult.Cancel)
+            {
+                return;
+            }
+
+            var apiResponse = await _jobApplicationService.DeleteJobApplication(id);
+
+            if (apiResponse.Success == false)
+            {
+                MessageBox.Show(apiResponse.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error); //MessageBoxService
+            }
+
+            var jobApplicationToRemove = JobApplications.SingleOrDefault(x => x.Id == id);
+
+            if (jobApplicationToRemove != null)
+            {
+                JobApplications.Remove(jobApplicationToRemove);
+            }
+
         }
     }
 }

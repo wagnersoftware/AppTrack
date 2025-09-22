@@ -36,7 +36,8 @@
                                 <Button Content="Update" Margin="5,0,0,0"
                                     Command="{Binding UpdateJobApplication, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
                                 <Button Content="Delete" Margin="5,0,0,0"
-                                    Command="{Binding DeleteJobApplication, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+                                        Command="{Binding DataContext.DeleteJobApplicationCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                        CommandParameter="{Binding Id}" />
                             </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
