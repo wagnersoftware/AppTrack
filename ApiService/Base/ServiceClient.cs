@@ -916,8 +916,8 @@ namespace AppTrack.Frontend.ApiService.Base
         [System.Text.Json.Serialization.JsonPropertyName("modifiedDate")]
         public System.DateTime ModifiedDate { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("clientName")]
-        public string ClientName { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("name")]
+        public string Name { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("position")]
         public string Position { get; set; }
@@ -943,8 +943,8 @@ namespace AppTrack.Frontend.ApiService.Base
         [System.Text.Json.Serialization.JsonPropertyName("id")]
         public int Id { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("clientName")]
-        public string ClientName { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("name")]
+        public string Name { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("position")]
         public string Position { get; set; }
@@ -1055,32 +1055,26 @@ namespace AppTrack.Frontend.ApiService.Base
         [System.Text.Json.Serialization.JsonPropertyName("id")]
         public int Id { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("client")]
-        public string Client { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("modifiedDate")]
+        public System.DateTime ModifiedDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("name")]
+        public string Name { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("position")]
         public string Position { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("url")]
+        public string Url { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("applicationText")]
+        public string ApplicationText { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("status")]
         public JobApplicationStatus Status { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("appliedDate")]
-        public System.DateTime? AppliedDate { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("followUpDate")]
-        public System.DateTime? FollowUpDate { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("notes")]
-        public string Notes { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("title")]
-        public string Title { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("applicationText")]
-        public string ApplicationText { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("dateCreated")]
-        public System.DateTime DateCreated { get; set; }
+        public System.DateTime AppliedDate { get; set; }
 
     }
 

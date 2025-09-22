@@ -12,14 +12,14 @@ public class JobApplicationConfiguration : IEntityTypeConfiguration<JobApplicati
             new JobApplication()
             {
                 Id = 1,
-                ClientName = "TestClient1",
+                Name = "TestClient1",
                 Position = "Developer1",
                 ApplicationText = "ApplicationText1",
                 Status = Domain.Enums.JobApplicationStatus.Rejected,
                 URL = "www.testURL.de"
             });
 
-        builder.Property(x => x.ClientName)
+        builder.Property(x => x.Name)
             .IsRequired()
             .HasMaxLength(50);
     }

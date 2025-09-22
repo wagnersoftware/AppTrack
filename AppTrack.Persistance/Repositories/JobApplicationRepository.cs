@@ -12,6 +12,6 @@ public class JobApplicationRepository : GenericRepository<JobApplication>, IJobA
     }
     public async Task<bool> IsClientUnique(string clientName)
     {
-        return !await _context.JobApplications.Where(x => x.ClientName == clientName).AnyAsync();
+        return !await _context.JobApplications.Where(x => x.Name == clientName).AnyAsync();
     }
 }

@@ -24,7 +24,7 @@ namespace AppTrack.Persistance.IntegrationTests
             var jobApplication = new JobApplication()
             {
                 Id = 1,
-                ClientName = "TestClient1",
+                Name = "TestClient1",
             };
 
             //Act
@@ -42,7 +42,7 @@ namespace AppTrack.Persistance.IntegrationTests
             var jobApplication = new JobApplication()
             {
                 Id = 1,
-                ClientName = "TestClient1",
+                Name = "TestClient1",
             };
 
             //Act

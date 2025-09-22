@@ -15,6 +15,7 @@ public class WindowService : IWindowService
         Window window = viewModel switch
         {
             CreateJobApplicationViewModel vm => new CreateJobApplicationView(vm),
+            EditJobApplicationViewModel vm => new EditJobApplicationView(vm),
             _ => throw new NotImplementedException()
         };
 

@@ -11,7 +11,7 @@ public class CreateJobApplicationCommandValidator: AbstractValidator<CreateJobAp
     {
         _jobApplicationRepository = jobApplicationRepository;
 
-        RuleFor(x => x.ClientName)
+        RuleFor(x => x.Name)
             .NotEmpty().WithMessage("{PropertyName} is required")
             .NotNull()
             .MaximumLength(50).WithMessage("{PropertyName} must be fewer than 50 characters");
@@ -24,6 +24,6 @@ public class CreateJobApplicationCommandValidator: AbstractValidator<CreateJobAp
 
     private async Task<bool> ClientUnique(CreateJobApplicationCommand command, CancellationToken token)
     {
-        return await _jobApplicationRepository.IsClientUnique(command.ClientName);
+        return await _jobApplicationRepository.IsClientUnique(command.Name);
     }
 }

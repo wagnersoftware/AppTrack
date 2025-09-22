@@ -1,9 +1,13 @@
-﻿<Window x:Class="AppTrack.WpfUi.View.CreateJobApplicationView"
+﻿<Window x:Class="AppTrack.WpfUi.View.EditJobApplicationView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AppTrack.WpfUi.View" 
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:converter="clr-namespace:AppTrack.WpfUi.Converter"
-        Title="Create Job Application" Height="300" Width="400">
+        mc:Ignorable="d"
+        Title="EditJobApplicationView" Height="300" Width="400">
     <Window.Resources>
         <converter:ErrorsDictionaryConverter x:Key="ErrorsDictConverter"/>
     </Window.Resources>
@@ -14,13 +18,14 @@
                 <RowDefinition></RowDefinition>
                 <RowDefinition></RowDefinition>
                 <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"></ColumnDefinition>
                 <ColumnDefinition></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <!--Name-->
-            <Label HorizontalAlignment="Right" Grid.Row="0" Grid.Column="0">Name:</Label>
+            <Label HorizontalAlignment="Right" Grid.Row="0" Grid.Column="0">Client name:</Label>
             <StackPanel Grid.Row="0" Grid.Column="1">
                 <TextBox Text="{Binding JobApplication.Name}">
                     <i:Interaction.Triggers>
@@ -91,6 +96,9 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </StackPanel>
+            <!--Status-->
+            <Label HorizontalAlignment="Right" Grid.Row="4" Grid.Column="0">Status:</Label>
+            <ComboBox Grid.Row="4" Grid.Column="1"  ItemsSource="{Binding  JobApplication.JobApplicationStatusValues}" SelectedItem="{Binding JobApplication.Status, Mode=TwoWay}" />
         </Grid>
         <StackPanel Margin="10" Orientation="Horizontal" HorizontalAlignment="Center">
             <Button Content="Save" Command="{Binding SaveCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" HorizontalAlignment="Center" Margin="5"/>

@@ -1,5 +1,6 @@
 ﻿using AppTrack.Frontend.ApiService;
 using AppTrack.Frontend.ApiService.Contracts;
+using AppTrack.Frontend.Models.ModelValidator;
 using AppTrack.WpfUi.TokenStorage;
 using AppTrack.WpfUi.View;
 using AppTrack.WpfUi.ViewModel;
@@ -19,14 +20,15 @@ namespace AppTrack.Wpf
             services.AddSingleton<ITokenStorage, WpfTokenStorage>();
             services.AddApiServiceServices();
             services.AddSingleton<IWindowService, WindowService>();
+            services.AddTransient(typeof(IModelValidator<>), typeof(ModelValidator<>));
 
             // viewmodels
             services.AddSingleton<MainViewModel>();
-            //services.AddTransient<CreateJobApplicationViewModel>();
+            services.AddTransient<CreateJobApplicationViewModel>();
+            services.AddTransient<EditJobApplicationViewModel>();
 
             //views
             services.AddTransient<MainWindow>();
-            //services.AddTransient<CreateJobApplicationView>();
 
             ServiceProvider = services.BuildServiceProvider();
         }
