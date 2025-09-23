@@ -22,7 +22,7 @@
             <!--Name-->
             <Label HorizontalAlignment="Right" Grid.Row="0" Grid.Column="0">Name:</Label>
             <StackPanel Grid.Row="0" Grid.Column="1">
-                <TextBox Text="{Binding JobApplication.Name}">
+                <TextBox Text="{Binding Model.Name}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="TextChanged">
                             <i:InvokeCommandAction Command="{Binding ResetErrorsCommand}" CommandParameter="Name" />
@@ -40,7 +40,7 @@
             <!--Position-->
             <Label HorizontalAlignment="Right" Grid.Row="1" Grid.Column="0">Position:</Label>
             <StackPanel Grid.Row="1" Grid.Column="1">
-                <TextBox Text="{Binding JobApplication.Position}">
+                <TextBox Text="{Binding Model.Position}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="TextChanged">
                             <i:InvokeCommandAction Command="{Binding ResetErrorsCommand}" CommandParameter="Position" />
@@ -58,7 +58,7 @@
             <!--URL-->
             <Label HorizontalAlignment="Right" Grid.Row="2" Grid.Column="0">Url:</Label>
             <StackPanel Grid.Row="2" Grid.Column="1">
-                <TextBox Text="{Binding JobApplication.URL}">
+                <TextBox Text="{Binding Model.URL}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="TextChanged">
                             <i:InvokeCommandAction Command="{Binding ResetErrorsCommand}" CommandParameter="URL" />
@@ -76,7 +76,7 @@
             <!--ApplicationText-->
             <Label HorizontalAlignment="Right" Grid.Row="3" Grid.Column="0">Application Text:</Label>
             <StackPanel Grid.Row="3" Grid.Column="1">
-                <TextBox Text="{Binding JobApplication.ApplicationText}">
+                <TextBox Text="{Binding Model.ApplicationText}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="TextChanged">
                             <i:InvokeCommandAction Command="{Binding ResetErrorsCommand}" CommandParameter="ApplicationText" />

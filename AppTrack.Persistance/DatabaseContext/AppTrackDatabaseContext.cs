@@ -13,6 +13,8 @@ public class AppTrackDatabaseContext : DbContext
 
     public DbSet<JobApplication> JobApplications { get; set; }
 
+    public DbSet<JobApplicationDefaults> JobApplicationDefaults { get; set; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.ApplyConfigurationsFromAssembly(typeof(AppTrackDatabaseContext).Assembly);

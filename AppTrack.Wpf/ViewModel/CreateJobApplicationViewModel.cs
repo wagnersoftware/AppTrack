@@ -1,48 +1,14 @@
 ﻿using AppTrack.Frontend.Models;
 using AppTrack.Frontend.Models.ModelValidator;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using System.Windows;
+using AppTrack.WpfUi.ViewModel.Base;
 
 namespace AppTrack.WpfUi.ViewModel;
 
-public partial class CreateJobApplicationViewModel : ObservableObject
+public class CreateJobApplicationViewModel : AppTrackFormViewModelBase<JobApplicationModel>
 {
-    public JobApplicationModel JobApplication { get; set; } = new();
-
-    private readonly IModelValidator<JobApplicationModel> _modelValidator;
-
-    public IReadOnlyDictionary<string, List<string>> Errors => _modelValidator.Errors;
-
     public CreateJobApplicationViewModel(IModelValidator<JobApplicationModel> modelValidator)
+        : base(modelValidator, new JobApplicationModel())
     {
-        this._modelValidator = modelValidator;
-    }
 
-    [RelayCommand]
-    private void Save(Window window)
-    {
-        if(_modelValidator.Validate(JobApplication) == false)
-        {
-            OnPropertyChanged(nameof(Errors));
-            return;
-        }
-
-        window.DialogResult = true;
-        window.Close();
-    }
-
-    [RelayCommand]
-    private void Cancel(Window window)
-    {
-        window.DialogResult = false;
-        window.Close();
-    }
-
-    [RelayCommand]
-    private void ResetErrors(string propertyName)
-    {
-        _modelValidator.ResetErrors(propertyName);
-        OnPropertyChanged(nameof(Errors));
     }
 }

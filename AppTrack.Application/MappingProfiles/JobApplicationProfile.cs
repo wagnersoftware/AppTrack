@@ -1,6 +1,7 @@
-﻿using AppTrack.Application.Features.JobApplications.Commands.CreateJobApplication;
+﻿using AppTrack.Application.Features.JobApplicationDefaults.Dto;
+using AppTrack.Application.Features.JobApplications.Commands.CreateJobApplication;
 using AppTrack.Application.Features.JobApplications.Commands.UpdateJobApplication;
-using AppTrack.Application.Features.JobApplications.Queries.GetAllJobApplications;
+using AppTrack.Application.Features.JobApplications.Dto;
 using AppTrack.Domain;
 using AutoMapper;
 
@@ -12,6 +13,8 @@ public class JobApplicationProfile: Profile
         CreateMap<JobApplicationDto, JobApplication>().ReverseMap();
         CreateMap<CreateJobApplicationCommand, JobApplication>();
         CreateMap<UpdateJobApplicationCommand, JobApplication>();
+
+        CreateMap<JobApplicationDefaultsDto, JobApplicationDefaults>().ReverseMap();
     }
 }
 

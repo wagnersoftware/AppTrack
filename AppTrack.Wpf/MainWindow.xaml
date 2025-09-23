@@ -8,8 +8,24 @@
         mc:Ignorable="d"
         Title="App Track" Height="800" Width="1500"
         Loaded="Page_Loaded">
-
     <StackPanel Margin="10">
+        <!--Menu-->
+        <DockPanel>
+            <Menu DockPanel.Dock="Top">
+                <MenuItem Header="File">
+                    <MenuItem Header="E_xit" Command="{Binding ExitCommand}" />
+                </MenuItem>
+                <MenuItem Header="Settings">
+                    <MenuItem Header="Defaults">
+                        <MenuItem Header="Set Defaults" Command="{Binding SetDefaultsCommand}"/>
+                    </MenuItem>
+                    <MenuItem Header="AI">
+                        <MenuItem Header="AI Settings" Command="{Binding AiSettingsCommand}"/>
+                    </MenuItem>
+                </MenuItem>
+            </Menu>
+        </DockPanel>
+        <!--MainContent-->
         <Button Content="Create Job Application"
                 HorizontalAlignment="Right"
                 Margin="10"

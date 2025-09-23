@@ -1,8 +1,7 @@
 ﻿using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Exceptions;
-using AppTrack.Application.Features.JobApplications.Commands.UpdateJobApplication;
-using AppTrack.Application.Features.JobApplications.Queries.GetAllJobApplications;
+using AppTrack.Application.Features.JobApplications.Dto;
 using AutoMapper;
 
 namespace AppTrack.Application.Features.JobApplications.Queries.GetJobApplicationById;

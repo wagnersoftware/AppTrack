@@ -1,6 +1,7 @@
 ﻿using AppTrack.Application.Contracts.Logging;
 using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Contracts.Persistance;
+using AppTrack.Application.Features.JobApplications.Dto;
 using AutoMapper;
 
 namespace AppTrack.Application.Features.JobApplications.Queries.GetAllJobApplications;

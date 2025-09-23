@@ -26,6 +26,7 @@ namespace AppTrack.Wpf
             services.AddSingleton<MainViewModel>();
             services.AddTransient<CreateJobApplicationViewModel>();
             services.AddTransient<EditJobApplicationViewModel>();
+            services.AddTransient<SetJobApplicationDefaultsViewModel>();
 
             //views
             services.AddTransient<MainWindow>();

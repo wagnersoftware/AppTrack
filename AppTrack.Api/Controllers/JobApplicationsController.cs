@@ -2,6 +2,7 @@
 using AppTrack.Application.Features.JobApplications.Commands.CreateJobApplication;
 using AppTrack.Application.Features.JobApplications.Commands.DeleteJobApplication;
 using AppTrack.Application.Features.JobApplications.Commands.UpdateJobApplication;
+using AppTrack.Application.Features.JobApplications.Dto;
 using AppTrack.Application.Features.JobApplications.Queries.GetAllJobApplications;
 using AppTrack.Application.Features.JobApplications.Queries.GetJobApplicationById;
 using Microsoft.AspNetCore.Mvc;

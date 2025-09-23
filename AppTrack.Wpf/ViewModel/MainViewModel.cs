@@ -42,7 +42,7 @@ namespace AppTrack.WpfUi.ViewModel
                 return;
             }
 
-            var apiResponse = await _jobApplicationService.CreateJobApplication(createJobApplicationViewModel.JobApplication);
+            var apiResponse = await _jobApplicationService.CreateJobApplication(createJobApplicationViewModel.Model);
 
             if(apiResponse.Success == false)
             {
@@ -97,6 +97,27 @@ namespace AppTrack.WpfUi.ViewModel
                 MessageBox.Show(apiResponse.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error); //MessageBoxService
             }
 
+        }
+
+        [RelayCommand]
+        private void SetDefaults()
+        {
+            // todo: load defaults
+            var dummy = new JobApplicationDefaultsModel() { Name = "DummyName", Position = "DummyPosition"};
+
+            var jobApplicatiobDefaultsViewModel = ActivatorUtilities.CreateInstance<SetJobApplicationDefaultsViewModel>(_serviceProvider, dummy);
+            var windowResult = _windowService.ShowWindow(jobApplicatiobDefaultsViewModel);
+
+            if (windowResult == false)
+            {
+                return;
+            }
+        }
+
+        [RelayCommand]
+        private void Exit()
+        {
+            Application.Current.Shutdown();
         }
     }
 }

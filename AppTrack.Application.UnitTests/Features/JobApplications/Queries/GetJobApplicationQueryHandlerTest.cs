@@ -1,5 +1,6 @@
 ﻿using AppTrack.Application.Contracts.Logging;
 using AppTrack.Application.Contracts.Persistance;
+using AppTrack.Application.Features.JobApplications.Dto;
 using AppTrack.Application.Features.JobApplications.Queries.GetAllJobApplications;
 using AppTrack.Application.MappingProfiles;
 using AppTrack.Application.UnitTests.Mocks;
