@@ -1,5 +1,6 @@
 ﻿using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Contracts.Persistance;
+using AppTrack.Application.Exceptions;
 using AppTrack.Application.Shared;
 using AutoMapper;
 
@@ -18,6 +19,14 @@ public class UpdateJobApplicationCommandHandler : IRequestHandler<UpdateJobAppli
 
     public async Task<Unit> Handle(UpdateJobApplicationCommand request, CancellationToken cancellationToken)
     {
+        var validator = new UpdateJobApplicationCommandValidator(_jobApplicationRepository);
+        var validationResult = await validator.ValidateAsync(request);
+
+        if (validationResult.Errors.Any())
+        {
+            throw new BadRequestException($"Invalid JobApplication", validationResult);
+        }
+
         var jobApplicationToUpdate = _mapper.Map<Domain.JobApplication>(request);
 
         await _jobApplicationRepository.UpdateAsync(jobApplicationToUpdate);

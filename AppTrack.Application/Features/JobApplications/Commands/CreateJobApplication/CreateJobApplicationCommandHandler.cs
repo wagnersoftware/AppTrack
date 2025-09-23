@@ -18,7 +18,7 @@ public class CreateJobApplicationCommandHandler : IRequestHandler<CreateJobAppli
 
     public async Task<JobApplication> Handle(CreateJobApplicationCommand request, CancellationToken cancellationToken)
     {
-        var validator = new CreateJobApplicationCommandValidator(_jobApplicationRepository);
+        var validator = new CreateJobApplicationCommandValidator();
         var validationResult = await validator.ValidateAsync(request);
 
         if(validationResult.Errors.Any())

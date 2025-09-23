@@ -5,7 +5,6 @@ using AppTrack.Domain.Enums;
 namespace AppTrack.Application.Features.JobApplications.Commands.CreateJobApplication;
 public class CreateJobApplicationCommand: IRequest<JobApplication>
 {
-    public int Id { get; set; }
     public DateTime CreationDate { get; set; }
     public DateTime ModifiedDate { get; set; }
     public string Name { get; set; } = string.Empty;

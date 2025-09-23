@@ -5,25 +5,24 @@ namespace AppTrack.Application.Features.JobApplications.Commands.CreateJobApplic
 
 public class CreateJobApplicationCommandValidator: AbstractValidator<CreateJobApplicationCommand>
 {
-    private readonly IJobApplicationRepository _jobApplicationRepository;
-
-    public CreateJobApplicationCommandValidator(IJobApplicationRepository jobApplicationRepository)
+    public CreateJobApplicationCommandValidator()
     {
-        _jobApplicationRepository = jobApplicationRepository;
-
         RuleFor(x => x.Name)
             .NotEmpty().WithMessage("{PropertyName} is required")
-            .NotNull()
+            .NotNull().WithMessage("{PropertyName} is required")
             .MaximumLength(50).WithMessage("{PropertyName} must be fewer than 50 characters");
 
-        RuleFor(x => x)
-            .MustAsync(ClientUnique)
-            .WithMessage("Client name already exists");
+        RuleFor(x => x.Position)
+            .NotEmpty().WithMessage("{PropertyName} is required")
+            .NotNull().WithMessage("{PropertyName} is required")
+            .MaximumLength(30).WithMessage("{PropertyName} must be fewer than 30 characters");
 
-    }
+        RuleFor(x => x.URL)
+            .NotEmpty().WithMessage("{PropertyName} is required")
+            .NotNull().WithMessage("{PropertyName} is required")
+            .MaximumLength(500).WithMessage("{PropertyName} must be fewer than 500 characters");
 
-    private async Task<bool> ClientUnique(CreateJobApplicationCommand command, CancellationToken token)
-    {
-        return await _jobApplicationRepository.IsClientUnique(command.Name);
+        RuleFor(x => x.Status)
+            .NotNull().WithMessage("{PropertyName} is required");
     }
 }

@@ -19,6 +19,14 @@ public class DeleteJobApplicationCommandHandler: IRequestHandler<DeleteJobApplic
 
     public async Task<Unit> Handle(DeleteJobApplicationCommand request, CancellationToken cancellationToken)
     {
+        var validator = new DeleteJobApplicationCommandValidator(_jobApplicationRepository);
+        var validationResult = await validator.ValidateAsync(request);
+
+        if (validationResult.Errors.Any())
+        {
+            throw new BadRequestException($"Invalid delete request", validationResult);
+        }
+
         var jobApplicationToDelete = await _jobApplicationRepository.GetByIdAsync(request.Id);
 
         if (jobApplicationToDelete == null)
