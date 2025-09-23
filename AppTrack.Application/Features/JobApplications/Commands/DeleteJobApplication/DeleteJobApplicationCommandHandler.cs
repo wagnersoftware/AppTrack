@@ -1,7 +1,8 @@
 ﻿using AppTrack.Application.Contracts.Logging;
+using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Exceptions;
-using MediatR;
+using AppTrack.Application.Shared;
 
 namespace AppTrack.Application.Features.JobApplications.Commands.DeleteJobApplication;
 

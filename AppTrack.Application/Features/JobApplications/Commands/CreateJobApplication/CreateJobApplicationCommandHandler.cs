@@ -1,8 +1,8 @@
-﻿using AppTrack.Application.Contracts.Persistance;
+﻿using AppTrack.Application.Contracts.Mediator;
+using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Exceptions;
 using AppTrack.Domain;
 using AutoMapper;
-using MediatR;
 
 namespace AppTrack.Application.Features.JobApplications.Commands.CreateJobApplication;
 public class CreateJobApplicationCommandHandler : IRequestHandler<CreateJobApplicationCommand, JobApplication>

@@ -1,5 +1,5 @@
-﻿using AppTrack.Application.Features.JobApplications.Queries.GetAllJobApplications;
-using MediatR;
+﻿using AppTrack.Application.Contracts.Mediator;
+using AppTrack.Application.Features.JobApplications.Queries.GetAllJobApplications;
 
 namespace AppTrack.Application.Features.JobApplications.Queries.GetJobApplicationById;
 

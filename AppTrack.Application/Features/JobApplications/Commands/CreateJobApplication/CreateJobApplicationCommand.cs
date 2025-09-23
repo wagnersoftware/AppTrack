@@ -1,6 +1,6 @@
-﻿using AppTrack.Domain;
+﻿using AppTrack.Application.Contracts.Mediator;
+using AppTrack.Domain;
 using AppTrack.Domain.Enums;
-using MediatR;
 
 namespace AppTrack.Application.Features.JobApplications.Commands.CreateJobApplication;
 public class CreateJobApplicationCommand: IRequest<JobApplication>

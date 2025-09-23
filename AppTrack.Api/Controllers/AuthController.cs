@@ -1,6 +1,5 @@
 ﻿using AppTrack.Application.Contracts.Identity;
 using AppTrack.Application.Models.Identity;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AppTrack.Api.Controllers

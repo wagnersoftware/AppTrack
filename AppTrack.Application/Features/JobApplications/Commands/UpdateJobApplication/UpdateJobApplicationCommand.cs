@@ -1,5 +1,6 @@
-﻿using AppTrack.Domain.Enums;
-using MediatR;
+﻿using AppTrack.Application.Contracts.Mediator;
+using AppTrack.Application.Shared;
+using AppTrack.Domain.Enums;
 
 namespace AppTrack.Application.Features.JobApplications.Commands.UpdateJobApplication;
 

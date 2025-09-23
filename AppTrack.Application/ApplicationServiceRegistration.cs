@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using AppTrack.Application.Contracts.Mediator;
+using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
 namespace AppTrack.Application
@@ -12,10 +13,12 @@ namespace AppTrack.Application
                 cfg.AddMaps(Assembly.GetExecutingAssembly());
             });
 
-            services.AddMediatR(cfg =>
-            {
-                cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
-            });
+            //register mediator handlers
+            services.Scan(scan => scan
+                .FromAssemblies(Assembly.GetExecutingAssembly())
+                .AddClasses(c => c.AssignableTo(typeof(IRequestHandler<,>)))
+                .AsImplementedInterfaces()
+                .WithTransientLifetime());
 
             return services;
         }

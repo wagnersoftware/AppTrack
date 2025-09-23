@@ -1,6 +1,7 @@
-﻿using AppTrack.Application.Contracts.Persistance;
+﻿using AppTrack.Application.Contracts.Mediator;
+using AppTrack.Application.Contracts.Persistance;
+using AppTrack.Application.Shared;
 using AutoMapper;
-using MediatR;
 
 namespace AppTrack.Application.Features.JobApplications.Commands.UpdateJobApplication;
 

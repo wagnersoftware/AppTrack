@@ -1,7 +1,7 @@
 ﻿using AppTrack.Application.Contracts.Logging;
+using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Contracts.Persistance;
 using AutoMapper;
-using MediatR;
 
 namespace AppTrack.Application.Features.JobApplications.Queries.GetAllJobApplications;
 public class GetJobApplicationsQueryHandler : IRequestHandler<GetJobApplicationsQuery, List<JobApplicationDto>>

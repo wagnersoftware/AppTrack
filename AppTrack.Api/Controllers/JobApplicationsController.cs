@@ -1,9 +1,9 @@
-﻿using AppTrack.Application.Features.JobApplications.Commands.CreateJobApplication;
+﻿using AppTrack.Application.Contracts.Mediator;
+using AppTrack.Application.Features.JobApplications.Commands.CreateJobApplication;
 using AppTrack.Application.Features.JobApplications.Commands.DeleteJobApplication;
 using AppTrack.Application.Features.JobApplications.Commands.UpdateJobApplication;
 using AppTrack.Application.Features.JobApplications.Queries.GetAllJobApplications;
 using AppTrack.Application.Features.JobApplications.Queries.GetJobApplicationById;
-using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
