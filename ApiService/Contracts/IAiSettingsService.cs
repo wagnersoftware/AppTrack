@@ -4,5 +4,7 @@ namespace AppTrack.Frontend.ApiService.Contracts;
 
 public interface IAiSettingsService
 {
-    Task<JobApplicationDefaultsModel> GetForUser(int userId);
+    Task<AiSettingsModel> GetForUserAsync(int userId);
+
+    Task UpdateAiSettingsAsync(AiSettingsModel aiSettingsModel);
 }

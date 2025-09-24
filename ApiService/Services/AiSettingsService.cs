@@ -1,17 +1,31 @@
 ﻿using AppTrack.Frontend.ApiService.Base;
 using AppTrack.Frontend.ApiService.Contracts;
 using AppTrack.Frontend.Models;
+using AutoMapper;
 
 namespace AppTrack.Frontend.ApiService.Services;
 
 public class AiSettingsService : BaseHttpService, IAiSettingsService
 {
-    public AiSettingsService(IClient client, ITokenStorage tokenStorage) : base(client, tokenStorage)
+    private readonly IMapper _mapper;
+
+    public AiSettingsService(IMapper mapper, IClient client, ITokenStorage tokenStorage) : base(client, tokenStorage)
     {
+        this._mapper = mapper;
     }
 
-    public Task<JobApplicationDefaultsModel> GetForUser(int userId)
+    public async Task<AiSettingsModel> GetForUserAsync(int userId)
     {
-        throw new NotImplementedException();
+        await AddBearerTokenAsync();
+        var aiSettingsDto = await _client.GetAiSettingsForUserAsync(userId.ToString());
+        return _mapper.Map<AiSettingsModel>(aiSettingsDto);
+    }
+
+    public async Task UpdateAiSettingsAsync(AiSettingsModel aiSettingsModel)
+    {
+        await AddBearerTokenAsync();
+        var updateAiSettingsCommand = _mapper.Map<UpdateAiSettingsCommand>(aiSettingsModel);
+        await _client.AiSettingsAsync("1", updateAiSettingsCommand); // todo
     }
 }
+

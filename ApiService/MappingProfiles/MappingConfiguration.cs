@@ -8,11 +8,17 @@ public class MappingConfiguration: Profile
 {
     public MappingConfiguration()
     {
+        //Job Application
         CreateMap<JobApplicationDto, JobApplicationModel>().ReverseMap();
         CreateMap<CreateJobApplicationCommand, JobApplicationModel>().ReverseMap();
         CreateMap<UpdateJobApplicationCommand, JobApplicationModel>().ReverseMap();
 
+        //Job Application Defaults
         CreateMap<JobApplicationDefaultsDto, JobApplicationDefaultsModel>().ReverseMap();
-        CreateMap<UpdateJobApplicationDefaultsByUserIdCommand, JobApplicationDefaultsModel>().ReverseMap();
+        CreateMap<UpdateJobApplicationDefaultsByUserIdCommand, JobApplicationDefaultsModel>();
+
+        //Ai Settings
+        CreateMap<AiSettingsDto, AiSettingsModel>().ReverseMap();
+        CreateMap<AiSettingsModel, UpdateAiSettingsCommand>();
     }
 }

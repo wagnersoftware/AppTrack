@@ -1,7 +1,7 @@
 ﻿namespace AppTrack.Application.Shared;
 
 /// <summary>
-/// Placeholder for medaitor void return type.
+/// Placeholder for mediator void return type.
 /// </summary>
 public struct Unit
 {

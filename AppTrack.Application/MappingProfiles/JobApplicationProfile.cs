@@ -14,9 +14,6 @@ public class JobApplicationProfile: Profile
         CreateMap<JobApplicationDto, JobApplication>().ReverseMap();
         CreateMap<CreateJobApplicationCommand, JobApplication>();
         CreateMap<UpdateJobApplicationCommand, JobApplication>();
-
-        CreateMap<JobApplicationDefaultsDto, JobApplicationDefaults>().ReverseMap();
-        CreateMap<UpdateJobApplicationDefaultsByUserIdCommand, JobApplicationDefaults>();
     }
 }
 

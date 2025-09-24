@@ -14,6 +14,7 @@ public static class ApiServiceRegistration
 
         services.AddScoped<IJobApplicationService, JobApplicationService>();
         services.AddScoped<IJobApplicationDefaultsService, JobApplicationDefaultsService>();
+        services.AddScoped<IAiSettingsService, AiSettingsService>();
 
         services.AddAutoMapper(cfg =>
         {

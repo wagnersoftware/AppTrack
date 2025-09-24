@@ -15,15 +15,21 @@ namespace AppTrack.WpfUi.ViewModel
         private readonly IJobApplicationDefaultsService _jobApplicationDefaultsService;
         private readonly IWindowService _windowService;
         private readonly IServiceProvider _serviceProvider;
+        private readonly IAiSettingsService _aiSettingsService;
 
         public ObservableCollection<JobApplicationModel> JobApplications { get; set; } = new();
 
-        public MainViewModel(IJobApplicationService jobApplicationService, IJobApplicationDefaultsService jobApplicationDefaultsService, IWindowService windowService, IServiceProvider serviceProvider)
+        public MainViewModel(IJobApplicationService jobApplicationService,
+                             IJobApplicationDefaultsService jobApplicationDefaultsService,
+                             IWindowService windowService,
+                             IServiceProvider serviceProvider,
+                             IAiSettingsService aiSettingsService)
         {
             this._jobApplicationService = jobApplicationService;
             this._jobApplicationDefaultsService = jobApplicationDefaultsService;
             this._windowService = windowService;
             this._serviceProvider = serviceProvider;
+            this._aiSettingsService = aiSettingsService;
         }
 
         public async Task LoadJobApplicationsAsync()
@@ -36,7 +42,7 @@ namespace AppTrack.WpfUi.ViewModel
         [RelayCommand]
         private async Task CreateJobApplication()
         {
-            var jobApplicationDefaults = await _jobApplicationDefaultsService.GetForUser(1);// todo user
+            var jobApplicationDefaults = await _jobApplicationDefaultsService.GetForUserAsync(1);// todo user
 
             var createJobApplicationViewModel = _serviceProvider.GetRequiredService<CreateJobApplicationViewModel>();
             createJobApplicationViewModel.SetDefaults(jobApplicationDefaults);
@@ -108,7 +114,7 @@ namespace AppTrack.WpfUi.ViewModel
         [RelayCommand]
         private async Task SetDefaults()
         {
-            var jobApplicationDefaults = await _jobApplicationDefaultsService.GetForUser(1);// todo user
+            var jobApplicationDefaults = await _jobApplicationDefaultsService.GetForUserAsync(1);// todo user
 
             var jobApplicatiobDefaultsViewModel = ActivatorUtilities.CreateInstance<SetJobApplicationDefaultsViewModel>(_serviceProvider, jobApplicationDefaults);
             var windowResult = _windowService.ShowWindow(jobApplicatiobDefaultsViewModel);
@@ -118,25 +124,22 @@ namespace AppTrack.WpfUi.ViewModel
                 return;
             }
 
-            await _jobApplicationDefaultsService.UpdateForUser(1, jobApplicationDefaults);
+            await _jobApplicationDefaultsService.UpdateForUserAsync(1, jobApplicationDefaults);
         }
 
         [RelayCommand]
         private async Task AiSettings()
         {
-            // get Ai Settings for user
-
-            //open window
-
-            //update settings
-            var dummy = new AiSettingsModel() { ApiKey = "1234", MySkills=".NET", Prompt="Lets do this" };
-            var setAiSettingsViewModel = ActivatorUtilities.CreateInstance<SetAiSettingsViewModel>(_serviceProvider, dummy);
+            var aiSettingsModel = await _aiSettingsService.GetForUserAsync(1); // todo user
+            var setAiSettingsViewModel = ActivatorUtilities.CreateInstance<SetAiSettingsViewModel>(_serviceProvider, aiSettingsModel);
             var windowResult = _windowService.ShowWindow(setAiSettingsViewModel);
 
             if (windowResult == false)
             {
                 return;
             }
+
+            await _aiSettingsService.UpdateAiSettingsAsync(aiSettingsModel);
         }
 
         [RelayCommand]

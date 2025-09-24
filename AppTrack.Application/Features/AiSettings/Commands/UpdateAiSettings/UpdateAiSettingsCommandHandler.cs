@@ -1,0 +1,35 @@
+﻿using AppTrack.Application.Contracts.Persistance;
+using AppTrack.Application.Exceptions;
+using AppTrack.Application.Shared;
+using AutoMapper;
+
+namespace AppTrack.Application.Features.AiSettings.Commands.UpdateAiSettings;
+
+internal class UpdateAiSettingsCommandHandler
+{
+    private readonly IMapper _mapper;
+    private readonly IAiSettingsRepository _aiSettingsRepository;
+
+    public UpdateAiSettingsCommandHandler(IMapper mapper, IAiSettingsRepository aiSettingsRepository)
+    {
+        _mapper = mapper;
+        _aiSettingsRepository = aiSettingsRepository;
+    }
+
+    public async Task<Unit> Handle(UpdateAiSettingsCommand request, CancellationToken cancellationToken)
+    {
+        var validator = new UpdateAiSettingsCommandValidator(_aiSettingsRepository);
+        var validationResult = await validator.ValidateAsync(request);
+
+        if (validationResult.Errors.Any())
+        {
+            throw new BadRequestException($"Invalid Ai settings request", validationResult);
+        }
+
+        var aiSettingsToUpdate = _mapper.Map<Domain.AiSettings>(request);
+
+        await _aiSettingsRepository.UpdateAsync(aiSettingsToUpdate);
+
+        return Unit.Value;
+    }
+}

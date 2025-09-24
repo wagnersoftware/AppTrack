@@ -1,4 +1,5 @@
 ﻿using AppTrack.Application.Contracts.Mediator;
+using AppTrack.Application.Features.AiSettings.Commands.UpdateAiSettings;
 using AppTrack.Application.Features.AiSettings.Dto;
 using AppTrack.Application.Features.AiSettings.Queries.GetAiSettingsByUserId;
 using Microsoft.AspNetCore.Mvc;
@@ -17,7 +18,7 @@ namespace AppTrack.Api.Controllers
             this._mediator = mediator;
         }
 
-        // GET api/<JobApplicationsController>/5
+        // GET api/<AiSettingsController>/5
         [HttpGet("{userId}", Name = "GetAiSettingsForUser")]
         [ProducesResponseType(typeof(AiSettingsDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -25,6 +26,18 @@ namespace AppTrack.Api.Controllers
         {
             var aiSettingsDto = await _mediator.Send(new GetAiSettingsByUserIdQuery() { UserId = userId });
             return Ok(aiSettingsDto);
+        }
+
+        // PUT api/<AiSettingsController>/5
+        [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
+        public async Task<ActionResult> Put([FromBody] UpdateAiSettingsCommand updateAiSettingsCommand)
+        {
+            await _mediator.Send(updateAiSettingsCommand);
+            return NoContent();
         }
     }
 }
