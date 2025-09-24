@@ -122,6 +122,24 @@ namespace AppTrack.WpfUi.ViewModel
         }
 
         [RelayCommand]
+        private async Task AiSettings()
+        {
+            // get Ai Settings for user
+
+            //open window
+
+            //update settings
+            var dummy = new AiSettingsModel() { ApiKey = "1234", MySkills=".NET", Prompt="Lets do this" };
+            var setAiSettingsViewModel = ActivatorUtilities.CreateInstance<SetAiSettingsViewModel>(_serviceProvider, dummy);
+            var windowResult = _windowService.ShowWindow(setAiSettingsViewModel);
+
+            if (windowResult == false)
+            {
+                return;
+            }
+        }
+
+        [RelayCommand]
         private void Exit()
         {
             Application.Current.Shutdown();

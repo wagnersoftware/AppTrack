@@ -38,6 +38,7 @@ namespace AppTrack.Application.Features.JobApplicationDefaults.Queries.GetJobApp
 
             if (jobApplicationDefaults == null)
             {
+                //todo: CreateAsync()
                 jobApplicationDefaults = await _jobApplicationDefaultsRepository.CreateForUserAsync(request.UserId);
             }
 

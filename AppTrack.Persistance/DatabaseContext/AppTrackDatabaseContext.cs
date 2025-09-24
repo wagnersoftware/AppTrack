@@ -15,6 +15,8 @@ public class AppTrackDatabaseContext : DbContext
 
     public DbSet<JobApplicationDefaults> JobApplicationDefaults { get; set; }
 
+    public DbSet<AiSettings> AiSettings { get; set; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.ApplyConfigurationsFromAssembly(typeof(AppTrackDatabaseContext).Assembly);

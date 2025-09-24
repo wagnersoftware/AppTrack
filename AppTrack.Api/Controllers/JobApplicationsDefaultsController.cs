@@ -8,11 +8,11 @@ namespace AppTrack.Api.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class JobApplicationsDefaultController : ControllerBase
+public class JobApplicationsDefaultsController : ControllerBase
 {
     private readonly IMediator _mediator;
 
-    public JobApplicationsDefaultController(IMediator mediator)
+    public JobApplicationsDefaultsController(IMediator mediator)
     {
         this._mediator = mediator;
     }

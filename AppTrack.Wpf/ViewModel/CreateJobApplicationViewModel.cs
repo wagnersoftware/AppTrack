@@ -9,7 +9,6 @@ public class CreateJobApplicationViewModel : AppTrackFormViewModelBase<JobApplic
     public CreateJobApplicationViewModel(IModelValidator<JobApplicationModel> modelValidator)
         : base(modelValidator, new JobApplicationModel())
     {
-
     }
 
     public void SetDefaults(JobApplicationDefaultsModel jobApplicationDefaults)
