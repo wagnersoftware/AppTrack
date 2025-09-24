@@ -12,14 +12,16 @@ namespace AppTrack.WpfUi.ViewModel
     public partial class MainViewModel: ObservableObject
     {
         private readonly IJobApplicationService _jobApplicationService;
+        private readonly IJobApplicationDefaultsService _jobApplicationDefaultsService;
         private readonly IWindowService _windowService;
         private readonly IServiceProvider _serviceProvider;
 
         public ObservableCollection<JobApplicationModel> JobApplications { get; set; } = new();
 
-        public MainViewModel(IJobApplicationService jobApplicationService, IWindowService windowService, IServiceProvider serviceProvider)
+        public MainViewModel(IJobApplicationService jobApplicationService, IJobApplicationDefaultsService jobApplicationDefaultsService, IWindowService windowService, IServiceProvider serviceProvider)
         {
             this._jobApplicationService = jobApplicationService;
+            this._jobApplicationDefaultsService = jobApplicationDefaultsService;
             this._windowService = windowService;
             this._serviceProvider = serviceProvider;
         }
@@ -34,7 +36,11 @@ namespace AppTrack.WpfUi.ViewModel
         [RelayCommand]
         private async Task CreateJobApplication()
         {
+            var jobApplicationDefaults = await _jobApplicationDefaultsService.GetForUser(1);// todo user
+
             var createJobApplicationViewModel = _serviceProvider.GetRequiredService<CreateJobApplicationViewModel>();
+            createJobApplicationViewModel.SetDefaults(jobApplicationDefaults);
+
             var windowResult = _windowService.ShowWindow(createJobApplicationViewModel);
 
             if(windowResult == false)
@@ -100,18 +106,19 @@ namespace AppTrack.WpfUi.ViewModel
         }
 
         [RelayCommand]
-        private void SetDefaults()
+        private async Task SetDefaults()
         {
-            // todo: load defaults
-            var dummy = new JobApplicationDefaultsModel() { Name = "DummyName", Position = "DummyPosition"};
+            var jobApplicationDefaults = await _jobApplicationDefaultsService.GetForUser(1);// todo user
 
-            var jobApplicatiobDefaultsViewModel = ActivatorUtilities.CreateInstance<SetJobApplicationDefaultsViewModel>(_serviceProvider, dummy);
+            var jobApplicatiobDefaultsViewModel = ActivatorUtilities.CreateInstance<SetJobApplicationDefaultsViewModel>(_serviceProvider, jobApplicationDefaults);
             var windowResult = _windowService.ShowWindow(jobApplicatiobDefaultsViewModel);
 
             if (windowResult == false)
             {
                 return;
             }
+
+            await _jobApplicationDefaultsService.UpdateForUser(1, jobApplicationDefaults);
         }
 
         [RelayCommand]

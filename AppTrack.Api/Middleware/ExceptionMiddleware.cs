@@ -1,6 +1,4 @@
 ﻿using AppTrack.Api.Models;
-using AppTrack.Application.Exceptions;
-using SendGrid.Helpers.Errors.Model;
 using System.Net;
 using BadRequestException = AppTrack.Application.Exceptions.BadRequestException;
 using NotFoundException = AppTrack.Application.Exceptions.NotFoundException;

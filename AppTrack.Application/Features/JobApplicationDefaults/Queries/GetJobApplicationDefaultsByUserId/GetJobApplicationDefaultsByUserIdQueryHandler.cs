@@ -1,11 +1,12 @@
-﻿using AppTrack.Application.Contracts.Persistance;
+﻿using AppTrack.Application.Contracts.Mediator;
+using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Exceptions;
 using AppTrack.Application.Features.JobApplicationDefaults.Dto;
 using AutoMapper;
 
 namespace AppTrack.Application.Features.JobApplicationDefaults.Queries.GetJobApplicationDefaultsByUserId
 {
-    public class GetJobApplicationDefaultsByUserIdQueryHandler
+    public class GetJobApplicationDefaultsByUserIdQueryHandler : IRequestHandler<GetJobApplicationDefaultsByUserIdQuery,JobApplicationDefaultsDto>
     {
         private readonly IMapper _mapper;
         private readonly IJobApplicationDefaultsRepository _jobApplicationDefaultsRepository;
@@ -33,11 +34,11 @@ namespace AppTrack.Application.Features.JobApplicationDefaults.Queries.GetJobApp
                 throw new BadRequestException($"Invalid get job application defaults request", validationResult);
             }
 
-            var jobApplicationDefaults = await _jobApplicationDefaultsRepository.GetByUserIdAsync(request.Id);
+            var jobApplicationDefaults = await _jobApplicationDefaultsRepository.GetByUserIdAsync(request.UserId);
 
             if (jobApplicationDefaults == null)
             {
-                jobApplicationDefaults = await _jobApplicationDefaultsRepository.CreateForUserAsync(request.Id);
+                jobApplicationDefaults = await _jobApplicationDefaultsRepository.CreateForUserAsync(request.UserId);
             }
 
             var jobApplicationDto = _mapper.Map<JobApplicationDefaultsDto>(jobApplicationDefaults);

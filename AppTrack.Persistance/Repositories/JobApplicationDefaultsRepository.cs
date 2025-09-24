@@ -11,14 +11,14 @@ public class JobApplicationDefaultsRepository : GenericRepository<JobApplication
     {
     }
 
-    public async Task<JobApplicationDefaults?> CreateForUserAsync(int userId)
+    public async Task<JobApplicationDefaults?> CreateForUserAsync(string userId)
     {
         var entityToCreate = new JobApplicationDefaults() { UserId = userId};
         await CreateAsync(entityToCreate);
         return entityToCreate;
     }
 
-    public async Task<JobApplicationDefaults> GetByUserIdAsync(int userId)
+    public async Task<JobApplicationDefaults> GetByUserIdAsync(string userId)
     {
         return await _context.JobApplicationDefaults.AsNoTracking().SingleOrDefaultAsync(x => x.UserId == userId);
     }

@@ -16,8 +16,8 @@ public partial class AppTrackFormViewModelBase<T>: ObservableObject where T : Mo
 
     public AppTrackFormViewModelBase(IModelValidator<T> modelValidator, T model)
     {
-        this._modelValidator = modelValidator;
         Model = model ?? throw new ArgumentNullException("Null is not valid for the model, pass a new instance of Type T instead");
+        this._modelValidator = modelValidator;
     }
 
     [RelayCommand]

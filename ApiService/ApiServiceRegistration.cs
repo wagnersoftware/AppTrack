@@ -13,6 +13,7 @@ public static class ApiServiceRegistration
         services.AddHttpClient<IClient, Client>(client => client.BaseAddress = new Uri("https://localhost:7273"));
 
         services.AddScoped<IJobApplicationService, JobApplicationService>();
+        services.AddScoped<IJobApplicationDefaultsService, JobApplicationDefaultsService>();
 
         services.AddAutoMapper(cfg =>
         {

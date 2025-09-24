@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:AppTrack.WpfUi.View" xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:converter="clr-namespace:AppTrack.WpfUi.Converter"
         mc:Ignorable="d"
-        Title="Defaults" Height="450" Width="800">
+        Title="Defaults" Height="300" Width="400">
     <Window.Resources>
         <converter:ErrorsDictionaryConverter x:Key="ErrorsDictConverter"/>
     </Window.Resources>

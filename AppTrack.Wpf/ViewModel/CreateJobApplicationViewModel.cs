@@ -11,4 +11,10 @@ public class CreateJobApplicationViewModel : AppTrackFormViewModelBase<JobApplic
     {
 
     }
+
+    public void SetDefaults(JobApplicationDefaultsModel jobApplicationDefaults)
+    {
+        base.Model.Name = jobApplicationDefaults.Name;
+        base.Model.Position = jobApplicationDefaults.Position;
+    }
 }

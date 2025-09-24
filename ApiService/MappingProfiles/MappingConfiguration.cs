@@ -11,5 +11,8 @@ public class MappingConfiguration: Profile
         CreateMap<JobApplicationDto, JobApplicationModel>().ReverseMap();
         CreateMap<CreateJobApplicationCommand, JobApplicationModel>().ReverseMap();
         CreateMap<UpdateJobApplicationCommand, JobApplicationModel>().ReverseMap();
+
+        CreateMap<JobApplicationDefaultsDto, JobApplicationDefaultsModel>().ReverseMap();
+        CreateMap<UpdateJobApplicationDefaultsByUserIdCommand, JobApplicationDefaultsModel>().ReverseMap();
     }
 }

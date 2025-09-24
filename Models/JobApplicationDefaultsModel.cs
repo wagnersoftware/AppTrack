@@ -9,4 +9,6 @@ public class JobApplicationDefaultsModel: ModelBase
 
     [MaxLength(30, ErrorMessage = "Maximum length for name is 30 characters")]
     public string Position { get; set; } = string.Empty;
+
+    public string UserId { get; set; } = string.Empty;
 }

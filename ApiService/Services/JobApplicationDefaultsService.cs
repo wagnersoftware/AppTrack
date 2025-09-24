@@ -17,7 +17,14 @@ public class JobApplicationDefaultsService : BaseHttpService, IJobApplicationDef
     public async Task<JobApplicationDefaultsModel> GetForUser(int userId)
     {
         await AddBearerTokenAsync();
-        var jobApplicationDefaults = await _client.GetJobApplicationDefaultsByUserIdAsync(userId);
+        var jobApplicationDefaults = await _client.GetJobApplicationDefaultsForUserAsync(userId.ToString());
         return _mapper.Map<JobApplicationDefaultsModel>(jobApplicationDefaults);
+    }
+
+    public async Task UpdateForUser(int userId, JobApplicationDefaultsModel jobApplicationDefaultsModel)
+    {
+        await AddBearerTokenAsync();
+        var command = _mapper.Map<UpdateJobApplicationDefaultsByUserIdCommand>(jobApplicationDefaultsModel);
+        await _client.UpdateJobApplicationDefaultsForUserAsync(userId.ToString(), command);
     }
 }
