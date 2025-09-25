@@ -17,7 +17,7 @@ public class AiSettingsService : BaseHttpService, IAiSettingsService
     public async Task<AiSettingsModel> GetForUserAsync(int userId)
     {
         await AddBearerTokenAsync();
-        var aiSettingsDto = await _client.GetAiSettingsForUserAsync(userId.ToString());
+        var aiSettingsDto = await _client.GetAiSettingsForUserAsync(userId);
         return _mapper.Map<AiSettingsModel>(aiSettingsDto);
     }
 

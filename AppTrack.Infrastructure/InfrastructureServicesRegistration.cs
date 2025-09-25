@@ -1,4 +1,5 @@
-﻿using AppTrack.Application.Contracts.Email;
+﻿using AppTrack.Application.Contracts.ApplicationTextGenerator;
+using AppTrack.Application.Contracts.Email;
 using AppTrack.Application.Contracts.Logging;
 using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Models.Email;
@@ -17,6 +18,9 @@ namespace AppTrack.Infrastructure
             services.AddTransient<IEmailSender, EmailSender>();
             services.AddScoped(typeof(IAppLogger<>), typeof(LoggingAdapter<>));
             services.AddScoped<IMediator, Mediator.Mediator>();
+
+            services.AddHttpClient<IApplicationTextGenerator, OpenAiApplicationTextGenerator>();
+
             return services;
         }
     }

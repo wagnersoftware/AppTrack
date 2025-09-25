@@ -16,6 +16,7 @@ namespace AppTrack.WpfUi.ViewModel
         private readonly IWindowService _windowService;
         private readonly IServiceProvider _serviceProvider;
         private readonly IAiSettingsService _aiSettingsService;
+        private readonly IApplicationTextService _applicationTextService;
 
         public ObservableCollection<JobApplicationModel> JobApplications { get; set; } = new();
 
@@ -23,13 +24,15 @@ namespace AppTrack.WpfUi.ViewModel
                              IJobApplicationDefaultsService jobApplicationDefaultsService,
                              IWindowService windowService,
                              IServiceProvider serviceProvider,
-                             IAiSettingsService aiSettingsService)
+                             IAiSettingsService aiSettingsService,
+                             IApplicationTextService applicationTextService)
         {
             this._jobApplicationService = jobApplicationService;
             this._jobApplicationDefaultsService = jobApplicationDefaultsService;
             this._windowService = windowService;
             this._serviceProvider = serviceProvider;
             this._aiSettingsService = aiSettingsService;
+            this._applicationTextService = applicationTextService;
         }
 
         public async Task LoadJobApplicationsAsync()
@@ -109,6 +112,20 @@ namespace AppTrack.WpfUi.ViewModel
                 MessageBox.Show(apiResponse.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error); //MessageBoxService
             }
 
+        }
+
+        [RelayCommand]
+        private async Task GenerateApplicationText(JobApplicationModel jobApplicationModel)
+        {
+            var apiResponse = await _applicationTextService.GenerateApplicationText(jobApplicationModel.Id, 1, jobApplicationModel.URL, jobApplicationModel.Position); // todo UserId
+
+            if (apiResponse.Success == false)
+            {
+                MessageBox.Show(apiResponse.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error); //MessageBoxService
+                return;
+            }
+
+            jobApplicationModel.ApplicationText = apiResponse.Data;
         }
 
         [RelayCommand]

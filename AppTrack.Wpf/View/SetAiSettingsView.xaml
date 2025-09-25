@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:AppTrack.WpfUi.View"
         mc:Ignorable="d"
         xmlns:converter="clr-namespace:AppTrack.WpfUi.Converter" xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-        Title="AI Settings" Height="300" Width="400">
+        Title="AI Settings" Height="800" Width="600">
     <Window.Resources>
         <converter:ErrorsDictionaryConverter x:Key="ErrorsDictConverter"/>
     </Window.Resources>
@@ -15,9 +15,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition></RowDefinition>
                 <RowDefinition></RowDefinition>
-                <RowDefinition></RowDefinition>
-                <RowDefinition></RowDefinition>
-                <RowDefinition></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"></ColumnDefinition>
@@ -62,7 +60,9 @@
             <!--Prompt-->
             <Label HorizontalAlignment="Right" Grid.Row="2" Grid.Column="0">Prompt:</Label>
             <StackPanel Grid.Row="2" Grid.Column="1">
-                <TextBox Text="{Binding Model.Prompt}">
+                <TextBox Text="{Binding Model.Prompt}"
+                         AcceptsReturn="True"          
+                         VerticalScrollBarVisibility="Auto">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="TextChanged">
                             <i:InvokeCommandAction Command="{Binding ResetErrorsCommand}" CommandParameter="Prompt" />

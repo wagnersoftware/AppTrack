@@ -1,6 +1,7 @@
 ﻿using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Features.JobApplications.Commands.CreateJobApplication;
 using AppTrack.Application.Features.JobApplications.Commands.DeleteJobApplication;
+using AppTrack.Application.Features.JobApplications.Commands.GenerateApplicationText;
 using AppTrack.Application.Features.JobApplications.Commands.UpdateJobApplication;
 using AppTrack.Application.Features.JobApplications.Dto;
 using AppTrack.Application.Features.JobApplications.Queries.GetAllJobApplications;

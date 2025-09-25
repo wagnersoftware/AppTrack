@@ -51,6 +51,9 @@
                                 <Button Content="Edit" Margin="5,0,0,0"
                                         Command="{Binding DataContext.EditJobApplicationCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                         CommandParameter="{Binding}" />
+                                <Button Content="Generate Text" Margin="5,0,0,0"
+                                        Command="{Binding DataContext.GenerateApplicationTextCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                        CommandParameter="{Binding}" />
                                 <Button Content="Delete" Margin="5,0,0,0"
                                         Command="{Binding DataContext.DeleteJobApplicationCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                         CommandParameter="{Binding Id}" />

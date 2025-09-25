@@ -5,6 +5,6 @@ namespace AppTrack.Application.Features.JobApplicationDefaults.Queries.GetJobApp
 {
     public class GetJobApplicationDefaultsByUserIdQuery : IRequest<JobApplicationDefaultsDto>
     {
-        public string UserId { get; set; }
+        public string UserId { get; set; } = string.Empty;
     }
 }

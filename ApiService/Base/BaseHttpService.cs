@@ -14,7 +14,7 @@ public class BaseHttpService
         this._tokenStorage = tokenStorage;
     }
 
-    protected Response<T> ConvertApiException<T>(ApiException apiException) where T : ModelBase
+    protected Response<T> ConvertApiException<T>(ApiException apiException)
     {
         if (apiException.StatusCode == 400) // bad request
         {

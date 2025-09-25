@@ -11,7 +11,7 @@ public class AiSettingsRepository : GenericRepository<AiSettings>, IAiSettingsRe
     {
     }
 
-    public async Task<AiSettings> GetByUserIdAsync(string userId)
+    public async Task<AiSettings> GetByUserIdAsync(int userId)
     {
         return await _context.AiSettings.AsNoTracking().SingleOrDefaultAsync(x => x.UserId == userId);
     }
