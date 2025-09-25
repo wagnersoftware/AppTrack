@@ -1,15 +1,15 @@
 ﻿using AppTrack.Application.Contracts.Persistance;
 using FluentValidation;
 
-namespace AppTrack.Application.Features.JobApplicationDefaults.Commands.UpdateApplicationDefaultsByUserId;
+namespace AppTrack.Application.Features.JobApplicationDefaults.Commands.UpdateApplicationDefaults;
 
-public class UpdateJobApplicationDefaultsByUserIdCommandValidator : AbstractValidator<UpdateJobApplicationDefaultsByUserIdCommand>
+public class UpdateJobApplicationDefaultsCommandValidator : AbstractValidator<UpdateJobApplicationDefaultsCommand>
 {
     private readonly IJobApplicationDefaultsRepository _jobApplicationDefaultsRepository;
 
-    public UpdateJobApplicationDefaultsByUserIdCommandValidator(IJobApplicationDefaultsRepository jobApplicationDefaultsRepository)
+    public UpdateJobApplicationDefaultsCommandValidator(IJobApplicationDefaultsRepository jobApplicationDefaultsRepository)
     {
-        this._jobApplicationDefaultsRepository = jobApplicationDefaultsRepository;
+        _jobApplicationDefaultsRepository = jobApplicationDefaultsRepository;
 
         RuleFor(x => x.Id)
         .NotNull().WithMessage("{PropertyName} is required");
@@ -27,15 +27,15 @@ public class UpdateJobApplicationDefaultsByUserIdCommandValidator : AbstractVali
         .WithMessage("The requested job application defaults don't match the use id");
     }
 
-    private async Task<bool> JobApplicationDefaultsExistsForUser(UpdateJobApplicationDefaultsByUserIdCommand command, CancellationToken token)
-    {
-        var jobApplicationDefault = await _jobApplicationDefaultsRepository.GetByUserIdAsync(command.UserId!);
-        return jobApplicationDefault != null;
-    }
-
-    private async Task<bool> JobApplicationDefaultsExists(UpdateJobApplicationDefaultsByUserIdCommand command, CancellationToken token)
+    private async Task<bool> JobApplicationDefaultsExists(UpdateJobApplicationDefaultsCommand command, CancellationToken token)
     {
         var jobApplicationDefault = await _jobApplicationDefaultsRepository.GetByIdAsync(command.Id!);
         return jobApplicationDefault != null;
+    }
+
+    private async Task<bool> JobApplicationDefaultsExistsForUser(UpdateJobApplicationDefaultsCommand command, CancellationToken token)
+    {
+        var jobApplicationDefault = await _jobApplicationDefaultsRepository.GetByIdAsync(command.Id!);
+        return jobApplicationDefault.UserId == command.UserId;
     }
 }

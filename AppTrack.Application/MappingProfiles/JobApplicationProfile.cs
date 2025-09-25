@@ -1,6 +1,4 @@
-﻿using AppTrack.Application.Features.JobApplicationDefaults.Commands.UpdateApplicationDefaultsByUserId;
-using AppTrack.Application.Features.JobApplicationDefaults.Dto;
-using AppTrack.Application.Features.JobApplications.Commands.CreateJobApplication;
+﻿using AppTrack.Application.Features.JobApplications.Commands.CreateJobApplication;
 using AppTrack.Application.Features.JobApplications.Commands.UpdateJobApplication;
 using AppTrack.Application.Features.JobApplications.Dto;
 using AppTrack.Domain;

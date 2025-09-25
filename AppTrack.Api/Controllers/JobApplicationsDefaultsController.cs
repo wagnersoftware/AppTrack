@@ -1,5 +1,5 @@
 ﻿using AppTrack.Application.Contracts.Mediator;
-using AppTrack.Application.Features.JobApplicationDefaults.Commands.UpdateApplicationDefaultsByUserId;
+using AppTrack.Application.Features.JobApplicationDefaults.Commands.UpdateApplicationDefaults;
 using AppTrack.Application.Features.JobApplicationDefaults.Dto;
 using AppTrack.Application.Features.JobApplicationDefaults.Queries.GetJobApplicationDefaultsByUserId;
 using Microsoft.AspNetCore.Mvc;
@@ -23,25 +23,25 @@ public class JobApplicationsDefaultsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<JobApplicationDefaultsDto>> GetForUser(string userId)
     {
+        //todo für aktuellen User(me), sobald Authorisierung implementiert -> var userId = _userContext.UserId; // aus JWT / ClaimsPrincipal
         var jobApplicationDetailsDto = await _mediator.Send(new GetJobApplicationDefaultsByUserIdQuery() { UserId = userId });
         return Ok(jobApplicationDetailsDto);
     }
 
     // GET api/<JobApplicationsController>/5
-    [HttpPut("{userId}", Name = "UpdateJobApplicationDefaultsForUser")]
+    [HttpPut("{id}", Name = "UpdateJobApplicationDefaults")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesDefaultResponseType]
-    public async Task<ActionResult> UpdateForUser([FromRoute] string userId, [FromBody] UpdateJobApplicationDefaultsByUserIdCommand updateJobApplicationDefaultsByUserIdCommand)
+    public async Task<ActionResult> Put([FromRoute] int id, [FromBody] UpdateJobApplicationDefaultsCommand updateJobApplicationDefaultsCommand)
     {
-        if (!ModelState.IsValid)
+        if (id != updateJobApplicationDefaultsCommand.Id)
         {
-            return BadRequest(ModelState);
+            return BadRequest("Route ID and body ID do not match.");
         }
 
-        updateJobApplicationDefaultsByUserIdCommand.UserId = userId;
-        await _mediator.Send(updateJobApplicationDefaultsByUserIdCommand);
+        await _mediator.Send(updateJobApplicationDefaultsCommand);
         return NoContent();
     }
 }

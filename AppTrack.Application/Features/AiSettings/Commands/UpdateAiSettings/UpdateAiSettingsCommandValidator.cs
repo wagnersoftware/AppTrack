@@ -47,7 +47,7 @@ public class UpdateAiSettingsCommandValidator : AbstractValidator<UpdateAiSettin
 
     private async Task<bool> AiSettingsExistsForUser(UpdateAiSettingsCommand command, CancellationToken token)
     {
-        var aiSettings = await _aiSettingsRepository.GetByUserIdAsync(command.UserId!);
-        return aiSettings != null;
+        var aiSettings = await _aiSettingsRepository.GetByIdAsync(command.Id!);
+        return aiSettings.UserId == command.UserId;
     }
 }

@@ -24,7 +24,7 @@ public class UpdateAiSettingsCommandHandler : IRequestHandler<UpdateAiSettingsCo
 
         if (validationResult.Errors.Any())
         {
-            throw new BadRequestException($"Invalid Ai settings request", validationResult);
+            throw new BadRequestException($"Invalid update ai settings request", validationResult);
         }
 
         var aiSettingsToUpdate = _mapper.Map<Domain.AiSettings>(request);

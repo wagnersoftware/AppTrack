@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AppTrack.Api.Controllers
 {
-    [Route("api/ai-settings")]
+    [Route("api/Ai-settings")]
     [ApiController]
     //[Authorize]
     public class AiSettingsController : ControllerBase
@@ -24,7 +24,7 @@ namespace AppTrack.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<AiSettingsDto>> GetForUser(string userId)
         {
-            //todo für aktuellen User(me), sobald Authorisierung implementiert
+            //todo für aktuellen User(me), sobald Authorisierung implementiert -> var userId = _userContext.UserId; // aus JWT / ClaimsPrincipal
             var aiSettingsDto = await _mediator.Send(new GetAiSettingsByUserIdQuery() { UserId = userId });
             return Ok(aiSettingsDto);
         }

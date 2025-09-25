@@ -119,12 +119,12 @@ namespace AppTrack.Frontend.ApiService.Base
 
         /// <returns>No Content</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task UpdateJobApplicationDefaultsForUserAsync(string userId, UpdateJobApplicationDefaultsByUserIdCommand body);
+        System.Threading.Tasks.Task UpdateJobApplicationDefaultsAsync(int id, UpdateJobApplicationDefaultsCommand body);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>No Content</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task UpdateJobApplicationDefaultsForUserAsync(string userId, UpdateJobApplicationDefaultsByUserIdCommand body, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task UpdateJobApplicationDefaultsAsync(int id, UpdateJobApplicationDefaultsCommand body, System.Threading.CancellationToken cancellationToken);
 
     }
 
@@ -1070,18 +1070,18 @@ namespace AppTrack.Frontend.ApiService.Base
 
         /// <returns>No Content</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task UpdateJobApplicationDefaultsForUserAsync(string userId, UpdateJobApplicationDefaultsByUserIdCommand body)
+        public virtual System.Threading.Tasks.Task UpdateJobApplicationDefaultsAsync(int id, UpdateJobApplicationDefaultsCommand body)
         {
-            return UpdateJobApplicationDefaultsForUserAsync(userId, body, System.Threading.CancellationToken.None);
+            return UpdateJobApplicationDefaultsAsync(id, body, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>No Content</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task UpdateJobApplicationDefaultsForUserAsync(string userId, UpdateJobApplicationDefaultsByUserIdCommand body, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task UpdateJobApplicationDefaultsAsync(int id, UpdateJobApplicationDefaultsCommand body, System.Threading.CancellationToken cancellationToken)
         {
-            if (userId == null)
-                throw new System.ArgumentNullException("userId");
+            if (id == null)
+                throw new System.ArgumentNullException("id");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -1097,9 +1097,9 @@ namespace AppTrack.Frontend.ApiService.Base
 
                     var urlBuilder_ = new System.Text.StringBuilder();
                 
-                    // Operation Path: "api/JobApplicationsDefaults/{userId}"
+                    // Operation Path: "api/JobApplicationsDefaults/{id}"
                     urlBuilder_.Append("api/JobApplicationsDefaults/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(userId, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -1564,7 +1564,7 @@ namespace AppTrack.Frontend.ApiService.Base
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.6.0.0 (NJsonSchema v11.5.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class UpdateJobApplicationDefaultsByUserIdCommand
+    public partial class UpdateJobApplicationDefaultsCommand
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("id")]

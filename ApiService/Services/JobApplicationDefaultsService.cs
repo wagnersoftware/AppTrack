@@ -21,10 +21,10 @@ public class JobApplicationDefaultsService : BaseHttpService, IJobApplicationDef
         return _mapper.Map<JobApplicationDefaultsModel>(jobApplicationDefaults);
     }
 
-    public async Task UpdateForUserAsync(int userId, JobApplicationDefaultsModel jobApplicationDefaultsModel)
+    public async Task UpdateAsync(int id, JobApplicationDefaultsModel jobApplicationDefaultsModel)
     {
         await AddBearerTokenAsync();
-        var command = _mapper.Map<UpdateJobApplicationDefaultsByUserIdCommand>(jobApplicationDefaultsModel);
-        await _client.UpdateJobApplicationDefaultsForUserAsync(userId.ToString(), command);
+        var command = _mapper.Map<UpdateJobApplicationDefaultsCommand>(jobApplicationDefaultsModel);
+        await _client.UpdateJobApplicationDefaultsAsync(id, command);
     }
 }

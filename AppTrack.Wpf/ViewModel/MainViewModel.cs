@@ -124,7 +124,7 @@ namespace AppTrack.WpfUi.ViewModel
                 return;
             }
 
-            await _jobApplicationDefaultsService.UpdateForUserAsync(1, jobApplicationDefaults);
+            await _jobApplicationDefaultsService.UpdateAsync(jobApplicationDefaults.Id, jobApplicationDefaults);
         }
 
         [RelayCommand]
@@ -139,7 +139,7 @@ namespace AppTrack.WpfUi.ViewModel
                 return;
             }
 
-            await _aiSettingsService.UpdateAiSettingsAsync(aiSettingsModel);
+            await _aiSettingsService.UpdateAsync(aiSettingsModel.Id, aiSettingsModel);
         }
 
         [RelayCommand]

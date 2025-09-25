@@ -7,5 +7,5 @@ public interface IJobApplicationDefaultsService
 {
     Task<JobApplicationDefaultsModel> GetForUserAsync(int userId);
 
-    Task UpdateForUserAsync(int userId, JobApplicationDefaultsModel jobApplicationDefaultsModel);
+    Task UpdateAsync(int id, JobApplicationDefaultsModel jobApplicationDefaultsModel);
 }

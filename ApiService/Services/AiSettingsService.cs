@@ -21,11 +21,11 @@ public class AiSettingsService : BaseHttpService, IAiSettingsService
         return _mapper.Map<AiSettingsModel>(aiSettingsDto);
     }
 
-    public async Task UpdateAiSettingsAsync(AiSettingsModel aiSettingsModel)
+    public async Task UpdateAsync(int id, AiSettingsModel aiSettingsModel)
     {
         await AddBearerTokenAsync();
         var updateAiSettingsCommand = _mapper.Map<UpdateAiSettingsCommand>(aiSettingsModel);
-        await _client.UpdateAiSettingsAsync(1, updateAiSettingsCommand);
+        await _client.UpdateAiSettingsAsync(id, updateAiSettingsCommand);
     }
 }
 

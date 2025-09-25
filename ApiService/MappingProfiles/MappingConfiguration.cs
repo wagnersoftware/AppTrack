@@ -15,7 +15,7 @@ public class MappingConfiguration: Profile
 
         //Job Application Defaults
         CreateMap<JobApplicationDefaultsDto, JobApplicationDefaultsModel>().ReverseMap();
-        CreateMap<UpdateJobApplicationDefaultsByUserIdCommand, JobApplicationDefaultsModel>();
+        CreateMap<JobApplicationDefaultsModel, UpdateJobApplicationDefaultsCommand>();
 
         //Ai Settings
         CreateMap<AiSettingsDto, AiSettingsModel>().ReverseMap();

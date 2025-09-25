@@ -6,5 +6,5 @@ public interface IAiSettingsService
 {
     Task<AiSettingsModel> GetForUserAsync(int userId);
 
-    Task UpdateAiSettingsAsync(AiSettingsModel aiSettingsModel);
+    Task UpdateAsync(int id, AiSettingsModel aiSettingsModel);
 }
