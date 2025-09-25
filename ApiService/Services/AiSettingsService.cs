@@ -25,7 +25,7 @@ public class AiSettingsService : BaseHttpService, IAiSettingsService
     {
         await AddBearerTokenAsync();
         var updateAiSettingsCommand = _mapper.Map<UpdateAiSettingsCommand>(aiSettingsModel);
-        await _client.AiSettingsAsync("1", updateAiSettingsCommand); // todo
+        await _client.UpdateAiSettingsAsync(1, updateAiSettingsCommand);
     }
 }
 

@@ -42,8 +42,8 @@ public class GetAiSettingsByUserIdQueryHandler : IRequestHandler<GetAiSettingsBy
             await _aiSettingsRepository.CreateAsync(entity);
         }
 
-        var jobApplicationDto = _mapper.Map<AiSettingsDto>(entity);
+        var aiSettingsDto = _mapper.Map<AiSettingsDto>(entity);
 
-        return jobApplicationDto;
+        return aiSettingsDto;
     }
 }

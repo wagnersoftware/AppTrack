@@ -2,6 +2,8 @@
 
 public class AiSettingsDto
 {
+    public int Id { get; set; }
+
     public string ApiKey { get; set; } = string.Empty;
 
     public string MySkills { get; set; } = string.Empty;

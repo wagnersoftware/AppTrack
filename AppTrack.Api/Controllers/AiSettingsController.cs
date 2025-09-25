@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AppTrack.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/ai-settings")]
     [ApiController]
     //[Authorize]
     public class AiSettingsController : ControllerBase
@@ -18,24 +18,30 @@ namespace AppTrack.Api.Controllers
             this._mediator = mediator;
         }
 
-        // GET api/<AiSettingsController>/5
+        // GET api/ai-settings/5
         [HttpGet("{userId}", Name = "GetAiSettingsForUser")]
         [ProducesResponseType(typeof(AiSettingsDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<AiSettingsDto>> GetForUser(string userId)
         {
+            //todo für aktuellen User(me), sobald Authorisierung implementiert
             var aiSettingsDto = await _mediator.Send(new GetAiSettingsByUserIdQuery() { UserId = userId });
             return Ok(aiSettingsDto);
         }
 
-        // PUT api/<AiSettingsController>/5
-        [HttpPut("{id}")]
+        // PUT api/ai-settings/5
+        [HttpPut("{id}",  Name = "UpdateAiSettings")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesDefaultResponseType]
-        public async Task<ActionResult> Put([FromBody] UpdateAiSettingsCommand updateAiSettingsCommand)
+        public async Task<ActionResult> Put([FromRoute]int id, [FromBody] UpdateAiSettingsCommand updateAiSettingsCommand)
         {
+            if(id != updateAiSettingsCommand.Id)
+            {
+                return BadRequest("Route ID and body ID do not match.");
+            }
+
             await _mediator.Send(updateAiSettingsCommand);
             return NoContent();
         }

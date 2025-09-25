@@ -1,11 +1,12 @@
-﻿using AppTrack.Application.Contracts.Persistance;
+﻿using AppTrack.Application.Contracts.Mediator;
+using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Exceptions;
 using AppTrack.Application.Shared;
 using AutoMapper;
 
 namespace AppTrack.Application.Features.AiSettings.Commands.UpdateAiSettings;
 
-internal class UpdateAiSettingsCommandHandler
+public class UpdateAiSettingsCommandHandler : IRequestHandler<UpdateAiSettingsCommand, Unit>
 {
     private readonly IMapper _mapper;
     private readonly IAiSettingsRepository _aiSettingsRepository;

@@ -38,12 +38,12 @@ namespace AppTrack.Frontend.ApiService.Base
 
         /// <returns>No Content</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task AiSettingsAsync(string id, UpdateAiSettingsCommand body);
+        System.Threading.Tasks.Task UpdateAiSettingsAsync(int id, UpdateAiSettingsCommand body);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>No Content</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task AiSettingsAsync(string id, UpdateAiSettingsCommand body, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task UpdateAiSettingsAsync(int id, UpdateAiSettingsCommand body, System.Threading.CancellationToken cancellationToken);
 
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
@@ -186,8 +186,8 @@ namespace AppTrack.Frontend.ApiService.Base
 
                     var urlBuilder_ = new System.Text.StringBuilder();
                 
-                    // Operation Path: "api/AiSettings/{userId}"
-                    urlBuilder_.Append("api/AiSettings/");
+                    // Operation Path: "api/ai-settings/{userId}"
+                    urlBuilder_.Append("api/ai-settings/");
                     urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(userId, System.Globalization.CultureInfo.InvariantCulture)));
 
                     PrepareRequest(client_, request_, urlBuilder_);
@@ -254,15 +254,15 @@ namespace AppTrack.Frontend.ApiService.Base
 
         /// <returns>No Content</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task AiSettingsAsync(string id, UpdateAiSettingsCommand body)
+        public virtual System.Threading.Tasks.Task UpdateAiSettingsAsync(int id, UpdateAiSettingsCommand body)
         {
-            return AiSettingsAsync(id, body, System.Threading.CancellationToken.None);
+            return UpdateAiSettingsAsync(id, body, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>No Content</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task AiSettingsAsync(string id, UpdateAiSettingsCommand body, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task UpdateAiSettingsAsync(int id, UpdateAiSettingsCommand body, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -281,8 +281,8 @@ namespace AppTrack.Frontend.ApiService.Base
 
                     var urlBuilder_ = new System.Text.StringBuilder();
                 
-                    // Operation Path: "api/AiSettings/{id}"
-                    urlBuilder_.Append("api/AiSettings/");
+                    // Operation Path: "api/ai-settings/{id}"
+                    urlBuilder_.Append("api/ai-settings/");
                     urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
                     PrepareRequest(client_, request_, urlBuilder_);
@@ -1304,6 +1304,9 @@ namespace AppTrack.Frontend.ApiService.Base
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.6.0.0 (NJsonSchema v11.5.0.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class AiSettingsDto
     {
+
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        public int Id { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("apiKey")]
         public string ApiKey { get; set; }
