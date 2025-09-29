@@ -14,17 +14,20 @@ public class JobApplicationDefaultsService : BaseHttpService, IJobApplicationDef
         this._mapper = mapper;
     }
 
-    public async Task<JobApplicationDefaultsModel> GetForUserAsync(int userId)
-    {
-        await AddBearerTokenAsync();
-        var jobApplicationDefaults = await _client.GetJobApplicationDefaultsForUserAsync(userId.ToString());
-        return _mapper.Map<JobApplicationDefaultsModel>(jobApplicationDefaults);
-    }
+    public Task<Response<JobApplicationDefaultsModel>> GetForUserAsync(int userId) =>
+        TryExecuteAsync(async () =>
+        {
+            var jobApplicationDefaults = await _client.GetJobApplicationDefaultsForUserAsync(userId.ToString());
+            return _mapper.Map<JobApplicationDefaultsModel>(jobApplicationDefaults);
+        });
 
-    public async Task UpdateAsync(int id, JobApplicationDefaultsModel jobApplicationDefaultsModel)
-    {
-        await AddBearerTokenAsync();
-        var command = _mapper.Map<UpdateJobApplicationDefaultsCommand>(jobApplicationDefaultsModel);
-        await _client.UpdateJobApplicationDefaultsAsync(id, command);
-    }
+
+    public Task<Response<JobApplicationDefaultsModel>> UpdateAsync(int id, JobApplicationDefaultsModel jobApplicationDefaultsModel) =>
+        TryExecuteAsync<JobApplicationDefaultsModel>(async () =>
+        {
+            var command = _mapper.Map<UpdateJobApplicationDefaultsCommand>(jobApplicationDefaultsModel);
+            await _client.UpdateJobApplicationDefaultsAsync(id, command);
+        });
 }
+
+

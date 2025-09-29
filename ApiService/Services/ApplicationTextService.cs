@@ -9,9 +9,8 @@ namespace AppTrack.Frontend.ApiService.Services
         {
         }
 
-        public async Task<Response<string>> GenerateApplicationText(int applicationId, int userId, string url, string position)
-        {
-            try
+        public Task<Response<string>> GenerateApplicationText(int applicationId, int userId, string url, string position) =>
+            TryExecuteAsync(async () =>
             {
                 var command = new GenerateApplicationTextCommand()
                 {
@@ -22,12 +21,7 @@ namespace AppTrack.Frontend.ApiService.Services
                 };
 
                 var generatedTextDto = await _client.GenerateApplicationTextAsync(command);
-                return new Response<string> (){ Data = generatedTextDto.ApplicationText };
-            }
-            catch (ApiException e)
-            {
-                return ConvertApiException<string>(e);
-            } 
-        }
+                return generatedTextDto.ApplicationText;
+            });
     }
 }

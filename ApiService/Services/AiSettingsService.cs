@@ -14,18 +14,18 @@ public class AiSettingsService : BaseHttpService, IAiSettingsService
         this._mapper = mapper;
     }
 
-    public async Task<AiSettingsModel> GetForUserAsync(int userId)
-    {
-        await AddBearerTokenAsync();
-        var aiSettingsDto = await _client.GetAiSettingsForUserAsync(userId);
-        return _mapper.Map<AiSettingsModel>(aiSettingsDto);
-    }
+    public Task<Response<AiSettingsModel>> GetForUserAsync(int userId) =>
+        TryExecuteAsync(async () =>
+        {
+            var aiSettingsDto = await _client.GetAiSettingsForUserAsync(userId);
+            return _mapper.Map<AiSettingsModel>(aiSettingsDto);
+        });
 
-    public async Task UpdateAsync(int id, AiSettingsModel aiSettingsModel)
-    {
-        await AddBearerTokenAsync();
-        var updateAiSettingsCommand = _mapper.Map<UpdateAiSettingsCommand>(aiSettingsModel);
-        await _client.UpdateAiSettingsAsync(id, updateAiSettingsCommand);
-    }
+    public Task<Response<AiSettingsModel>> UpdateAsync(int id, AiSettingsModel aiSettingsModel) =>
+        TryExecuteAsync<AiSettingsModel>(async () =>
+        {
+            var updateAiSettingsCommand = _mapper.Map<UpdateAiSettingsCommand>(aiSettingsModel);
+            await _client.UpdateAiSettingsAsync(id, updateAiSettingsCommand);
+        });
 }
 

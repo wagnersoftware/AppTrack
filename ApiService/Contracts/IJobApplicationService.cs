@@ -5,9 +5,9 @@ namespace AppTrack.Frontend.ApiService.Contracts;
 
 public interface IJobApplicationService
 {
-    Task<List<JobApplicationModel>> GetJobApplicationsAsync();
-    Task<JobApplicationModel> GetJobApplicationById(int id);
-    Task<Response<JobApplicationModel>> CreateJobApplication(JobApplicationModel jobApplicationModel);
-    Task<Response<JobApplicationModel>> UpdateJobApplication(int id, JobApplicationModel jobApplication);
-    Task<Response<JobApplicationModel>> DeleteJobApplication(int id);
+    Task<Response<List<JobApplicationModel>>> GetJobApplicationsAsync();
+    Task<Response<JobApplicationModel>>GetJobApplicationByIdAsync(int id);
+    Task<Response<JobApplicationModel>> CreateJobApplicationAsync(JobApplicationModel jobApplicationModel);
+    Task<Response<JobApplicationModel>> UpdateJobApplicationAsync(int id, JobApplicationModel jobApplication);
+    Task<Response<JobApplicationModel>> DeleteJobApplicationAsync(int id);
 }

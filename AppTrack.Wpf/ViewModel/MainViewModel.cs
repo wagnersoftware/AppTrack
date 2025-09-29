@@ -1,5 +1,6 @@
 ﻿using AppTrack.Frontend.ApiService.Contracts;
 using AppTrack.Frontend.Models;
+using AppTrack.WpfUi.MessageBoxService;
 using AppTrack.WpfUi.WindowService;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -17,6 +18,7 @@ namespace AppTrack.WpfUi.ViewModel
         private readonly IServiceProvider _serviceProvider;
         private readonly IAiSettingsService _aiSettingsService;
         private readonly IApplicationTextService _applicationTextService;
+        private readonly IMessageBoxService _messageBoxService;
 
         public ObservableCollection<JobApplicationModel> JobApplications { get; set; } = new();
 
@@ -25,7 +27,8 @@ namespace AppTrack.WpfUi.ViewModel
                              IWindowService windowService,
                              IServiceProvider serviceProvider,
                              IAiSettingsService aiSettingsService,
-                             IApplicationTextService applicationTextService)
+                             IApplicationTextService applicationTextService,
+                             IMessageBoxService messageBoxService)
         {
             this._jobApplicationService = jobApplicationService;
             this._jobApplicationDefaultsService = jobApplicationDefaultsService;
@@ -33,22 +36,23 @@ namespace AppTrack.WpfUi.ViewModel
             this._serviceProvider = serviceProvider;
             this._aiSettingsService = aiSettingsService;
             this._applicationTextService = applicationTextService;
+            this._messageBoxService = messageBoxService;
         }
 
         public async Task LoadJobApplicationsAsync()
         {
-            var jobApplications = await _jobApplicationService.GetJobApplicationsAsync();
+            var apiResponse = await _jobApplicationService.GetJobApplicationsAsync();
 
-            jobApplications.ForEach(x => JobApplications.Add(x));
+            apiResponse.Data.ForEach(x => JobApplications.Add(x));
         }
 
         [RelayCommand]
         private async Task CreateJobApplication()
         {
-            var jobApplicationDefaults = await _jobApplicationDefaultsService.GetForUserAsync(1);// todo user
+            var response = await _jobApplicationDefaultsService.GetForUserAsync(1);// todo user
 
             var createJobApplicationViewModel = _serviceProvider.GetRequiredService<CreateJobApplicationViewModel>();
-            createJobApplicationViewModel.SetDefaults(jobApplicationDefaults);
+            createJobApplicationViewModel.SetDefaults(response.Data);
 
             var windowResult = _windowService.ShowWindow(createJobApplicationViewModel);
 
@@ -57,11 +61,11 @@ namespace AppTrack.WpfUi.ViewModel
                 return;
             }
 
-            var apiResponse = await _jobApplicationService.CreateJobApplication(createJobApplicationViewModel.Model);
+            var apiResponse = await _jobApplicationService.CreateJobApplicationAsync(createJobApplicationViewModel.Model);
 
             if(apiResponse.Success == false)
             {
-                MessageBox.Show(apiResponse.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error); //MessageBoxService
+                _messageBoxService.ShowErrorMessageBox(apiResponse.Message);
             }
 
             JobApplications.Add(apiResponse.Data);
@@ -71,18 +75,18 @@ namespace AppTrack.WpfUi.ViewModel
         [RelayCommand]
         private async Task DeleteJobApplication(int id)
         {
-            var dialogResult = MessageBox.Show($"Do you really want to delete application with id: {id}", "Delete application", MessageBoxButton.OKCancel, MessageBoxImage.Question); //MessageBoxService
+            var dialogResult = _messageBoxService.ShowQuestionMessageBox($"Do you really want to delete application with id: {id}", "Delete application");
 
             if (dialogResult == MessageBoxResult.No || dialogResult == MessageBoxResult.Cancel)
             {
                 return;
             }
 
-            var apiResponse = await _jobApplicationService.DeleteJobApplication(id);
+            var apiResponse = await _jobApplicationService.DeleteJobApplicationAsync(id);
 
             if (apiResponse.Success == false)
             {
-                MessageBox.Show(apiResponse.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error); //MessageBoxService
+                _messageBoxService.ShowErrorMessageBox(apiResponse.Message);
             }
 
             var jobApplicationToRemove = JobApplications.SingleOrDefault(x => x.Id == id);
@@ -105,11 +109,11 @@ namespace AppTrack.WpfUi.ViewModel
                 return;
             }
 
-            var apiResponse = await _jobApplicationService.UpdateJobApplication(jobApplicationModel.Id, jobApplicationModel);
+            var apiResponse = await _jobApplicationService.UpdateJobApplicationAsync(jobApplicationModel.Id, jobApplicationModel);
 
             if (apiResponse.Success == false)
             {
-                MessageBox.Show(apiResponse.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error); //MessageBoxService
+                _messageBoxService.ShowErrorMessageBox(apiResponse.Message);
             }
 
         }
@@ -121,7 +125,7 @@ namespace AppTrack.WpfUi.ViewModel
 
             if (apiResponse.Success == false)
             {
-                MessageBox.Show(apiResponse.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error); //MessageBoxService
+                _messageBoxService.ShowErrorMessageBox(apiResponse.Message);
                 return;
             }
 
@@ -131,9 +135,14 @@ namespace AppTrack.WpfUi.ViewModel
         [RelayCommand]
         private async Task SetDefaults()
         {
-            var jobApplicationDefaults = await _jobApplicationDefaultsService.GetForUserAsync(1);// todo user
+            var apiResponse = await _jobApplicationDefaultsService.GetForUserAsync(1);// todo user
 
-            var jobApplicatiobDefaultsViewModel = ActivatorUtilities.CreateInstance<SetJobApplicationDefaultsViewModel>(_serviceProvider, jobApplicationDefaults);
+            if (apiResponse.Success == false)
+            {
+                _messageBoxService.ShowErrorMessageBox(apiResponse.Message);
+            }
+
+            var jobApplicatiobDefaultsViewModel = ActivatorUtilities.CreateInstance<SetJobApplicationDefaultsViewModel>(_serviceProvider, apiResponse.Data);
             var windowResult = _windowService.ShowWindow(jobApplicatiobDefaultsViewModel);
 
             if (windowResult == false)
@@ -141,14 +150,26 @@ namespace AppTrack.WpfUi.ViewModel
                 return;
             }
 
-            await _jobApplicationDefaultsService.UpdateAsync(jobApplicationDefaults.Id, jobApplicationDefaults);
+            apiResponse = await _jobApplicationDefaultsService.UpdateAsync(apiResponse.Data.Id, apiResponse.Data);
+
+            if (apiResponse.Success == false)
+            {
+                _messageBoxService.ShowErrorMessageBox(apiResponse.Message);
+                return;
+            }
         }
 
         [RelayCommand]
         private async Task AiSettings()
         {
-            var aiSettingsModel = await _aiSettingsService.GetForUserAsync(1); // todo user
-            var setAiSettingsViewModel = ActivatorUtilities.CreateInstance<SetAiSettingsViewModel>(_serviceProvider, aiSettingsModel);
+            var apiResponse = await _aiSettingsService.GetForUserAsync(1); // todo user
+
+            if (apiResponse.Success == false)
+            {
+                _messageBoxService.ShowErrorMessageBox(apiResponse.Message);
+            }
+
+            var setAiSettingsViewModel = ActivatorUtilities.CreateInstance<SetAiSettingsViewModel>(_serviceProvider, apiResponse.Data);
             var windowResult = _windowService.ShowWindow(setAiSettingsViewModel);
 
             if (windowResult == false)
@@ -156,7 +177,12 @@ namespace AppTrack.WpfUi.ViewModel
                 return;
             }
 
-            await _aiSettingsService.UpdateAsync(aiSettingsModel.Id, aiSettingsModel);
+            apiResponse = await _aiSettingsService.UpdateAsync(apiResponse.Data.Id, apiResponse.Data);
+
+            if (apiResponse.Success == false)
+            {
+                _messageBoxService.ShowErrorMessageBox(apiResponse.Message);
+            }
         }
 
         [RelayCommand]

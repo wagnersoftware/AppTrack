@@ -1,10 +1,11 @@
-﻿using AppTrack.Frontend.Models;
+﻿using AppTrack.Frontend.ApiService.Base;
+using AppTrack.Frontend.Models;
 
 namespace AppTrack.Frontend.ApiService.Contracts;
 
 public interface IAiSettingsService
 {
-    Task<AiSettingsModel> GetForUserAsync(int userId);
+    Task<Response<AiSettingsModel>> GetForUserAsync(int userId);
 
-    Task UpdateAsync(int id, AiSettingsModel aiSettingsModel);
+    Task<Response<AiSettingsModel>> UpdateAsync(int id, AiSettingsModel aiSettingsModel);
 }

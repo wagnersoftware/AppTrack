@@ -1,6 +1,7 @@
 ﻿using AppTrack.Frontend.ApiService;
 using AppTrack.Frontend.ApiService.Contracts;
 using AppTrack.Frontend.Models.ModelValidator;
+using AppTrack.WpfUi.MessageBoxService;
 using AppTrack.WpfUi.TokenStorage;
 using AppTrack.WpfUi.ViewModel;
 using AppTrack.WpfUi.WindowService;
@@ -19,6 +20,7 @@ public partial class App : Application
         services.AddSingleton<ITokenStorage, WpfTokenStorage>();
         services.AddApiServiceServices();
         services.AddSingleton<IWindowService, WindowService>();
+        services.AddSingleton<IMessageBoxService, MessageBoxService>();
         services.AddTransient(typeof(IModelValidator<>), typeof(ModelValidator<>));
 
         // viewmodels

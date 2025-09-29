@@ -14,7 +14,7 @@ public class BaseHttpService
         this._tokenStorage = tokenStorage;
     }
 
-    protected Response<T> ConvertApiException<T>(ApiException apiException)
+    private Response<T> ConvertApiException<T>(ApiException apiException)
     {
         if (apiException.StatusCode == 400) // bad request
         {
@@ -30,11 +30,39 @@ public class BaseHttpService
         }
     }
 
-    protected async Task AddBearerTokenAsync()
+    private async Task AddBearerTokenAsync()
     {
         if (await _tokenStorage.ContainsKeyAsync("token"))
         {
             _client.HttpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", await _tokenStorage.GetItemAsync<string>("token"));
+        }
+    }
+
+    protected async Task<Response<T>> TryExecuteAsync<T>(Func<Task<T>> action)
+    {
+        try
+        {
+            await AddBearerTokenAsync();
+            var result = await action();
+            return new Response<T> { Success = true, Data = result };
+        }
+        catch (ApiException e)
+        {
+            return ConvertApiException<T>(e);
+        }
+    }
+
+    protected async Task<Response<T>> TryExecuteAsync<T>(Func<Task> action)
+    {
+        try
+        {
+            await AddBearerTokenAsync();
+            await action();
+            return new Response<T> { Success = true };
+        }
+        catch (ApiException e)
+        {
+            return ConvertApiException<T>(e);
         }
     }
 }
