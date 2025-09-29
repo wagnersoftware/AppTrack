@@ -7,26 +7,29 @@
         xmlns:models="clr-namespace:AppTrack.Frontend.Models;assembly=AppTrack.Frontend.Models"
         mc:Ignorable="d"
         Title="App Track" Height="800" Width="1500"
-        Loaded="Page_Loaded">
-    <StackPanel Margin="10">
+        Loaded="Page_Loaded"
+        WindowStartupLocation="CenterScreen">
+    <DockPanel Margin="10">
         <!--Menu-->
-        <DockPanel>
+        <DockPanel DockPanel.Dock="Top">
             <Menu DockPanel.Dock="Top">
-                <MenuItem Header="File">
-                    <MenuItem Header="E_xit" Command="{Binding ExitCommand}" />
+                <MenuItem Header="File" FontSize="18">
+                    <MenuItem Header="E_xit" Command="{Binding ExitCommand}"/>
                 </MenuItem>
-                <MenuItem Header="Settings">
-                    <MenuItem Header="Defaults">
+                <MenuItem Header="Settings" FontSize="18">
+                    <MenuItem Header="Defaults" FontSize="18">
                         <MenuItem Header="Set Defaults" Command="{Binding SetDefaultsCommand}"/>
                     </MenuItem>
-                    <MenuItem Header="AI">
+                    <MenuItem Header="AI" FontSize="18">
                         <MenuItem Header="AI Settings" Command="{Binding AiSettingsCommand}"/>
                     </MenuItem>
                 </MenuItem>
             </Menu>
         </DockPanel>
         <!--MainContent-->
-        <Button Content="Create Job Application"
+        <Button DockPanel.Dock="Top"
+                Content="Create Job Application"
+                FontSize="18"
                 HorizontalAlignment="Right"
                 Margin="10"
                 Command="{Binding CreateJobApplicationCommand}">
@@ -34,27 +37,89 @@
         <DataGrid ItemsSource="{Binding JobApplications}"
                   AutoGenerateColumns="False"
                   IsReadOnly="True"
-                  d:DataContext="{d:DesignInstance Type=models:JobApplicationModel, IsDesignTimeCreatable=True}">
+                  d:DataContext="{d:DesignInstance Type=models:JobApplicationModel, IsDesignTimeCreatable=True}"
+                  AlternatingRowBackground="LightGray"
+                  RowHeight="30"
+                  MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Window}}"
+                  ColumnWidth="*"
+                  Focusable="False">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Id" Binding="{Binding Id}"></DataGridTextColumn>
-                <DataGridTextColumn Header="Name" Binding="{Binding Name}"></DataGridTextColumn>
-                <DataGridTextColumn Header="Position" Binding="{Binding Position}"></DataGridTextColumn>
-                <DataGridTextColumn Header="URL" Binding="{Binding URL}"></DataGridTextColumn>
-                <DataGridTextColumn Header="Status" Binding="{Binding Status}"></DataGridTextColumn>
-                <DataGridTextColumn Header="Application Text" Binding="{Binding ApplicationText}"></DataGridTextColumn>
-                <DataGridTextColumn Header="Created" Binding="{Binding CreationDate}"></DataGridTextColumn>
-                <DataGridTextColumn Header="Modified" Binding="{Binding ModifiedDate}"></DataGridTextColumn>
-                <DataGridTemplateColumn Header="Functions" Width="*">
+                <!--Id-->
+                <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="0.3*">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="ToolTip" Value="{Binding Id}" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <!--Name-->
+                <DataGridTextColumn Header="Name" Binding="{Binding Name}" >
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="ToolTip" Value="{Binding Name}" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <!--Position-->
+                <DataGridTextColumn Header="Position" Binding="{Binding Position}" Width="1*">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="ToolTip" Value="{Binding Position}" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <!--URL-->
+                <DataGridTextColumn Header="URL" Binding="{Binding URL}" Width="1.5*">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="ToolTip" Value="{Binding URL}" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <!--Status-->
+                <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="1*">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="ToolTip" Value="{Binding Status}" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <!--ApplicationText-->
+                <DataGridTextColumn Header="Application Text" Binding="{Binding ApplicationText}" Width="4*">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="ToolTip" Value="{Binding ApplicationText}" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <!--CreationDate-->
+                <DataGridTextColumn Header="Created" Binding="{Binding CreationDate}" Width="1.9*">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="ToolTip" Value="{Binding CreationDate}" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <!--ModifiedDate-->
+                <DataGridTextColumn Header="Modified" Binding="{Binding ModifiedDate}" Width="1.9*">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="ToolTip" Value="{Binding ModifiedDate}" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <!--Functions-->
+                <DataGridTemplateColumn Header="Functions" Width="2.3*" CanUserResize="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                                <Button Content="Edit" Margin="5,0,0,0"
+                                <Button Content="Edit" Margin="5,2,2,0"
                                         Command="{Binding DataContext.EditJobApplicationCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                         CommandParameter="{Binding}" />
-                                <Button Content="Generate Text" Margin="5,0,0,0"
+                                <Button Content="Generate Text" Margin="5,2,2,0"
                                         Command="{Binding DataContext.GenerateApplicationTextCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                         CommandParameter="{Binding}" />
-                                <Button Content="Delete" Margin="5,0,0,0"
+                                <Button Content="Delete" Margin="5,2,2,0"
                                         Command="{Binding DataContext.DeleteJobApplicationCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                         CommandParameter="{Binding Id}" />
                             </StackPanel>
@@ -63,5 +128,5 @@
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
-    </StackPanel>
+    </DockPanel>
 </Window>

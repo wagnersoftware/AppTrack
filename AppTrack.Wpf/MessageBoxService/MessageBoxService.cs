@@ -6,11 +6,19 @@ public class MessageBoxService : IMessageBoxService
 {
     public MessageBoxResult ShowErrorMessageBox(string message, string caption = "Error")
     {
-        return MessageBox.Show(message, caption, MessageBoxButton.OK, MessageBoxImage.Error);
+        var owner = GetActiveWindow();
+        return MessageBox.Show(owner, message, caption, MessageBoxButton.OK, MessageBoxImage.Error);
     }
 
     public MessageBoxResult ShowQuestionMessageBox(string message, string caption)
     {
-        return MessageBox.Show(message, caption, MessageBoxButton.OKCancel, MessageBoxImage.Question);
+        var owner = GetActiveWindow(); 
+        return MessageBox.Show(owner, message, caption, MessageBoxButton.OKCancel, MessageBoxImage.Question);
     }
+
+    private Window GetActiveWindow() =>
+        Application.Current.Windows
+            .OfType<Window>()
+            .FirstOrDefault(w => w.IsActive)
+        ?? Application.Current.MainWindow;
 }

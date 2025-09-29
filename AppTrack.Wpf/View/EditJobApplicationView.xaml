@@ -7,7 +7,7 @@
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:converter="clr-namespace:AppTrack.WpfUi.Converter"
         mc:Ignorable="d"
-        Title="EditJobApplicationView" Height="300" Width="400">
+        Title="EditJobApplicationView" Height="600" Width="600">
     <Window.Resources>
         <converter:ErrorsDictionaryConverter x:Key="ErrorsDictConverter"/>
     </Window.Resources>
@@ -27,7 +27,7 @@
             <!--Name-->
             <Label HorizontalAlignment="Right" Grid.Row="0" Grid.Column="0">Name:</Label>
             <StackPanel Grid.Row="0" Grid.Column="1">
-                <TextBox Text="{Binding Model.Name}">
+                <TextBox Text="{Binding Model.Name}" ToolTip="{Binding Model.Name}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="TextChanged">
                             <i:InvokeCommandAction Command="{Binding ResetErrorsCommand}" CommandParameter="Name" />
@@ -45,7 +45,7 @@
             <!--Position-->
             <Label HorizontalAlignment="Right" Grid.Row="1" Grid.Column="0">Position:</Label>
             <StackPanel Grid.Row="1" Grid.Column="1">
-                <TextBox Text="{Binding Model.Position}">
+                <TextBox Text="{Binding Model.Position}" ToolTip="{Binding Model.Position}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="TextChanged">
                             <i:InvokeCommandAction Command="{Binding ResetErrorsCommand}" CommandParameter="Position" />
@@ -63,7 +63,7 @@
             <!--URL-->
             <Label HorizontalAlignment="Right" Grid.Row="2" Grid.Column="0">Url:</Label>
             <StackPanel Grid.Row="2" Grid.Column="1">
-                <TextBox Text="{Binding Model.URL}">
+                <TextBox Text="{Binding Model.URL}" ToolTip="{Binding Model.URL}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="TextChanged">
                             <i:InvokeCommandAction Command="{Binding ResetErrorsCommand}" CommandParameter="URL" />
@@ -78,10 +78,16 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </StackPanel>
+            <!--Status-->
+            <Label HorizontalAlignment="Right" Grid.Row="3" Grid.Column="0">Status:</Label>
+            <ComboBox Grid.Row="3" Grid.Column="1"  ItemsSource="{Binding  Model.JobApplicationStatusValues}" SelectedItem="{Binding Model.Status, Mode=TwoWay}" />
             <!--ApplicationText-->
-            <Label HorizontalAlignment="Right" Grid.Row="3" Grid.Column="0">Application Text:</Label>
-            <StackPanel Grid.Row="3" Grid.Column="1">
-                <TextBox Text="{Binding Model.ApplicationText}">
+            <Label HorizontalAlignment="Right" Grid.Row="4" Grid.Column="0" Margin="0,10,0,0">Application Text:</Label>
+            <StackPanel Grid.Row="4" Grid.Column="1" Margin="0,10,0,0">
+                <TextBox Text="{Binding Model.ApplicationText}" ToolTip="{Binding Model.ApplicationText}"
+                            AcceptsReturn="True"          
+                            VerticalScrollBarVisibility="Auto"
+                            Height="380">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="TextChanged">
                             <i:InvokeCommandAction Command="{Binding ResetErrorsCommand}" CommandParameter="ApplicationText" />
@@ -96,9 +102,6 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </StackPanel>
-            <!--Status-->
-            <Label HorizontalAlignment="Right" Grid.Row="4" Grid.Column="0">Status:</Label>
-            <ComboBox Grid.Row="4" Grid.Column="1"  ItemsSource="{Binding  Model.JobApplicationStatusValues}" SelectedItem="{Binding Model.Status, Mode=TwoWay}" />
         </Grid>
         <StackPanel Margin="10" Orientation="Horizontal" HorizontalAlignment="Center">
             <Button Content="Save" Command="{Binding SaveCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" HorizontalAlignment="Center" Margin="5"/>

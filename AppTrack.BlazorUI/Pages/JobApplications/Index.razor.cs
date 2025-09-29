@@ -33,7 +33,7 @@ namespace AppTrack.BlazorUI.Pages.JobApplications
 
         protected async Task DeleteJobApplication(int id)
         {
-            var response = await JobApplicationService.DeleteJobApplication(id);
+            var response = await JobApplicationService.DeleteJobApplicationAsync(id);
 
             if (response.Success)
             {
@@ -47,7 +47,8 @@ namespace AppTrack.BlazorUI.Pages.JobApplications
 
         protected override async Task OnInitializedAsync()
         {
-            JobApplications = await JobApplicationService.GetJobApplicationsAsync();
+            var apiResponse = await JobApplicationService.GetJobApplicationsAsync();
+            JobApplications = apiResponse.Data;
         }
     }
 }

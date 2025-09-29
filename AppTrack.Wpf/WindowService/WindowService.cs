@@ -8,9 +8,7 @@ public class WindowService : IWindowService
 {
     public bool? ShowWindow<TViewModel>(TViewModel viewModel) where TViewModel : class
     {
-        var owner = Application.Current.Windows
-        .OfType<Window>()
-        .FirstOrDefault(w => w.IsActive);
+        var owner = GetActiveWindow();
 
         Window window = viewModel switch
         {
@@ -29,4 +27,10 @@ public class WindowService : IWindowService
 
         return window.ShowDialog();
     }
+
+    private Window GetActiveWindow() =>
+    Application.Current.Windows
+        .OfType<Window>()
+        .FirstOrDefault(w => w.IsActive)
+    ?? Application.Current.MainWindow;
 }
