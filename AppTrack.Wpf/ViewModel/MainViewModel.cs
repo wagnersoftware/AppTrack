@@ -114,7 +114,12 @@ namespace AppTrack.WpfUi.ViewModel
             if (apiResponse.Success == false)
             {
                 _messageBoxService.ShowErrorMessageBox(apiResponse.Message);
+                return;
             }
+
+            int index = JobApplications.IndexOf(jobApplicationModel);
+            JobApplications.RemoveAt(index);
+            JobApplications.Insert(index, apiResponse.Data);
 
         }
 

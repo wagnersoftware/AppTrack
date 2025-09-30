@@ -1,10 +1,10 @@
 ﻿using AppTrack.Application.Contracts.Mediator;
-using AppTrack.Application.Shared;
+using AppTrack.Application.Features.JobApplications.Dto;
 using AppTrack.Domain.Enums;
 
 namespace AppTrack.Application.Features.JobApplications.Commands.UpdateJobApplication;
 
-public  class UpdateJobApplicationCommand: IRequest<Unit>
+public  class UpdateJobApplicationCommand: IRequest<JobApplicationDto>
 {
     public int Id { get; set; }
     public DateTime ModifiedDate { get; set; }

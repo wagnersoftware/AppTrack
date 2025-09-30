@@ -34,6 +34,7 @@
                 Margin="10"
                 Command="{Binding CreateJobApplicationCommand}">
         </Button>
+        <!--DataGrid-->
         <DataGrid ItemsSource="{Binding JobApplications}"
                   AutoGenerateColumns="False"
                   IsReadOnly="True"

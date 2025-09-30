@@ -24,13 +24,13 @@
             <!--Api Key-->
             <Label HorizontalAlignment="Right" Grid.Row="0" Grid.Column="0">Api Key:</Label>
             <StackPanel Grid.Row="0" Grid.Column="1">
-                <TextBlock Text="{Binding Model.ApiKey}">
+                <TextBox Text="{Binding Model.ApiKey}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="TextChanged">
                             <i:InvokeCommandAction Command="{Binding ResetErrorsCommand}" CommandParameter="ApiKey" />
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
-                </TextBlock>
+                </TextBox>
                 <ItemsControl ItemsSource="{Binding Errors, Converter={StaticResource ErrorsDictConverter}, ConverterParameter=ApiKey}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>

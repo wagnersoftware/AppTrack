@@ -10,6 +10,8 @@ public class JobApplicationDefaultsProfile : Profile
     public JobApplicationDefaultsProfile()
     {
         CreateMap<JobApplicationDefaultsDto, JobApplicationDefaults>().ReverseMap();
-        CreateMap<UpdateJobApplicationDefaultsCommand, JobApplicationDefaults>();
+        CreateMap<UpdateJobApplicationDefaultsCommand, JobApplicationDefaults>()
+            .ForMember(dest => dest.CreationDate, opt => opt.Ignore())
+            .ForMember(dest => dest.Id, opt => opt.Ignore());
     }
 }

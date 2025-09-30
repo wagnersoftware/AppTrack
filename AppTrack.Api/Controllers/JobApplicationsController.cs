@@ -52,14 +52,13 @@ public class JobApplicationsController : ControllerBase
 
     // PUT api/<JobApplicationsController>/5
     [HttpPut("{id}")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(JobApplicationDto))]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesDefaultResponseType]
-    public async Task<ActionResult> Put(UpdateJobApplicationCommand updateJobApplicationCommand)
+    public async Task<ActionResult<JobApplicationDto>> Put(UpdateJobApplicationCommand updateJobApplicationCommand)
     {
-        await _mediator.Send(updateJobApplicationCommand);
-        return NoContent();
+        var jobApplicationDto = await _mediator.Send(updateJobApplicationCommand);
+        return Ok(jobApplicationDto);
     }
 
     // DELETE api/<JobApplicationsController>/5

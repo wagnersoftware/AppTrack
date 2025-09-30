@@ -27,8 +27,8 @@ public class UpdateJobApplicationDefaultsCommandHandler : IRequestHandler<Update
             throw new BadRequestException($"Invalid update job application defaults request", validationResult);
         }
 
-        var jobApplicationDefaultsToUpdate = _mapper.Map<Domain.JobApplicationDefaults>(request);
-
+        var jobApplicationDefaultsToUpdate = await _jobApplicationDefaultsRepository.GetByIdAsync(request.Id);
+        _mapper.Map(request, jobApplicationDefaultsToUpdate);
         await _jobApplicationDefaultsRepository.UpdateAsync(jobApplicationDefaultsToUpdate);
 
         return Unit.Value;
