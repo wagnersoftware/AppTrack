@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:AppTrack.Wpf" xmlns:viewmodel="clr-namespace:AppTrack.WpfUi.ViewModel"
         xmlns:models="clr-namespace:AppTrack.Frontend.Models;assembly=AppTrack.Frontend.Models"
         mc:Ignorable="d"
-        Title="App Track" Height="800" Width="1500"
+        Title="AppTrack" Height="800" Width="1500"
         Loaded="Page_Loaded"
         WindowStartupLocation="CenterScreen">
     <DockPanel Margin="10">

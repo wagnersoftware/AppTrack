@@ -7,6 +7,11 @@
         <!-- Globale Default-FontSize -->
         <System:Double x:Key="DefaultFontSize">18</System:Double>
 
+        <!-- PasswordBox -->
+        <Style TargetType="PasswordBox">
+            <Setter Property="FontSize" Value="{StaticResource DefaultFontSize}" />
+        </Style>
+        
         <!-- TextBlocks -->
         <Style TargetType="TextBlock">
             <Setter Property="FontSize" Value="{StaticResource DefaultFontSize}" />
@@ -22,9 +27,14 @@
             <Setter Property="FontSize" Value="{StaticResource DefaultFontSize}" />
         </Style>
 
-        <!-- Labels -->
+        <!-- Label -->
         <Style TargetType="Label">
             <Setter Property="FontSize" Value="{StaticResource DefaultFontSize}" />
+        </Style>
+        
+        <!--Small Label-->
+        <Style x:Key="SmallLabelStyle" TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
+            <Setter Property="FontSize" Value="8"/>
         </Style>
 
         <!-- MenuItems -->

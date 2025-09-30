@@ -1,11 +1,13 @@
 ﻿using AppTrack.Frontend.ApiService;
 using AppTrack.Frontend.ApiService.Contracts;
+using AppTrack.Frontend.Models;
 using AppTrack.Frontend.Models.ModelValidator;
 using AppTrack.WpfUi.MessageBoxService;
 using AppTrack.WpfUi.TokenStorage;
 using AppTrack.WpfUi.ViewModel;
 using AppTrack.WpfUi.WindowService;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Windows;
 
 namespace AppTrack.Wpf;
@@ -41,5 +43,9 @@ public partial class App : Application
         var mainWindow = ServiceProvider.GetRequiredService<MainWindow>();
         mainWindow.Show();
         base.OnStartup(e);
+
+        var windowService = ServiceProvider.GetRequiredService<IWindowService>();
+        var loginViewModel = ActivatorUtilities.CreateInstance<LoginViewModel>(ServiceProvider);
+        windowService.ShowWindow(loginViewModel);
     }
 }
