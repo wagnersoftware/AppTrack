@@ -79,6 +79,7 @@
                 <TextBox Text="{Binding Model.ApplicationText}" ToolTip="{Binding Model.ApplicationText}"
                             AcceptsReturn="True"          
                             VerticalScrollBarVisibility="Auto"
+                            HorizontalScrollBarVisibility="Auto"
                             Height="340">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="TextChanged">

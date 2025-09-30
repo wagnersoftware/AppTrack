@@ -64,7 +64,8 @@
                          ToolTip="{Binding Model.Prompt}"
                          AcceptsReturn="True"          
                          VerticalScrollBarVisibility="Auto"
-                         Height="440">
+                         HorizontalScrollBarVisibility="Auto"
+                         Height="420">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="TextChanged">
                             <i:InvokeCommandAction Command="{Binding ResetErrorsCommand}" CommandParameter="Prompt" />
