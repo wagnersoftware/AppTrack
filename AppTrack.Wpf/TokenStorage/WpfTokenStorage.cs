@@ -5,7 +5,6 @@ using System.Text.Json;
 
 namespace AppTrack.WpfUi.TokenStorage
 {
-    // todo dependency injection
     public class WpfTokenStorage : ITokenStorage
     {
         private readonly string _filePath = Path.Combine(

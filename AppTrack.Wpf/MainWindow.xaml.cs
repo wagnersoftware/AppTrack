@@ -13,10 +13,4 @@ public partial class MainWindow : Window
         InitializeComponent();
         DataContext = viewModel;
     }
-
-    private async void Page_Loaded(object sender, RoutedEventArgs e)
-    {
-        var viewModel = (MainViewModel)this.DataContext;
-        await viewModel.LoadJobApplicationsAsync();
-    }
 }

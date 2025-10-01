@@ -20,5 +20,9 @@ public class MappingConfiguration: Profile
         //Ai Settings
         CreateMap<AiSettingsDto, AiSettingsModel>().ReverseMap();
         CreateMap<AiSettingsModel, UpdateAiSettingsCommand>();
+
+        //Authentication
+        CreateMap<LoginModel, AuthRequest>();
+        CreateMap<RegisterModel, RegistrationRequest>();
     }
 }

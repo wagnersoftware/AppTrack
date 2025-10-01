@@ -1,18 +1,57 @@
 ﻿<Window x:Class="AppTrack.WpfUi.View.LoginView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:converter="clr-namespace:AppTrack.WpfUi.Converter" xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         Title="AppTrack Login"
         SizeToContent="WidthAndHeight"
         WindowStartupLocation="CenterOwner">
+    <Window.Resources>
+        <converter:ErrorsDictionaryConverter x:Key="ErrorsDictConverter"/>
+    </Window.Resources>
     <StackPanel Margin="20" Width="250">
-        <TextBlock Text="Benutzername:"/>
-        <TextBox Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}" />
-        <TextBlock Text="Passwort:" Margin="0,10,0,0"/>
-        <PasswordBox x:Name="PasswordBox"/>
+        <!--UserName-->
+        <TextBlock Text="Username:"/>
+        <StackPanel>
+            <TextBox Text="{Binding Model.UserName}">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="TextChanged">
+                        <i:InvokeCommandAction Command="{Binding ResetErrorsCommand}" CommandParameter="UserName" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </TextBox>
+            <ItemsControl ItemsSource="{Binding Errors, Converter={StaticResource ErrorsDictConverter}, ConverterParameter=UserName}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Foreground="Red" FontSize="12" Text="{Binding}" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+        <!--Password-->
+        <TextBlock Text="Password:" Margin="0,10,0,0"/>
+        <StackPanel>
+            <PasswordBox x:Name="PasswordBox">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="PasswordChanged">
+                        <i:InvokeCommandAction Command="{Binding ResetErrorsCommand}" CommandParameter="Password" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </PasswordBox>
+            <ItemsControl ItemsSource="{Binding Errors, Converter={StaticResource ErrorsDictConverter}, ConverterParameter=Password}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Foreground="Red" FontSize="12" Text="{Binding}" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+        <!--Remember Me-->
         <DockPanel>
             <CheckBox VerticalAlignment="Center"></CheckBox>
             <Label FontSize="8" Content="Remember me" Style="{StaticResource ResourceKey=SmallLabelStyle}"></Label>
         </DockPanel>
+        <!--Message-->
+        <TextBlock Foreground="Red" FontSize="12" Text="{Binding ErrorMessage}" />
         <Button Content="Register" Command="{Binding RegisterCommand}" Margin="0,20,0,0"/>
         <Button Content="Login" Command="{Binding LoginCommand}" Margin="0,20,0,0"/>
     </StackPanel>

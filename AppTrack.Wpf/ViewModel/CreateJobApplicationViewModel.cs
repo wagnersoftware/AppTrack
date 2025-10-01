@@ -6,8 +6,8 @@ namespace AppTrack.WpfUi.ViewModel;
 
 public class CreateJobApplicationViewModel : AppTrackFormViewModelBase<JobApplicationModel>
 {
-    public CreateJobApplicationViewModel(IModelValidator<JobApplicationModel> modelValidator)
-        : base(modelValidator, new JobApplicationModel())
+    public CreateJobApplicationViewModel(IModelValidator<JobApplicationModel> modelValidator, JobApplicationModel model)
+        : base(modelValidator, model)
     {
     }
 

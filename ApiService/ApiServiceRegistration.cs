@@ -1,6 +1,8 @@
-﻿using AppTrack.Frontend.ApiService.Base;
+﻿using AppTrack.Frontend.ApiService.ApiAuthenticationProvider;
+using AppTrack.Frontend.ApiService.Base;
 using AppTrack.Frontend.ApiService.Contracts;
 using AppTrack.Frontend.ApiService.Services;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
@@ -16,6 +18,10 @@ public static class ApiServiceRegistration
         services.AddScoped<IJobApplicationDefaultsService, JobApplicationDefaultsService>();
         services.AddScoped<IAiSettingsService, AiSettingsService>();
         services.AddScoped<IApplicationTextService, ApplicationTextService>();
+
+        services.AddSingleton<ApiAuthenticationStateProvider>();
+        services.AddSingleton<AuthenticationStateProvider>(sp => sp.GetRequiredService<ApiAuthenticationStateProvider>());
+        services.AddScoped<IAuthenticationService, AuthenticationService>();
 
         services.AddAutoMapper(cfg =>
         {

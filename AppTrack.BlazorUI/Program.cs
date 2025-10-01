@@ -1,7 +1,7 @@
 using AppTrack.BlazorUI;
-using AppTrack.BlazorUI.Providers;
 using AppTrack.BlazorUI.TokenStorage;
 using AppTrack.Frontend.ApiService;
+using AppTrack.Frontend.ApiService.ApiAuthenticationProvider;
 using AppTrack.Frontend.ApiService.Contracts;
 using AppTrack.Frontend.ApiService.Services;
 using Blazored.LocalStorage;

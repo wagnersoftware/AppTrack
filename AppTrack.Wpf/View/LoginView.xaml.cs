@@ -13,16 +13,16 @@ namespace AppTrack.WpfUi.View
         {
             InitializeComponent();
             this.DataContext = viewModel;
-
-            viewModel.CloseAction = dlgResult =>
-            {
-                this.DialogResult = dlgResult;
-                this.Close();
-            };
             
             PasswordBox.PasswordChanged += (s, e) =>
             {
-                viewModel.Password = PasswordBox.Password;              
+                viewModel.Model.Password = PasswordBox.Password;              
+            };
+
+            viewModel.LoginSucceeded += () =>
+            {
+                this.DialogResult = true;
+                this.Close();
             };
         }
     }

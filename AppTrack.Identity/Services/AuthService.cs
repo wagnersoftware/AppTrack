@@ -25,18 +25,18 @@ public class AuthService : IAuthService
     }
     public async Task<AuthResponse> Login(AuthRequest request)
     {
-        var user = await _userManager.FindByEmailAsync(request.Email);
+        var user = await _userManager.FindByNameAsync(request.UserName);
 
         if (user == null)
         {
-            throw new NotFoundException("User with email {0} not found", request.Email);
+            throw new NotFoundException("User {0} not found", request.UserName);
         }
 
         var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, false);
 
         if (result.Succeeded == false)
         {
-            throw new BadRequestException($"Wrong credentials for user {request.Email}");
+            throw new BadRequestException($"Wrong credentials for user {request.UserName}");
         }
 
         var token = await GenerateToken(user);

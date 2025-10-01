@@ -7,7 +7,6 @@ using AppTrack.WpfUi.TokenStorage;
 using AppTrack.WpfUi.ViewModel;
 using AppTrack.WpfUi.WindowService;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 using System.Windows;
 
 namespace AppTrack.Wpf;
@@ -35,10 +34,14 @@ public partial class App : Application
         //views
         services.AddTransient<MainWindow>();
 
+        //models
+        services.AddTransient<JobApplicationModel>();
+        services.AddTransient<LoginModel>();
+
         ServiceProvider = services.BuildServiceProvider();
     }
 
-    protected override void OnStartup(StartupEventArgs e)
+    protected override async void OnStartup(StartupEventArgs e)
     {
         var mainWindow = ServiceProvider.GetRequiredService<MainWindow>();
         mainWindow.Show();
@@ -46,6 +49,17 @@ public partial class App : Application
 
         var windowService = ServiceProvider.GetRequiredService<IWindowService>();
         var loginViewModel = ActivatorUtilities.CreateInstance<LoginViewModel>(ServiceProvider);
-        windowService.ShowWindow(loginViewModel);
+        var isLoginSuccessful = windowService.ShowWindow(loginViewModel);
+
+        if(isLoginSuccessful == true)
+        {
+            var viewModel = (MainViewModel)mainWindow.DataContext;
+            await viewModel.LoadJobApplicationsAsync();
+        }
+        else
+        {
+            Application.Current.Shutdown();
+        }
+
     }
 }

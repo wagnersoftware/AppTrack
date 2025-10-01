@@ -43,6 +43,11 @@ namespace AppTrack.WpfUi.ViewModel
         {
             var apiResponse = await _jobApplicationService.GetJobApplicationsAsync();
 
+            if (apiResponse.Success == false)
+            {
+                _messageBoxService.ShowErrorMessageBox(apiResponse.Message);
+            }
+
             apiResponse.Data.ForEach(x => JobApplications.Add(x));
         }
 
