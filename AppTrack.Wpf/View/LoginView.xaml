@@ -1,7 +1,9 @@
 ﻿<Window x:Class="AppTrack.WpfUi.View.LoginView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:converter="clr-namespace:AppTrack.WpfUi.Converter" xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:converter="clr-namespace:AppTrack.WpfUi.Converter" 
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:helpers="clr-namespace:AppTrack.WpfUi.Helpers"
         Title="AppTrack Login"
         SizeToContent="WidthAndHeight"
         WindowStartupLocation="CenterOwner">
@@ -30,7 +32,7 @@
         <!--Password-->
         <TextBlock Text="Password:" Margin="0,10,0,0"/>
         <StackPanel>
-            <PasswordBox x:Name="PasswordBox">
+            <PasswordBox x:Name="PasswordBox" helpers:PasswordBoxHelper.BoundPassword="{Binding Model.Password}">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="PasswordChanged">
                         <i:InvokeCommandAction Command="{Binding ResetErrorsCommand}" CommandParameter="Password" />
@@ -46,13 +48,12 @@
             </ItemsControl>
         </StackPanel>
         <!--Remember Me-->
-        <DockPanel>
-            <CheckBox VerticalAlignment="Center"></CheckBox>
-            <Label FontSize="8" Content="Remember me" Style="{StaticResource ResourceKey=SmallLabelStyle}"></Label>
-        </DockPanel>
+        <CheckBox Margin="5" IsChecked="{Binding RememberMe}">
+            <TextBlock Text="Remember me" FontSize="12"/>
+        </CheckBox>
         <!--Message-->
         <TextBlock Foreground="Red" FontSize="12" Text="{Binding ErrorMessage}" />
-        <Button Content="Register" Command="{Binding RegisterCommand}" Margin="0,20,0,0"/>
         <Button Content="Login" Command="{Binding LoginCommand}" Margin="0,20,0,0"/>
+        <Button Content="Register" Command="{Binding RegisterCommand}" Margin="0,20,0,0"/>
     </StackPanel>
 </Window>

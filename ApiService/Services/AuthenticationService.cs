@@ -24,7 +24,6 @@ public class AuthenticationService : BaseHttpService, IAuthenticationService
     {
         try
         {
-            // todo user TryExecute
             var authenticationRequest = _mapper.Map<AuthRequest>(loginModel);
             var authenticationResponse = await _client.LoginAsync(authenticationRequest);
             if (authenticationResponse.Token != string.Empty)
@@ -48,7 +47,6 @@ public class AuthenticationService : BaseHttpService, IAuthenticationService
 
     public async Task<bool> RegisterAsync(RegisterModel registerModel)
     {
-        // todo user TryExecute
         var registrationRequest = _mapper.Map<RegistrationRequest>(registerModel);
         var response = await _client.RegisterAsync(registrationRequest);
 

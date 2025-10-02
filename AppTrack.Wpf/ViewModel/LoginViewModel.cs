@@ -1,6 +1,7 @@
 ﻿using AppTrack.Frontend.ApiService.Contracts;
 using AppTrack.Frontend.Models;
 using AppTrack.Frontend.Models.ModelValidator;
+using AppTrack.WpfUi.CredentialManagement;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -11,6 +12,7 @@ public partial class LoginViewModel : ObservableObject
     private readonly IAuthenticationService _authenticationService;
 
     private readonly IModelValidator<LoginModel> _modelValidator;
+    private readonly ICredentialManager _credentialManager;
 
     public IReadOnlyDictionary<string, List<string>> Errors => _modelValidator.Errors;
 
@@ -19,13 +21,34 @@ public partial class LoginViewModel : ObservableObject
     [ObservableProperty]
     private string errorMessage = string.Empty;
 
+
+    [ObservableProperty]
+    private bool rememberMe;
+
     public LoginModel Model { get; }
 
-    public LoginViewModel(LoginModel model, IAuthenticationService authenticationService, IModelValidator<LoginModel> modelValidator)
+    public LoginViewModel(LoginModel model, IAuthenticationService authenticationService, IModelValidator<LoginModel> modelValidator, ICredentialManager credentialManager)
     {
         this.Model = model;
         this._authenticationService = authenticationService;
         this._modelValidator = modelValidator;
+        this._credentialManager = credentialManager;
+
+        //get persisted value from settins
+        RememberMe = Properties.Settings.Default.RememberMe;
+
+        if(RememberMe == false)
+        {
+            return;
+        }
+
+        //load persisted credentials
+        var credentials = _credentialManager.LoadCredentials();
+        if (credentials.HasValue)
+        {
+            Model.UserName = credentials.Value.username;
+            Model.Password = credentials.Value.password;
+        }
     }
 
     [RelayCommand]
@@ -42,7 +65,22 @@ public partial class LoginViewModel : ObservableObject
         if (isAuthenticated == false)
         {
             ErrorMessage = "Authentication failed!";
+            return;
         }
+
+        //remember credentials
+        if (RememberMe)
+        {
+            _credentialManager.SaveCredentials(Model.UserName, Model.Password);
+        }
+        else
+        {
+            _credentialManager.DeleteCredentials();
+        }
+
+        //persist remember me
+        Properties.Settings.Default.RememberMe = RememberMe;
+        Properties.Settings.Default.Save();
 
         LoginSucceeded?.Invoke();
     }

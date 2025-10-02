@@ -1,13 +1,14 @@
 ﻿using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Features.JobApplications.Commands.GenerateApplicationText;
 using AppTrack.Application.Features.JobApplications.Dto;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AppTrack.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class ApplicationTextController : ControllerBase
     {
         private readonly IMediator _mediator;

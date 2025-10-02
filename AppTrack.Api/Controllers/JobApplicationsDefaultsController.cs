@@ -2,12 +2,14 @@
 using AppTrack.Application.Features.JobApplicationDefaults.Commands.UpdateApplicationDefaults;
 using AppTrack.Application.Features.JobApplicationDefaults.Dto;
 using AppTrack.Application.Features.JobApplicationDefaults.Queries.GetJobApplicationDefaultsByUserId;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AppTrack.Api.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class JobApplicationsDefaultsController : ControllerBase
 {
     private readonly IMediator _mediator;

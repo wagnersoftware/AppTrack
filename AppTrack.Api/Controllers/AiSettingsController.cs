@@ -2,13 +2,14 @@
 using AppTrack.Application.Features.AiSettings.Commands.UpdateAiSettings;
 using AppTrack.Application.Features.AiSettings.Dto;
 using AppTrack.Application.Features.AiSettings.Queries.GetAiSettingsByUserId;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AppTrack.Api.Controllers
 {
     [Route("api/Ai-settings")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class AiSettingsController : ControllerBase
     {
         private readonly IMediator _mediator;
