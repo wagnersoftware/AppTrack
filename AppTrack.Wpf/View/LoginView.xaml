@@ -9,6 +9,7 @@
         WindowStartupLocation="CenterOwner">
     <Window.Resources>
         <converter:ErrorsDictionaryConverter x:Key="ErrorsDictConverter"/>
+        <converter:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
     </Window.Resources>
     <StackPanel Margin="20" Width="250">
         <!--UserName-->
@@ -32,13 +33,17 @@
         <!--Password-->
         <TextBlock Text="Password:" Margin="0,10,0,0"/>
         <StackPanel>
-            <PasswordBox x:Name="PasswordBox" helpers:PasswordBoxHelper.BoundPassword="{Binding Model.Password}">
+            <PasswordBox x:Name="PasswordBox" helpers:PasswordBoxHelper.BoundPassword="{Binding Model.Password}"  
+                         Visibility="{Binding IsPasswordVisible, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=False}">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="PasswordChanged">
                         <i:InvokeCommandAction Command="{Binding ResetErrorsCommand}" CommandParameter="Password" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
             </PasswordBox>
+            <TextBox x:Name="PasswordTextBox"
+                 Text="{Binding Model.Password, Mode=TwoWay}"
+                 Visibility="{Binding IsPasswordVisible, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=True}"/>
             <ItemsControl ItemsSource="{Binding Errors, Converter={StaticResource ErrorsDictConverter}, ConverterParameter=Password}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
@@ -47,12 +52,18 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </StackPanel>
-        <!--Remember Me-->
-        <CheckBox Margin="5" IsChecked="{Binding RememberMe}">
-            <TextBlock Text="Remember me" FontSize="12"/>
+        <!--Checkboxes-->
+        <StackPanel>
+            <CheckBox Margin="0,5" IsChecked="{Binding IsRememberMeChecked}">
+                <TextBlock Text="Remember me" FontSize="12"/>
+            </CheckBox>
+            <CheckBox Margin="0,5" IsChecked="{Binding IsPasswordVisible}">
+                <TextBlock Text="Show password" FontSize="12"/>
         </CheckBox>
+        </StackPanel>
         <!--Message-->
         <TextBlock Foreground="Red" FontSize="12" Text="{Binding ErrorMessage}" />
+        <!--Buttons-->
         <Button Content="Login" Command="{Binding LoginCommand}" Margin="0,20,0,0"/>
         <Button Content="Register" Command="{Binding RegisterCommand}" Margin="0,20,0,0"/>
     </StackPanel>

@@ -23,7 +23,10 @@ public partial class LoginViewModel : ObservableObject
 
 
     [ObservableProperty]
-    private bool rememberMe;
+    private bool isRememberMeChecked;
+
+    [ObservableProperty]
+    private bool isPasswordVisible;
 
     public LoginModel Model { get; }
 
@@ -35,9 +38,9 @@ public partial class LoginViewModel : ObservableObject
         this._credentialManager = credentialManager;
 
         //get persisted value from settins
-        RememberMe = Properties.Settings.Default.RememberMe;
+        IsRememberMeChecked = Properties.Settings.Default.RememberMe;
 
-        if(RememberMe == false)
+        if(IsRememberMeChecked == false)
         {
             return;
         }
@@ -46,8 +49,8 @@ public partial class LoginViewModel : ObservableObject
         var credentials = _credentialManager.LoadCredentials();
         if (credentials.HasValue)
         {
-            Model.UserName = credentials.Value.username;
-            Model.Password = credentials.Value.password;
+            Model.UserName = credentials.Value.username!;
+            Model.Password = credentials.Value.password!;
         }
     }
 
@@ -68,8 +71,7 @@ public partial class LoginViewModel : ObservableObject
             return;
         }
 
-        //remember credentials
-        if (RememberMe)
+        if (IsRememberMeChecked)
         {
             _credentialManager.SaveCredentials(Model.UserName, Model.Password);
         }
@@ -79,7 +81,7 @@ public partial class LoginViewModel : ObservableObject
         }
 
         //persist remember me
-        Properties.Settings.Default.RememberMe = RememberMe;
+        Properties.Settings.Default.RememberMe = IsRememberMeChecked;
         Properties.Settings.Default.Save();
 
         LoginSucceeded?.Invoke();

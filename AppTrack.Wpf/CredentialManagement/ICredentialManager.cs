@@ -3,7 +3,7 @@
 public interface ICredentialManager
 {
     void SaveCredentials(string username, string password);
-    (string username, string password)? LoadCredentials();
+    (string? username, string? password)? LoadCredentials();
     void DeleteCredentials();
 }
 
