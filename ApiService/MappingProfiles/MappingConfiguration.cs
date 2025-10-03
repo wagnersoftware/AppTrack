@@ -23,6 +23,6 @@ public class MappingConfiguration: Profile
 
         //Authentication
         CreateMap<LoginModel, AuthRequest>();
-        CreateMap<RegisterModel, RegistrationRequest>();
+        CreateMap<RegistrationModel, RegistrationRequest>();
     }
 }

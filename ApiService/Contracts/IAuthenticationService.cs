@@ -6,7 +6,7 @@ public interface IAuthenticationService
 {
     Task<bool> AuthenticateAsync(LoginModel loginModel);
 
-    Task<bool> RegisterAsync(RegisterModel registerModel);
+    Task<bool> RegisterAsync(RegistrationModel registerModel);
 
     Task Logout();
 }

@@ -8,9 +8,9 @@ namespace AppTrack.WpfUi.ViewModel.Base;
 
 public partial class AppTrackFormViewModelBase<T>: ObservableObject where T : ModelBase
 {
-    public T Model { get; set; }
+    public T Model { get; }
 
-    private readonly IModelValidator<T> _modelValidator;
+    protected readonly IModelValidator<T> _modelValidator;
 
     public IReadOnlyDictionary<string, List<string>> Errors => _modelValidator.Errors;
 
@@ -21,9 +21,36 @@ public partial class AppTrackFormViewModelBase<T>: ObservableObject where T : Mo
     }
 
     [RelayCommand]
-    private void Save(Window window)
+    protected virtual async Task Save(Window window)
     {
-        if (_modelValidator.Validate(Model) == false)
+        await SaveInternal(window, false);
+    }
+
+    [RelayCommand]
+    protected virtual async Task SaveWithoutValidation(Window window)
+    {
+        await SaveInternal(window, true);
+    }
+
+    [RelayCommand]
+    protected virtual async Task Cancel(Window window)
+    {
+        window.DialogResult = false;
+        window.Close();
+
+        await Task.CompletedTask;
+    }
+
+    [RelayCommand]
+    protected virtual void ResetErrors(string propertyName)
+    {
+        _modelValidator.ResetErrors(propertyName);
+        OnPropertyChanged(nameof(Errors));
+    }
+
+    private async Task SaveInternal(Window window, bool validate)
+    {
+        if (validate && !_modelValidator.Validate(Model))
         {
             OnPropertyChanged(nameof(Errors));
             return;
@@ -31,19 +58,6 @@ public partial class AppTrackFormViewModelBase<T>: ObservableObject where T : Mo
 
         window.DialogResult = true;
         window.Close();
-    }
-
-    [RelayCommand]
-    private void Cancel(Window window)
-    {
-        window.DialogResult = false;
-        window.Close();
-    }
-
-    [RelayCommand]
-    private void ResetErrors(string propertyName)
-    {
-        _modelValidator.ResetErrors(propertyName);
-        OnPropertyChanged(nameof(Errors));
+        await Task.CompletedTask;
     }
 }

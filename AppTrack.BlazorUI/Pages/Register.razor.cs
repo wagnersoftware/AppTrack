@@ -7,7 +7,7 @@ namespace AppTrack.BlazorUI.Pages;
 public partial class Register
 {
 
-    public RegisterModel Model { get; set; }
+    public RegistrationModel Model { get; set; }
 
     [Inject]
     public NavigationManager NavigationManager { get; set; }
@@ -19,7 +19,7 @@ public partial class Register
 
     protected override void OnInitialized()
     {
-        Model = new RegisterModel();
+        Model = new RegistrationModel();
     }
 
     protected async Task HandleRegister()

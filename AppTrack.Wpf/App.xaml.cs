@@ -32,6 +32,7 @@ public partial class App : Application
         services.AddTransient<EditJobApplicationViewModel>();
         services.AddTransient<SetJobApplicationDefaultsViewModel>();
         services.AddTransient<SetAiSettingsViewModel>();
+        services.AddTransient<RegistrationViewModel>();
 
         //views
         services.AddTransient<MainWindow>();
@@ -39,6 +40,7 @@ public partial class App : Application
         //models
         services.AddTransient<JobApplicationModel>();
         services.AddTransient<LoginModel>();
+        services.AddTransient<RegistrationModel>();
 
         ServiceProvider = services.BuildServiceProvider();
     }

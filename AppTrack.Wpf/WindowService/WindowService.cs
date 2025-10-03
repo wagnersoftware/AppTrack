@@ -17,6 +17,7 @@ public class WindowService : IWindowService
             SetJobApplicationDefaultsViewModel vm => new SetJobApplicationDefaultsView(vm),
             SetAiSettingsViewModel vm => new SetAiSettingsView(vm),
             LoginViewModel vm => new LoginView(vm),
+            RegistrationViewModel vm => new RegistrationView(vm),
             _ => throw new NotImplementedException()
         };
 

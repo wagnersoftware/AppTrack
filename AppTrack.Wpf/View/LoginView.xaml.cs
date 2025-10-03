@@ -18,12 +18,6 @@ namespace AppTrack.WpfUi.View
             {
                 viewModel.Model.Password = PasswordBox.Password;              
             };
-
-            viewModel.LoginSucceeded += () =>
-            {
-                this.DialogResult = true;
-                this.Close();
-            };
         }
     }
 }

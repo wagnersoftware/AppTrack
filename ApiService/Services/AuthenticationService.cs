@@ -45,7 +45,7 @@ public class AuthenticationService : BaseHttpService, IAuthenticationService
         await ((ApiAuthenticationStateProvider)_authenticationStateProvider).LoggedOut();
     }
 
-    public async Task<bool> RegisterAsync(RegisterModel registerModel)
+    public async Task<bool> RegisterAsync(RegistrationModel registerModel)
     {
         var registrationRequest = _mapper.Map<RegistrationRequest>(registerModel);
         var response = await _client.RegisterAsync(registrationRequest);

@@ -2,21 +2,22 @@
 using AppTrack.Frontend.Models;
 using AppTrack.Frontend.Models.ModelValidator;
 using AppTrack.WpfUi.CredentialManagement;
+using AppTrack.WpfUi.ViewModel.Base;
+using AppTrack.WpfUi.WindowService;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.DependencyInjection;
+using System.Windows;
 
 namespace AppTrack.WpfUi.ViewModel;
 
-public partial class LoginViewModel : ObservableObject
+public partial class LoginViewModel : AppTrackFormViewModelBase<LoginModel>
 {
     private readonly IAuthenticationService _authenticationService;
 
-    private readonly IModelValidator<LoginModel> _modelValidator;
     private readonly ICredentialManager _credentialManager;
-
-    public IReadOnlyDictionary<string, List<string>> Errors => _modelValidator.Errors;
-
-    public event Action? LoginSucceeded;
+    private readonly IWindowService _windowService;
+    private readonly IServiceProvider _serviceProvider;
 
     [ObservableProperty]
     private string errorMessage = string.Empty;
@@ -28,14 +29,18 @@ public partial class LoginViewModel : ObservableObject
     [ObservableProperty]
     private bool isPasswordVisible;
 
-    public LoginModel Model { get; }
-
-    public LoginViewModel(LoginModel model, IAuthenticationService authenticationService, IModelValidator<LoginModel> modelValidator, ICredentialManager credentialManager)
+    public LoginViewModel(
+        LoginModel model,
+        IAuthenticationService authenticationService,
+        IModelValidator<LoginModel> modelValidator,
+        ICredentialManager credentialManager,
+        IWindowService windowService,
+        IServiceProvider serviceProvider) :base(modelValidator, model)
     {
-        this.Model = model;
         this._authenticationService = authenticationService;
-        this._modelValidator = modelValidator;
         this._credentialManager = credentialManager;
+        this._windowService = windowService;
+        this._serviceProvider = serviceProvider;
 
         //get persisted value from settins
         IsRememberMeChecked = Properties.Settings.Default.RememberMe;
@@ -54,8 +59,7 @@ public partial class LoginViewModel : ObservableObject
         }
     }
 
-    [RelayCommand]
-    private async Task Login()
+    protected override async Task Save(Window window)
     {
         if (_modelValidator.Validate(Model) == false)
         {
@@ -84,21 +88,20 @@ public partial class LoginViewModel : ObservableObject
         Properties.Settings.Default.RememberMe = IsRememberMeChecked;
         Properties.Settings.Default.Save();
 
-        LoginSucceeded?.Invoke();
+        await base.SaveWithoutValidation(window);
     }
 
     [RelayCommand]
-    private async Task Register()
+    private void Register()
     {
-
+        var registrationViewModel = _serviceProvider.GetRequiredService<RegistrationViewModel>();
+        _windowService.ShowWindow(registrationViewModel);
     }
 
-    [RelayCommand]
-    private void ResetErrors(string propertyName)
+    protected override void ResetErrors(string propertyName)
     {
         ErrorMessage = string.Empty;
-        _modelValidator.ResetErrors(propertyName);
-        OnPropertyChanged(nameof(Errors));
+        base.ResetErrors(propertyName);
     }
 }
 
