@@ -67,11 +67,11 @@ public partial class LoginViewModel : AppTrackFormViewModelBase<LoginModel>
             return;
         }
 
-        var isAuthenticated = await _authenticationService.AuthenticateAsync(Model);
+        var apiResponse = await _authenticationService.AuthenticateAsync(Model);
 
-        if (isAuthenticated == false)
+        if (apiResponse.Success == false)
         {
-            ErrorMessage = "Authentication failed!";
+            ErrorMessage = apiResponse.ValidationErrors;
             return;
         }
 

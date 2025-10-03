@@ -25,7 +25,7 @@
             <ItemsControl ItemsSource="{Binding Errors, Converter={StaticResource ErrorsDictConverter}, ConverterParameter=UserName}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Foreground="Red" FontSize="12" Text="{Binding}" />
+                        <TextBlock Foreground="Red" FontSize="12" Text="{Binding}" TextWrapping="Wrap" />
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
@@ -46,7 +46,7 @@
             <ItemsControl ItemsSource="{Binding Errors, Converter={StaticResource ErrorsDictConverter}, ConverterParameter=Password}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Foreground="Red" FontSize="12" Text="{Binding}" />
+                        <TextBlock Foreground="Red" FontSize="12" Text="{Binding}" TextWrapping="Wrap"/>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
@@ -61,7 +61,7 @@
             </CheckBox>
         </StackPanel>
         <!--Message-->
-        <TextBlock Foreground="Red" FontSize="12" Text="{Binding ErrorMessage}" />
+        <TextBlock Foreground="Red" FontSize="12" Text="{Binding ErrorMessage}" TextWrapping="Wrap"/>
         <!--Buttons-->
         <Button Content="Login" Command="{Binding SaveCommand }" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" Margin="0,20,0,0"/>
         <Button Content="Register" Command="{Binding RegisterCommand}" Margin="0,20,0,0"/>

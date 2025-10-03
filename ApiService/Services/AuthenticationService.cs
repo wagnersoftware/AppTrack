@@ -20,40 +20,35 @@ public class AuthenticationService : BaseHttpService, IAuthenticationService
         this._authenticationStateProvider = authenticationStateProvider;
     }
 
-    public async Task<bool> AuthenticateAsync(LoginModel loginModel)
-    {
-        try
-        {
-            var authenticationRequest = _mapper.Map<AuthRequest>(loginModel);
-            var authenticationResponse = await _client.LoginAsync(authenticationRequest);
-            if (authenticationResponse.Token != string.Empty)
-            {
-                await _tokenStorage.SetItemAsync("token", authenticationResponse.Token);
-                await ((ApiAuthenticationStateProvider)_authenticationStateProvider).LoggedIn();
-                return true;
-            }
-            return false;
-        }
-        catch (Exception)
-        {
-            return false;
-        }
+    public Task<Response<bool>> AuthenticateAsync(LoginModel loginModel) => 
+           TryExecuteAsync(async () =>
+           {
+               var authenticationRequest = _mapper.Map<AuthRequest>(loginModel);
+               var authenticationResponse = await _client.LoginAsync(authenticationRequest);
+               if (authenticationResponse.Token != string.Empty)
+               {
+                   await _tokenStorage.SetItemAsync("token", authenticationResponse.Token);
+                   await ((ApiAuthenticationStateProvider)_authenticationStateProvider).LoggedIn();
+                   return true;
+               }
+               return false;
+           });
 
-    }
     public async Task Logout()
     {
         await ((ApiAuthenticationStateProvider)_authenticationStateProvider).LoggedOut();
     }
 
-    public async Task<bool> RegisterAsync(RegistrationModel registerModel)
-    {
-        var registrationRequest = _mapper.Map<RegistrationRequest>(registerModel);
-        var response = await _client.RegisterAsync(registrationRequest);
+    public Task<Response<bool>> RegisterAsync(RegistrationModel registerModel) =>
+       TryExecuteAsync(async () =>
+       {
+           var registrationRequest = _mapper.Map<RegistrationRequest>(registerModel);
+           var response = await _client.RegisterAsync(registrationRequest);
 
-        if (!string.IsNullOrEmpty(response.UserId))
-        {
-            return true;
-        }
-        return false;
-    }
+           if (!string.IsNullOrEmpty(response.UserId))
+           {
+               return true;
+           }
+           return false;
+       });
 }

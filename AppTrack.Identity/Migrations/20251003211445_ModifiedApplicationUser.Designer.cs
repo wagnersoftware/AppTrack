@@ -4,6 +4,7 @@ using AppTrack.Identity.DBContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AppTrack.Identity.Migrations
 {
     [DbContext(typeof(AppTrackIdentityDbContext))]
-    partial class AppTrackIdentityDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251003211445_ModifiedApplicationUser")]
+    partial class ModifiedApplicationUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

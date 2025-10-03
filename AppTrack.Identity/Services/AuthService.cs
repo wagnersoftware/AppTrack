@@ -56,9 +56,6 @@ public class AuthService : IAuthService
     {
         var user = new ApplicationUser
         {
-            Email = request.Email,
-            FirstName = request.FirstName,
-            LastName = request.LastName,
             UserName = request.UserName,
             EmailConfirmed = true
         };
@@ -91,7 +88,6 @@ public class AuthService : IAuthService
         {
             new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email)
         }
         .Union(userClaims)
         .Union(roleClaims);

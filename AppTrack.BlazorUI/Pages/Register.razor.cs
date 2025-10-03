@@ -24,9 +24,9 @@ public partial class Register
 
     protected async Task HandleRegister()
     {
-        var result = await AuthenticationService.RegisterAsync(Model);
+        var apiResponse = await AuthenticationService.RegisterAsync(Model);
 
-        if (result)
+        if (apiResponse.Success)
         {
             NavigationManager.NavigateTo("/");
         }

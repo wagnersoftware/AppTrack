@@ -48,13 +48,13 @@
             <ItemsControl ItemsSource="{Binding Errors, Converter={StaticResource ErrorsDictConverter}, ConverterParameter=Password}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Foreground="Red" FontSize="12" Text="{Binding}" />
+                        <TextBlock Foreground="Red" FontSize="12" Text="{Binding}" TextWrapping="Wrap"/>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </StackPanel>
         <!--Confirm Password-->
-        <TextBlock Text="Repeat Password:" Margin="0,10,0,0"/>
+        <TextBlock Text="Confirm Password:" Margin="0,10,0,0"/>
         <StackPanel>
             <PasswordBox x:Name="ConfirmPasswordBox" helpers:PasswordBoxHelper.BoundPassword="{Binding Model.ConfirmPassword}"  
               Visibility="{Binding IsPasswordVisible, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=False}">
@@ -69,7 +69,7 @@
             <ItemsControl ItemsSource="{Binding Errors, Converter={StaticResource ErrorsDictConverter}, ConverterParameter=ConfirmPassword}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Foreground="Red" FontSize="12" Text="{Binding}" />
+                        <TextBlock Foreground="Red" FontSize="12" Text="{Binding}" TextWrapping="Wrap"/>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
@@ -79,11 +79,9 @@
             <TextBlock Text="Show password" FontSize="12"/>
         </CheckBox>
         <!--Message-->
-        <TextBlock Foreground="Red" FontSize="12" Text="{Binding ErrorMessage}" />
+        <TextBlock Foreground="Red" FontSize="12" Text="{Binding ErrorMessage}" TextWrapping="Wrap"/>
         <!--Buttons-->
-        <StackPanel Margin="10" Orientation="Horizontal" HorizontalAlignment="Center">
-            <Button Content="Register" Command="{Binding SaveCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" HorizontalAlignment="Center" Margin="5"/>
-            <Button Content="Cancel" Command="{Binding CancelCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" HorizontalAlignment="Center" Margin="5"/>
-        </StackPanel>
+        <Button Content="Register" Command="{Binding SaveCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" Margin="0,20,0,0"/>
+        <Button Content="Cancel" Command="{Binding CancelCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" Margin="0,20,0,0"/>
     </StackPanel>
 </Window>

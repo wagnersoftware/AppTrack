@@ -1,4 +1,4 @@
-﻿using AppTrack.BlazorUI.Providers;
+﻿using AppTrack.Frontend.ApiService.ApiAuthenticationProvider;
 using AppTrack.Frontend.ApiService.Contracts;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;

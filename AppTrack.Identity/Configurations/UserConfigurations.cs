@@ -25,8 +25,6 @@ public class UserConfiguration : IEntityTypeConfiguration<ApplicationUser>
                 PasswordHash = "AQAAAAIAAYagAAAAEONXKAOgk5TYispSOWr01crXs7n+NCe/sj+xSXJDAqPP+h0E+ZoUE440rEsfvH9wwA==", //Password1!
                 SecurityStamp = "STATIC-SECURITYSTAMP-ADMIN",
                 ConcurrencyStamp = "STATIC-CONCURRENCYSTAMP-ADMIN",
-                FirstName = "System",
-                LastName = "Admin",
                 AccessFailedCount = 0,
                 LockoutEnabled = false,
                 LockoutEnd = null,
@@ -45,8 +43,6 @@ public class UserConfiguration : IEntityTypeConfiguration<ApplicationUser>
                 PasswordHash = "AQAAAAIAAYagAAAAEIQ9SN1FNoOq38KmHYBolcXPW3nqc5eXMGmzGJ7KnNCFLJH/7Y1B6vHdCvbk/J+TwA==", //Password1!
                 SecurityStamp = "STATIC-SECURITYSTAMP-USER",
                 ConcurrencyStamp = "STATIC-CONCURRENCYSTAMP-USER",
-                FirstName = "System",
-                LastName = "User",
                 AccessFailedCount = 0,
                 LockoutEnabled = false,
                 LockoutEnd = null,

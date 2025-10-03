@@ -1,5 +1,5 @@
 ﻿using AppTrack.Frontend.ApiService.Contracts;
-using AppTrack.Frontend.Models;
+using AppTrack.Frontend.ApiService.Helper;
 
 namespace AppTrack.Frontend.ApiService.Base;
 
@@ -18,7 +18,7 @@ public class BaseHttpService
     {
         if (apiException.StatusCode == 400) // bad request
         {
-            return new Response<T> { Message = "Invalid data was submitted", ValidationErrors = apiException.Response, Success = false };
+            return new Response<T> { Message = "Invalid data was submitted", ValidationErrors = ApiErrorHelper.ExtractErrors(apiException.Response), Success = false };
         }
         else if (apiException.StatusCode == 404) // not found
         {

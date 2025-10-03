@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -26,7 +25,7 @@ public static class IdentityServiceRegistration
 
         services.AddIdentity<ApplicationUser, IdentityRole>(options =>
             {
-                options.User.RequireUniqueEmail = true;
+                options.User.RequireUniqueEmail = false;
             })
             .AddEntityFrameworkStores<AppTrackIdentityDbContext>()
             .AddDefaultTokenProviders();

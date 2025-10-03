@@ -32,11 +32,11 @@ public partial class RegistrationViewModel : AppTrackFormViewModelBase<Registrat
             return;
         }
 
-        var success = await _authenticationService.RegisterAsync(Model);
+        var apiResponse = await _authenticationService.RegisterAsync(Model);
 
-        if (success == false)
+        if (apiResponse.Success == false)
         {
-            ErrorMessage = "Registration was not successful, please try again.";
+            ErrorMessage = apiResponse.ValidationErrors;
             return;
         }
 

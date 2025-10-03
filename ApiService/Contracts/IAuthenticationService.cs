@@ -1,12 +1,13 @@
-﻿using AppTrack.Frontend.Models;
+﻿using AppTrack.Frontend.ApiService.Base;
+using AppTrack.Frontend.Models;
 
 namespace AppTrack.Frontend.ApiService.Contracts;
 
 public interface IAuthenticationService
 {
-    Task<bool> AuthenticateAsync(LoginModel loginModel);
+    Task<Response<bool>> AuthenticateAsync(LoginModel loginModel);
 
-    Task<bool> RegisterAsync(RegistrationModel registerModel);
+    Task<Response<bool>> RegisterAsync(RegistrationModel registerModel);
 
     Task Logout();
 }
