@@ -20,10 +20,6 @@ public partial class RegistrationViewModel : AppTrackFormViewModelBase<Registrat
     public RegistrationViewModel(IModelValidator<RegistrationModel> modelValidator, RegistrationModel model, IAuthenticationService authenticationService) : base(modelValidator, model)
     {
         this._authenticationService = authenticationService;
-
-        // this will subscribe the PasswordBox to the PasswordChanged event in PasswordBoxHelper
-        this.Model.Password = default!;
-        this.Model.ConfirmPassword = default!;
     }
 
     protected override async Task Save(Window window)

@@ -1,4 +1,5 @@
-﻿using AppTrack.WpfUi.ViewModel;
+﻿using AppTrack.WpfUi.Helpers;
+using AppTrack.WpfUi.ViewModel;
 using System.Windows;
 
 namespace AppTrack.WpfUi.View;
@@ -15,11 +16,13 @@ public partial class RegistrationView : Window
 
         PasswordBox.PasswordChanged += (s, e) =>
         {
+            PasswordBoxHelper.PasswordBox_PasswordChanged(s, e);
             viewModel.Model.Password = PasswordBox.Password;
         };
 
         ConfirmPasswordBox.PasswordChanged += (s, e) =>
         {
+            PasswordBoxHelper.PasswordBox_PasswordChanged(s, e);
             viewModel.Model.ConfirmPassword = ConfirmPasswordBox.Password;
         };
     }

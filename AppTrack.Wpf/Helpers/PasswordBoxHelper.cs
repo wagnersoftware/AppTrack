@@ -29,18 +29,15 @@ public static class PasswordBoxHelper
     {
         if (d is PasswordBox passwordBox)
         {
-            passwordBox.PasswordChanged -= PasswordBox_PasswordChanged;
-
             if (!GetIsUpdating(passwordBox)) //avoid infinite loop
             {
                 passwordBox.Password = e.NewValue as string ?? string.Empty;
             }
 
-            passwordBox.PasswordChanged += PasswordBox_PasswordChanged;
         }
     }
 
-    private static void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
+    internal static void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
     {
         if (sender is PasswordBox passwordBox)
         {

@@ -1,4 +1,5 @@
-﻿using AppTrack.WpfUi.ViewModel;
+﻿using AppTrack.WpfUi.Helpers;
+using AppTrack.WpfUi.ViewModel;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -16,7 +17,8 @@ namespace AppTrack.WpfUi.View
             
             PasswordBox.PasswordChanged += (s, e) =>
             {
-                viewModel.Model.Password = PasswordBox.Password;              
+                PasswordBoxHelper.PasswordBox_PasswordChanged(s, e);
+                viewModel.Model.Password = PasswordBox.Password;
             };
         }
     }
