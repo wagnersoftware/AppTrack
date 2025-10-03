@@ -45,7 +45,10 @@ public partial class LoginViewModel : AppTrackFormViewModelBase<LoginModel>
         //get persisted value from settins
         IsRememberMeChecked = Properties.Settings.Default.RememberMe;
 
-        if(IsRememberMeChecked == false)
+        // this will subscribe the PasswordBox to the PasswordChanged event in PasswordBoxHelper
+        this.Model.Password = default!;
+
+        if (IsRememberMeChecked == false)
         {
             return;
         }
