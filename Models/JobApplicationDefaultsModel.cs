@@ -2,7 +2,7 @@
 
 namespace AppTrack.Frontend.Models;
 
-public class JobApplicationDefaultsModel: ModelBase
+public class JobApplicationDefaultsModel : ModelBase
 {
     [MaxLength(50, ErrorMessage = "Maximum length for name is 50 characters")]
     public string Name { get; set; } = string.Empty;

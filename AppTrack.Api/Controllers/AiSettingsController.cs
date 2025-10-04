@@ -31,14 +31,14 @@ namespace AppTrack.Api.Controllers
         }
 
         // PUT api/ai-settings/5
-        [HttpPut("{id}",  Name = "UpdateAiSettings")]
+        [HttpPut("{id}", Name = "UpdateAiSettings")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesDefaultResponseType]
-        public async Task<ActionResult> Put([FromRoute]int id, [FromBody] UpdateAiSettingsCommand updateAiSettingsCommand)
+        public async Task<ActionResult> Put([FromRoute] int id, [FromBody] UpdateAiSettingsCommand updateAiSettingsCommand)
         {
-            if(id != updateAiSettingsCommand.Id)
+            if (id != updateAiSettingsCommand.Id)
             {
                 return BadRequest("Route ID and body ID do not match.");
             }

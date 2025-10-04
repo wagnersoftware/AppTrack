@@ -5,7 +5,7 @@ namespace AppTrack.Frontend.Models;
 
 public class RegistrationModel : ModelBase
 {
-    
+
     [Required(ErrorMessage = "The UserName field is required.")]
     [UserNameValidation]
     public string UserName { get; set; } = string.Empty;

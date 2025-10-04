@@ -6,7 +6,7 @@ using System.Windows;
 
 namespace AppTrack.WpfUi.ViewModel.Base;
 
-public partial class AppTrackFormViewModelBase<T>: ObservableObject where T : ModelBase
+public partial class AppTrackFormViewModelBase<T> : ObservableObject where T : ModelBase
 {
     public T Model { get; }
 

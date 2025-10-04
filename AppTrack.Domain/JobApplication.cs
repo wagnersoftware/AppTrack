@@ -2,7 +2,7 @@
 using AppTrack.Domain.Enums;
 
 namespace AppTrack.Domain;
-public class JobApplication: BaseEntity
+public class JobApplication : BaseEntity
 {
     public string Name { get; set; } = string.Empty;
     public string Position { get; set; } = string.Empty;

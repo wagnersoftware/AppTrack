@@ -13,7 +13,7 @@ public class JobApplicationDefaultsRepository : GenericRepository<JobApplication
 
     public async Task<JobApplicationDefaults?> CreateForUserAsync(string userId)
     {
-        var entityToCreate = new JobApplicationDefaults() { UserId = userId};
+        var entityToCreate = new JobApplicationDefaults() { UserId = userId };
         await CreateAsync(entityToCreate);
         return entityToCreate;
     }

@@ -24,7 +24,7 @@ public class CredentialManager : ICredentialManager
         var cred = Meziantou.Framework.Win32.CredentialManager.ReadCredential(_applicationName);
         if (cred != null)
         {
-            return(cred.UserName, cred.Password);
+            return (cred.UserName, cred.Password);
         }
 
         return null;

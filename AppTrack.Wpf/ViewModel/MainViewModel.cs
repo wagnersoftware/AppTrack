@@ -10,7 +10,7 @@ using System.Windows;
 
 namespace AppTrack.WpfUi.ViewModel
 {
-    public partial class MainViewModel: ObservableObject
+    public partial class MainViewModel : ObservableObject
     {
         private readonly IJobApplicationService _jobApplicationService;
         private readonly IJobApplicationDefaultsService _jobApplicationDefaultsService;
@@ -61,20 +61,20 @@ namespace AppTrack.WpfUi.ViewModel
 
             var windowResult = _windowService.ShowWindow(createJobApplicationViewModel);
 
-            if(windowResult == false)
+            if (windowResult == false)
             {
                 return;
             }
 
             var apiResponse = await _jobApplicationService.CreateJobApplicationAsync(createJobApplicationViewModel.Model);
 
-            if(apiResponse.Success == false)
+            if (apiResponse.Success == false)
             {
                 _messageBoxService.ShowErrorMessageBox(apiResponse.Message);
             }
 
             JobApplications.Add(apiResponse.Data);
-            
+
         }
 
         [RelayCommand]
@@ -109,7 +109,7 @@ namespace AppTrack.WpfUi.ViewModel
             var editJobApplicationViewModel = ActivatorUtilities.CreateInstance<EditJobApplicationViewModel>(_serviceProvider, jobApplicationModel);
             var windowResult = _windowService.ShowWindow(editJobApplicationViewModel);
 
-            if(windowResult == false)
+            if (windowResult == false)
             {
                 return;
             }

@@ -11,9 +11,9 @@ namespace AppTrack.Persistance.IntegrationTests
 
         public AppTrackDatabaseContextTests()
         {
-          var dbOptions = new DbContextOptionsBuilder<AppTrackDatabaseContext>()
-                .UseInMemoryDatabase(new Guid().ToString())
-                .Options;
+            var dbOptions = new DbContextOptionsBuilder<AppTrackDatabaseContext>()
+                  .UseInMemoryDatabase(new Guid().ToString())
+                  .Options;
 
             _appTrackDatabaseContext = new AppTrackDatabaseContext(dbOptions);
         }

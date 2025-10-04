@@ -12,7 +12,7 @@ public class MessageBoxService : IMessageBoxService
 
     public MessageBoxResult ShowQuestionMessageBox(string message, string caption)
     {
-        var owner = GetActiveWindow(); 
+        var owner = GetActiveWindow();
         return MessageBox.Show(owner, message, caption, MessageBoxButton.OKCancel, MessageBoxImage.Question);
     }
 

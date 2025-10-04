@@ -6,7 +6,7 @@ using AutoMapper;
 
 namespace AppTrack.Application.Features.JobApplicationDefaults.Queries.GetJobApplicationDefaultsByUserId
 {
-    public class GetJobApplicationDefaultsByUserIdQueryHandler : IRequestHandler<GetJobApplicationDefaultsByUserIdQuery,JobApplicationDefaultsDto>
+    public class GetJobApplicationDefaultsByUserIdQueryHandler : IRequestHandler<GetJobApplicationDefaultsByUserIdQuery, JobApplicationDefaultsDto>
     {
         private readonly IMapper _mapper;
         private readonly IJobApplicationDefaultsRepository _jobApplicationDefaultsRepository;

@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace AppTrack.Application.Features.JobApplications.Commands.CreateJobApplication;
 
-public class CreateJobApplicationCommandValidator: AbstractValidator<CreateJobApplicationCommand>
+public class CreateJobApplicationCommandValidator : AbstractValidator<CreateJobApplicationCommand>
 {
     public CreateJobApplicationCommandValidator()
     {

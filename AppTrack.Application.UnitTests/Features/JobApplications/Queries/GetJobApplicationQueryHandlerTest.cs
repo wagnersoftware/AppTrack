@@ -23,7 +23,7 @@ public class GetJobApplicationQueryHandlerTest
         var mapperConfig = new MapperConfiguration(cfg =>
         {
             cfg.AddProfile<JobApplicationProfile>();
-        }, NullLoggerFactory.Instance); 
+        }, NullLoggerFactory.Instance);
 
         _mapper = mapperConfig.CreateMapper();
         _mockAppLogger = new Mock<IAppLogger<GetJobApplicationsQueryHandler>>();

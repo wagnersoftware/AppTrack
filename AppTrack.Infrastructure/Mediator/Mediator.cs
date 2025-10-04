@@ -22,7 +22,7 @@ public class Mediator : IMediator
         {
             throw new InvalidOperationException($"No handler for type {request.GetType().Name} found");
         }
-            
+
 
         return (Task<TResponse>)handlerType
             .GetMethod("Handle")!

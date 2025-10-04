@@ -36,7 +36,7 @@ public class JobApplicationsController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<JobApplicationDto>> Get(int id)
     {
-        var jobApplicationDto = await _mediator.Send(new GetJobApplicationByIdQuery() { Id = id});
+        var jobApplicationDto = await _mediator.Send(new GetJobApplicationByIdQuery() { Id = id });
         return Ok(jobApplicationDto);
     }
 
@@ -48,7 +48,7 @@ public class JobApplicationsController : ControllerBase
     public async Task<ActionResult<JobApplicationDto>> Post(CreateJobApplicationCommand createJobApplicationCommand)
     {
         var response = await _mediator.Send(createJobApplicationCommand);
-        return CreatedAtAction(nameof(Get), response );
+        return CreatedAtAction(nameof(Get), response);
     }
 
     // PUT api/<JobApplicationsController>/5

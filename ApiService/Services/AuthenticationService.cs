@@ -20,7 +20,7 @@ public class AuthenticationService : BaseHttpService, IAuthenticationService
         this._authenticationStateProvider = authenticationStateProvider;
     }
 
-    public Task<Response<bool>> AuthenticateAsync(LoginModel loginModel) => 
+    public Task<Response<bool>> AuthenticateAsync(LoginModel loginModel) =>
            TryExecuteAsync(async () =>
            {
                var authenticationRequest = _mapper.Map<AuthRequest>(loginModel);

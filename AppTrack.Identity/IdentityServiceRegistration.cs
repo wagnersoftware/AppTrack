@@ -19,7 +19,8 @@ public static class IdentityServiceRegistration
     {
         services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
 
-        services.AddDbContext<AppTrackIdentityDbContext>(options => {
+        services.AddDbContext<AppTrackIdentityDbContext>(options =>
+        {
             options.UseSqlServer(configuration.GetConnectionString("AppTrackConnectionString"));
         });
 
@@ -43,7 +44,7 @@ public static class IdentityServiceRegistration
             {
                 ValidateIssuerSigningKey = true,
                 ValidateIssuer = true,
-                ValidateAudience =  true,
+                ValidateAudience = true,
                 ValidateLifetime = true,
                 ClockSkew = TimeSpan.Zero,
                 ValidIssuer = configuration["JwtSettings:Issuer"],

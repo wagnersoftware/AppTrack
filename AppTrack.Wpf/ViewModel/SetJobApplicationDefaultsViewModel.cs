@@ -6,7 +6,7 @@ namespace AppTrack.WpfUi.ViewModel;
 
 public class SetJobApplicationDefaultsViewModel : AppTrackFormViewModelBase<JobApplicationDefaultsModel>
 {
-    public SetJobApplicationDefaultsViewModel(JobApplicationDefaultsModel jobApplicationDefaults, IModelValidator<JobApplicationDefaultsModel> modelValidator) 
+    public SetJobApplicationDefaultsViewModel(JobApplicationDefaultsModel jobApplicationDefaults, IModelValidator<JobApplicationDefaultsModel> modelValidator)
         : base(modelValidator, jobApplicationDefaults)
     {
     }

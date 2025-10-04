@@ -21,7 +21,7 @@ public class CreateJobApplicationCommandHandler : IRequestHandler<CreateJobAppli
         var validator = new CreateJobApplicationCommandValidator();
         var validationResult = await validator.ValidateAsync(request);
 
-        if(validationResult.Errors.Any())
+        if (validationResult.Errors.Any())
         {
             throw new BadRequestException($"Invalid JobApplication", validationResult);
         }

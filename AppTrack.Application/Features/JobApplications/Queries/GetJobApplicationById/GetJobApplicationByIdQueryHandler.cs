@@ -11,7 +11,7 @@ public class GetJobApplicationByIdQueryHandler : IRequestHandler<GetJobApplicati
     private readonly IMapper _mapper;
     private readonly IJobApplicationRepository _jobApplicationRepository;
 
-    public GetJobApplicationByIdQueryHandler(IMapper mapper,IJobApplicationRepository jobApplicationRepository)
+    public GetJobApplicationByIdQueryHandler(IMapper mapper, IJobApplicationRepository jobApplicationRepository)
     {
         this._mapper = mapper;
         this._jobApplicationRepository = jobApplicationRepository;

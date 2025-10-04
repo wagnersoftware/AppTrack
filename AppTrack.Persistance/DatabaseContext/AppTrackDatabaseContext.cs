@@ -8,7 +8,7 @@ public class AppTrackDatabaseContext : DbContext
 {
     public AppTrackDatabaseContext(DbContextOptions<AppTrackDatabaseContext> options) : base(options)
     {
-       
+
     }
 
     public DbSet<JobApplication> JobApplications { get; set; }
@@ -25,7 +25,7 @@ public class AppTrackDatabaseContext : DbContext
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        foreach(var entry in base.ChangeTracker.Entries<BaseEntity>().Where((entry => entry.State == EntityState.Added || entry.State == EntityState.Modified )))
+        foreach (var entry in base.ChangeTracker.Entries<BaseEntity>().Where((entry => entry.State == EntityState.Added || entry.State == EntityState.Modified)))
         {
             entry.Entity.ModifiedDate = DateTime.Now;
 

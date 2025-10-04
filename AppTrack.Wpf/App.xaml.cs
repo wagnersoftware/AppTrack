@@ -55,7 +55,7 @@ public partial class App : Application
         var loginViewModel = ActivatorUtilities.CreateInstance<LoginViewModel>(ServiceProvider);
         var isLoginSuccessful = windowService.ShowWindow(loginViewModel);
 
-        if(isLoginSuccessful == true)
+        if (isLoginSuccessful == true)
         {
             var viewModel = (MainViewModel)mainWindow.DataContext;
             await viewModel.LoadJobApplicationsAsync();

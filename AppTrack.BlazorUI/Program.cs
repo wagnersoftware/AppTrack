@@ -22,8 +22,8 @@ builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>();
 builder.Services.AddScoped<IJobApplicationService, JobApplicationService>();
 
-builder.Services.AddAutoMapper(cfg =>  
-{ 
+builder.Services.AddAutoMapper(cfg =>
+{
     cfg.AddMaps(Assembly.GetExecutingAssembly());
 });
 

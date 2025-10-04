@@ -4,7 +4,7 @@ using AutoMapper;
 
 namespace AppTrack.Frontend.ApiService.MappingProfiles;
 
-public class MappingConfiguration: Profile
+public class MappingConfiguration : Profile
 {
     public MappingConfiguration()
     {

@@ -4,7 +4,7 @@ using AppTrack.Domain.Enums;
 
 namespace AppTrack.Application.Features.JobApplications.Commands.UpdateJobApplication;
 
-public  class UpdateJobApplicationCommand: IRequest<JobApplicationDto>
+public class UpdateJobApplicationCommand : IRequest<JobApplicationDto>
 {
     public int Id { get; set; }
     public DateTime ModifiedDate { get; set; }

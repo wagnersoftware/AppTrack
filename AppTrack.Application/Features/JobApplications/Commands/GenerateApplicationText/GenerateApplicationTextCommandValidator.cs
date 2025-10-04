@@ -8,7 +8,7 @@ public class GenerateApplicationTextCommandValidator : AbstractValidator<Generat
     private readonly IJobApplicationRepository _jobApplicationRepository;
     private readonly IAiSettingsRepository _aiSettingsRepository;
 
-    public GenerateApplicationTextCommandValidator(IJobApplicationRepository jobApplicationRepository,IAiSettingsRepository aiSettingsRepository)
+    public GenerateApplicationTextCommandValidator(IJobApplicationRepository jobApplicationRepository, IAiSettingsRepository aiSettingsRepository)
     {
         _jobApplicationRepository = jobApplicationRepository;
         _aiSettingsRepository = aiSettingsRepository;

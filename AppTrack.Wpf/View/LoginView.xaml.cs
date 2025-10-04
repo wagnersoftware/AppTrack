@@ -14,7 +14,7 @@ namespace AppTrack.WpfUi.View
         {
             InitializeComponent();
             this.DataContext = viewModel;
-            
+
             PasswordBox.PasswordChanged += (s, e) =>
             {
                 PasswordBoxHelper.PasswordBox_PasswordChanged(s, e);

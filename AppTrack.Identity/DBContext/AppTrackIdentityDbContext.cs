@@ -10,7 +10,7 @@ public class AppTrackIdentityDbContext : IdentityDbContext<ApplicationUser>
 {
     public AppTrackIdentityDbContext(DbContextOptions<AppTrackIdentityDbContext> options) : base(options)
     {
-        
+
     }
 
     protected override void OnModelCreating(ModelBuilder builder)

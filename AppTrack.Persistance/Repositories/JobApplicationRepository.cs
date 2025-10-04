@@ -7,7 +7,7 @@ namespace AppTrack.Persistance.Repositories;
 
 public class JobApplicationRepository : GenericRepository<JobApplication>, IJobApplicationRepository
 {
-    public JobApplicationRepository(AppTrackDatabaseContext dbContext): base(dbContext)
+    public JobApplicationRepository(AppTrackDatabaseContext dbContext) : base(dbContext)
     {
     }
     public async Task<bool> IsClientUnique(string clientName)

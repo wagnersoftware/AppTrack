@@ -9,11 +9,12 @@ namespace AppTrack.Persistance;
 
 public static class PersistanceServiceRegistration
 {
-    public static IServiceCollection AddPersistanceServices(this IServiceCollection services, IConfiguration  configuration)
+    public static IServiceCollection AddPersistanceServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContext<AppTrackDatabaseContext>(options => {
+        services.AddDbContext<AppTrackDatabaseContext>(options =>
+        {
             options.UseSqlServer(configuration.GetConnectionString("AppTrackConnectionString"));
-            });
+        });
 
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
         services.AddScoped<IJobApplicationRepository, JobApplicationRepository>();

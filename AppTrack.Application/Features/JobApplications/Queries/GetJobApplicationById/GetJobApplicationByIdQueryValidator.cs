@@ -2,7 +2,7 @@
 
 namespace AppTrack.Application.Features.JobApplications.Queries.GetJobApplicationById;
 
-public class GetJobApplicationByIdQueryValidator: AbstractValidator<GetJobApplicationByIdQuery>
+public class GetJobApplicationByIdQueryValidator : AbstractValidator<GetJobApplicationByIdQuery>
 {
     public GetJobApplicationByIdQueryValidator()
     {

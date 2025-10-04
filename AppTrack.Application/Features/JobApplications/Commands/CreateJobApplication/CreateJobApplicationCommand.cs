@@ -3,7 +3,7 @@ using AppTrack.Domain;
 using AppTrack.Domain.Enums;
 
 namespace AppTrack.Application.Features.JobApplications.Commands.CreateJobApplication;
-public class CreateJobApplicationCommand: IRequest<JobApplication>
+public class CreateJobApplicationCommand : IRequest<JobApplication>
 {
     public DateTime CreationDate { get; set; }
     public DateTime ModifiedDate { get; set; }

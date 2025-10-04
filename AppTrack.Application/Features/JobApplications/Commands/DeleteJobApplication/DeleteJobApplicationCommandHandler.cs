@@ -6,7 +6,7 @@ using AppTrack.Application.Shared;
 
 namespace AppTrack.Application.Features.JobApplications.Commands.DeleteJobApplication;
 
-public class DeleteJobApplicationCommandHandler: IRequestHandler<DeleteJobApplicationCommand, Unit>
+public class DeleteJobApplicationCommandHandler : IRequestHandler<DeleteJobApplicationCommand, Unit>
 {
     private readonly IJobApplicationRepository _jobApplicationRepository;
     private readonly IAppLogger<DeleteJobApplicationCommandHandler> _logger;

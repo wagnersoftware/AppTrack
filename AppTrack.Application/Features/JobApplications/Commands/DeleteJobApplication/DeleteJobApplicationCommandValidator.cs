@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace AppTrack.Application.Features.JobApplications.Commands.DeleteJobApplication;
 
-public class DeleteJobApplicationCommandValidator: AbstractValidator<DeleteJobApplicationCommand>
+public class DeleteJobApplicationCommandValidator : AbstractValidator<DeleteJobApplicationCommand>
 {
     private readonly IJobApplicationRepository _jobApplicationRepository;
 

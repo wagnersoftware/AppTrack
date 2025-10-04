@@ -23,7 +23,7 @@ namespace AppTrack.BlazorUI.Pages.JobApplications
 
         protected void AllocateJobApplication(int id)
         {
-            
+
         }
 
         protected void EditJobApplication(int id)

@@ -35,7 +35,7 @@ public partial class LoginViewModel : AppTrackFormViewModelBase<LoginModel>
         IModelValidator<LoginModel> modelValidator,
         ICredentialManager credentialManager,
         IWindowService windowService,
-        IServiceProvider serviceProvider) :base(modelValidator, model)
+        IServiceProvider serviceProvider) : base(modelValidator, model)
     {
         this._authenticationService = authenticationService;
         this._credentialManager = credentialManager;
