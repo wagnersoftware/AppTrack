@@ -14,8 +14,8 @@ namespace AppTrack.Application.UnitTests.Features.JobApplications.Queries;
 public class GetJobApplicationQueryHandlerTest
 {
     private readonly Mock<IJobApplicationRepository> _mockRepo;
-    private IMapper _mapper;
-    private Mock<IAppLogger<GetJobApplicationsQueryHandler>> _mockAppLogger;
+    private readonly IMapper _mapper;
+    private readonly Mock<IAppLogger<GetJobApplicationsQueryHandler>> _mockAppLogger;
 
     public GetJobApplicationQueryHandlerTest()
     {
@@ -37,6 +37,6 @@ public class GetJobApplicationQueryHandlerTest
         var result = await handler.Handle(new GetJobApplicationsQuery(), CancellationToken.None);
 
         result.ShouldBeOfType<List<JobApplicationDto>>();
-        result.Count().ShouldBe(2);
+        result.Count.ShouldBe(2);
     }
 }

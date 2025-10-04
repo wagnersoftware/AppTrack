@@ -29,7 +29,7 @@ public class ExceptionMiddleware
     private async Task HandleExceptionAsync(HttpContext httpContext, Exception ex)
     {
         HttpStatusCode statusCode = HttpStatusCode.InternalServerError;
-        CustomProblemDetails problem = new();
+        CustomProblemDetails problem;
 
         switch (ex)
         {

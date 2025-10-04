@@ -4,7 +4,7 @@ using Moq;
 
 namespace AppTrack.Application.UnitTests.Mocks;
 
-public class MockJobApplicationRepository
+public static class MockJobApplicationRepository
 {
     public static Mock<IJobApplicationRepository> GetJobApplicationRepository()
     {

@@ -30,7 +30,7 @@ public class WindowService : IWindowService
         return window.ShowDialog();
     }
 
-    private Window GetActiveWindow() =>
+    private static Window GetActiveWindow() =>
     Application.Current.Windows
         .OfType<Window>()
         .FirstOrDefault(w => w.IsActive)

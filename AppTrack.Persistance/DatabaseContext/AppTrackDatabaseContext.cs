@@ -17,10 +17,10 @@ public class AppTrackDatabaseContext : DbContext
 
     public DbSet<AiSettings> AiSettings { get; set; }
 
-    protected override void OnModelCreating(ModelBuilder builder)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        builder.ApplyConfigurationsFromAssembly(typeof(AppTrackDatabaseContext).Assembly);
-        base.OnModelCreating(builder);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppTrackDatabaseContext).Assembly);
+        base.OnModelCreating(modelBuilder);
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

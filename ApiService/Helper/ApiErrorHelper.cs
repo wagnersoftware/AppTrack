@@ -36,7 +36,7 @@ public static class ApiErrorHelper
         {
             foreach (var item in errors.EnumerateArray())
             {
-                messages.Add(item.GetString());
+                messages.Add(item.GetString());             
             }
         }
 

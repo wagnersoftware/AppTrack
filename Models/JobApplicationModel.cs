@@ -22,7 +22,7 @@ public class JobApplicationModel : ModelBase
     [Required]
     public JobApplicationStatus Status { get; set; } = JobApplicationStatus.New;
     public DateTime AppliedDate { get; set; }
-    public Array JobApplicationStatusValues => Enum.GetValues(typeof(JobApplicationStatus));
+    public static Array JobApplicationStatusValues => Enum.GetValues(typeof(JobApplicationStatus));
     public enum JobApplicationStatus
     {
         New,
