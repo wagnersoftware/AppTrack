@@ -32,13 +32,18 @@
                 </MenuItem>
             </Menu>
         </DockPanel>
-        <!--  MainContent  -->
-        <Button
-            Margin="10,20,10,20"
-            HorizontalAlignment="Left"
-            Command="{Binding CreateJobApplicationCommand}"
-            Content="Create Job Application"
-            DockPanel.Dock="Top" />
+        <!--  Command Bar  -->
+        <ui:CommandBar Margin="10" DockPanel.Dock="Top">
+            <ui:AppBarButton
+                HorizontalAlignment="Left"
+                Command="{Binding CreateJobApplicationCommand}"
+                Icon="Add"
+                Label="New" />
+            <ui:CommandBar.SecondaryCommands>
+                <ui:AppBarButton Icon="Setting" Label="Settings" />
+                <ui:AppBarButton Icon="Help" Label="Help" />
+            </ui:CommandBar.SecondaryCommands>
+        </ui:CommandBar>
         <!--  DataGrid  -->
         <DataGrid
             MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Window}}"
