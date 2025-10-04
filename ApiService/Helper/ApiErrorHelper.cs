@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using Microsoft.AspNetCore.Components;
+using System.Text.Json;
 
 namespace AppTrack.Frontend.ApiService.Helper;
 
@@ -6,6 +7,11 @@ public static class ApiErrorHelper
 {
     public static string ExtractErrors(string json)
     {
+        if(string.IsNullOrEmpty(json))
+        {
+            return string.Empty;
+        }
+
         using var doc = JsonDocument.Parse(json);
 
         string? title = doc.RootElement.TryGetProperty("title", out var titleProp)

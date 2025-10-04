@@ -6,13 +6,14 @@
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     Title="Create Job Application"
     Width="600"
-    Height="600">
+    Height="650">
     <Window.Resources>
         <converter:ErrorsDictionaryConverter x:Key="ErrorsDictConverter" />
     </Window.Resources>
     <StackPanel>
-        <Grid Margin="10,10,10,10">
+        <Grid Margin="10">
             <Grid.RowDefinitions>
+                <RowDefinition />
                 <RowDefinition />
                 <RowDefinition />
                 <RowDefinition />
@@ -26,10 +27,14 @@
             <Label
                 Grid.Row="0"
                 Grid.Column="0"
+                Margin="0,5,5,0"
                 HorizontalAlignment="Right">
                 Name:
             </Label>
-            <StackPanel Grid.Row="0" Grid.Column="1">
+            <StackPanel
+                Grid.Row="0"
+                Grid.Column="1"
+                Margin="5">
                 <TextBox Text="{Binding Model.Name}" ToolTip="{Binding Model.Name}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="TextChanged">
@@ -52,10 +57,14 @@
             <Label
                 Grid.Row="1"
                 Grid.Column="0"
+                Margin="0,5,5,0"
                 HorizontalAlignment="Right">
                 Position:
             </Label>
-            <StackPanel Grid.Row="1" Grid.Column="1">
+            <StackPanel
+                Grid.Row="1"
+                Grid.Column="1"
+                Margin="5">
                 <TextBox Text="{Binding Model.Position}" ToolTip="{Binding Model.Position}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="TextChanged">
@@ -78,10 +87,14 @@
             <Label
                 Grid.Row="2"
                 Grid.Column="0"
+                Margin="0,5,5,0"
                 HorizontalAlignment="Right">
                 Url:
             </Label>
-            <StackPanel Grid.Row="2" Grid.Column="1">
+            <StackPanel
+                Grid.Row="2"
+                Grid.Column="1"
+                Margin="5">
                 <TextBox Text="{Binding Model.URL}" ToolTip="{Binding Model.URL}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="TextChanged">
@@ -104,10 +117,14 @@
             <Label
                 Grid.Row="3"
                 Grid.Column="0"
+                Margin="0,5,5,0"
                 HorizontalAlignment="Right">
                 Application Text:
             </Label>
-            <StackPanel Grid.Row="3" Grid.Column="1">
+            <StackPanel
+                Grid.Row="3"
+                Grid.Column="1"
+                Margin="5">
                 <TextBox
                     Height="340"
                     AcceptsReturn="True"
@@ -132,23 +149,21 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </StackPanel>
+            <!--  Buttons  -->
+            <StackPanel Grid.Row="4" Grid.Column="2">
+                <Button
+                    Margin="5,20,5,5"
+                    HorizontalAlignment="Stretch"
+                    Command="{Binding SaveCommand}"
+                    CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
+                    Content="Save" />
+                <Button
+                    Margin="5"
+                    HorizontalAlignment="Stretch"
+                    Command="{Binding CancelCommand}"
+                    CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
+                    Content="Cancel" />
+            </StackPanel>
         </Grid>
-        <StackPanel
-            Margin="10"
-            HorizontalAlignment="Center"
-            Orientation="Horizontal">
-            <Button
-                Margin="5"
-                HorizontalAlignment="Center"
-                Command="{Binding SaveCommand}"
-                CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
-                Content="Save" />
-            <Button
-                Margin="5"
-                HorizontalAlignment="Center"
-                Command="{Binding CancelCommand}"
-                CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
-                Content="Cancel" />
-        </StackPanel>
     </StackPanel>
 </Window>

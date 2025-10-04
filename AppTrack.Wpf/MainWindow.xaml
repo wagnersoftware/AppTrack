@@ -6,10 +6,12 @@
     xmlns:local="clr-namespace:AppTrack.Wpf"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:AppTrack.Frontend.Models;assembly=AppTrack.Frontend.Models"
+    xmlns:ui="http://schemas.modernwpf.com/2019"
     xmlns:viewmodel="clr-namespace:AppTrack.WpfUi.ViewModel"
     Title="AppTrack"
     Width="1500"
     Height="800"
+    ui:WindowHelper.UseModernWindowStyle="True"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
 
@@ -32,12 +34,11 @@
         </DockPanel>
         <!--  MainContent  -->
         <Button
-            Margin="10"
-            HorizontalAlignment="Right"
+            Margin="10,20,10,20"
+            HorizontalAlignment="Left"
             Command="{Binding CreateJobApplicationCommand}"
             Content="Create Job Application"
-            DockPanel.Dock="Top"
-            FontSize="18" />
+            DockPanel.Dock="Top" />
         <!--  DataGrid  -->
         <DataGrid
             MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Window}}"
@@ -49,11 +50,11 @@
             Focusable="False"
             IsReadOnly="True"
             ItemsSource="{Binding JobApplications}"
-            RowHeight="30">
+            RowHeight="40">
             <DataGrid.Columns>
                 <!--  Id  -->
                 <DataGridTextColumn
-                    Width="0.3*"
+                    Width="0.4*"
                     Binding="{Binding Id}"
                     Header="Id">
                     <DataGridTextColumn.ElementStyle>
@@ -105,7 +106,7 @@
                 </DataGridTextColumn>
                 <!--  ApplicationText  -->
                 <DataGridTextColumn
-                    Width="4*"
+                    Width="3.5*"
                     Binding="{Binding ApplicationText}"
                     Header="Application Text">
                     <DataGridTextColumn.ElementStyle>
@@ -116,7 +117,7 @@
                 </DataGridTextColumn>
                 <!--  CreationDate  -->
                 <DataGridTextColumn
-                    Width="1.9*"
+                    Width="1.7*"
                     Binding="{Binding CreationDate}"
                     Header="Created">
                     <DataGridTextColumn.ElementStyle>
@@ -127,7 +128,7 @@
                 </DataGridTextColumn>
                 <!--  ModifiedDate  -->
                 <DataGridTextColumn
-                    Width="1.9*"
+                    Width="1.7*"
                     Binding="{Binding ModifiedDate}"
                     Header="Modified">
                     <DataGridTextColumn.ElementStyle>
@@ -138,24 +139,24 @@
                 </DataGridTextColumn>
                 <!--  Functions  -->
                 <DataGridTemplateColumn
-                    Width="2.3*"
+                    Width="2.5*"
                     CanUserResize="False"
                     Header="Functions">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
                                 <Button
-                                    Margin="5,2,2,0"
+                                    Margin="5"
                                     Command="{Binding DataContext.EditJobApplicationCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                     CommandParameter="{Binding}"
                                     Content="Edit" />
                                 <Button
-                                    Margin="5,2,2,0"
+                                    Margin="5"
                                     Command="{Binding DataContext.GenerateApplicationTextCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                     CommandParameter="{Binding}"
                                     Content="Generate Text" />
                                 <Button
-                                    Margin="5,2,2,0"
+                                    Margin="5"
                                     Command="{Binding DataContext.DeleteJobApplicationCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                     CommandParameter="{Binding Id}"
                                     Content="Delete" />

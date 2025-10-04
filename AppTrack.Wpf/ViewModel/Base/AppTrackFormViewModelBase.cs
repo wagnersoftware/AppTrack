@@ -16,20 +16,20 @@ public partial class AppTrackFormViewModelBase<T> : ObservableObject where T : M
 
     public AppTrackFormViewModelBase(IModelValidator<T> modelValidator, T model)
     {
-        Model = model ?? throw new ArgumentNullException("Null is not valid for the model, pass a new instance of Type T instead");
+        Model = model ?? throw new ArgumentNullException(nameof(model));
         this._modelValidator = modelValidator;
     }
 
     [RelayCommand]
     protected virtual async Task Save(Window window)
     {
-        await SaveInternal(window, false);
+        await SaveInternal(window, true);
     }
 
     [RelayCommand]
     protected virtual async Task SaveWithoutValidation(Window window)
     {
-        await SaveInternal(window, true);
+        await SaveInternal(window, false);
     }
 
     [RelayCommand]
