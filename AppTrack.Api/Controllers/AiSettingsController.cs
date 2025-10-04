@@ -25,7 +25,6 @@ namespace AppTrack.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<AiSettingsDto>> GetForUser(int userId)
         {
-            //todo für aktuellen User(me), sobald Authorisierung implementiert -> var userId = _userContext.UserId; // aus JWT / ClaimsPrincipal
             var aiSettingsDto = await _mediator.Send(new GetAiSettingsByUserIdQuery() { UserId = userId });
             return Ok(aiSettingsDto);
         }

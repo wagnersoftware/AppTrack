@@ -48,7 +48,7 @@ namespace AppTrack.WpfUi.ViewModel
                 _messageBoxService.ShowErrorMessageBox(apiResponse.Message);
             }
 
-            apiResponse.Data.ForEach(x => JobApplications.Add(x));
+            apiResponse.Data?.ForEach(x => JobApplications.Add(x));
         }
 
         [RelayCommand]

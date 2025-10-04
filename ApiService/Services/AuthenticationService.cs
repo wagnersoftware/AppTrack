@@ -4,6 +4,7 @@ using AppTrack.Frontend.ApiService.Contracts;
 using AppTrack.Frontend.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Components.Authorization;
+using System.Security.Claims;
 
 namespace AppTrack.Frontend.ApiService.Services;
 

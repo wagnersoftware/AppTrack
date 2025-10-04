@@ -45,7 +45,7 @@ public class GenerateApplicationTextCommandHandler : IRequestHandler<GenerateApp
         return new GeneratedApplicationTextDto() { ApplicationText = generatedApplicationText };
     }
 
-    private string BuildPrompt(string prompt, string position, string mySkills, string url)
+    private static string BuildPrompt(string prompt, string position, string mySkills, string url)
     {
         var replacements = new Dictionary<string, string>
         {

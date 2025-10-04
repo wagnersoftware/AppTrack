@@ -41,7 +41,7 @@ public class ApiAuthenticationStateProvider : AuthenticationStateProvider
 
     public async Task LoggedOut()
     {
-        var claims = await GetClaimsAsync();
+        await _localStorageService.RemoveItemAsync("token");
         var nobody = new ClaimsPrincipal(new ClaimsIdentity());
         var authstate = Task.FromResult(new AuthenticationState(nobody));
         NotifyAuthenticationStateChanged(authstate);
