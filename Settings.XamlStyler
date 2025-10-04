@@ -1,0 +1,48 @@
+{
+  "IndentWithTabs": false,
+  "IndentSize": 2,
+
+  "AttributesTolerance": 1,
+  "KeepFirstAttributeOnSameLine": true,
+  "MaxAttributeCharactersPerLine": 120,
+  "MaxAttributesPerLine": 3,
+  "PutAttributeOrder": [
+    "x:Class",
+    "xmlns",
+    "xmlns:x",
+    "xmlns:mc",
+    "xmlns:d",
+    "xmlns:*",
+    "x:Name",
+    "Name",
+    "Grid.Row",
+    "Grid.Column",
+    "Grid.RowSpan",
+    "Grid.ColumnSpan",
+    "Width",
+    "Height",
+    "Margin",
+    "Padding",
+    "Style",
+    "Background",
+    "Foreground",
+    "FontSize",
+    "FontWeight",
+    "HorizontalAlignment",
+    "VerticalAlignment",
+    "Command",
+    "Content",
+    "Text",
+    "Template",
+    "DataContext",
+    "x:Key"
+  ],
+
+  "SeparateByGroups": true,
+  "NewlineExemptionElements": [ "TextBlock", "Run" ],
+
+  "RemoveDesignTimeReferences": false,
+  "ReorderVSM": true,
+  "ReorderGridChildren": false,
+  "ReorderCanvasChildren": false
+}
