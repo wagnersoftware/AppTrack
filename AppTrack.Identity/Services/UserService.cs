@@ -19,7 +19,6 @@ public class UserService : IUserService
 
         return new User()
         {
-            Email = user.Email,
             Id = user.Id,
         };
     }
@@ -29,7 +28,6 @@ public class UserService : IUserService
         var users = await _userManager.GetUsersInRoleAsync("User");
         return users.Select(u => new User()
         {
-            Email = u.Email,
             Id = u.Id,
         }).ToList();
     }

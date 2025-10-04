@@ -2,6 +2,7 @@
 
 namespace AppTrack.Frontend.Models.ValidationAttributes
 {
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
     public class UserNameValidationAttribute : ValidationAttribute
     {
         public int MaxLength { get; set; } = 256;

@@ -2,6 +2,7 @@
 
 namespace AppTrack.Frontend.Models.ValidationAttributes;
 
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
 public class PasswordValidationAttribute : ValidationAttribute
 {
     public int RequiredLength { get; set; } = 6;
