@@ -9,7 +9,6 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.ObjectModel;
-using System.Security.Claims;
 using System.Windows;
 
 namespace AppTrack.WpfUi.ViewModel
