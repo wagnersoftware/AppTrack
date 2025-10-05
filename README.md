@@ -9,7 +9,9 @@ The project is primarily intended as a playground for exploring new technologies
 - Manage personal job applications
 - Generate application texts using AI
 - Token Authentication
-- WPF (MVVM) desktop frontend (Blazor web frontend planned)
+- WPF desktop frontend (Blazor web frontend planned)
+- WPF implemented with MVVM and CommunityToolkit.Mvvm
+- XAMLStyler for codestyle
 - ASP.NET Web API backend with Clean Architecture, CQRS, and Mediator pattern
 - Dependency Injection
 - Clean Code and SOLID prinicipals
@@ -18,6 +20,10 @@ The project is primarily intended as a playground for exploring new technologies
 - Fluent Validations
 - ModernWpfUi controls
 - Unit- and Integration Tests
+- static code analysis with SonarAnalyzer.CSharp
+- Entity Framework Core
+- SQLite Datenbank
+
 
 ## Installation
 1. Clone the repository:
