@@ -1,6 +1,8 @@
 # AppTrack
 
-AppTrack helps me manage my own job applications and generate application texts using AI (work in progress). It features a WPF frontend, with a Blazor web frontend planned for the future. The backend is an ASP.NET Web API (all .NET 8) following Clean Architecture, CQRS, and the Mediator pattern. 
+![AppTrack](Documentation/Screenshots/Apptrack.png))
+
+AppTrack helps me manage my own job applications and generate application texts using AI (work in progress). It features Bearer-Token Authentication, a WPF frontend, with a Blazor web frontend planned for the future. The backend is an ASP.NET Web API (all .NET 8) following Clean Architecture, CQRS, and the Mediator pattern. 
 The project is primarily intended as a playground for exploring new technologies and architectures.
 
 ## Features
@@ -20,6 +22,11 @@ The project is primarily intended as a playground for exploring new technologies
 4. Run the backend and frontend projects. (right click on solution -> Properties
 
 ![Properties](Documentation/Screenshots/MultipleStartProjects.png))
+
+5. Run the database migrations in packet-manager
+   ```bash
+   update-database -context AppTrackDatabaseContext
+   update-database -context AppTrackIdentityDbContext
 
 ## Contributing
 
