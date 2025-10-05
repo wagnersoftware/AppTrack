@@ -6,7 +6,7 @@ namespace AppTrack.Application.Features.JobApplications.Commands.GenerateApplica
 public class GenerateApplicationTextCommand : IRequest<GeneratedApplicationTextDto>
 {
     public int ApplicationId { get; set; }
-    public int UserId { get; set; }
+    public string UserId { get; set; } = string.Empty;
     public string URL { get; set; } = string.Empty;
     public string Position { get; set; } = string.Empty;
 }

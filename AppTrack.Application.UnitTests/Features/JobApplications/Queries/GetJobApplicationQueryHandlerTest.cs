@@ -1,7 +1,7 @@
 ﻿using AppTrack.Application.Contracts.Logging;
 using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Features.JobApplications.Dto;
-using AppTrack.Application.Features.JobApplications.Queries.GetAllJobApplications;
+using AppTrack.Application.Features.JobApplications.Queries.GetAllJobApplicationsForUser;
 using AppTrack.Application.MappingProfiles;
 using AppTrack.Application.UnitTests.Mocks;
 using AutoMapper;
@@ -15,7 +15,7 @@ public class GetJobApplicationQueryHandlerTest
 {
     private readonly Mock<IJobApplicationRepository> _mockRepo;
     private readonly IMapper _mapper;
-    private readonly Mock<IAppLogger<GetJobApplicationsQueryHandler>> _mockAppLogger;
+    private readonly Mock<IAppLogger<GetJobApplicationsForUserQueryHandler>> _mockAppLogger;
 
     public GetJobApplicationQueryHandlerTest()
     {
@@ -26,15 +26,15 @@ public class GetJobApplicationQueryHandlerTest
         }, NullLoggerFactory.Instance);
 
         _mapper = mapperConfig.CreateMapper();
-        _mockAppLogger = new Mock<IAppLogger<GetJobApplicationsQueryHandler>>();
+        _mockAppLogger = new Mock<IAppLogger<GetJobApplicationsForUserQueryHandler>>();
     }
 
     [Fact]
     public async Task GetJobApplicationListTest()
     {
-        var handler = new GetJobApplicationsQueryHandler(_mapper, _mockRepo.Object, _mockAppLogger.Object);
+        var handler = new GetJobApplicationsForUserQueryHandler(_mapper, _mockRepo.Object, _mockAppLogger.Object);
 
-        var result = await handler.Handle(new GetJobApplicationsQuery(), CancellationToken.None);
+        var result = await handler.Handle(new GetJobApplicationsForUserQuery(), CancellationToken.None);
 
         result.ShouldBeOfType<List<JobApplicationDto>>();
         result.Count.ShouldBe(2);

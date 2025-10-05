@@ -14,10 +14,10 @@ public class JobApplicationDefaultsService : BaseHttpService, IJobApplicationDef
         this._mapper = mapper;
     }
 
-    public Task<Response<JobApplicationDefaultsModel>> GetForUserAsync(int userId) =>
+    public Task<Response<JobApplicationDefaultsModel>> GetForUserAsync(string userId) =>
         TryExecuteAsync(async () =>
         {
-            var jobApplicationDefaults = await _client.GetJobApplicationDefaultsForUserAsync(userId.ToString());
+            var jobApplicationDefaults = await _client.GetJobApplicationDefaultsForUserAsync(userId);
             return _mapper.Map<JobApplicationDefaultsModel>(jobApplicationDefaults);
         });
 

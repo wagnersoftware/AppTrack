@@ -10,7 +10,10 @@ public class MappingConfiguration : Profile
     {
         //Job Application
         CreateMap<JobApplicationDto, JobApplicationModel>().ReverseMap();
-        CreateMap<CreateJobApplicationCommand, JobApplicationModel>().ReverseMap();
+        CreateMap<CreateJobApplicationCommand, JobApplicationModel>()
+                .ReverseMap()
+                .ForMember(dest => dest.UserId, opt => opt.Ignore());
+
         CreateMap<UpdateJobApplicationCommand, JobApplicationModel>().ReverseMap();
 
         //Job Application Defaults

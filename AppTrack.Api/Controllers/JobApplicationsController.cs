@@ -1,10 +1,9 @@
 ﻿using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Features.JobApplications.Commands.CreateJobApplication;
 using AppTrack.Application.Features.JobApplications.Commands.DeleteJobApplication;
-using AppTrack.Application.Features.JobApplications.Commands.GenerateApplicationText;
 using AppTrack.Application.Features.JobApplications.Commands.UpdateJobApplication;
 using AppTrack.Application.Features.JobApplications.Dto;
-using AppTrack.Application.Features.JobApplications.Queries.GetAllJobApplications;
+using AppTrack.Application.Features.JobApplications.Queries.GetAllJobApplicationsForUser;
 using AppTrack.Application.Features.JobApplications.Queries.GetJobApplicationById;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -25,10 +24,10 @@ public class JobApplicationsController : ControllerBase
         this._mediator = mediator;
     }
     // GET: api/<JobApplicationsController>
-    [HttpGet]
-    public async Task<ActionResult<List<JobApplicationDto>>> Get()
+    [HttpGet("forUser/{userId}")]
+    public async Task<ActionResult<List<JobApplicationDto>>> Get(string userId)
     {
-        var jobApplicationDtos = await _mediator.Send(new GetJobApplicationsQuery());
+        var jobApplicationDtos = await _mediator.Send(new GetJobApplicationsForUserQuery() { UserId = userId});
         return Ok(jobApplicationDtos);
     }
 
@@ -48,7 +47,7 @@ public class JobApplicationsController : ControllerBase
     public async Task<ActionResult<JobApplicationDto>> Post(CreateJobApplicationCommand createJobApplicationCommand)
     {
         var response = await _mediator.Send(createJobApplicationCommand);
-        return CreatedAtAction(nameof(Get), response);
+        return CreatedAtAction(nameof(Post), response);
     }
 
     // PUT api/<JobApplicationsController>/5

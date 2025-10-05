@@ -14,10 +14,11 @@ public class JobApplicationService : BaseHttpService, IJobApplicationService
         this._mapper = mapper;
     }
 
-    public Task<Response<JobApplicationModel>> CreateJobApplicationAsync(JobApplicationModel jobApplicationModel) =>
+    public Task<Response<JobApplicationModel>> CreateJobApplicationForUserAsync(JobApplicationModel jobApplicationModel, string userId) =>
         TryExecuteAsync(async () =>
         {
             var createJobApplicationCommand = _mapper.Map<CreateJobApplicationCommand>(jobApplicationModel);
+            createJobApplicationCommand.UserId = userId;
             var jobApplicationDto = await _client.JobApplicationsPOSTAsync(createJobApplicationCommand);
             return _mapper.Map<JobApplicationModel>(jobApplicationDto);
         });
@@ -35,10 +36,10 @@ public class JobApplicationService : BaseHttpService, IJobApplicationService
             return _mapper.Map<JobApplicationModel>(jobApplicationDtos);
         });
 
-    public Task<Response<List<JobApplicationModel>>> GetJobApplicationsAsync() =>
+    public Task<Response<List<JobApplicationModel>>> GetJobApplicationsForUserAsync(string userId) =>
         TryExecuteAsync(async () =>
         {
-            var jobApplicationDtos = await _client.JobApplicationsAllAsync();
+            var jobApplicationDtos = await _client.ForUserAsync(userId);
             return _mapper.Map<List<JobApplicationModel>>(jobApplicationDtos);
         });
 

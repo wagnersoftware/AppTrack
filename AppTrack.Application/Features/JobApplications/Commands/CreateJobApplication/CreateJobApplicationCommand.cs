@@ -13,5 +13,6 @@ public class CreateJobApplicationCommand : IRequest<JobApplication>
     public string ApplicationText { get; set; } = string.Empty;
     public JobApplicationStatus Status { get; set; } = JobApplicationStatus.New;
     public DateTime AppliedDate { get; set; }
+    public string UserId { get; set; } = string.Empty;
 }
 

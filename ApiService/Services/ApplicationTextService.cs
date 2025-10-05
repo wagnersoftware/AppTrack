@@ -9,7 +9,7 @@ namespace AppTrack.Frontend.ApiService.Services
         {
         }
 
-        public Task<Response<string>> GenerateApplicationText(int applicationId, int userId, string url, string position) =>
+        public Task<Response<string>> GenerateApplicationText(int applicationId, string userId, string url, string position) =>
             TryExecuteAsync(async () =>
             {
                 var command = new GenerateApplicationTextCommand()

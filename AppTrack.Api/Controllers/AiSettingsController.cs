@@ -23,7 +23,7 @@ namespace AppTrack.Api.Controllers
         [HttpGet("{userId}", Name = "GetAiSettingsForUser")]
         [ProducesResponseType(typeof(AiSettingsDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<AiSettingsDto>> GetForUser(int userId)
+        public async Task<ActionResult<AiSettingsDto>> GetForUser(string userId)
         {
             var aiSettingsDto = await _mediator.Send(new GetAiSettingsByUserIdQuery() { UserId = userId });
             return Ok(aiSettingsDto);

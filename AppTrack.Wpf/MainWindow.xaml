@@ -2,6 +2,7 @@
     x:Class="AppTrack.Wpf.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converter="clr-namespace:AppTrack.WpfUi.Converter"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:AppTrack.Wpf"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -15,6 +16,9 @@
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
 
+    <Window.Resources>
+        <converter:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+    </Window.Resources>
     <DockPanel Margin="10">
         <!--  Menu  -->
         <DockPanel DockPanel.Dock="Top">
@@ -32,21 +36,56 @@
                 </MenuItem>
             </Menu>
         </DockPanel>
+        <!--  Login information  -->
+        <StackPanel
+            Margin="0,0,10,0"
+            HorizontalAlignment="Right"
+            DockPanel.Dock="Top"
+            Orientation="Horizontal"
+            Visibility="{Binding IsLoggedIn, Converter={StaticResource BoolToVisibilityConverter}}">
+            <TextBlock
+                Margin="0,0,10,0"
+                Foreground="Green"
+                Text="Logged in as:" />
+            <TextBlock Foreground="Green" Text="{Binding LoggedInUser}" />
+        </StackPanel>
         <!--  Command Bar  -->
         <ui:CommandBar Margin="10" DockPanel.Dock="Top">
-            <ui:AppBarButton
-                HorizontalAlignment="Left"
-                Command="{Binding CreateJobApplicationCommand}"
-                Icon="Add"
-                Label="New" />
-            <ui:CommandBar.SecondaryCommands>
-                <ui:AppBarButton Icon="Setting" Label="Settings" />
-                <ui:AppBarButton Icon="Help" Label="Help" />
-            </ui:CommandBar.SecondaryCommands>
+            <ui:CommandBar.Content>
+                <Grid Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=ui:CommandBar}}" HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <!--  <Add jobApplication button  -->
+                    <ui:AppBarButton
+                        Command="{Binding CreateJobApplicationCommand}"
+                        Icon="Add"
+                        IsEnabled="{Binding IsLoggedIn}"
+                        Label="New" />
+                    <!--  Logout Button  -->
+                    <StackPanel Grid.Column="2" Orientation="Horizontal">
+                        <ui:AppBarButton
+                            Command="{Binding LogoutCommand}"
+                            Icon="LeaveChat"
+                            Label="Logout"
+                            Visibility="{Binding IsLoggedIn, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=true}" />
+                        <ui:AppBarButton
+                            Command="{Binding LoginCommand}"
+                            Icon="Contact"
+                            Label="Login"
+                            Visibility="{Binding IsLoggedIn, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=false}" />
+                    </StackPanel>
+                </Grid>
+            </ui:CommandBar.Content>
         </ui:CommandBar>
+
         <!--  DataGrid  -->
         <DataGrid
             MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Window}}"
+            Margin="0,20,0,0"
             d:DataContext="{d:DesignInstance Type=models:JobApplicationModel,
                                              IsDesignTimeCreatable=True}"
             AlternatingRowBackground="LightGray"

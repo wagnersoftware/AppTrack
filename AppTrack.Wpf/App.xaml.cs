@@ -2,7 +2,9 @@
 using AppTrack.Frontend.ApiService.Contracts;
 using AppTrack.Frontend.Models;
 using AppTrack.Frontend.Models.ModelValidator;
+using AppTrack.WpfUi.Contracts;
 using AppTrack.WpfUi.CredentialManagement;
+using AppTrack.WpfUi.Helpers;
 using AppTrack.WpfUi.MessageBoxService;
 using AppTrack.WpfUi.TokenStorage;
 using AppTrack.WpfUi.ViewModel;
@@ -25,6 +27,7 @@ public partial class App : Application
         services.AddSingleton<IMessageBoxService, MessageBoxService>();
         services.AddTransient(typeof(IModelValidator<>), typeof(ModelValidator<>));
         services.AddSingleton<ICredentialManager, CredentialManager>();
+        services.AddSingleton<IUserHelper, UserHelper>();
 
         // viewmodels
         services.AddSingleton<MainViewModel>();
@@ -33,6 +36,7 @@ public partial class App : Application
         services.AddTransient<SetJobApplicationDefaultsViewModel>();
         services.AddTransient<SetAiSettingsViewModel>();
         services.AddTransient<RegistrationViewModel>();
+        services.AddTransient<LoginViewModel>();
 
         //views
         services.AddTransient<MainWindow>();
@@ -52,13 +56,13 @@ public partial class App : Application
         base.OnStartup(e);
 
         var windowService = ServiceProvider.GetRequiredService<IWindowService>();
-        var loginViewModel = ActivatorUtilities.CreateInstance<LoginViewModel>(ServiceProvider);
+        var loginViewModel = ServiceProvider.GetRequiredService<LoginViewModel>();
         var isLoginSuccessful = windowService.ShowWindow(loginViewModel);
 
         if (isLoginSuccessful == true)
         {
             var viewModel = (MainViewModel)mainWindow.DataContext;
-            await viewModel.LoadJobApplicationsAsync();
+            await viewModel.LoadJobApplicationsForUserAsync();
         }
         else
         {

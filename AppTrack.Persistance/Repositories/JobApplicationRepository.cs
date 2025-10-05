@@ -10,8 +10,9 @@ public class JobApplicationRepository : GenericRepository<JobApplication>, IJobA
     public JobApplicationRepository(AppTrackDatabaseContext dbContext) : base(dbContext)
     {
     }
-    public async Task<bool> IsClientUnique(string clientName)
+
+    public async Task<List<JobApplication>> GetAllForUserAsync(string userId)
     {
-        return !await _context.JobApplications.Where(x => x.Name == clientName).AnyAsync();
+        return await _context.JobApplications.Where(x => x.UserId == userId).ToListAsync();
     }
 }

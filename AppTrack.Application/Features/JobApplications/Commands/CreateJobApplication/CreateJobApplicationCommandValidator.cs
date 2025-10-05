@@ -1,5 +1,4 @@
-﻿using AppTrack.Application.Contracts.Persistance;
-using FluentValidation;
+﻿using FluentValidation;
 
 namespace AppTrack.Application.Features.JobApplications.Commands.CreateJobApplication;
 
@@ -21,6 +20,10 @@ public class CreateJobApplicationCommandValidator : AbstractValidator<CreateJobA
             .NotEmpty().WithMessage("{PropertyName} is required")
             .NotNull().WithMessage("{PropertyName} is required")
             .MaximumLength(500).WithMessage("{PropertyName} must be fewer than 500 characters");
+
+        RuleFor(x => x.UserId)
+            .NotEmpty().WithMessage("{PropertyName} is required")
+            .NotNull().WithMessage("{PropertyName} is required");
 
         RuleFor(x => x.Status)
             .NotNull().WithMessage("{PropertyName} is required");

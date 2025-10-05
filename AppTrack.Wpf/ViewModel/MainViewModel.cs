@@ -1,11 +1,15 @@
-﻿using AppTrack.Frontend.ApiService.Contracts;
+﻿using AppTrack.Frontend.ApiService.ApiAuthenticationProvider;
+using AppTrack.Frontend.ApiService.Contracts;
 using AppTrack.Frontend.Models;
+using AppTrack.WpfUi.Contracts;
 using AppTrack.WpfUi.MessageBoxService;
 using AppTrack.WpfUi.WindowService;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.ObjectModel;
+using System.Security.Claims;
 using System.Windows;
 
 namespace AppTrack.WpfUi.ViewModel
@@ -19,8 +23,17 @@ namespace AppTrack.WpfUi.ViewModel
         private readonly IAiSettingsService _aiSettingsService;
         private readonly IApplicationTextService _applicationTextService;
         private readonly IMessageBoxService _messageBoxService;
+        private readonly IAuthenticationService _authenticationService;
+        private readonly ApiAuthenticationStateProvider _apiAuthenticationStateProvider;
+        private readonly IUserHelper _userHelper;
 
         public ObservableCollection<JobApplicationModel> JobApplications { get; set; } = new();
+
+        [ObservableProperty]
+        private bool isLoggedIn = false;
+
+        [ObservableProperty]
+        private string loggedInUser = string.Empty;
 
         public MainViewModel(IJobApplicationService jobApplicationService,
                              IJobApplicationDefaultsService jobApplicationDefaultsService,
@@ -28,7 +41,10 @@ namespace AppTrack.WpfUi.ViewModel
                              IServiceProvider serviceProvider,
                              IAiSettingsService aiSettingsService,
                              IApplicationTextService applicationTextService,
-                             IMessageBoxService messageBoxService)
+                             IMessageBoxService messageBoxService,
+                             IAuthenticationService authenticationService,
+                             ApiAuthenticationStateProvider apiAuthenticationStateProvider,
+                             IUserHelper userHelper)
         {
             this._jobApplicationService = jobApplicationService;
             this._jobApplicationDefaultsService = jobApplicationDefaultsService;
@@ -37,11 +53,35 @@ namespace AppTrack.WpfUi.ViewModel
             this._aiSettingsService = aiSettingsService;
             this._applicationTextService = applicationTextService;
             this._messageBoxService = messageBoxService;
+            this._authenticationService = authenticationService;
+            this._apiAuthenticationStateProvider = apiAuthenticationStateProvider;
+            this._userHelper = userHelper;
+            _apiAuthenticationStateProvider.AuthenticationStateChanged += ApiAuthenticationStateProvider_AuthenticationStateChanged;
         }
 
-        public async Task LoadJobApplicationsAsync()
+        private async void ApiAuthenticationStateProvider_AuthenticationStateChanged(Task<AuthenticationState> task)
         {
-            var apiResponse = await _jobApplicationService.GetJobApplicationsAsync();
+            var state = await task;
+            LoggedInUser = state.User.Identity?.Name ?? string.Empty;
+            IsLoggedIn = state.User.Identity?.IsAuthenticated ?? false;
+            
+            if(IsLoggedIn == false)
+            {
+                LoggedInUser = string.Empty;
+                JobApplications.Clear();
+            }
+        }
+
+        public async Task LoadJobApplicationsForUserAsync()
+        {
+            var userId = await _userHelper.TryGetUserIdAsync();
+
+            if (userId == null)
+            {
+                return;
+            }
+
+            var apiResponse = await _jobApplicationService.GetJobApplicationsForUserAsync(userId);
 
             if (apiResponse.Success == false)
             {
@@ -54,7 +94,15 @@ namespace AppTrack.WpfUi.ViewModel
         [RelayCommand]
         private async Task CreateJobApplication()
         {
-            var response = await _jobApplicationDefaultsService.GetForUserAsync(1);// todo user
+
+            var userId = await _userHelper.TryGetUserIdAsync();
+
+            if(userId == null)
+            {
+                return;
+            }
+
+            var response = await _jobApplicationDefaultsService.GetForUserAsync(userId);
 
             var createJobApplicationViewModel = _serviceProvider.GetRequiredService<CreateJobApplicationViewModel>();
             createJobApplicationViewModel.SetDefaults(response.Data);
@@ -66,7 +114,7 @@ namespace AppTrack.WpfUi.ViewModel
                 return;
             }
 
-            var apiResponse = await _jobApplicationService.CreateJobApplicationAsync(createJobApplicationViewModel.Model);
+            var apiResponse = await _jobApplicationService.CreateJobApplicationForUserAsync(createJobApplicationViewModel.Model, userId);
 
             if (apiResponse.Success == false)
             {
@@ -131,7 +179,14 @@ namespace AppTrack.WpfUi.ViewModel
         [RelayCommand]
         private async Task GenerateApplicationText(JobApplicationModel jobApplicationModel)
         {
-            var apiResponse = await _applicationTextService.GenerateApplicationText(jobApplicationModel.Id, 1, jobApplicationModel.URL, jobApplicationModel.Position); // todo UserId
+            var userId = await _userHelper.TryGetUserIdAsync();
+
+            if (userId == null)
+            {
+                return;
+            }
+
+            var apiResponse = await _applicationTextService.GenerateApplicationText(jobApplicationModel.Id, userId, jobApplicationModel.URL, jobApplicationModel.Position);
 
             if (apiResponse.Success == false)
             {
@@ -145,7 +200,14 @@ namespace AppTrack.WpfUi.ViewModel
         [RelayCommand]
         private async Task SetDefaults()
         {
-            var apiResponse = await _jobApplicationDefaultsService.GetForUserAsync(1);// todo user
+            var userId = await _userHelper.TryGetUserIdAsync();
+
+            if (userId == null)
+            {
+                return;
+            }
+
+            var apiResponse = await _jobApplicationDefaultsService.GetForUserAsync(userId);
 
             if (apiResponse.Success == false)
             {
@@ -165,14 +227,20 @@ namespace AppTrack.WpfUi.ViewModel
             if (apiResponse.Success == false)
             {
                 _messageBoxService.ShowErrorMessageBox(apiResponse.Message);
-                return;
             }
         }
 
         [RelayCommand]
         private async Task AiSettings()
         {
-            var apiResponse = await _aiSettingsService.GetForUserAsync(1); // todo user
+            var userId = await _userHelper.TryGetUserIdAsync();
+
+            if (userId == null)
+            {
+                return;
+            }
+
+            var apiResponse = await _aiSettingsService.GetForUserAsync(userId);
 
             if (apiResponse.Success == false)
             {
@@ -192,6 +260,24 @@ namespace AppTrack.WpfUi.ViewModel
             if (apiResponse.Success == false)
             {
                 _messageBoxService.ShowErrorMessageBox(apiResponse.Message);
+            }
+        }
+
+        [RelayCommand]
+        private void Logout()
+        {
+            _authenticationService.Logout();
+        }
+
+        [RelayCommand]
+        private async Task Login()
+        {
+            var loginViewModel = _serviceProvider.GetRequiredService<LoginViewModel>();
+            var isLoginSuccessful = _windowService.ShowWindow(loginViewModel);
+
+            if (isLoginSuccessful == true)
+            {
+                await LoadJobApplicationsForUserAsync();
             }
         }
 

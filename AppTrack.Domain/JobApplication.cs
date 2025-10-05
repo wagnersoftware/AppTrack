@@ -10,5 +10,6 @@ public class JobApplication : BaseEntity
     public string ApplicationText { get; set; } = string.Empty;
     public JobApplicationStatus Status { get; set; }
     public DateTime AppliedDate { get; set; }
+    public string UserId { get; set; } = string.Empty;
 
 }

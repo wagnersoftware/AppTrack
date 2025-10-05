@@ -23,7 +23,7 @@ public class CreateJobApplicationCommandHandler : IRequestHandler<CreateJobAppli
 
         if (validationResult.Errors.Any())
         {
-            throw new BadRequestException($"Invalid JobApplication", validationResult);
+            throw new BadRequestException($"Invalid Request", validationResult);
         }
 
         var jobApplicationToCreate = _mapper.Map<Domain.JobApplication>(request);

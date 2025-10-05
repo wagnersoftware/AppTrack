@@ -4,5 +4,5 @@ namespace AppTrack.Application.Contracts.Persistance;
 
 public interface IAiSettingsRepository : IGenericRepository<AiSettings>
 {
-    Task<AiSettings> GetByUserIdAsync(int userId);
+    Task<AiSettings> GetByUserIdAsync(string userId);
 }
