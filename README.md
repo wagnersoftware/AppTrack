@@ -17,4 +17,18 @@ The project is primarily intended as a playground for exploring new technologies
 
 3. Restore NuGet packages.
 
-4. Run the backend and frontend projects.
+4. Run the backend and frontend projects. (right click on solution -> Properties
+
+![Properties](Documentation/Screenshots/MultipleStartProjects.png))
+
+## Contributing
+
+1. Fork the repository.
+
+2. Create a new branch for your feature or bugfix.
+
+3. Submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License.
