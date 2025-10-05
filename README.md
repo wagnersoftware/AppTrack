@@ -1,6 +1,6 @@
 # AppTrack
 
-![AppTrack](Documentation/Screenshots/Apptrack.png))
+![AppTrack](Documentation/Screenshots/AppTrack.png))
 
 AppTrack helps me manage my own job applications and generate application texts using AI (work in progress). It features Bearer-Token Authentication, a WPF frontend, with a Blazor web frontend planned for the future. The backend is an ASP.NET Web API (all .NET 8) following Clean Architecture, CQRS, and the Mediator pattern. 
 The project is primarily intended as a playground for exploring new technologies and architectures.
