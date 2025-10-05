@@ -8,9 +8,16 @@ The project is primarily intended as a playground for exploring new technologies
 ## Features
 - Manage personal job applications
 - Generate application texts using AI
-- WPF desktop frontend (Blazor web frontend planned)
-- ASP.NET Web API backend with Clean Architecture, CQRS, and Mediator pattern
 - Token Authentication
+- WPF (MVVM) desktop frontend (Blazor web frontend planned)
+- ASP.NET Web API backend with Clean Architecture, CQRS, and Mediator pattern
+- Dependency Injection
+- Clean Code and SOLID prinicipals
+- API client generation with Nswag
+- Automapper
+- Fluent Validations
+- ModernWpfUi controls
+- Unit- and Integration Tests
 
 ## Installation
 1. Clone the repository:
@@ -24,7 +31,7 @@ The project is primarily intended as a playground for exploring new technologies
 
 ![Properties](Documentation/Screenshots/MultipleStartProjects.png)
 
-5. Run the database migrations in packet-manager
+5. Run the database migrations in package-manager
    ```bash
    update-database -context AppTrackDatabaseContext
    update-database -context AppTrackIdentityDbContext
