@@ -20,22 +20,6 @@
         <converter:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
     </Window.Resources>
     <DockPanel Margin="10">
-        <!--  Menu  -->
-        <DockPanel DockPanel.Dock="Top">
-            <Menu DockPanel.Dock="Top">
-                <MenuItem FontSize="18" Header="File">
-                    <MenuItem Command="{Binding ExitCommand}" Header="E_xit" />
-                </MenuItem>
-                <MenuItem FontSize="18" Header="Settings">
-                    <MenuItem FontSize="18" Header="Defaults">
-                        <MenuItem Command="{Binding SetDefaultsCommand}" Header="Set Defaults" />
-                    </MenuItem>
-                    <MenuItem FontSize="18" Header="AI">
-                        <MenuItem Command="{Binding AiSettingsCommand}" Header="AI Settings" />
-                    </MenuItem>
-                </MenuItem>
-            </Menu>
-        </DockPanel>
         <!--  Login information  -->
         <StackPanel
             Margin="0,0,10,0"
@@ -57,16 +41,31 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <!--  <Add jobApplication button  -->
-                    <ui:AppBarButton
-                        Command="{Binding CreateJobApplicationCommand}"
-                        Icon="Add"
-                        IsEnabled="{Binding IsLoggedIn}"
-                        Label="New" />
+                    <!--  <Add jobApplication and setting buttons  -->
+                    <StackPanel Grid.Column="0" Orientation="Horizontal">
+                        <ui:AppBarButton
+                            Command="{Binding CreateJobApplicationCommand}"
+                            Icon="Add"
+                            IsEnabled="{Binding IsLoggedIn}"
+                            Label="New" />
+                        <ui:AppBarButton
+                            Command="{Binding AiSettingsCommand}"
+                            Icon="Setting"
+                            IsEnabled="{Binding IsLoggedIn}"
+                            Label="Ai Settings" />
+                        <ui:AppBarButton
+                            Command="{Binding SetDefaultsCommand}"
+                            Icon="Repair"
+                            IsEnabled="{Binding IsLoggedIn}"
+                            Label="Set defaults" />
+                    </StackPanel>
                     <!--  Logout Button  -->
                     <StackPanel Grid.Column="2" Orientation="Horizontal">
+                        <ui:AppBarButton
+                            Command="{Binding ExitCommand}"
+                            Icon="Cancel"
+                            Label="Exit" />
                         <ui:AppBarButton
                             Command="{Binding LogoutCommand}"
                             Icon="LeaveChat"
