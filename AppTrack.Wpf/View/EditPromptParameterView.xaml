@@ -39,15 +39,23 @@
                 <DataGridTemplateColumn Width="*" Header="Key">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Key}" />
+                            <TextBlock
+                                MaxHeight="150"
+                                Text="{Binding Key}"
+                                TextWrapping="Wrap"
+                                ToolTip="{Binding Key}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <!--  Value  -->
-                <DataGridTemplateColumn Width="*" Header="Value">
+                <DataGridTemplateColumn Width="*" Header="Key">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Value}" />
+                            <TextBlock
+                                MaxHeight="150"
+                                Text="{Binding Value}"
+                                TextWrapping="Wrap"
+                                ToolTip="{Binding Value}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
