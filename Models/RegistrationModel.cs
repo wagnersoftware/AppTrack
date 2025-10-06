@@ -1,4 +1,5 @@
-﻿using AppTrack.Frontend.Models.ValidationAttributes;
+﻿using AppTrack.Frontend.Models.Base;
+using AppTrack.Frontend.Models.ValidationAttributes;
 using System.ComponentModel.DataAnnotations;
 
 namespace AppTrack.Frontend.Models;

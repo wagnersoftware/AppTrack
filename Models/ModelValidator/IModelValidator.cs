@@ -1,4 +1,6 @@
-﻿namespace AppTrack.Frontend.Models.ModelValidator;
+﻿using AppTrack.Frontend.Models.Base;
+
+namespace AppTrack.Frontend.Models.ModelValidator;
 
 public interface IModelValidator<T> where T : ModelBase
 {

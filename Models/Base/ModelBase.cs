@@ -1,8 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
-namespace AppTrack.Frontend.Models
+namespace AppTrack.Frontend.Models.Base
 {
-    public class ModelBase
+    public class ModelBase : ObservableValidator
     {
         [Required]
         public int Id { get; set; }

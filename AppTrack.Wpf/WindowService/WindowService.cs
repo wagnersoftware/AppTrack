@@ -18,6 +18,8 @@ public class WindowService : IWindowService
             SetAiSettingsViewModel vm => new SetAiSettingsView(vm),
             LoginViewModel vm => new LoginView(vm),
             RegistrationViewModel vm => new RegistrationView(vm),
+            EditPromptParameterViewModel vm => new EditPromptParameterView(vm),
+            EditKeyValueItemViewModel vm => new EditKeyValueItemView(vm),
             _ => throw new NotImplementedException()
         };
 

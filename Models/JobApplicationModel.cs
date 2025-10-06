@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using AppTrack.Frontend.Models.Base;
+using System.ComponentModel.DataAnnotations;
 
 namespace AppTrack.Frontend.Models;
 

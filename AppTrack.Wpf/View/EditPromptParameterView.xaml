@@ -1,0 +1,103 @@
+﻿<Window
+    x:Class="AppTrack.WpfUi.View.EditPromptParameterView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converter="clr-namespace:AppTrack.WpfUi.Converter"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:AppTrack.WpfUi.View"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="Edit Prompt Parameter"
+    Width="800"
+    Height="450"
+    mc:Ignorable="d">
+    <Window.Resources>
+        <converter:ErrorsDictionaryConverter x:Key="ErrorsDictConverter" />
+    </Window.Resources>
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <!--  Datagrid  -->
+        <DataGrid
+            Grid.Row="0"
+            Grid.Column="0"
+            MaxHeight="400"
+            AutoGenerateColumns="False"
+            CanUserAddRows="True"
+            CanUserDeleteRows="True"
+            HorizontalScrollBarVisibility="Auto"
+            IsReadOnly="True"
+            ItemsSource="{Binding PromptParameter}"
+            VerticalScrollBarVisibility="Auto">
+            <DataGrid.Columns>
+                <!--  Key  -->
+                <DataGridTemplateColumn Width="*" Header="Key">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Key}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <!--  Value  -->
+                <DataGridTemplateColumn Width="*" Header="Value">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Value}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <!--  Functions  -->
+                <DataGridTemplateColumn
+                    Width="130"
+                    CanUserResize="False"
+                    Header="Functions">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
+                                <Button
+                                    Margin="5"
+                                    Command="{Binding DataContext.EditKeyValueItemCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                    CommandParameter="{Binding}"
+                                    Content="Edit" />
+                                <Button
+                                    Margin="5"
+                                    Command="{Binding DataContext.DeleteKeyValueItemCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                    CommandParameter="{Binding Id}"
+                                    Content="Delete" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        <!--  Add Button  -->
+        <Button
+            Grid.Row="0"
+            Grid.Column="1"
+            Width="100"
+            Margin="10"
+            VerticalAlignment="Top"
+            Command="{Binding AddKeyValueItemCommand}"
+            Content="Add" />
+        <!--  Save/Cancel Buttons  -->
+        <StackPanel Grid.Row="2">
+            <Button
+                Margin="0,10,0,0"
+                HorizontalAlignment="Stretch"
+                Command="{Binding SaveCommand}"
+                CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
+                Content="Save" />
+            <Button
+                Margin="0,10,0,0"
+                HorizontalAlignment="Stretch"
+                Command="{Binding CancelCommand}"
+                CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
+                Content="Cancel" />
+        </StackPanel>
+    </Grid>
+</Window>

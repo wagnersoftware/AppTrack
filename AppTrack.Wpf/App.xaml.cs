@@ -37,6 +37,8 @@ public partial class App : Application
         services.AddTransient<SetAiSettingsViewModel>();
         services.AddTransient<RegistrationViewModel>();
         services.AddTransient<LoginViewModel>();
+        services.AddTransient<EditPromptParameterViewModel>();
+        services.AddTransient<EditKeyValueItemViewModel>();
 
         //views
         services.AddTransient<MainWindow>();
