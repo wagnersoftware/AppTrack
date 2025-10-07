@@ -6,6 +6,8 @@ namespace AppTrack.WpfUi.ViewModel;
 
 public class EditKeyValueItemViewModel : AppTrackFormViewModelBase<KeyValueItemModel>
 {
+
+
     /// <summary>
     /// Constructor for editing existing item.
     /// </summary>
@@ -13,6 +15,7 @@ public class EditKeyValueItemViewModel : AppTrackFormViewModelBase<KeyValueItemM
     /// <param name="model"></param>
     public EditKeyValueItemViewModel(IModelValidator<KeyValueItemModel> modelValidator, KeyValueItemModel model) : base(modelValidator, model)
     {
+
     }
 
     /// <summary>
@@ -21,5 +24,6 @@ public class EditKeyValueItemViewModel : AppTrackFormViewModelBase<KeyValueItemM
     /// <param name="modelValidator"></param>
     public EditKeyValueItemViewModel(IModelValidator<KeyValueItemModel> modelValidator) : base(modelValidator, new KeyValueItemModel())
     {
+
     }
 }

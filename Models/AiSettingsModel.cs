@@ -1,9 +1,10 @@
 ﻿using AppTrack.Frontend.Models.Base;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace AppTrack.Frontend.Models;
 
-public class AiSettingsModel : ModelBase
+public partial class AiSettingsModel : ModelBase
 {
     [Required]
     public string ApiKey { get; set; } = string.Empty;
@@ -14,5 +15,6 @@ public class AiSettingsModel : ModelBase
     [Required]
     public string Prompt { get; set; } = string.Empty;
 
-    public string UserId { get; set; } = string.Empty;
+    [ObservableProperty]
+    private List<KeyValueItemModel> promptParameter = new List<KeyValueItemModel>();
 }

@@ -59,7 +59,7 @@
                 HorizontalAlignment="Stretch"
                 Command="{Binding SaveCommand}"
                 CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
-                Content="Save" />
+                Content="OK" />
             <Button
                 Margin="5"
                 HorizontalAlignment="Stretch"

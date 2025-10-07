@@ -25,7 +25,8 @@ public partial class EditPromptParameterViewModel : ObservableObject
     [RelayCommand]
     private void AddKeyValueItem()
     {
-        var editKeyItemViewModel = _serviceProvider.GetRequiredService<EditKeyValueItemViewModel>();
+        var keyValueItem = new KeyValueItemModel() { ParentCollection = this.PromptParameter};
+        var editKeyItemViewModel = ActivatorUtilities.CreateInstance<EditKeyValueItemViewModel>(_serviceProvider, keyValueItem);
         var dialogResult = _windowService.ShowWindow(editKeyItemViewModel);
 
         if (dialogResult == true)
@@ -38,6 +39,7 @@ public partial class EditPromptParameterViewModel : ObservableObject
     private void EditKeyValueItem(KeyValueItemModel keyValueItem)
     {
         var clone = keyValueItem.Clone();
+        clone.ParentCollection = this.PromptParameter;
 
         var editKeyItemViewModel = ActivatorUtilities.CreateInstance<EditKeyValueItemViewModel>(_serviceProvider, clone);
         var dialogResult = _windowService.ShowWindow(editKeyItemViewModel);
@@ -50,9 +52,9 @@ public partial class EditPromptParameterViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void DeleteKeyValueItem(int id)
+    private void DeleteKeyValueItem(Guid tempId)
     {
-        var itemToRemove = PromptParameter.FirstOrDefault(x => x.Id == id);
+        var itemToRemove = PromptParameter.FirstOrDefault(x => x.TempId == tempId);
 
         if (itemToRemove != null)
         {

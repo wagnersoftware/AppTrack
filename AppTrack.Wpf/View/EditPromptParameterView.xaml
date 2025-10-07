@@ -75,7 +75,7 @@
                                 <Button
                                     Margin="5"
                                     Command="{Binding DataContext.DeleteKeyValueItemCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                    CommandParameter="{Binding Id}"
+                                    CommandParameter="{Binding TempId}"
                                     Content="Delete" />
                             </StackPanel>
                         </DataTemplate>
@@ -99,7 +99,7 @@
                 HorizontalAlignment="Stretch"
                 Command="{Binding SaveCommand}"
                 CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
-                Content="Save" />
+                Content="OK" />
             <Button
                 Margin="0,10,0,0"
                 HorizontalAlignment="Stretch"

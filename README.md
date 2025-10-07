@@ -7,22 +7,38 @@ The project is primarily intended as a playground for exploring new technologies
 
 ## Features
 - Manage personal job applications
+
 - Generate application texts using AI
-- Token Authentication
+
+- Token-based authentication
+
 - WPF desktop frontend (Blazor web frontend planned)
+
 - WPF implemented with MVVM and CommunityToolkit.Mvvm
-- XAMLStyler for codestyle
-- ASP.NET Web API backend with Clean Architecture, CQRS, and Mediator pattern
+
+- XAML Styler for consistent code style
+
+- ASP.NET Web API backend with Clean Architecture, CQRS, and the Mediator pattern
+
 - Dependency Injection
-- Clean Code and SOLID prinicipals
-- API client generation with Nswag
-- Automapper
-- Fluent Validations
-- ModernWpfUi controls
-- Unit- and Integration Tests
-- static code analysis with SonarAnalyzer.CSharp
+
+- Clean Code and SOLID principles
+
+- API client generation with NSwag
+
+- AutoMapper
+
+- FluentValidation
+
+- ModernWpfUI controls
+
+- Unit and integration tests
+
+- Static code analysis with SonarAnalyzer.CSharp
+
 - Entity Framework Core
-- SQLite Datenbank
+
+- SQLite database
 
 
 ## Installation
