@@ -20,6 +20,7 @@ public class WindowService : IWindowService
             RegistrationViewModel vm => new RegistrationView(vm),
             EditPromptParameterViewModel vm => new EditPromptParameterView(vm),
             EditKeyValueItemViewModel vm => new EditKeyValueItemView(vm),
+            TextViewModel vm => new TextView(vm),
             _ => throw new NotImplementedException()
         };
 

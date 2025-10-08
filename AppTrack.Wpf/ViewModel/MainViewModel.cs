@@ -194,6 +194,16 @@ namespace AppTrack.WpfUi.ViewModel
             }
 
             jobApplicationModel.ApplicationText = apiResponse.Data;
+
+            var textModel = new TextModel
+            {
+                Text = apiResponse.Data,
+                WindowTitle = "Generated application text",
+                UserMessage = string.Empty // todo
+            };
+
+            var textViewModel = ActivatorUtilities.CreateInstance<TextViewModel>(_serviceProvider, textModel);
+            _windowService.ShowWindow(textViewModel);
         }
 
         [RelayCommand]

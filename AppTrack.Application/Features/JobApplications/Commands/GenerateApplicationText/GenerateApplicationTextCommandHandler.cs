@@ -32,46 +32,45 @@ public class GenerateApplicationTextCommandHandler : IRequestHandler<GenerateApp
 
         //get Ai settings
         var aiSettings = await _aiSettingsRepository.GetByUserIdWithPromptParameterAsync(request.UserId);
-        _applicationTextGenerator.SetApiKey(aiSettings.ApiKey);
+        _applicationTextGenerator.SetApiKey(aiSettings!.ApiKey);
 
-        //build and generate prompt
-        var prompt = BuildPrompt(aiSettings.Prompt, request.Position, aiSettings.PromptParameter.ToList(), request.URL);
+        //build prompt
+        var (prompt, unusedKeys) = BuildPrompt(aiSettings.Prompt, request.Position, aiSettings.PromptParameter.ToList(), request.URL);
+
+        //generate application text
         var generatedApplicationText = await _applicationTextGenerator.GenerateApplicationTextAsync(prompt, cancellationToken);
 
         //update the job application with generated text
         var jobApplicationToUpdate = await _jobApplicationRepository.GetByIdAsync(request.ApplicationId);
-        jobApplicationToUpdate.ApplicationText = generatedApplicationText;
+        jobApplicationToUpdate!.ApplicationText = generatedApplicationText;
         await _jobApplicationRepository.UpdateAsync(jobApplicationToUpdate);
 
-        return new GeneratedApplicationTextDto() { ApplicationText = generatedApplicationText };
+        return new GeneratedApplicationTextDto() { ApplicationText = generatedApplicationText, UnusedKeys= unusedKeys};
     }
 
-    private static string BuildPrompt(string prompt, string position, List<PromptParameter> promptParameter, string url)
+    private static (string prompt, List<string> unusedKeys) BuildPrompt(string prompt, string position, List<PromptParameter> promptParameter, string url)
     {
-        var replacements = new Dictionary<string, string>
+        var replacements = new Dictionary<string, string>();
+        var unusedKeys = new List<string>();
+
+        foreach (var parameter in promptParameter)
         {
-            ["{position}"] = position,
-            ["{url}"] = url
-        };
+            var key = $"{{{parameter.Key.Trim()}}}";
+            replacements.Add(key, parameter.Value);
+        }
 
         foreach (var kvp in replacements)
         {
-            prompt = prompt.Replace(kvp.Key, kvp.Value);
+            if (prompt.Contains(kvp.Key, StringComparison.OrdinalIgnoreCase)) // ignore upper/lower case
+            {
+                prompt = prompt.Replace(kvp.Key, kvp.Value, StringComparison.OrdinalIgnoreCase);
+            }
+            else
+            {
+                unusedKeys.Add(kvp.Key);
+            }
         }
 
-        if (prompt.Contains("{position}"))
-        {
-            throw new InvalidOperationException("Placeholder {position} was not replaced in the prompt.");
-        }
-        else if (prompt.Contains("{skills}"))
-        {
-            throw new InvalidOperationException("Placeholder {skills} was not replaced in the propmt.");
-        }
-        else if (prompt.Contains("{url}"))
-        {
-            throw new InvalidOperationException("Placeholder {url} was not replaced in the propmt.");
-        }
-
-        return prompt;
+        return (prompt, unusedKeys);
     }
 }

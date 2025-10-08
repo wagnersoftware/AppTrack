@@ -3,6 +3,8 @@ using AppTrack.Infrastructure.ApplicationTextGeneration.OpAiModels;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
+namespace AppTrack.Infrastructure.ApplicationTextGeneration;
+
 public class OpenAiApplicationTextGenerator : IApplicationTextGenerator
 {
     private readonly HttpClient _httpClient;

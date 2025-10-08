@@ -3,6 +3,7 @@ using AppTrack.Application.Contracts.Email;
 using AppTrack.Application.Contracts.Logging;
 using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Models.Email;
+using AppTrack.Infrastructure.ApplicationTextGeneration;
 using AppTrack.Infrastructure.EmailService;
 using AppTrack.Infrastructure.Logging;
 using Microsoft.Extensions.Configuration;
