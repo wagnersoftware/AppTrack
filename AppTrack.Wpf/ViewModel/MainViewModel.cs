@@ -230,7 +230,7 @@ namespace AppTrack.WpfUi.ViewModel
         }
 
         [RelayCommand]
-        private async Task AiSettings()
+        private async Task OpenAiSettings()
         {
             var userId = await _userHelper.TryGetUserIdAsync();
 

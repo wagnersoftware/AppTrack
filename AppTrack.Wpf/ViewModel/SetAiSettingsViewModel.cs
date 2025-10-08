@@ -22,7 +22,7 @@ public partial class SetAiSettingsViewModel : AppTrackFormViewModelBase<AiSettin
     [RelayCommand]
     public void EditPromptParameter()
     {
-        ObservableCollection<KeyValueItemModel> observableList = new ObservableCollection<KeyValueItemModel>(Model.PromptParameter);
+        ObservableCollection<PromptParameterModel> observableList = new ObservableCollection<PromptParameterModel>(Model.PromptParameter);
         var viewModel = ActivatorUtilities.CreateInstance<EditPromptParameterViewModel>(_serviceProvider, observableList);
 
         var dialogResult =_windowService.ShowWindow(viewModel);

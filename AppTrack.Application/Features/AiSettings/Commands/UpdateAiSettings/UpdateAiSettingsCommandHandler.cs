@@ -27,10 +27,10 @@ public class UpdateAiSettingsCommandHandler : IRequestHandler<UpdateAiSettingsCo
             throw new BadRequestException($"Invalid update ai settings request", validationResult);
         }
 
-        var aiSettingsToUpdate = await _aiSettingsRepository.GetByIdAsync(request.Id);
+        var aiSettingsToUpdate = await _aiSettingsRepository.GetByIdWithPromptParameterAsync(request.Id);
         _mapper.Map(request, aiSettingsToUpdate);
 
-        await _aiSettingsRepository.UpdateAsync(aiSettingsToUpdate);
+        await _aiSettingsRepository.UpdateAsync(aiSettingsToUpdate!);
 
         return Unit.Value;
     }

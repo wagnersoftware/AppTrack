@@ -4,7 +4,7 @@ using AppTrack.WpfUi.ViewModel.Base;
 
 namespace AppTrack.WpfUi.ViewModel;
 
-public class EditKeyValueItemViewModel : AppTrackFormViewModelBase<KeyValueItemModel>
+public class EditKeyValueItemViewModel : AppTrackFormViewModelBase<PromptParameterModel>
 {
 
 
@@ -13,7 +13,7 @@ public class EditKeyValueItemViewModel : AppTrackFormViewModelBase<KeyValueItemM
     /// </summary>
     /// <param name="modelValidator"></param>
     /// <param name="model"></param>
-    public EditKeyValueItemViewModel(IModelValidator<KeyValueItemModel> modelValidator, KeyValueItemModel model) : base(modelValidator, model)
+    public EditKeyValueItemViewModel(IModelValidator<PromptParameterModel> modelValidator, PromptParameterModel model) : base(modelValidator, model)
     {
 
     }
@@ -22,7 +22,7 @@ public class EditKeyValueItemViewModel : AppTrackFormViewModelBase<KeyValueItemM
     /// Constructor for creating new item.
     /// </summary>
     /// <param name="modelValidator"></param>
-    public EditKeyValueItemViewModel(IModelValidator<KeyValueItemModel> modelValidator) : base(modelValidator, new KeyValueItemModel())
+    public EditKeyValueItemViewModel(IModelValidator<PromptParameterModel> modelValidator) : base(modelValidator, new PromptParameterModel())
     {
 
     }

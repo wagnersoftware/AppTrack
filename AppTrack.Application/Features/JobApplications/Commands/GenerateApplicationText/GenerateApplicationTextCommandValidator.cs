@@ -41,7 +41,7 @@ public class GenerateApplicationTextCommandValidator : AbstractValidator<Generat
 
     private async Task ValidateAiSettings(GenerateApplicationTextCommand command, ValidationContext<GenerateApplicationTextCommand> context, CancellationToken token)
     {
-        var aiSettings = await _aiSettingsRepository.GetByUserIdAsync(command.UserId);
+        var aiSettings = await _aiSettingsRepository.GetByUserIdWithPromptParameterAsync(command.UserId);
 
         if (aiSettings == null)
         {
@@ -55,8 +55,6 @@ public class GenerateApplicationTextCommandValidator : AbstractValidator<Generat
         if (string.IsNullOrWhiteSpace(aiSettings.Prompt))
             context.AddFailure("Prompt in AI settings is missing.");
 
-        if (string.IsNullOrWhiteSpace(aiSettings.MySkills))
-            context.AddFailure("MySkills in AI settings is missing.");
     }
 }
 

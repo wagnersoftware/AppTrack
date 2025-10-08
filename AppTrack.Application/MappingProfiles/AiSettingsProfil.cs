@@ -10,10 +10,13 @@ public class AiSettingsProfil : Profile
 {
     public AiSettingsProfil()
     {
-        CreateMap<AiSettingsDto, AiSettings>().ReverseMap();
+        CreateMap<AiSettingsDto, AiSettings>().ReverseMap()
+                    .ForMember(dest => dest.PromptParameter, opt => opt.MapFrom(src => src.PromptParameter));
+
         CreateMap<GetAiSettingsByUserIdQuery, AiSettings>();
         CreateMap<UpdateAiSettingsCommand, AiSettings>()
             .ForMember(dest => dest.CreationDate, opt => opt.Ignore())
-            .ForMember(dest => dest.Id, opt => opt.Ignore());
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
+            .ForMember(dest => dest.PromptParameter, opt => opt.MapFrom(src => src.PromptParameter));
     }
 }

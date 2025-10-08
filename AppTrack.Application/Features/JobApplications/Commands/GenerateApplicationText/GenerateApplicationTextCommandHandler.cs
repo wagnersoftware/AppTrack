@@ -3,6 +3,7 @@ using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Exceptions;
 using AppTrack.Application.Features.JobApplications.Dto;
+using AppTrack.Domain;
 
 namespace AppTrack.Application.Features.JobApplications.Commands.GenerateApplicationText;
 
@@ -30,11 +31,11 @@ public class GenerateApplicationTextCommandHandler : IRequestHandler<GenerateApp
         }
 
         //get Ai settings
-        var aiSettings = await _aiSettingsRepository.GetByUserIdAsync(request.UserId);
+        var aiSettings = await _aiSettingsRepository.GetByUserIdWithPromptParameterAsync(request.UserId);
         _applicationTextGenerator.SetApiKey(aiSettings.ApiKey);
 
         //build and generate prompt
-        var prompt = BuildPrompt(aiSettings.Prompt, request.Position, aiSettings.MySkills, request.URL);
+        var prompt = BuildPrompt(aiSettings.Prompt, request.Position, aiSettings.PromptParameter.ToList(), request.URL);
         var generatedApplicationText = await _applicationTextGenerator.GenerateApplicationTextAsync(prompt, cancellationToken);
 
         //update the job application with generated text
@@ -45,12 +46,11 @@ public class GenerateApplicationTextCommandHandler : IRequestHandler<GenerateApp
         return new GeneratedApplicationTextDto() { ApplicationText = generatedApplicationText };
     }
 
-    private static string BuildPrompt(string prompt, string position, string mySkills, string url)
+    private static string BuildPrompt(string prompt, string position, List<PromptParameter> promptParameter, string url)
     {
         var replacements = new Dictionary<string, string>
         {
             ["{position}"] = position,
-            ["{skills}"] = mySkills,
             ["{url}"] = url
         };
 

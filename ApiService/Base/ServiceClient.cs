@@ -1418,14 +1418,14 @@ namespace AppTrack.Frontend.ApiService.Base
         [System.Text.Json.Serialization.JsonPropertyName("apiKey")]
         public string ApiKey { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("mySkills")]
-        public string MySkills { get; set; }
-
         [System.Text.Json.Serialization.JsonPropertyName("prompt")]
         public string Prompt { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("userId")]
         public string UserId { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("promptParameter")]
+        public System.Collections.Generic.ICollection<PromptParameterDto> PromptParameter { get; set; }
 
     }
 
@@ -1610,6 +1610,21 @@ namespace AppTrack.Frontend.ApiService.Base
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.6.1.0 (NJsonSchema v11.5.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class PromptParameterDto
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("key")]
+        public string Key { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("value")]
+        public string Value { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        public int Id { get; set; }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.6.1.0 (NJsonSchema v11.5.1.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class RegistrationRequest
     {
 
@@ -1644,14 +1659,14 @@ namespace AppTrack.Frontend.ApiService.Base
         [System.Text.Json.Serialization.JsonPropertyName("apiKey")]
         public string ApiKey { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("mySkills")]
-        public string MySkills { get; set; }
-
         [System.Text.Json.Serialization.JsonPropertyName("prompt")]
         public string Prompt { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("userId")]
         public string UserId { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("promptParameter")]
+        public System.Collections.Generic.ICollection<PromptParameterDto> PromptParameter { get; set; }
 
     }
 

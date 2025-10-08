@@ -20,7 +20,16 @@ public class AppTrackDatabaseContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppTrackDatabaseContext).Assembly);
+
+        modelBuilder.Entity<AiSettings>()
+            .HasMany(s => s.PromptParameter)
+            .WithOne(p => p.AISettings)
+            .HasForeignKey(p => p.AISettingsId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+
         base.OnModelCreating(modelBuilder);
+
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

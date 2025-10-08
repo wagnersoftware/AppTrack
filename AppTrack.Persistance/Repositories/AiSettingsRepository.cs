@@ -11,8 +11,18 @@ public class AiSettingsRepository : GenericRepository<AiSettings>, IAiSettingsRe
     {
     }
 
-    public async Task<AiSettings> GetByUserIdAsync(string userId)
+    public async Task<AiSettings?> GetByIdWithPromptParameterAsync(int id)
     {
-        return await _context.AiSettings.AsNoTracking().SingleOrDefaultAsync(x => x.UserId == userId);
+        return await _context.AiSettings
+            .Include(s => s.PromptParameter)
+            .SingleOrDefaultAsync(s => s.Id == id);
+    }
+
+    public async Task<AiSettings?> GetByUserIdWithPromptParameterAsync(string userId)
+    {
+        return await _context.AiSettings.AsNoTracking()
+            .Include(s => s.PromptParameter)
+            .SingleOrDefaultAsync(s => s.UserId == userId);
+
     }
 }

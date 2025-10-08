@@ -50,7 +50,7 @@
                             IsEnabled="{Binding IsLoggedIn}"
                             Label="New" />
                         <ui:AppBarButton
-                            Command="{Binding AiSettingsCommand}"
+                            Command="{Binding OpenAiSettingsCommand}"
                             Icon="Setting"
                             IsEnabled="{Binding IsLoggedIn}"
                             Label="Ai Settings" />

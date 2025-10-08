@@ -31,10 +31,10 @@ public class GetAiSettingsByUserIdQueryHandler : IRequestHandler<GetAiSettingsBy
 
         if (validationResult.Errors.Any())
         {
-            throw new BadRequestException($"Invalid get AI settings request", validationResult);
+            throw new BadRequestException($"Invalid request", validationResult);
         }
 
-        var entity = await _aiSettingsRepository.GetByUserIdAsync(request.UserId);
+        var entity = await _aiSettingsRepository.GetByUserIdWithPromptParameterAsync(request.UserId);
 
         if (entity == null)
         {

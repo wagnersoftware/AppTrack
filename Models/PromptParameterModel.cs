@@ -2,11 +2,10 @@
 using AppTrack.Frontend.Models.ValidationAttributes;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 
 namespace AppTrack.Frontend.Models;
 
-public partial class KeyValueItemModel : ModelBase
+public partial class PromptParameterModel : ModelBase
 {
     [Required]
     [ObservableProperty]
@@ -17,13 +16,13 @@ public partial class KeyValueItemModel : ModelBase
     [ObservableProperty]
     private string value = string.Empty;
 
-    public IEnumerable<KeyValueItemModel>? ParentCollection { get; set; }// the current items, for key unique validation
+    public IEnumerable<PromptParameterModel>? ParentCollection { get; set; }// the current items, for key unique validation
 
     public Guid TempId { get; set; } = Guid.NewGuid(); // for comparing instances, if Id is not set yet by the database
 
-    public KeyValueItemModel Clone()
+    public PromptParameterModel Clone()
     {
-        return new KeyValueItemModel
+        return new PromptParameterModel
         {
             Id = Id,
             Key = Key,

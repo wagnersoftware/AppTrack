@@ -31,23 +31,17 @@ public class UpdateAiSettingsCommandValidator : AbstractValidator<UpdateAiSettin
         .NotNull().WithMessage("{PropertyName} is required");
 
         RuleFor(x => x)
-        .MustAsync(AiSettingsExists)
-        .WithMessage("Ai setting doesn't exist");
-
-        RuleFor(x => x)
-        .MustAsync(AiSettingsExistsForUser)
-        .WithMessage("The requested ai setting doesn't match the user id");
+            .MustAsync(AiSettingsExistsAndBelongsToUser)
+            .WithMessage("Ai settings not found or not assigned to this user.");
     }
 
-    private async Task<bool> AiSettingsExists(UpdateAiSettingsCommand command, CancellationToken token)
+    private async Task<bool> AiSettingsExistsAndBelongsToUser(UpdateAiSettingsCommand command, CancellationToken token)
     {
-        var aiSettings = await _aiSettingsRepository.GetByIdAsync(command.Id!);
-        return aiSettings != null;
-    }
-
-    private async Task<bool> AiSettingsExistsForUser(UpdateAiSettingsCommand command, CancellationToken token)
-    {
-        var aiSettings = await _aiSettingsRepository.GetByIdAsync(command.Id!);
+        var aiSettings = await _aiSettingsRepository.GetByIdAsync(command.Id);
+        if (aiSettings is null)
+        {
+            return false;
+        }
         return aiSettings.UserId == command.UserId;
     }
 }

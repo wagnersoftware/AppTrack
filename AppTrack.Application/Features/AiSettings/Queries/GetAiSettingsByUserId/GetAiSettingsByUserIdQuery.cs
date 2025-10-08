@@ -5,5 +5,5 @@ namespace AppTrack.Application.Features.AiSettings.Queries.GetAiSettingsByUserId
 
 public class GetAiSettingsByUserIdQuery : IRequest<AiSettingsDto>
 {
-    public string UserId { get; set; }
+    public string UserId { get; set; } = string.Empty;
 }

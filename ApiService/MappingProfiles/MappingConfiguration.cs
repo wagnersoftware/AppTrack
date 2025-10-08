@@ -27,5 +27,8 @@ public class MappingConfiguration : Profile
         //Authentication
         CreateMap<LoginModel, AuthRequest>();
         CreateMap<RegistrationModel, RegistrationRequest>();
+
+        //PromptParameter
+        CreateMap<PromptParameterDto, PromptParameterModel>().ReverseMap();
     }
 }

@@ -13,9 +13,9 @@ public partial class EditPromptParameterViewModel : ObservableObject
     private readonly IWindowService _windowService;
     private readonly IServiceProvider _serviceProvider;
 
-    public ObservableCollection<KeyValueItemModel> PromptParameter { get; set; }
+    public ObservableCollection<PromptParameterModel> PromptParameter { get; set; }
 
-    public EditPromptParameterViewModel(ObservableCollection<KeyValueItemModel> promptParameter, IWindowService windowService, IServiceProvider serviceProvider)
+    public EditPromptParameterViewModel(ObservableCollection<PromptParameterModel> promptParameter, IWindowService windowService, IServiceProvider serviceProvider)
     {
         this.PromptParameter = promptParameter;
         this._windowService = windowService;
@@ -25,7 +25,7 @@ public partial class EditPromptParameterViewModel : ObservableObject
     [RelayCommand]
     private void AddKeyValueItem()
     {
-        var keyValueItem = new KeyValueItemModel() { ParentCollection = this.PromptParameter};
+        var keyValueItem = new PromptParameterModel() { ParentCollection = this.PromptParameter};
         var editKeyItemViewModel = ActivatorUtilities.CreateInstance<EditKeyValueItemViewModel>(_serviceProvider, keyValueItem);
         var dialogResult = _windowService.ShowWindow(editKeyItemViewModel);
 
@@ -36,7 +36,7 @@ public partial class EditPromptParameterViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void EditKeyValueItem(KeyValueItemModel keyValueItem)
+    private void EditKeyValueItem(PromptParameterModel keyValueItem)
     {
         var clone = keyValueItem.Clone();
         clone.ParentCollection = this.PromptParameter;

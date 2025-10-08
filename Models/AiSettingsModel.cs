@@ -10,11 +10,10 @@ public partial class AiSettingsModel : ModelBase
     public string ApiKey { get; set; } = string.Empty;
 
     [Required]
-    public string MySkills { get; set; } = string.Empty;
-
-    [Required]
     public string Prompt { get; set; } = string.Empty;
 
+    public string UserId { get; set; } = string.Empty;
+
     [ObservableProperty]
-    private List<KeyValueItemModel> promptParameter = new List<KeyValueItemModel>();
+    private List<PromptParameterModel> promptParameter = new List<PromptParameterModel>();
 }
