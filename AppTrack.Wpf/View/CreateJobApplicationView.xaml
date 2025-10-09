@@ -9,7 +9,7 @@
     xmlns:viewModel="clr-namespace:AppTrack.WpfUi.ViewModel"
     Title="Create Job Application"
     Width="600"
-    Height="850"
+    Height="920"
     d:DataContext="{d:DesignInstance Type=viewModel:CreateJobApplicationViewModel}"
     mc:Ignorable="d">
     <Window.Resources>
@@ -51,7 +51,7 @@
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </TextBox>
-                <ItemsControl ItemsSource="{Binding Errors, Converter={StaticResource ErrorsDictConverter}, ConverterParameter=Name}">
+                <ItemsControl MinHeight="16" ItemsSource="{Binding Errors, Converter={StaticResource ErrorsDictConverter}, ConverterParameter=Name}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <TextBlock
@@ -81,7 +81,7 @@
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </TextBox>
-                <ItemsControl ItemsSource="{Binding Errors, Converter={StaticResource ErrorsDictConverter}, ConverterParameter=Position}">
+                <ItemsControl MinHeight="16" ItemsSource="{Binding Errors, Converter={StaticResource ErrorsDictConverter}, ConverterParameter=Position}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <TextBlock
@@ -111,7 +111,7 @@
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </TextBox>
-                <ItemsControl ItemsSource="{Binding Errors, Converter={StaticResource ErrorsDictConverter}, ConverterParameter=URL}">
+                <ItemsControl MinHeight="16" ItemsSource="{Binding Errors, Converter={StaticResource ErrorsDictConverter}, ConverterParameter=URL}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <TextBlock
@@ -147,7 +147,7 @@
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </TextBox>
-                <ItemsControl ItemsSource="{Binding Errors, Converter={StaticResource ErrorsDictConverter}, ConverterParameter=JobDescription}">
+                <ItemsControl MinHeight="16" ItemsSource="{Binding Errors, Converter={StaticResource ErrorsDictConverter}, ConverterParameter=JobDescription}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <TextBlock
@@ -177,7 +177,7 @@
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </TextBox>
-                <ItemsControl ItemsSource="{Binding Errors, Converter={StaticResource ErrorsDictConverter}, ConverterParameter=DurationInMonths}">
+                <ItemsControl MinHeight="16" ItemsSource="{Binding Errors, Converter={StaticResource ErrorsDictConverter}, ConverterParameter=DurationInMonths}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <TextBlock
@@ -207,7 +207,7 @@
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </TextBox>
-                <ItemsControl ItemsSource="{Binding Errors, Converter={StaticResource ErrorsDictConverter}, ConverterParameter=Location}">
+                <ItemsControl MinHeight="16" ItemsSource="{Binding Errors, Converter={StaticResource ErrorsDictConverter}, ConverterParameter=Location}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <TextBlock
@@ -237,7 +237,7 @@
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </TextBox>
-                <ItemsControl ItemsSource="{Binding Errors, Converter={StaticResource ErrorsDictConverter}, ConverterParameter=ContactPerson}">
+                <ItemsControl MinHeight="16" ItemsSource="{Binding Errors, Converter={StaticResource ErrorsDictConverter}, ConverterParameter=ContactPerson}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <TextBlock
