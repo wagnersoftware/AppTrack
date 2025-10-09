@@ -28,5 +28,36 @@ namespace AppTrack.WpfUi.ViewModel
         {
             window.Close();
         }
+
+        /// <summary>
+        /// Copy text for text editors with \n line endings.
+        /// </summary>
+        /// <returns></returns>
+        [RelayCommand(CanExecute = nameof(CanCopy))]
+        public async Task CopyTextPlain()
+        {
+            try
+            {
+                Clipboard.SetText(Text);
+
+                await ShowUserMessageAsync("Text copied.");
+            }
+            catch
+            {
+                await ShowUserMessageAsync("Error: Could not copy text");
+            }
+        }
+
+        private bool CanCopy()
+        {
+            return !string.IsNullOrWhiteSpace(Text);
+        }
+
+        private async Task ShowUserMessageAsync(string message, int durationMs = 3000)
+        {
+            UserMessage = message;
+            await Task.Delay(durationMs);
+            UserMessage = string.Empty;
+        }
     }
 }
