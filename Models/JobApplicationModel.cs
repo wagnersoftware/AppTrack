@@ -18,11 +18,28 @@ public class JobApplicationModel : ModelBase
     [Url]
     public string URL { get; set; } = string.Empty;
 
-    public string ApplicationText { get; set; } = string.Empty;
+    [Required]
+    public string JobDescription { get; set; } = string.Empty;
+
+    [Required]
+    public string Location { get; set; } = string.Empty;
+
+    [Required]
+    public string ContactPerson { get; set; } = string.Empty;
 
     [Required]
     public JobApplicationStatus Status { get; set; } = JobApplicationStatus.New;
-    public DateTime AppliedDate { get; set; }
+
+    [Required]
+    [DataType(DataType.Date)]
+    public DateTime StartDate { get; set; }
+
+    public string ApplicationText { get; set; } = string.Empty;
+
+    [DataType(DataType.Duration)]
+    [Range(1, 120, ErrorMessage = "Duration must be between 1 and 120 months")]
+    public int DurationInMonths { get; set; }
+
     public static Array JobApplicationStatusValues => Enum.GetValues(typeof(JobApplicationStatus));
     public enum JobApplicationStatus
     {

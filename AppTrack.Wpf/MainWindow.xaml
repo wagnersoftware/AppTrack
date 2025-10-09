@@ -8,10 +8,11 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:AppTrack.Frontend.Models;assembly=AppTrack.Frontend.Models"
     xmlns:ui="http://schemas.modernwpf.com/2019"
-    xmlns:viewmodel="clr-namespace:AppTrack.WpfUi.ViewModel"
+    xmlns:viewModel="clr-namespace:AppTrack.WpfUi.ViewModel"
     Title="AppTrack"
     Width="1500"
     Height="800"
+    d:DataContext="{d:DesignInstance Type=viewModel:MainViewModel}"
     ui:WindowHelper.UseModernWindowStyle="True"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
