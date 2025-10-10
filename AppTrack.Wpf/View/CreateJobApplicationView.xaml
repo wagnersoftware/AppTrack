@@ -260,8 +260,8 @@
                 Grid.Row="7"
                 Grid.Column="1"
                 Margin="5"
-                DisplayDateStart="{Binding Model.StartDate}"
-                SelectedDate="{Binding Model.StartDate}" />
+                DisplayDateStart="{Binding Model.StartDateAsDateTime}"
+                SelectedDate="{Binding Model.StartDateAsDateTime}" />
             <!--  Buttons  -->
             <StackPanel
                 Grid.Row="8"

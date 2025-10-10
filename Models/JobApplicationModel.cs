@@ -1,9 +1,10 @@
 ﻿using AppTrack.Frontend.Models.Base;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace AppTrack.Frontend.Models;
 
-public class JobApplicationModel : ModelBase
+public partial class JobApplicationModel : ModelBase
 {
     [Required]
     [MaxLength(50, ErrorMessage = "Maximum length for name is 50 characters")]
@@ -32,9 +33,10 @@ public class JobApplicationModel : ModelBase
 
     [Required]
     [DataType(DataType.Date)]
-    public DateTime StartDate { get; set; }
+    public DateOnly StartDate { get; set; }
 
-    public string ApplicationText { get; set; } = string.Empty;
+    [ObservableProperty]
+    private string applicationText = string.Empty;
 
     [DataType(DataType.Duration)]
     [Range(1, 120, ErrorMessage = "Duration must be between 1 and 120 months if provided")]
@@ -46,5 +48,14 @@ public class JobApplicationModel : ModelBase
         New,
         WaitingForFeedback,
         Rejected
+    }
+
+    public DateTime StartDateAsDateTime
+    {
+        get => StartDate.ToDateTime(TimeOnly.MinValue);
+        set
+        {
+            StartDate = DateOnly.FromDateTime(value);
+        }
     }
 }

@@ -8,11 +8,13 @@ public class MappingConfiguration : Profile
 {
     public MappingConfiguration()
     {
+        CreateMap<DateOnly, DateTime>().ConvertUsing(d => d.ToDateTime(TimeOnly.MinValue));
+        CreateMap<DateTime, DateOnly>().ConvertUsing(dt => DateOnly.FromDateTime(dt));
+
         //Job Application
-        CreateMap<JobApplicationDto, JobApplicationModel>().ReverseMap();
-        CreateMap<CreateJobApplicationCommand, JobApplicationModel>()
-                .ReverseMap()
-                .ForMember(dest => dest.UserId, opt => opt.Ignore());
+        CreateMap<JobApplicationDto, JobApplicationModel>();
+
+        CreateMap<JobApplicationModel, CreateJobApplicationCommand>();
 
         CreateMap<UpdateJobApplicationCommand, JobApplicationModel>().ReverseMap();
 
