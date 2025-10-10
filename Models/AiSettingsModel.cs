@@ -10,7 +10,7 @@ public partial class AiSettingsModel : ModelBase
     public string ApiKey { get; set; } = string.Empty;
 
     [Required]
-    public string Prompt { get; set; } = string.Empty;
+    public string PromptTemplate { get; set; } = string.Empty;
 
     public string UserId { get; set; } = string.Empty;
 

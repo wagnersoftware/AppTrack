@@ -125,16 +125,16 @@
                     Height="420"
                     AcceptsReturn="True"
                     HorizontalScrollBarVisibility="Auto"
-                    Text="{Binding Model.Prompt}"
+                    Text="{Binding Model.PromptTemplate}"
                     ToolTip="{Binding Model.Prompt}"
                     VerticalScrollBarVisibility="Auto">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="TextChanged">
-                            <i:InvokeCommandAction Command="{Binding ResetErrorsCommand}" CommandParameter="Prompt" />
+                            <i:InvokeCommandAction Command="{Binding ResetErrorsCommand}" CommandParameter="PromptTemplate" />
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </TextBox>
-                <ItemsControl ItemsSource="{Binding Errors, Converter={StaticResource ErrorsDictConverter}, ConverterParameter=Prompt}">
+                <ItemsControl ItemsSource="{Binding Errors, Converter={StaticResource ErrorsDictConverter}, ConverterParameter=PromptTemplate}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <TextBlock

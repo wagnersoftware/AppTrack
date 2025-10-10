@@ -185,7 +185,7 @@ namespace AppTrack.WpfUi.ViewModel
                 return;
             }
 
-            var apiResponse = await _applicationTextService.GenerateApplicationText(jobApplicationModel.Id, userId, jobApplicationModel.URL, jobApplicationModel.Position);
+            var apiResponse = await _applicationTextService.GenerateApplicationText(jobApplicationModel.Id, userId);
 
             if (apiResponse.Success == false)
             {

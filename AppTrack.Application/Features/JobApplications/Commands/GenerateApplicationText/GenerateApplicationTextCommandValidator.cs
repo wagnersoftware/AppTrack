@@ -14,16 +14,12 @@ public class GenerateApplicationTextCommandValidator : AbstractValidator<Generat
         _aiSettingsRepository = aiSettingsRepository;
 
         RuleFor(x => x.UserId)
-            .NotEmpty().WithMessage("{PropertyName} is required");
+            .NotEmpty().WithMessage("{PropertyName} is required")
+            .NotNull().WithMessage("{PropertyName} is required");
 
-        RuleFor(x => x.ApplicationId)
-            .NotEmpty().WithMessage("{PropertyName} is required");
-
-        RuleFor(x => x.URL)
-            .NotEmpty().WithMessage("{PropertyName} is required");
-
-        RuleFor(x => x.Position)
-            .NotEmpty().WithMessage("{PropertyName} is required");
+        RuleFor(x => x.JobApplicationId)
+            .NotEmpty().WithMessage("{PropertyName} is required")
+            .NotNull().WithMessage("{PropertyName} is required");
 
         RuleFor(x => x)
             .MustAsync(JobApplicationExists)
@@ -35,7 +31,7 @@ public class GenerateApplicationTextCommandValidator : AbstractValidator<Generat
 
     private async Task<bool> JobApplicationExists(GenerateApplicationTextCommand command, CancellationToken token)
     {
-        var jobApplication = await _jobApplicationRepository.GetByIdAsync(command.ApplicationId);
+        var jobApplication = await _jobApplicationRepository.GetByIdAsync(command.JobApplicationId);
         return jobApplication != null;
     }
 
@@ -52,7 +48,7 @@ public class GenerateApplicationTextCommandValidator : AbstractValidator<Generat
         if (string.IsNullOrWhiteSpace(aiSettings.ApiKey))
             context.AddFailure("ApiKey in AI settings is missing.");
 
-        if (string.IsNullOrWhiteSpace(aiSettings.Prompt))
+        if (string.IsNullOrWhiteSpace(aiSettings.PromptTemplate))
             context.AddFailure("Prompt in AI settings is missing.");
 
     }

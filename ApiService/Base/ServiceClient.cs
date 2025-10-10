@@ -1418,8 +1418,8 @@ namespace AppTrack.Frontend.ApiService.Base
         [System.Text.Json.Serialization.JsonPropertyName("apiKey")]
         public string ApiKey { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("prompt")]
-        public string Prompt { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("promptTemplate")]
+        public string PromptTemplate { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("userId")]
         public string UserId { get; set; }
@@ -1497,7 +1497,7 @@ namespace AppTrack.Frontend.ApiService.Base
         public System.DateTime StartDate { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("durationInMonths")]
-        public int? DurationInMonths { get; set; }
+        public string DurationInMonths { get; set; }
 
     }
 
@@ -1505,17 +1505,11 @@ namespace AppTrack.Frontend.ApiService.Base
     public partial class GenerateApplicationTextCommand
     {
 
-        [System.Text.Json.Serialization.JsonPropertyName("applicationId")]
-        public int ApplicationId { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("jobApplicationId")]
+        public int JobApplicationId { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("userId")]
         public string UserId { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("url")]
-        public string Url { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("position")]
-        public string Position { get; set; }
 
     }
 
@@ -1590,7 +1584,7 @@ namespace AppTrack.Frontend.ApiService.Base
         public System.DateTime StartDate { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("durationInMonths")]
-        public int DurationInMonths { get; set; }
+        public string DurationInMonths { get; set; }
 
     }
 
@@ -1686,8 +1680,8 @@ namespace AppTrack.Frontend.ApiService.Base
         [System.Text.Json.Serialization.JsonPropertyName("apiKey")]
         public string ApiKey { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("prompt")]
-        public string Prompt { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("promptTemplate")]
+        public string PromptTemplate { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("userId")]
         public string UserId { get; set; }

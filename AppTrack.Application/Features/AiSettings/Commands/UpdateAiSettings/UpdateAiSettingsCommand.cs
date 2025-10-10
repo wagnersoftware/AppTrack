@@ -8,7 +8,7 @@ public class UpdateAiSettingsCommand : IRequest<Unit>
 {
     public int Id { get; set; }
     public string ApiKey { get; set; } = string.Empty;
-    public string Prompt { get; set; } = string.Empty;
+    public string PromptTemplate { get; set; } = string.Empty;
     public string UserId { get; set; } = string.Empty;
     public List<PromptParameterDto> PromptParameter { get; set; } = new List<PromptParameterDto>();
 }

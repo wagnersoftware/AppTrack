@@ -46,9 +46,8 @@ public class CreateJobApplicationCommandValidator : AbstractValidator<CreateJobA
             .NotNull().WithMessage("{PropertyName} is required");
 
         RuleFor(x => x.DurationInMonths)
-            .InclusiveBetween(1, 120)
-            .When(x => x.DurationInMonths.HasValue)
-            .WithMessage("{PropertyName} must be between 1 and 120 if provided.");
+            .Must(value => string.IsNullOrEmpty(value) || int.TryParse(value, out _))
+            .WithMessage("{PropertyName} must be a valid number.");
     }
 
     private static bool BeAValidUrl(string url)

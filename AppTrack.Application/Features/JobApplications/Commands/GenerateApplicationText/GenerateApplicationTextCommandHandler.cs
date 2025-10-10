@@ -3,7 +3,8 @@ using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Exceptions;
 using AppTrack.Application.Features.JobApplications.Dto;
-using AppTrack.Domain;
+using AppTrack.Domain.Contracts;
+using AppTrack.Domain.Extensions;
 
 namespace AppTrack.Application.Features.JobApplications.Commands.GenerateApplicationText;
 
@@ -12,12 +13,17 @@ public class GenerateApplicationTextCommandHandler : IRequestHandler<GenerateApp
     private readonly IApplicationTextGenerator _applicationTextGenerator;
     private readonly IAiSettingsRepository _aiSettingsRepository;
     private readonly IJobApplicationRepository _jobApplicationRepository;
+    private readonly IPromptBuilder _promptBuilder;
 
-    public GenerateApplicationTextCommandHandler(IApplicationTextGenerator applicationTextGenerator, IAiSettingsRepository aiSettingsRepository, IJobApplicationRepository jobApplicationRepository)
+    public GenerateApplicationTextCommandHandler(IApplicationTextGenerator applicationTextGenerator,
+                                                 IAiSettingsRepository aiSettingsRepository,
+                                                 IJobApplicationRepository jobApplicationRepository,
+                                                 IPromptBuilder promptBuilder)
     {
         this._applicationTextGenerator = applicationTextGenerator;
         this._aiSettingsRepository = aiSettingsRepository;
         this._jobApplicationRepository = jobApplicationRepository;
+        this._promptBuilder = promptBuilder;
     }
 
     public async Task<GeneratedApplicationTextDto> Handle(GenerateApplicationTextCommand request, CancellationToken cancellationToken)
@@ -34,43 +40,22 @@ public class GenerateApplicationTextCommandHandler : IRequestHandler<GenerateApp
         var aiSettings = await _aiSettingsRepository.GetByUserIdWithPromptParameterAsync(request.UserId);
         _applicationTextGenerator.SetApiKey(aiSettings!.ApiKey);
 
+        //get job application
+        var jobApplication = await _jobApplicationRepository.GetByIdAsync(request.JobApplicationId);
+
         //build prompt
-        var (prompt, unusedKeys) = BuildPrompt(aiSettings.Prompt, request.Position, aiSettings.PromptParameter.ToList(), request.URL);
+        var applicantParameter = aiSettings.PromptParameter.ToList();
+        var jobApplicationParameter = jobApplication!.ToPromptParameters().ToList();
+        var promptParameter = jobApplicationParameter.Union(applicantParameter).ToList();
+        var (prompt, unusedKeys) = _promptBuilder.BuildPrompt(promptParameter, aiSettings.PromptTemplate);
 
         //generate application text
         var generatedApplicationText = await _applicationTextGenerator.GenerateApplicationTextAsync(prompt, cancellationToken);
 
         //update the job application with generated text
-        var jobApplicationToUpdate = await _jobApplicationRepository.GetByIdAsync(request.ApplicationId);
-        jobApplicationToUpdate!.ApplicationText = generatedApplicationText;
-        await _jobApplicationRepository.UpdateAsync(jobApplicationToUpdate);
+        jobApplication!.ApplicationText = generatedApplicationText;
+        await _jobApplicationRepository.UpdateAsync(jobApplication);
 
         return new GeneratedApplicationTextDto() { ApplicationText = generatedApplicationText, UnusedKeys= unusedKeys};
-    }
-
-    private static (string prompt, List<string> unusedKeys) BuildPrompt(string prompt, string position, List<PromptParameter> promptParameter, string url)
-    {
-        var replacements = new Dictionary<string, string>();
-        var unusedKeys = new List<string>();
-
-        foreach (var parameter in promptParameter)
-        {
-            var key = $"{{{parameter.Key.Trim()}}}";
-            replacements.Add(key, parameter.Value);
-        }
-
-        foreach (var kvp in replacements)
-        {
-            if (prompt.Contains(kvp.Key, StringComparison.OrdinalIgnoreCase)) // ignore upper/lower case
-            {
-                prompt = prompt.Replace(kvp.Key, kvp.Value, StringComparison.OrdinalIgnoreCase);
-            }
-            else
-            {
-                unusedKeys.Add(kvp.Key);
-            }
-        }
-
-        return (prompt, unusedKeys);
     }
 }

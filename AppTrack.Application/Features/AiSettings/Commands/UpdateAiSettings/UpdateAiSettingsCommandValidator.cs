@@ -18,7 +18,7 @@ public class UpdateAiSettingsCommandValidator : AbstractValidator<UpdateAiSettin
         .NotEmpty().WithMessage("{PropertyName} is required")
         .NotNull().WithMessage("{PropertyName} is required");
 
-        RuleFor(x => x.Prompt)
+        RuleFor(x => x.PromptTemplate)
         .NotEmpty().WithMessage("{PropertyName} is required")
         .NotNull().WithMessage("{PropertyName} is required");
 

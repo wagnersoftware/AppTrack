@@ -24,6 +24,7 @@ public class OpenAiApplicationTextGenerator : IApplicationTextGenerator
         {
             throw new InvalidOperationException("API key not set.");
         }
+
         var request = new HttpRequestMessage(HttpMethod.Post, _openAiUrl);
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
 

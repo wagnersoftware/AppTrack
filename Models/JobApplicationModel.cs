@@ -7,15 +7,12 @@ namespace AppTrack.Frontend.Models;
 public partial class JobApplicationModel : ModelBase
 {
     [Required]
-    [MaxLength(50, ErrorMessage = "Maximum length for name is 50 characters")]
     public string Name { get; set; } = string.Empty;
 
     [Required]
-    [MaxLength(30, ErrorMessage = "Maximum length for name is 30 characters")]
     public string Position { get; set; } = string.Empty;
 
     [Required]
-    [MaxLength(500, ErrorMessage = "Maximum length for name is 500 characters")]
     [Url]
     public string URL { get; set; } = string.Empty;
 
@@ -38,9 +35,8 @@ public partial class JobApplicationModel : ModelBase
     [ObservableProperty]
     private string applicationText = string.Empty;
 
-    [DataType(DataType.Duration)]
-    [Range(1, 120, ErrorMessage = "Duration must be between 1 and 120 months if provided")]
-    public int? DurationInMonths { get; set; }
+    [RegularExpression(@"^\d+$", ErrorMessage = "{0} must be a number.")]
+    public string DurationInMonths { get; set; } = string.Empty;
 
     public static Array JobApplicationStatusValues => Enum.GetValues(typeof(JobApplicationStatus));
     public enum JobApplicationStatus

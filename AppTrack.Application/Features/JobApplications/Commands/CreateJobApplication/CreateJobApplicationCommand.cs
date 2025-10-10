@@ -17,6 +17,6 @@ public class CreateJobApplicationCommand : IRequest<JobApplicationDto>
     public string Location { get; set; } = string.Empty;
     public string ContactPerson { get; set; } = string.Empty;
     public DateTime StartDate { get; set; }
-    public int? DurationInMonths { get; set; }
+    public string DurationInMonths { get; set; } = string.Empty;
 }
 
