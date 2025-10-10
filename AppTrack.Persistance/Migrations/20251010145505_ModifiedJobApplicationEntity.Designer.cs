@@ -4,6 +4,7 @@ using AppTrack.Persistance.DatabaseContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AppTrack.Persistance.Migrations
 {
     [DbContext(typeof(AppTrackDatabaseContext))]
-    partial class AppTrackDatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20251010145505_ModifiedJobApplicationEntity")]
+    partial class ModifiedJobApplicationEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -50,7 +53,7 @@ namespace AppTrack.Persistance.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AiSettings", (string)null);
+                    b.ToTable("AiSettings");
                 });
 
             modelBuilder.Entity("AppTrack.Domain.JobApplication", b =>
@@ -114,7 +117,7 @@ namespace AppTrack.Persistance.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("JobApplications", (string)null);
+                    b.ToTable("JobApplications");
 
                     b.HasData(
                         new
@@ -162,7 +165,7 @@ namespace AppTrack.Persistance.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("JobApplicationDefaults", (string)null);
+                    b.ToTable("JobApplicationDefaults");
                 });
 
             modelBuilder.Entity("AppTrack.Domain.PromptParameter", b =>
@@ -188,7 +191,7 @@ namespace AppTrack.Persistance.Migrations
 
                     b.HasIndex("AISettingsId");
 
-                    b.ToTable("PromptParameter", (string)null);
+                    b.ToTable("PromptParameter");
                 });
 
             modelBuilder.Entity("AppTrack.Domain.PromptParameter", b =>

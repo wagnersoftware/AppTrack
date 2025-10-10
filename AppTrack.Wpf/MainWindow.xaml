@@ -15,6 +15,8 @@
     d:DataContext="{d:DesignInstance Type=viewModel:MainViewModel}"
     ui:WindowHelper.UseModernWindowStyle="True"
     WindowStartupLocation="CenterScreen"
+    WindowState="Maximized"
+    WindowStyle="None"
     mc:Ignorable="d">
 
     <Window.Resources>
@@ -81,13 +83,11 @@
                 </Grid>
             </ui:CommandBar.Content>
         </ui:CommandBar>
-
         <!--  DataGrid  -->
         <DataGrid
             MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Window}}"
             Margin="0,20,0,0"
-            d:DataContext="{d:DesignInstance Type=models:JobApplicationModel,
-                                             IsDesignTimeCreatable=True}"
+            d:ItemsSource="{d:SampleData}"
             AlternatingRowBackground="LightGray"
             AutoGenerateColumns="False"
             ColumnWidth="*"
@@ -108,32 +108,13 @@
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
                 <!--  Name  -->
-                <DataGridTextColumn Binding="{Binding Name}" Header="Name">
+                <DataGridTextColumn
+                    Width="*"
+                    Binding="{Binding Name}"
+                    Header="Name">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="ToolTip" Value="{Binding Name}" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-                <!--  Position  -->
-                <DataGridTextColumn
-                    Width="1*"
-                    Binding="{Binding Position}"
-                    Header="Position">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="ToolTip" Value="{Binding Position}" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-                <!--  URL  -->
-                <DataGridTextColumn
-                    Width="1.5*"
-                    Binding="{Binding URL}"
-                    Header="URL">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="ToolTip" Value="{Binding URL}" />
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
@@ -148,9 +129,86 @@
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
+                <!--  URL  -->
+                <DataGridTextColumn
+                    Width="1.5*"
+                    Binding="{Binding URL}"
+                    Header="URL">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="ToolTip" Value="{Binding URL}" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <!--  Position  -->
+                <DataGridTextColumn
+                    Width="*"
+                    Binding="{Binding Position}"
+                    Header="Position">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="ToolTip" Value="{Binding Position}" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <!--  Job Description  -->
+                <DataGridTextColumn
+                    Width="1.5*"
+                    Binding="{Binding JobDescription}"
+                    Header="Job Description">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="ToolTip" Value="{Binding JobDescription}" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <!--  Location  -->
+                <DataGridTextColumn
+                    Width="*"
+                    Binding="{Binding Location}"
+                    Header="Location">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="ToolTip" Value="{Binding Location}" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <!--  Start Date  -->
+                <DataGridTextColumn
+                    Width="*"
+                    Binding="{Binding StartDate}"
+                    Header="Start date">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="ToolTip" Value="{Binding StartDate}" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <!--  Duration in months  -->
+                <DataGridTextColumn
+                    Width="0.8*"
+                    Binding="{Binding DurationInMonths}"
+                    Header="Duration(months)">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="ToolTip" Value="{Binding DurationInMonths}" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <!--  Contact Person  -->
+                <DataGridTextColumn
+                    Width="*"
+                    Binding="{Binding ContactPerson}"
+                    Header="Contact Person">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="ToolTip" Value="{Binding ContactPerson}" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
                 <!--  ApplicationText  -->
                 <DataGridTextColumn
-                    Width="3.2*"
+                    Width="3*"
                     Binding="{Binding ApplicationText}"
                     Header="Application Text">
                     <DataGridTextColumn.ElementStyle>
@@ -161,7 +219,7 @@
                 </DataGridTextColumn>
                 <!--  CreationDate  -->
                 <DataGridTextColumn
-                    Width="1.7*"
+                    Width="1.6*"
                     Binding="{Binding CreationDate}"
                     Header="Created">
                     <DataGridTextColumn.ElementStyle>
@@ -172,7 +230,7 @@
                 </DataGridTextColumn>
                 <!--  ModifiedDate  -->
                 <DataGridTextColumn
-                    Width="1.7*"
+                    Width="1.6*"
                     Binding="{Binding ModifiedDate}"
                     Header="Modified">
                     <DataGridTextColumn.ElementStyle>

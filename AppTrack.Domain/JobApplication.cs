@@ -11,5 +11,10 @@ public class JobApplication : BaseEntity
     public JobApplicationStatus Status { get; set; }
     public DateTime AppliedDate { get; set; }
     public string UserId { get; set; } = string.Empty;
+    public string JobDescription { get; set; } = string.Empty;
+    public string Location { get; set; } = string.Empty;
+    public string ContactPerson { get; set; } = string.Empty;
+    public int? DurationInMonths { get; set; }
+    public DateTime StartDate { get; set; }
 
 }

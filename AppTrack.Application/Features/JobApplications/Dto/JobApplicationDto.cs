@@ -11,7 +11,11 @@ public class JobApplicationDto
     public DateTime CreationDate { get; set; }
     public DateTime ModifiedDate { get; set; }
     public JobApplicationStatus Status { get; set; } = JobApplicationStatus.New;
-    public DateTime AppliedDate { get; set; }
+    public string JobDescription { get; set; } = string.Empty;
+    public string Location { get; set; } = string.Empty;
+    public string ContactPerson { get; set; } = string.Empty;
+    public DateTime StartDate { get; set; }
+    public int DurationInMonths { get; set; }
 
 }
 

@@ -37,8 +37,8 @@ public class JobApplicationModel : ModelBase
     public string ApplicationText { get; set; } = string.Empty;
 
     [DataType(DataType.Duration)]
-    [Range(1, 120, ErrorMessage = "Duration must be between 1 and 120 months")]
-    public int DurationInMonths { get; set; }
+    [Range(1, 120, ErrorMessage = "Duration must be between 1 and 120 months if provided")]
+    public int? DurationInMonths { get; set; }
 
     public static Array JobApplicationStatusValues => Enum.GetValues(typeof(JobApplicationStatus));
     public enum JobApplicationStatus

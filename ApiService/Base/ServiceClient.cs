@@ -1481,11 +1481,23 @@ namespace AppTrack.Frontend.ApiService.Base
         [System.Text.Json.Serialization.JsonPropertyName("status")]
         public JobApplicationStatus Status { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("appliedDate")]
-        public System.DateTime AppliedDate { get; set; }
-
         [System.Text.Json.Serialization.JsonPropertyName("userId")]
         public string UserId { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("jobDescription")]
+        public string JobDescription { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("location")]
+        public string Location { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("contactPerson")]
+        public string ContactPerson { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("startDate")]
+        public System.DateTime StartDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("durationInMonths")]
+        public int? DurationInMonths { get; set; }
 
     }
 
@@ -1513,6 +1525,9 @@ namespace AppTrack.Frontend.ApiService.Base
 
         [System.Text.Json.Serialization.JsonPropertyName("applicationText")]
         public string ApplicationText { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("unusedKeys")]
+        public System.Collections.Generic.ICollection<string> UnusedKeys { get; set; }
 
     }
 
@@ -1562,8 +1577,20 @@ namespace AppTrack.Frontend.ApiService.Base
         [System.Text.Json.Serialization.JsonPropertyName("status")]
         public JobApplicationStatus Status { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("appliedDate")]
-        public System.DateTime AppliedDate { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("jobDescription")]
+        public string JobDescription { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("location")]
+        public string Location { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("contactPerson")]
+        public string ContactPerson { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("startDate")]
+        public System.DateTime StartDate { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("durationInMonths")]
+        public int DurationInMonths { get; set; }
 
     }
 

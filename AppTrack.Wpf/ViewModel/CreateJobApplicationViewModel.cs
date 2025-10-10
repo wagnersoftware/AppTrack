@@ -15,6 +15,6 @@ public class CreateJobApplicationViewModel : AppTrackFormViewModelBase<JobApplic
     {
         base.Model.Name = jobApplicationDefaults.Name;
         base.Model.Position = jobApplicationDefaults.Position;
-        base.Model.StartDate = DateTime.Today; // set as default
+        base.Model.StartDate = DateTime.Today;
     }
 }
