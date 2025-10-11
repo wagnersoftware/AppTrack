@@ -1,23 +1,27 @@
 ﻿<Window
-    x:Class="AppTrack.WpfUi.View.CreateJobApplicationView"
+    x:Class="AppTrack.WpfUi.View.JobApplicationView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:base="clr-namespace:AppTrack.WpfUi.ViewModel.Base"
     xmlns:converter="clr-namespace:AppTrack.WpfUi.Converter"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewModel="clr-namespace:AppTrack.WpfUi.ViewModel"
     Title="Create Job Application"
-    Width="600"
-    Height="920"
-    d:DataContext="{d:DesignInstance Type=viewModel:CreateJobApplicationViewModel}"
+    Width="800"
+    d:DataContext="{d:DesignInstance Type=base:JobApplicationViewModelBase}"
+    SizeToContent="Height"
     mc:Ignorable="d">
     <Window.Resources>
         <converter:ErrorsDictionaryConverter x:Key="ErrorsDictConverter" />
+        <converter:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
     </Window.Resources>
     <StackPanel>
         <Grid Margin="10">
             <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
                 <RowDefinition />
                 <RowDefinition />
                 <RowDefinition />
@@ -158,16 +162,54 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </StackPanel>
-            <!--  Duration  -->
+            <!--  ApplicationText  -->
             <Label
                 Grid.Row="4"
+                Grid.Column="0"
+                Margin="0,5,5,0"
+                HorizontalAlignment="Right"
+                Visibility="{Binding IsEditView, Converter={StaticResource BoolToVisibilityConverter}}">
+                Application Text:
+            </Label>
+            <StackPanel
+                Grid.Row="4"
+                Grid.Column="1"
+                Margin="5"
+                Visibility="{Binding IsEditView, Converter={StaticResource BoolToVisibilityConverter}}">
+                <TextBox
+                    Height="340"
+                    AcceptsReturn="True"
+                    HorizontalScrollBarVisibility="Auto"
+                    Text="{Binding Model.ApplicationText}"
+                    ToolTip="{Binding Model.ApplicationText}"
+                    VerticalScrollBarVisibility="Auto">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="TextChanged">
+                            <i:InvokeCommandAction Command="{Binding ResetErrorsCommand}" CommandParameter="ApplicationText" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </TextBox>
+                <ItemsControl ItemsSource="{Binding Errors, Converter={StaticResource ErrorsDictConverter}, ConverterParameter=ApplicationText}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock
+                                FontSize="12"
+                                Foreground="Red"
+                                Text="{Binding}" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+            <!--  Duration  -->
+            <Label
+                Grid.Row="5"
                 Grid.Column="0"
                 Margin="0,5,5,0"
                 HorizontalAlignment="Right">
                 Duration in months:
             </Label>
             <StackPanel
-                Grid.Row="4"
+                Grid.Row="5"
                 Grid.Column="1"
                 Margin="5">
                 <TextBox Text="{Binding Model.DurationInMonths}" ToolTip="{Binding Model.DurationInMonths}">
@@ -190,14 +232,14 @@
             </StackPanel>
             <!--  Location  -->
             <Label
-                Grid.Row="5"
+                Grid.Row="6"
                 Grid.Column="0"
                 Margin="0,5,5,0"
                 HorizontalAlignment="Right">
                 Location:
             </Label>
             <StackPanel
-                Grid.Row="5"
+                Grid.Row="6"
                 Grid.Column="1"
                 Margin="5">
                 <TextBox Text="{Binding Model.Location}" ToolTip="{Binding Model.Location}">
@@ -220,14 +262,14 @@
             </StackPanel>
             <!--  Contact Person  -->
             <Label
-                Grid.Row="6"
+                Grid.Row="7"
                 Grid.Column="0"
                 Margin="0,5,5,0"
                 HorizontalAlignment="Right">
                 Contact Person:
             </Label>
             <StackPanel
-                Grid.Row="6"
+                Grid.Row="7"
                 Grid.Column="1"
                 Margin="5">
                 <TextBox Text="{Binding Model.ContactPerson}" ToolTip="{Binding Model.ContactPerson}">
@@ -250,21 +292,38 @@
             </StackPanel>
             <!--  StartDate  -->
             <Label
-                Grid.Row="7"
+                Grid.Row="8"
                 Grid.Column="0"
                 Margin="0,5,5,0"
                 HorizontalAlignment="Right">
                 Start date:
             </Label>
             <DatePicker
-                Grid.Row="7"
+                Grid.Row="8"
                 Grid.Column="1"
                 Margin="5"
                 DisplayDateStart="{Binding Model.StartDateAsDateTime}"
                 SelectedDate="{Binding Model.StartDateAsDateTime}" />
+            <!--  Status  -->
+            <Label
+                Grid.Row="9"
+                Grid.Column="0"
+                Margin="0,5,5,0"
+                HorizontalAlignment="Right"
+                Visibility="{Binding IsEditView, Converter={StaticResource BoolToVisibilityConverter}}">
+                Status:
+            </Label>
+            <ComboBox
+                Grid.Row="9"
+                Grid.Column="1"
+                Width="200"
+                Margin="5"
+                ItemsSource="{Binding Model.JobApplicationStatusValues}"
+                SelectedItem="{Binding Model.Status, Mode=TwoWay}"
+                Visibility="{Binding IsEditView, Converter={StaticResource BoolToVisibilityConverter}}" />
             <!--  Buttons  -->
             <StackPanel
-                Grid.Row="8"
+                Grid.Row="10"
                 Grid.ColumnSpan="2"
                 Margin="5,20,5,5">
                 <Button

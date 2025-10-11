@@ -12,8 +12,8 @@ public class WindowService : IWindowService
 
         Window window = viewModel switch
         {
-            CreateJobApplicationViewModel vm => new CreateJobApplicationView(vm),
-            EditJobApplicationViewModel vm => new EditJobApplicationView(vm),
+            CreateJobApplicationViewModel vm => new JobApplicationView(vm),
+            EditJobApplicationViewModel vm => new JobApplicationView(vm),
             SetJobApplicationDefaultsViewModel vm => new SetJobApplicationDefaultsView(vm),
             SetAiSettingsViewModel vm => new SetAiSettingsView(vm),
             LoginViewModel vm => new LoginView(vm),

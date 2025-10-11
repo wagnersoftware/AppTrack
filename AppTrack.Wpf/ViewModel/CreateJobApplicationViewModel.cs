@@ -4,11 +4,13 @@ using AppTrack.WpfUi.ViewModel.Base;
 
 namespace AppTrack.WpfUi.ViewModel;
 
-public class CreateJobApplicationViewModel : AppTrackFormViewModelBase<JobApplicationModel>
+public class CreateJobApplicationViewModel : JobApplicationViewModelBase
 {
     public CreateJobApplicationViewModel(IModelValidator<JobApplicationModel> modelValidator, JobApplicationModel model)
         : base(modelValidator, model)
     {
+        base.IsEditView = false;
+        base.WindowTitle = "Create Job Application";
     }
 
     public void SetDefaults(JobApplicationDefaultsModel jobApplicationDefaults)

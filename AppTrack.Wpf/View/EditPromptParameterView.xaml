@@ -93,16 +93,18 @@
             Command="{Binding AddKeyValueItemCommand}"
             Content="Add" />
         <!--  Save/Cancel Buttons  -->
-        <StackPanel Grid.Row="2">
+        <StackPanel Grid.Row="2" Grid.ColumnSpan="2">
             <Button
+                Width="150"
                 Margin="0,10,0,0"
-                HorizontalAlignment="Stretch"
+                HorizontalAlignment="Center"
                 Command="{Binding SaveCommand}"
                 CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
                 Content="OK" />
             <Button
+                Width="150"
                 Margin="0,10,0,0"
-                HorizontalAlignment="Stretch"
+                HorizontalAlignment="Center"
                 Command="{Binding CancelCommand}"
                 CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
                 Content="Cancel" />

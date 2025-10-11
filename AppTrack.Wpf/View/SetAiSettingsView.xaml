@@ -146,16 +146,18 @@
                 </ItemsControl>
             </StackPanel>
             <!--  Buttons  -->
-            <StackPanel Grid.Row="4" Grid.Column="2">
+            <StackPanel Grid.Row="4" Grid.ColumnSpan="2">
                 <Button
+                    Width="150"
                     Margin="5,20,5,5"
-                    HorizontalAlignment="Stretch"
+                    HorizontalAlignment="Center"
                     Command="{Binding SaveCommand}"
                     CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
                     Content="Save" />
                 <Button
+                    Width="150"
                     Margin="5"
-                    HorizontalAlignment="Stretch"
+                    HorizontalAlignment="Center"
                     Command="{Binding CancelCommand}"
                     CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
                     Content="Cancel" />

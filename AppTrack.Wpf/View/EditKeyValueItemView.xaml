@@ -55,14 +55,16 @@
         <!--  Buttons  -->
         <StackPanel>
             <Button
+                Width="150"
                 Margin="5,20,5,5"
-                HorizontalAlignment="Stretch"
+                HorizontalAlignment="Center"
                 Command="{Binding SaveCommand}"
                 CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
                 Content="OK" />
             <Button
+                Width="150"
                 Margin="5"
-                HorizontalAlignment="Stretch"
+                HorizontalAlignment="Center"
                 Command="{Binding CancelCommand}"
                 CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
                 Content="Cancel" />
