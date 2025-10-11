@@ -3,6 +3,7 @@ using AppTrack.Frontend.ApiService.Base;
 using AppTrack.Frontend.ApiService.Contracts;
 using AppTrack.Frontend.ApiService.Services;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
@@ -10,9 +11,14 @@ namespace AppTrack.Frontend.ApiService;
 
 public static class ApiServiceRegistration
 {
-    public static IServiceCollection AddApiServiceServices(this IServiceCollection services)
+    public static IServiceCollection AddApiServiceServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddHttpClient<IClient, Client>(client => client.BaseAddress = new Uri("https://localhost:7273"));
+        var baseUrl = configuration["ApiSettings:BaseUrl"];
+        if (string.IsNullOrWhiteSpace(baseUrl))
+            throw new ArgumentNullException(nameof(configuration), message: "The base URL is not configured!");
+
+
+        services.AddHttpClient<IClient, Client>(client => client.BaseAddress = new Uri(baseUrl));
 
         services.AddScoped<IJobApplicationService, JobApplicationService>();
         services.AddScoped<IJobApplicationDefaultsService, JobApplicationDefaultsService>();

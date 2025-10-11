@@ -9,7 +9,9 @@ using AppTrack.WpfUi.MessageBoxService;
 using AppTrack.WpfUi.TokenStorage;
 using AppTrack.WpfUi.ViewModel;
 using AppTrack.WpfUi.WindowService;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Configuration;
 using System.Windows;
 
 namespace AppTrack.Wpf;
@@ -18,11 +20,25 @@ public partial class App : Application
 {
     public static IServiceProvider ServiceProvider { get; private set; } = default!;
 
+    public static IConfiguration Configuration { get; private set; } = default!;
+
     public App()
     {
+        var builder = new ConfigurationBuilder()
+    .SetBasePath(AppContext.BaseDirectory)
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+#if DEBUG
+    .AddJsonFile("appsettings.Development.json", optional: true)
+#else
+                            .AddJsonFile("appsettings.Production.json", optional: true)
+#endif
+    .AddEnvironmentVariables();
+
+        Configuration = builder.Build();
+
         var services = new ServiceCollection();
         services.AddSingleton<ITokenStorage, WpfTokenStorage>();
-        services.AddApiServiceServices();
+        services.AddApiServiceServices(Configuration);
         services.AddSingleton<IWindowService, WindowService>();
         services.AddSingleton<IMessageBoxService, MessageBoxService>();
         services.AddTransient(typeof(IModelValidator<>), typeof(ModelValidator<>));
@@ -71,6 +87,5 @@ public partial class App : Application
         {
             Application.Current.Shutdown();
         }
-
     }
 }

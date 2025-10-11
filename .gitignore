@@ -17,6 +17,10 @@ obj/
 *.ldf
 *.ndf
 
+# Ignore local publish profiles
+**/Properties/PublishProfiles/*.pubxml
+**/Properties/PublishProfiles/*.pubxml.user
+
 # Visual Studio working folders
 .vs/
 *.vscode/

@@ -71,7 +71,7 @@ public partial class LoginViewModel : AppTrackFormViewModelBase<LoginModel>
 
         if (apiResponse.Success == false)
         {
-            ErrorMessage = apiResponse.ValidationErrors;
+            ErrorMessage = apiResponse.Message;
             return;
         }
 

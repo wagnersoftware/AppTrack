@@ -36,7 +36,6 @@ public class CreateJobApplicationCommandValidator : AbstractValidator<CreateJobA
             .NotNull().WithMessage("{PropertyName} is required");
 
         RuleFor(x => x.Status)
-            .NotEmpty().WithMessage("{PropertyName} is required")
             .NotNull().WithMessage("{PropertyName} is required");
 
         RuleFor(x => x.StartDate)
