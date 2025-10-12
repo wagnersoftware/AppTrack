@@ -12,9 +12,6 @@ public partial class RegistrationViewModel : AppTrackFormViewModelBase<Registrat
     private readonly IAuthenticationService _authenticationService;
 
     [ObservableProperty]
-    private bool isPasswordVisible;
-
-    [ObservableProperty]
     private string errorMessage = string.Empty;
 
     public RegistrationViewModel(IModelValidator<RegistrationModel> modelValidator, RegistrationModel model, IAuthenticationService authenticationService) : base(modelValidator, model)

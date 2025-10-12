@@ -2,6 +2,7 @@
 using AppTrack.Frontend.Models;
 using AppTrack.Frontend.Models.ModelValidator;
 using AppTrack.WpfUi.CredentialManagement;
+using AppTrack.WpfUi.MessageBoxService;
 using AppTrack.WpfUi.ViewModel.Base;
 using AppTrack.WpfUi.WindowService;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -18,7 +19,7 @@ public partial class LoginViewModel : AppTrackFormViewModelBase<LoginModel>
     private readonly ICredentialManager _credentialManager;
     private readonly IWindowService _windowService;
     private readonly IServiceProvider _serviceProvider;
-
+    private readonly IMessageBoxService _messageBoxService;
     [ObservableProperty]
     private string errorMessage = string.Empty;
 
@@ -26,21 +27,20 @@ public partial class LoginViewModel : AppTrackFormViewModelBase<LoginModel>
     [ObservableProperty]
     private bool isRememberMeChecked;
 
-    [ObservableProperty]
-    private bool isPasswordVisible;
-
     public LoginViewModel(
         LoginModel model,
         IAuthenticationService authenticationService,
         IModelValidator<LoginModel> modelValidator,
         ICredentialManager credentialManager,
         IWindowService windowService,
-        IServiceProvider serviceProvider) : base(modelValidator, model)
+        IServiceProvider serviceProvider,
+        IMessageBoxService messageBoxService) : base(modelValidator, model)
     {
         this._authenticationService = authenticationService;
         this._credentialManager = credentialManager;
         this._windowService = windowService;
         this._serviceProvider = serviceProvider;
+        this._messageBoxService = messageBoxService;
 
         //get persisted value from settins
         IsRememberMeChecked = Properties.Settings.Default.RememberMe;
@@ -95,7 +95,12 @@ public partial class LoginViewModel : AppTrackFormViewModelBase<LoginModel>
     private void Register()
     {
         var registrationViewModel = _serviceProvider.GetRequiredService<RegistrationViewModel>();
-        _windowService.ShowWindow(registrationViewModel);
+        var dialogResult = _windowService.ShowWindow(registrationViewModel);
+
+        if(dialogResult == true)
+        {
+            _messageBoxService.ShowInformationMessageBox($"User {registrationViewModel.Model.UserName} registered successfully.", "Registration successful");
+        }
     }
 
     protected override void ResetErrors(string propertyName)

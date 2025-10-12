@@ -5,6 +5,8 @@
     xmlns:converter="clr-namespace:AppTrack.WpfUi.Converter"
     xmlns:helpers="clr-namespace:AppTrack.WpfUi.Helpers"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModel="clr-namespace:AppTrack.WpfUi.ViewModel"
     Title="AppTrack Login"
     SizeToContent="WidthAndHeight"
     WindowStartupLocation="CenterOwner">
@@ -38,17 +40,13 @@
         <!--  Password  -->
         <TextBlock Margin="0,10,0,0" Text="Password:" />
         <StackPanel>
-            <PasswordBox
-                x:Name="PasswordBox"
-                helpers:PasswordBoxHelper.BoundPassword="{Binding Model.Password}"
-                Visibility="{Binding IsPasswordVisible, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=False}">
+            <PasswordBox x:Name="PasswordBox" helpers:PasswordBoxHelper.BoundPassword="{Binding Model.Password}">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="PasswordChanged">
                         <i:InvokeCommandAction Command="{Binding ResetErrorsCommand}" CommandParameter="Password" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
             </PasswordBox>
-            <TextBox Text="{Binding Model.Password, Mode=TwoWay}" Visibility="{Binding IsPasswordVisible, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=True}" />
             <ItemsControl ItemsSource="{Binding Errors, Converter={StaticResource ErrorsDictConverter}, ConverterParameter=Password}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
@@ -62,14 +60,9 @@
             </ItemsControl>
         </StackPanel>
         <!--  Checkboxes  -->
-        <StackPanel>
-            <CheckBox Margin="0,5" IsChecked="{Binding IsRememberMeChecked}">
-                <TextBlock FontSize="12" Text="Remember me" />
-            </CheckBox>
-            <CheckBox Margin="0,5" IsChecked="{Binding IsPasswordVisible}">
-                <TextBlock FontSize="12" Text="Show password" />
-            </CheckBox>
-        </StackPanel>
+        <CheckBox Margin="0,5" IsChecked="{Binding IsRememberMeChecked}">
+            <TextBlock FontSize="12" Text="Remember me" />
+        </CheckBox>
         <!--  Message  -->
         <TextBlock
             FontSize="12"

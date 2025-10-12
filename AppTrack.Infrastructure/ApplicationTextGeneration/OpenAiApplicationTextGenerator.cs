@@ -39,7 +39,7 @@ public class OpenAiApplicationTextGenerator : IApplicationTextGenerator
             max_tokens = 400 // limits the response message
         });
 
-        var response = await _httpClient.SendAsync(request, cancellationToken);// todo Hehlerbehandlung 429 -> Too Many Requests,
+        var response = await _httpClient.SendAsync(request, cancellationToken);// todo Fehlerbehandlung 429 -> Too Many Requests,
         response.EnsureSuccessStatusCode();
 
         var result = await response.Content.ReadFromJsonAsync<ChatCompletionResponse>(cancellationToken: cancellationToken);

@@ -10,6 +10,12 @@ public class MessageBoxService : IMessageBoxService
         return MessageBox.Show(owner, message, caption, MessageBoxButton.OK, MessageBoxImage.Error);
     }
 
+    public MessageBoxResult ShowInformationMessageBox(string message, string caption)
+    {
+        var owner = GetActiveWindow();
+        return MessageBox.Show(owner, message, caption, MessageBoxButton.OK, MessageBoxImage.Information);
+    }
+
     public MessageBoxResult ShowQuestionMessageBox(string message, string caption)
     {
         var owner = GetActiveWindow();
