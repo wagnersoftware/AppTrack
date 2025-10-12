@@ -14,12 +14,17 @@ namespace AppTrack.Frontend.ApiService.Services
             this._mapper = mapper;
         }
 
-        public Task<Response<string>> GenerateApplicationText(int jobApplicationId, string userId) =>
+        public Task<Response<ApplicationTextModel>> GenerateApplicationText(int jobApplicationId, string userId) =>
             TryExecuteAsync(async () =>
             {
                 var command = new GenerateApplicationTextCommand() {UserId = userId, JobApplicationId = jobApplicationId};
                 var generatedTextDto = await _client.GenerateApplicationTextAsync(command);
-                return generatedTextDto.ApplicationText;
+                return new ApplicationTextModel()
+                {
+                    Text = generatedTextDto.ApplicationText,
+                    WindowTitle = "Generated application text",
+                    UnusedKeys = generatedTextDto.UnusedKeys.ToList()               
+                };
             });
     }
 }

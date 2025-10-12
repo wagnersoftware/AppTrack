@@ -53,6 +53,12 @@ namespace AppTrack.WpfUi.ViewModel
             return !string.IsNullOrWhiteSpace(Text);
         }
 
+        /// <summary>
+        /// Displays the text for the given duration ( default 3000ms)
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="durationMs"></param>
+        /// <returns></returns>
         private async Task ShowUserMessageAsync(string message, int durationMs = 3000)
         {
             UserMessage = message;

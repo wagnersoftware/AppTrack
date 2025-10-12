@@ -193,16 +193,16 @@ namespace AppTrack.WpfUi.ViewModel
                 return;
             }
 
-            jobApplicationModel.ApplicationText = apiResponse.Data;
+            jobApplicationModel.ApplicationText = apiResponse.Data.Text;
 
-            var textModel = new TextModel
+            var textModel = new ApplicationTextModel
             {
-                Text = apiResponse.Data,
+                Text = apiResponse.Data.Text,
                 WindowTitle = "Generated application text",
-                UserMessage = string.Empty // todo
+                UnusedKeys = apiResponse.Data.UnusedKeys
             };
 
-            var textViewModel = ActivatorUtilities.CreateInstance<TextViewModel>(_serviceProvider, textModel);
+            var textViewModel = ActivatorUtilities.CreateInstance<ApplicationTextViewModel>(_serviceProvider, textModel);
             _windowService.ShowWindow(textViewModel);
         }
 

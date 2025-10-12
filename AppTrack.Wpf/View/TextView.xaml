@@ -30,6 +30,7 @@
         <!--  Usermessage Textblock  -->
         <TextBlock
             Grid.Row="1"
+            Margin="5"
             FontSize="12"
             Foreground="Red"
             Text="{Binding UserMessage}"

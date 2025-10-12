@@ -56,6 +56,7 @@ public partial class App : Application
         services.AddTransient<EditPromptParameterViewModel>();
         services.AddTransient<EditKeyValueItemViewModel>();
         services.AddTransient<TextViewModel>();
+        services.AddTransient<ApplicationTextViewModel>();
 
         //views
         services.AddTransient<MainWindow>();
