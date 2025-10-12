@@ -25,7 +25,7 @@ public static class ApiErrorHelper
         var messages = new List<string>
     {
         $"Status: {status}",
-        $"Title: {title}"
+        $"Message: {title}"
     };
 
         if (doc.RootElement.TryGetProperty("errors", out var errors) && errors.ValueKind == JsonValueKind.Object)

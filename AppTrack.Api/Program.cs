@@ -1,8 +1,10 @@
+using AppTrack.Api.Helper;
 using AppTrack.Api.Middleware;
 using AppTrack.Application;
 using AppTrack.Identity;
 using AppTrack.Infrastructure;
 using AppTrack.Persistance;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +28,8 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+await MigrationsHelper.TryApplyDatabaseMigrations(app);
+
 app.UseMiddleware<ExceptionMiddleware>();
 
 // Configure the HTTP request pipeline.
@@ -35,8 +39,6 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
     app.UseSwaggerUI();
 }
 
-//app.UseHttpsRedirection();
-
 app.UseCors("All");
 
 app.UseAuthentication();
@@ -45,3 +47,4 @@ app.UseAuthorization();
 app.MapControllers();
 
 await app.RunAsync();
+
