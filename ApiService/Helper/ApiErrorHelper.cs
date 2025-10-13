@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using AppTrack.Frontend.ApiService.Base;
 using System.Text.Json;
 
 namespace AppTrack.Frontend.ApiService.Helper;
@@ -42,7 +42,36 @@ public static class ApiErrorHelper
         {
             foreach (var item in errors.EnumerateArray())
             {
-                messages.Add(item.GetString());             
+                var errorMessage = item.GetString();
+                if(errorMessage != null)
+                {
+                    messages.Add(errorMessage);
+                }     
+            }
+        }
+
+        return string.Join(Environment.NewLine, messages);
+    }
+
+    public static string ExtractErrors(CustomProblemDetails problem)
+    {
+        if (problem == null)
+            return string.Empty;
+
+        var messages = new List<string>
+        {
+            $"Status: {problem.Status}",
+            $"Message: {problem.Title}"
+        };
+
+        if (problem.Errors != null)
+        {
+            foreach (var kvp in problem.Errors)
+            {
+                foreach (var msg in kvp.Value)
+                {
+                    messages.Add($"{kvp.Key}: {msg}");
+                }
             }
         }
 

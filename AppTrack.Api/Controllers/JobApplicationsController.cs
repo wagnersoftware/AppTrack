@@ -1,4 +1,5 @@
-﻿using AppTrack.Application.Contracts.Mediator;
+﻿using AppTrack.Api.Models;
+using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Features.JobApplications.Commands.CreateJobApplication;
 using AppTrack.Application.Features.JobApplications.Commands.DeleteJobApplication;
 using AppTrack.Application.Features.JobApplications.Commands.UpdateJobApplication;
@@ -25,6 +26,9 @@ public class JobApplicationsController : ControllerBase
     }
     // GET: api/<JobApplicationsController>
     [HttpGet("forUser/{userId}")]
+    [ProducesResponseType(typeof(List<JobApplicationDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<List<JobApplicationDto>>> Get(string userId)
     {
         var jobApplicationDtos = await _mediator.Send(new GetJobApplicationsForUserQuery() { UserId = userId});
@@ -33,6 +37,9 @@ public class JobApplicationsController : ControllerBase
 
     // GET api/<JobApplicationsController>/5
     [HttpGet("{id}")]
+    [ProducesResponseType(typeof(JobApplicationDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<JobApplicationDto>> Get(int id)
     {
         var jobApplicationDto = await _mediator.Send(new GetJobApplicationByIdQuery() { Id = id });
@@ -41,9 +48,9 @@ public class JobApplicationsController : ControllerBase
 
     // POST api/<JobApplicationsController>
     [HttpPost]
-    [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(JobApplicationDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<JobApplicationDto>> Post(CreateJobApplicationCommand createJobApplicationCommand)
     {
         var response = await _mediator.Send(createJobApplicationCommand);
@@ -53,8 +60,8 @@ public class JobApplicationsController : ControllerBase
     // PUT api/<JobApplicationsController>/5
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(JobApplicationDto))]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<JobApplicationDto>> Put(UpdateJobApplicationCommand updateJobApplicationCommand)
     {
         var jobApplicationDto = await _mediator.Send(updateJobApplicationCommand);
@@ -64,8 +71,8 @@ public class JobApplicationsController : ControllerBase
     // DELETE api/<JobApplicationsController>/5
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesDefaultResponseType]
+    [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult> DeleteAsync(int id)
     {
         await _mediator.Send(new DeleteJobApplicationCommand() { Id = id });

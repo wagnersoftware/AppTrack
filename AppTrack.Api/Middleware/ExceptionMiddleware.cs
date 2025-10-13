@@ -52,7 +52,7 @@ public class ExceptionMiddleware
                     Title = notFoundException.Message,
                     Status = (int)statusCode,
                     Detail = notFoundException.InnerException?.Message,
-                    Type = nameof(NotFoundException)
+                    Type = nameof(NotFoundException),
                 };
 
                 break;
@@ -62,13 +62,14 @@ public class ExceptionMiddleware
                     Title = ex.Message,
                     Status = (int)statusCode,
                     Detail = ex.StackTrace,
-                    Type = nameof(HttpStatusCode.InternalServerError)
+                    Type = nameof(HttpStatusCode.InternalServerError),
                 };
 
                 break;
         }
-
+        httpContext.Response.Clear();
         httpContext.Response.StatusCode = (int)statusCode;
+        httpContext.Response.ContentType = "application/problem+json";
         await httpContext.Response.WriteAsJsonAsync(problem);
 
     }

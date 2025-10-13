@@ -44,10 +44,11 @@ public class JobApplicationService : BaseHttpService, IJobApplicationService
         });
 
 
-    public Task<Response<JobApplicationModel>> UpdateJobApplicationAsync(int id, JobApplicationModel jobApplicationModel) =>
+    public Task<Response<JobApplicationModel>> UpdateJobApplicationAsync(int id, string userId, JobApplicationModel jobApplicationModel) =>
         TryExecuteAsync(async () =>
         {
             var jobApplicationCommand = _mapper.Map<UpdateJobApplicationCommand>(jobApplicationModel);
+            jobApplicationCommand.UserId = userId;
             var jobApplicationDto = await _client.JobApplicationsPUTAsync(id.ToString(), jobApplicationCommand);
             return _mapper.Map<JobApplicationModel>(jobApplicationDto);
         });

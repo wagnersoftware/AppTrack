@@ -33,7 +33,7 @@ public partial class RegistrationViewModel : AppTrackFormViewModelBase<Registrat
 
         if (apiResponse.Success == false)
         {
-            ErrorMessage = apiResponse.ValidationErrors;
+            ErrorMessage = string.IsNullOrEmpty(apiResponse.ValidationErrors) == false ? apiResponse.ValidationErrors : apiResponse.ErrorMessage;
             return;
         }
 

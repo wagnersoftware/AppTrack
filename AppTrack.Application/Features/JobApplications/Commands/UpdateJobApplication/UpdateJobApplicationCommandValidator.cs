@@ -12,10 +12,6 @@ public class UpdateJobApplicationCommandValidator : AbstractValidator<UpdateJobA
     {
         this._jobApplicationRepository = jobApplicationRepository;
 
-        RuleFor(x => x.Id)
-            .NotEmpty().WithMessage("{PropertyName} is required")
-            .NotNull().WithMessage("{PropertyName} is required");
-
         RuleFor(x => x.Name)
             .NotEmpty().WithMessage("{PropertyName} is required")
             .NotNull().WithMessage("{PropertyName} is required");
@@ -26,19 +22,50 @@ public class UpdateJobApplicationCommandValidator : AbstractValidator<UpdateJobA
 
         RuleFor(x => x.URL)
             .NotEmpty().WithMessage("{PropertyName} is required")
+            .NotNull().WithMessage("{PropertyName} is required")
+            .Must(BeAValidUrl).WithMessage("{PropertyName} must be a valid URL");
+
+        RuleFor(x => x.UserId)
+            .NotEmpty().WithMessage("{PropertyName} is required")
+            .NotNull().WithMessage("{PropertyName} is required");
+
+        RuleFor(x => x.JobDescription)
+            .NotEmpty().WithMessage("{PropertyName} is required")
+            .NotNull().WithMessage("{PropertyName} is required");
+
+        RuleFor(x => x.Location)
+            .NotEmpty().WithMessage("{PropertyName} is required")
+            .NotNull().WithMessage("{PropertyName} is required");
+
+        RuleFor(x => x.ContactPerson)
+            .NotEmpty().WithMessage("{PropertyName} is required")
             .NotNull().WithMessage("{PropertyName} is required");
 
         RuleFor(x => x.Status)
             .NotNull().WithMessage("{PropertyName} is required");
 
+        RuleFor(x => x.StartDate)
+            .NotEmpty().WithMessage("{PropertyName} is required")
+            .NotNull().WithMessage("{PropertyName} is required");
+
+        RuleFor(x => x.DurationInMonths)
+            .Must(value => string.IsNullOrEmpty(value) || int.TryParse(value, out _))
+            .WithMessage("{PropertyName} must be a valid number.");
+
         RuleFor(x => x)
-            .MustAsync(JobApplicationExists)
-            .WithMessage("Job application doesn't exist");
+            .MustAsync(JobApplicationExistsForUser)
+            .WithMessage("Job application doesn't exist for user");
     }
 
-    private async Task<bool> JobApplicationExists(UpdateJobApplicationCommand command, CancellationToken token)
+    private async Task<bool> JobApplicationExistsForUser(UpdateJobApplicationCommand command, CancellationToken token)
     {
         var jobApplication = await _jobApplicationRepository.GetByIdAsync(command.Id);
-        return jobApplication != null;
+        return jobApplication != null && jobApplication.UserId == command.UserId;
+    }
+
+    private static bool BeAValidUrl(string url)
+    {
+        return Uri.TryCreate(url, UriKind.Absolute, out var uriResult)
+               && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
     }
 }

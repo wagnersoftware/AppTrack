@@ -29,7 +29,7 @@ public class AuthService : IAuthService
 
         if (user == null)
         {
-            throw new NotFoundException("User {0} not found", request.UserName);
+            throw new NotFoundException("User", request.UserName);
         }
 
         var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, false);

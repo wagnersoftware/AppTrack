@@ -1,13 +1,27 @@
-﻿using System.Windows;
+﻿using AppTrack.Frontend.ApiService.Base;
+using System.Windows;
 
 namespace AppTrack.WpfUi.MessageBoxService;
 
 public class MessageBoxService : IMessageBoxService
 {
-    public MessageBoxResult ShowErrorMessageBox(string message, string caption = "Error")
+    /// <summary>
+    /// Sets the response' validation error message as message box text if set, otherwise the response message.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="response"></param>
+    /// <returns></returns>
+    public MessageBoxResult ShowErrorMessageBox<T>(Response<T> response) 
     {
         var owner = GetActiveWindow();
-        return MessageBox.Show(owner, message, caption, MessageBoxButton.OK, MessageBoxImage.Error);
+        var message = string.IsNullOrEmpty(response.ValidationErrors) == false ? response.ValidationErrors : response.ErrorMessage;
+        return MessageBox.Show(owner, message, "error", MessageBoxButton.OK, MessageBoxImage.Error);
+    }
+
+    public MessageBoxResult ShowErrorMessageBox(string message)
+    {
+        var owner = GetActiveWindow();
+        return MessageBox.Show(owner, message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
     }
 
     public MessageBoxResult ShowInformationMessageBox(string message, string caption)
@@ -22,7 +36,7 @@ public class MessageBoxService : IMessageBoxService
         return MessageBox.Show(owner, message, caption, MessageBoxButton.OKCancel, MessageBoxImage.Question);
     }
 
-    private Window GetActiveWindow() =>
+    private static Window GetActiveWindow() =>
         Application.Current.Windows
             .OfType<Window>()
             .FirstOrDefault(w => w.IsActive)

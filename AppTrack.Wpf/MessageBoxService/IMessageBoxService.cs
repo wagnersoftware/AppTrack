@@ -1,10 +1,12 @@
-﻿using System.Windows;
+﻿using AppTrack.Frontend.ApiService.Base;
+using System.Windows;
 
 namespace AppTrack.WpfUi.MessageBoxService;
 
 public interface IMessageBoxService
 {
-    MessageBoxResult ShowErrorMessageBox(string message, string caption = null!);
+    MessageBoxResult ShowErrorMessageBox<T>(Response<T> response);
+    MessageBoxResult ShowErrorMessageBox(string message);
 
     MessageBoxResult ShowQuestionMessageBox(string message, string caption);
 

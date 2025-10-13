@@ -84,7 +84,8 @@ namespace AppTrack.WpfUi.ViewModel
 
             if (apiResponse.Success == false)
             {
-                _messageBoxService.ShowErrorMessageBox(apiResponse.Message);
+                _messageBoxService.ShowErrorMessageBox(apiResponse);
+                return;
             }
 
             apiResponse.Data?.ForEach(x => JobApplications.Add(x));
@@ -103,8 +104,14 @@ namespace AppTrack.WpfUi.ViewModel
 
             var response = await _jobApplicationDefaultsService.GetForUserAsync(userId);
 
+            if (response.Success == false)
+            {
+                _messageBoxService.ShowErrorMessageBox(response);
+                return;
+            }
+
             var createJobApplicationViewModel = _serviceProvider.GetRequiredService<CreateJobApplicationViewModel>();
-            createJobApplicationViewModel.SetDefaults(response.Data);
+            createJobApplicationViewModel.SetDefaults(response.Data!);
 
             var windowResult = _windowService.ShowWindow(createJobApplicationViewModel);
 
@@ -117,10 +124,11 @@ namespace AppTrack.WpfUi.ViewModel
 
             if (apiResponse.Success == false)
             {
-                _messageBoxService.ShowErrorMessageBox(apiResponse.Message);
+                _messageBoxService.ShowErrorMessageBox(apiResponse);
+                return;
             }
 
-            JobApplications.Add(apiResponse.Data);
+            JobApplications.Add(apiResponse.Data!);
 
         }
 
@@ -138,7 +146,8 @@ namespace AppTrack.WpfUi.ViewModel
 
             if (apiResponse.Success == false)
             {
-                _messageBoxService.ShowErrorMessageBox(apiResponse.Message);
+                _messageBoxService.ShowErrorMessageBox(apiResponse);
+                return;
             }
 
             var jobApplicationToRemove = JobApplications.SingleOrDefault(x => x.Id == id);
@@ -161,17 +170,24 @@ namespace AppTrack.WpfUi.ViewModel
                 return;
             }
 
-            var apiResponse = await _jobApplicationService.UpdateJobApplicationAsync(jobApplicationModel.Id, jobApplicationModel);
+            var userId = await _userHelper.TryGetUserIdAsync();
+
+            if (userId == null)
+            {
+                return;
+            }
+
+            var apiResponse = await _jobApplicationService.UpdateJobApplicationAsync(jobApplicationModel.Id, userId, jobApplicationModel);
 
             if (apiResponse.Success == false)
             {
-                _messageBoxService.ShowErrorMessageBox(apiResponse.Message);
+                _messageBoxService.ShowErrorMessageBox(apiResponse);
                 return;
             }
 
             int index = JobApplications.IndexOf(jobApplicationModel);
             JobApplications.RemoveAt(index);
-            JobApplications.Insert(index, apiResponse.Data);
+            JobApplications.Insert(index, apiResponse.Data!);
 
         }
 
@@ -189,11 +205,11 @@ namespace AppTrack.WpfUi.ViewModel
 
             if (apiResponse.Success == false)
             {
-                _messageBoxService.ShowErrorMessageBox(apiResponse.Message);
+                _messageBoxService.ShowErrorMessageBox(apiResponse);
                 return;
             }
 
-            jobApplicationModel.ApplicationText = apiResponse.Data.Text;
+            jobApplicationModel.ApplicationText = apiResponse.Data!.Text;
 
             var textModel = new ApplicationTextModel
             {
@@ -220,10 +236,11 @@ namespace AppTrack.WpfUi.ViewModel
 
             if (apiResponse.Success == false)
             {
-                _messageBoxService.ShowErrorMessageBox(apiResponse.Message);
+                _messageBoxService.ShowErrorMessageBox(apiResponse);
+                return;
             }
 
-            var jobApplicatiobDefaultsViewModel = ActivatorUtilities.CreateInstance<SetJobApplicationDefaultsViewModel>(_serviceProvider, apiResponse.Data);
+            var jobApplicatiobDefaultsViewModel = ActivatorUtilities.CreateInstance<SetJobApplicationDefaultsViewModel>(_serviceProvider, apiResponse.Data!);
             var windowResult = _windowService.ShowWindow(jobApplicatiobDefaultsViewModel);
 
             if (windowResult == false)
@@ -231,11 +248,11 @@ namespace AppTrack.WpfUi.ViewModel
                 return;
             }
 
-            apiResponse = await _jobApplicationDefaultsService.UpdateAsync(apiResponse.Data.Id, apiResponse.Data);
+            apiResponse = await _jobApplicationDefaultsService.UpdateAsync(apiResponse.Data!.Id, apiResponse.Data);
 
             if (apiResponse.Success == false)
             {
-                _messageBoxService.ShowErrorMessageBox(apiResponse.Message);
+                _messageBoxService.ShowErrorMessageBox(apiResponse);
             }
         }
 
@@ -253,10 +270,11 @@ namespace AppTrack.WpfUi.ViewModel
 
             if (apiResponse.Success == false)
             {
-                _messageBoxService.ShowErrorMessageBox(apiResponse.Message);
+                _messageBoxService.ShowErrorMessageBox(apiResponse);
+                return;
             }
 
-            var setAiSettingsViewModel = ActivatorUtilities.CreateInstance<SetAiSettingsViewModel>(_serviceProvider, apiResponse.Data);
+            var setAiSettingsViewModel = ActivatorUtilities.CreateInstance<SetAiSettingsViewModel>(_serviceProvider, apiResponse.Data!);
             var windowResult = _windowService.ShowWindow(setAiSettingsViewModel);
 
             if (windowResult == false)
@@ -264,11 +282,11 @@ namespace AppTrack.WpfUi.ViewModel
                 return;
             }
 
-            apiResponse = await _aiSettingsService.UpdateAsync(apiResponse.Data.Id, apiResponse.Data);
+            apiResponse = await _aiSettingsService.UpdateAsync(apiResponse.Data!.Id, apiResponse.Data);
 
             if (apiResponse.Success == false)
             {
-                _messageBoxService.ShowErrorMessageBox(apiResponse.Message);
+                _messageBoxService.ShowErrorMessageBox(apiResponse);
             }
         }
 

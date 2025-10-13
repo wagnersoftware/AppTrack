@@ -14,20 +14,25 @@ public class BaseHttpService
         this._tokenStorage = tokenStorage;
     }
 
-    private Response<T> ConvertApiException<T>(ApiException apiException)
+    private Response<T> ConvertApiException<T>(ApiException apiEx)
     {
-        if (apiException.StatusCode == 400) // bad request
+        string validationErrors = string.Empty;
+
+        if (apiEx is ApiException<CustomProblemDetails> typedException && typedException.Result != null)
         {
-            return new Response<T> { Message = "Invalid data was submitted", ValidationErrors = ApiErrorHelper.ExtractErrors(apiException.Response), Success = false };
+            validationErrors = ApiErrorHelper.ExtractErrors(typedException.Result);
         }
-        else if (apiException.StatusCode == 404) // not found
+        else if (!string.IsNullOrEmpty(apiEx.Response))
         {
-            return new Response<T> { Message = "The record was not found", Success = false };
+            validationErrors = ApiErrorHelper.ExtractErrors(apiEx.Response);
         }
-        else
+
+        return apiEx.StatusCode switch
         {
-            return new Response<T> { Message = "Something went wrong, please try again", Success = false };
-        }
+            400 => new Response<T> { ErrorMessage = "Invalid data was submitted", ValidationErrors = validationErrors, Success = false },
+            404 => new Response<T> { ErrorMessage = "The record was not found", ValidationErrors = validationErrors, Success = false },
+            _ => new Response<T> { ErrorMessage = "Something went wrong, please try again", ValidationErrors = validationErrors, Success = false },
+        };
     }
 
     private async Task AddBearerTokenAsync()

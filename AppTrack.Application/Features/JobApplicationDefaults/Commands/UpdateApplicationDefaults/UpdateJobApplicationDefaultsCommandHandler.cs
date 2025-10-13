@@ -29,7 +29,7 @@ public class UpdateJobApplicationDefaultsCommandHandler : IRequestHandler<Update
 
         var jobApplicationDefaultsToUpdate = await _jobApplicationDefaultsRepository.GetByIdAsync(request.Id);
         _mapper.Map(request, jobApplicationDefaultsToUpdate);
-        await _jobApplicationDefaultsRepository.UpdateAsync(jobApplicationDefaultsToUpdate);
+        await _jobApplicationDefaultsRepository.UpdateAsync(jobApplicationDefaultsToUpdate!);
 
         return Unit.Value;
     }
