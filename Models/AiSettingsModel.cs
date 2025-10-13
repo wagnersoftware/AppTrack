@@ -1,5 +1,5 @@
 ﻿using AppTrack.Frontend.Models.Base;
-using CommunityToolkit.Mvvm.ComponentModel;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace AppTrack.Frontend.Models;
@@ -14,6 +14,6 @@ public partial class AiSettingsModel : ModelBase
 
     public string UserId { get; set; } = string.Empty;
 
-    [ObservableProperty]
-    private List<PromptParameterModel> promptParameter = new List<PromptParameterModel>();
+
+    public ObservableCollection<PromptParameterModel> PromptParameter { get; set; } = new ObservableCollection<PromptParameterModel>();
 }

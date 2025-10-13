@@ -19,7 +19,7 @@ public class CredentialManager : ICredentialManager
             persistence: CredentialPersistence.LocalMachine);
     }
 
-    public (string? username, string? password)? LoadCredentials()
+    public (string? userName, string? password)? LoadCredentials()
     {
         var cred = Meziantou.Framework.Win32.CredentialManager.ReadCredential(_applicationName);
         if (cred != null)

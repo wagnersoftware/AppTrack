@@ -4,7 +4,6 @@ using AppTrack.WpfUi.ViewModel.Base;
 using AppTrack.WpfUi.WindowService;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
-using System.Collections.ObjectModel;
 
 namespace AppTrack.WpfUi.ViewModel;
 
@@ -19,17 +18,44 @@ public partial class SetAiSettingsViewModel : AppTrackFormViewModelBase<AiSettin
         this._serviceProvider = serviceProvider;
     }
 
-    [RelayCommand]
-    public void EditPromptParameter()
-    {
-        ObservableCollection<PromptParameterModel> observableList = new ObservableCollection<PromptParameterModel>(Model.PromptParameter);
-        var viewModel = ActivatorUtilities.CreateInstance<EditPromptParameterViewModel>(_serviceProvider, observableList);
 
-        var dialogResult =_windowService.ShowWindow(viewModel);
+    [RelayCommand]
+    private void AddPromptParameter()
+    {
+        var keyValueItem = new PromptParameterModel() { ParentCollection = this.Model.PromptParameter };
+        var editKeyItemViewModel = ActivatorUtilities.CreateInstance<EditKeyValueItemViewModel>(_serviceProvider, keyValueItem);
+        var dialogResult = _windowService.ShowWindow(editKeyItemViewModel);
 
         if (dialogResult == true)
         {
-            Model.PromptParameter = [.. viewModel.PromptParameter];
+            Model.PromptParameter.Add(editKeyItemViewModel.Model);
+        }
+    }
+
+    [RelayCommand]
+    private void EditPromptParameter(PromptParameterModel keyValueItem)
+    {
+        var clone = keyValueItem.Clone();
+        clone.ParentCollection = this.Model.PromptParameter;
+
+        var editKeyItemViewModel = ActivatorUtilities.CreateInstance<EditKeyValueItemViewModel>(_serviceProvider, clone);
+        var dialogResult = _windowService.ShowWindow(editKeyItemViewModel);
+
+        if (dialogResult == true)
+        {
+            keyValueItem.Key = clone.Key;
+            keyValueItem.Value = clone.Value;
+        }
+    }
+
+    [RelayCommand]
+    private void DeletePromptParameter(Guid tempId)
+    {
+        var itemToRemove = Model.PromptParameter.FirstOrDefault(x => x.TempId == tempId);
+
+        if (itemToRemove != null)
+        {
+            Model.PromptParameter.Remove(itemToRemove);
         }
     }
 }
