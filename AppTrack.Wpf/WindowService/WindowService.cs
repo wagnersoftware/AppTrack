@@ -19,7 +19,8 @@ public class WindowService : IWindowService
             LoginViewModel vm => new LoginView(vm),
             RegistrationViewModel vm => new RegistrationView(vm),
             EditKeyValueItemViewModel vm => new EditKeyValueItemView(vm),
-            TextViewModel vm => new TextView(vm),
+            GeneratedPromptViewModel vm => new GeneratedPromptView(vm),
+            ApplicationTextViewModel vm => new TextView(vm),
             _ => throw new NotImplementedException()
         };
 

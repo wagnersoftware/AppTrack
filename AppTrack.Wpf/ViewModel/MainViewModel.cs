@@ -201,24 +201,33 @@ namespace AppTrack.WpfUi.ViewModel
                 return;
             }
 
-            var apiResponse = await _applicationTextService.GenerateApplicationText(jobApplicationModel.Id, userId);
+            var generatedPromptResponse = await _applicationTextService.GeneratePrompt(jobApplicationModel.Id, userId);
 
-            if (apiResponse.Success == false)
+            if (generatedPromptResponse.Success == false)
             {
-                _messageBoxService.ShowErrorMessageBox(apiResponse);
+                _messageBoxService.ShowErrorMessageBox(generatedPromptResponse);
                 return;
             }
 
-            jobApplicationModel.ApplicationText = apiResponse.Data!.Text;
+            var generatedPromptViewModel = ActivatorUtilities.CreateInstance<GeneratedPromptViewModel>(_serviceProvider, generatedPromptResponse.Data!);
+            var promptDialogResult = _windowService.ShowWindow(generatedPromptViewModel);
 
-            var textModel = new ApplicationTextModel
+            if (promptDialogResult == false)
             {
-                Text = apiResponse.Data.Text,
-                WindowTitle = "Generated application text",
-                UnusedKeys = apiResponse.Data.UnusedKeys
-            };
+                return;
+            }
 
-            var textViewModel = ActivatorUtilities.CreateInstance<ApplicationTextViewModel>(_serviceProvider, textModel);
+            var applicationTextResponse = await _applicationTextService.GenerateApplicationText(generatedPromptViewModel.Text, userId, jobApplicationModel.Id);
+
+            if (applicationTextResponse.Success == false)
+            {
+                _messageBoxService.ShowErrorMessageBox(applicationTextResponse);
+                return;
+            }
+
+            jobApplicationModel.ApplicationText = applicationTextResponse.Data!.Text;
+
+            var textViewModel = ActivatorUtilities.CreateInstance<ApplicationTextViewModel>(_serviceProvider, applicationTextResponse.Data);
             _windowService.ShowWindow(textViewModel);
         }
 

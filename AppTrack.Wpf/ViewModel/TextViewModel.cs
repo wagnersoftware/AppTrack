@@ -26,6 +26,7 @@ namespace AppTrack.WpfUi.ViewModel
         [RelayCommand]
         public void Close(Window window)
         {
+            window.DialogResult = false;
             window.Close();
         }
 
@@ -33,7 +34,7 @@ namespace AppTrack.WpfUi.ViewModel
         /// Copy text for text editors with \n line endings.
         /// </summary>
         /// <returns></returns>
-        [RelayCommand(CanExecute = nameof(CanCopy))]
+        [RelayCommand(CanExecute = nameof(IsTextSet))]
         public async Task CopyTextPlain()
         {
             try
@@ -48,7 +49,7 @@ namespace AppTrack.WpfUi.ViewModel
             }
         }
 
-        private bool CanCopy()
+        protected bool IsTextSet()
         {
             return !string.IsNullOrWhiteSpace(Text);
         }

@@ -29,6 +29,11 @@ public class UpdateJobApplicationCommandHandler : IRequestHandler<UpdateJobAppli
 
         var jobApplicationToUpdate = await _jobApplicationRepository.GetByIdAsync(request.Id);
 
+        if (jobApplicationToUpdate == null)
+        {
+            throw new NotFoundException("Job Application", request.Id);
+        }
+
         _mapper.Map(request, jobApplicationToUpdate);
 
         await _jobApplicationRepository.UpdateAsync(jobApplicationToUpdate);
