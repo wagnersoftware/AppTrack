@@ -54,7 +54,7 @@ public partial class LoginViewModel : AppTrackFormViewModelBase<LoginModel>
         var credentials = _credentialManager.LoadCredentials();
         if (credentials.HasValue)
         {
-            Model.UserName = credentials.Value.username!;
+            Model.UserName = credentials.Value.userName!;
             Model.Password = credentials.Value.password!;
         }
     }

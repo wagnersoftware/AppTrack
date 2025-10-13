@@ -7,12 +7,12 @@ namespace AppTrack.WpfUi.CredentialManagement;
 /// </summary>
 public class CredentialManager : ICredentialManager
 {
-    private const string _applicationName = "AppTrack";
-
     public void SaveCredentials(string userName, string password)
     {
+        var applicationName = GetApplicationName();
+
         Meziantou.Framework.Win32.CredentialManager.WriteCredential(
-            applicationName: _applicationName,
+            applicationName: applicationName,
             userName: userName,
             secret: password,
             comment: "Persisted credentials",
@@ -21,7 +21,9 @@ public class CredentialManager : ICredentialManager
 
     public (string? userName, string? password)? LoadCredentials()
     {
-        var cred = Meziantou.Framework.Win32.CredentialManager.ReadCredential(_applicationName);
+        var applicationName = GetApplicationName();
+
+        var cred = Meziantou.Framework.Win32.CredentialManager.ReadCredential(applicationName);
         if (cred != null)
         {
             return (cred.UserName, cred.Password);
@@ -32,7 +34,21 @@ public class CredentialManager : ICredentialManager
 
     public void DeleteCredentials()
     {
-        Meziantou.Framework.Win32.CredentialManager.DeleteCredential(_applicationName);
+        var applicationName = GetApplicationName();
+        Meziantou.Framework.Win32.CredentialManager.DeleteCredential(applicationName);
+    }
+
+    /// <summary>
+    /// Application name is the current environment stage + current windows user name.
+    /// The application name serves as key for the credential manager.
+    /// </summary>
+    /// <returns></returns>
+    private static string GetApplicationName()
+    {
+        var environment = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") ?? "Production";
+        var userName = Environment.UserName;
+
+        return $"AppTrack_{environment}_{userName}";
     }
 }
 

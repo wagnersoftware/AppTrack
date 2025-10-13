@@ -11,7 +11,6 @@ using AppTrack.WpfUi.ViewModel;
 using AppTrack.WpfUi.WindowService;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System.Configuration;
 using System.Windows;
 
 namespace AppTrack.Wpf;
@@ -24,15 +23,15 @@ public partial class App : Application
 
     public App()
     {
+        SetEnvironmentVariable();
+
+        string env = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") ?? "Production";
+
         var builder = new ConfigurationBuilder()
-    .SetBasePath(AppContext.BaseDirectory)
-    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-#if DEBUG
-    .AddJsonFile("appsettings.Development.json", optional: true)
-#else
-                            .AddJsonFile("appsettings.Production.json", optional: true)
-#endif
-    .AddEnvironmentVariables();
+            .SetBasePath(AppContext.BaseDirectory)
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+            .AddJsonFile($"appsettings.{env}.json", optional: true, reloadOnChange: true)
+            .AddEnvironmentVariables();
 
         Configuration = builder.Build();
 
@@ -66,6 +65,15 @@ public partial class App : Application
         services.AddTransient<RegistrationModel>();
 
         ServiceProvider = services.BuildServiceProvider();
+    }
+
+    private static void SetEnvironmentVariable()
+    {
+#if DEBUG
+        Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", "Development");
+#else
+    Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", "Production");
+#endif
     }
 
     protected override async void OnStartup(StartupEventArgs e)
