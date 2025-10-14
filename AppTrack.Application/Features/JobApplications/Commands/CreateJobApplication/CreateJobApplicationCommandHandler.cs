@@ -5,6 +5,7 @@ using AppTrack.Application.Features.JobApplications.Dto;
 using AutoMapper;
 
 namespace AppTrack.Application.Features.JobApplications.Commands.CreateJobApplication;
+
 public class CreateJobApplicationCommandHandler : IRequestHandler<CreateJobApplicationCommand, JobApplicationDto>
 {
     private readonly IMapper _mapper;

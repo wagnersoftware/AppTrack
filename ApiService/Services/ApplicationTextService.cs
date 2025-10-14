@@ -14,12 +14,12 @@ namespace AppTrack.Frontend.ApiService.Services
         public Task<Response<ApplicationTextModel>> GenerateApplicationText(string prompt, string userId, int jobApplicationId) =>
             TryExecuteAsync(async () =>
             {
-                var command = new GenerateApplicationTextCommand() {UserId = userId, Prompt = prompt, JobApplicationId = jobApplicationId};
+                var command = new GenerateApplicationTextCommand() { UserId = userId, Prompt = prompt, JobApplicationId = jobApplicationId };
                 var generatedTextDto = await _client.GenerateApplicationTextAsync(command);
                 return new ApplicationTextModel()
                 {
                     Text = generatedTextDto.ApplicationText,
-                    WindowTitle = "Generated application text",           
+                    WindowTitle = "Generated application text",
                 };
             });
 

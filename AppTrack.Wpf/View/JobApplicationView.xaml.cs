@@ -1,5 +1,4 @@
-﻿using AppTrack.WpfUi.ViewModel;
-using AppTrack.WpfUi.ViewModel.Base;
+﻿using AppTrack.WpfUi.ViewModel.Base;
 using System.Windows;
 
 namespace AppTrack.WpfUi.View;

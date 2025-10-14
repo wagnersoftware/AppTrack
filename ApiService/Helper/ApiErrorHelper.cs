@@ -7,7 +7,7 @@ public static class ApiErrorHelper
 {
     public static string ExtractErrors(string json)
     {
-        if(string.IsNullOrEmpty(json))
+        if (string.IsNullOrEmpty(json))
         {
             return string.Empty;
         }
@@ -43,10 +43,10 @@ public static class ApiErrorHelper
             foreach (var item in errors.EnumerateArray())
             {
                 var errorMessage = item.GetString();
-                if(errorMessage != null)
+                if (errorMessage != null)
                 {
                     messages.Add(errorMessage);
-                }     
+                }
             }
         }
 

@@ -22,7 +22,7 @@ namespace AppTrack.Application
                 .AsImplementedInterfaces()
                 .WithTransientLifetime());
 
-            services.AddSingleton<IPromptBuilder,PromptBuilder>();
+            services.AddSingleton<IPromptBuilder, PromptBuilder>();
 
             return services;
         }

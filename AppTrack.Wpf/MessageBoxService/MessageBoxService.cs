@@ -11,7 +11,7 @@ public class MessageBoxService : IMessageBoxService
     /// <typeparam name="T"></typeparam>
     /// <param name="response"></param>
     /// <returns></returns>
-    public MessageBoxResult ShowErrorMessageBox<T>(Response<T> response) 
+    public MessageBoxResult ShowErrorMessageBox<T>(Response<T> response)
     {
         var owner = GetActiveWindow();
         var message = string.IsNullOrEmpty(response.ValidationErrors) == false ? response.ValidationErrors : response.ErrorMessage;

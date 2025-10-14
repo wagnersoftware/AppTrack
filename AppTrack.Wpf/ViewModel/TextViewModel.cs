@@ -5,7 +5,7 @@ using System.Windows;
 
 namespace AppTrack.WpfUi.ViewModel
 {
-    public partial class TextViewModel: ObservableObject
+    public partial class TextViewModel : ObservableObject
     {
         [ObservableProperty]
         private string windowTitle = "Text Window";

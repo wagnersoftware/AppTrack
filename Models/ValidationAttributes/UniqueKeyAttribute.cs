@@ -27,7 +27,7 @@ public class UniqueKeyAttribute : ValidationAttribute
         {
             return ValidationResult.Success;
         }
-            
+
 
         var instance = validationContext.ObjectInstance;
         var collectionProperty = instance.GetType().GetProperty(_collectionPropertyName);
@@ -50,7 +50,7 @@ public class UniqueKeyAttribute : ValidationAttribute
             // do not compare same instances
             var otherId = item.GetType().GetProperty(_idPropertyName)?.GetValue(item);
             if (Equals(otherId, instanceId))
-                return false; 
+                return false;
 
             return string.Equals(
                 keyVal?.ToString()?.Trim(),

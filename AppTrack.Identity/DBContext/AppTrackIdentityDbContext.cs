@@ -1,8 +1,6 @@
 ﻿using AppTrack.Identity.Models;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 
 namespace AppTrack.Identity.DBContext;
 

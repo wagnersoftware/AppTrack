@@ -6,6 +6,7 @@ using AppTrack.Application.Features.JobApplications.Dto;
 using AutoMapper;
 
 namespace AppTrack.Application.Features.JobApplications.Queries.GetAllJobApplicationsForUser;
+
 public class GetJobApplicationsForUserQueryHandler : IRequestHandler<GetJobApplicationsForUserQuery, List<JobApplicationDto>>
 {
     private readonly IMapper _mapper;

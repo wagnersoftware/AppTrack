@@ -1,5 +1,4 @@
-﻿using AppTrack.Frontend.Models;
-using AppTrack.Frontend.Models.Base;
+﻿using AppTrack.Frontend.Models.Base;
 using AppTrack.Frontend.Models.ModelValidator;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;

@@ -4,7 +4,6 @@ using AppTrack.Application;
 using AppTrack.Identity;
 using AppTrack.Infrastructure;
 using AppTrack.Persistance;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);

@@ -5,6 +5,7 @@ using AppTrack.Domain;
 using AutoMapper;
 
 namespace AppTrack.Application.MappingProfiles;
+
 public class JobApplicationProfile : Profile
 {
     public JobApplicationProfile()

@@ -1,5 +1,4 @@
 ﻿using AppTrack.Application.Contracts.Persistance;
-using AppTrack.Application.Features.JobApplications.Commands.DeleteJobApplication;
 using FluentValidation;
 
 namespace AppTrack.Application.Features.JobApplications.Commands.UpdateJobApplication;

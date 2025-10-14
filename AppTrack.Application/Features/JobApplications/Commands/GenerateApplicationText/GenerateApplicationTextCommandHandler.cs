@@ -45,6 +45,6 @@ public class GenerateApplicationTextCommandHandler : IRequestHandler<GenerateApp
         jobApplication!.ApplicationText = generatedApplicationText;
         await _jobApplicationRepository.UpdateAsync(jobApplication);
 
-        return new GeneratedApplicationTextDto() { ApplicationText = generatedApplicationText};
+        return new GeneratedApplicationTextDto() { ApplicationText = generatedApplicationText };
     }
 }

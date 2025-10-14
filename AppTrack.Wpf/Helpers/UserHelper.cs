@@ -8,7 +8,7 @@ namespace AppTrack.WpfUi.Helpers
     /// <summary>
     /// Provides functions for reading user data from authentication state.
     /// </summary>
-    public class UserHelper: IUserHelper
+    public class UserHelper : IUserHelper
     {
         private readonly ApiAuthenticationStateProvider _authProvider;
         private readonly IMessageBoxService _messageBoxService;

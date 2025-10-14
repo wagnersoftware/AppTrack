@@ -97,7 +97,7 @@ public partial class LoginViewModel : AppTrackFormViewModelBase<LoginModel>
         var registrationViewModel = _serviceProvider.GetRequiredService<RegistrationViewModel>();
         var dialogResult = _windowService.ShowWindow(registrationViewModel);
 
-        if(dialogResult == true)
+        if (dialogResult == true)
         {
             _messageBoxService.ShowInformationMessageBox($"User {registrationViewModel.Model.UserName} registered successfully.", "Registration successful");
         }

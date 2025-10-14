@@ -1,6 +1,7 @@
 ﻿using AppTrack.Domain.Enums;
 
 namespace AppTrack.Application.Features.JobApplications.Dto;
+
 public class JobApplicationDto
 {
     public int Id { get; set; }

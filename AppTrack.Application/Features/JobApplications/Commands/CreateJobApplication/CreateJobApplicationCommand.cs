@@ -3,6 +3,7 @@ using AppTrack.Application.Features.JobApplications.Dto;
 using AppTrack.Domain.Enums;
 
 namespace AppTrack.Application.Features.JobApplications.Commands.CreateJobApplication;
+
 public class CreateJobApplicationCommand : IRequest<JobApplicationDto>
 {
     public DateTime CreationDate { get; set; }

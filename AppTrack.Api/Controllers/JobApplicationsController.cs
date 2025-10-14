@@ -31,7 +31,7 @@ public class JobApplicationsController : ControllerBase
     [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<List<JobApplicationDto>>> Get(string userId)
     {
-        var jobApplicationDtos = await _mediator.Send(new GetJobApplicationsForUserQuery() { UserId = userId});
+        var jobApplicationDtos = await _mediator.Send(new GetJobApplicationsForUserQuery() { UserId = userId });
         return Ok(jobApplicationDtos);
     }
 

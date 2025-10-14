@@ -3,7 +3,7 @@ using AppTrack.Application.Features.ApplicationText.Dto;
 
 namespace AppTrack.Application.Features.ApplicationText.Query;
 
-public class GeneratePromptQuery: IRequest<GeneratedPromptDto>
+public class GeneratePromptQuery : IRequest<GeneratedPromptDto>
 {
     public int JobApplicationId { get; set; }
     public string UserId { get; set; } = string.Empty;

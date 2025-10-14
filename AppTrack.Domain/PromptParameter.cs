@@ -1,5 +1,4 @@
 ﻿using AppTrack.Domain.Common;
-using System.Runtime.InteropServices;
 
 namespace AppTrack.Domain;
 
@@ -12,7 +11,7 @@ public class PromptParameter : BaseEntity
 
     private PromptParameter()
     {
-            
+
     }
 
     public static PromptParameter Create(string? key, string? value)

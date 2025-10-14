@@ -46,6 +46,6 @@ public class GeneratePromptQueryHandler : IRequestHandler<GeneratePromptQuery, G
         var promptParameter = jobApplicationParameter.Union(applicantParameter).ToList();
         var (prompt, unusedKeys) = _promptBuilder.BuildPrompt(promptParameter, aiSettings.PromptTemplate);
 
-        return new GeneratedPromptDto () { Prompt = prompt, UnusedKeys = unusedKeys };
+        return new GeneratedPromptDto() { Prompt = prompt, UnusedKeys = unusedKeys };
     }
 }

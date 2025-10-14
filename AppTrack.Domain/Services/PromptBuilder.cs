@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 
 namespace AppTrack.Domain.Services;
 
-public class PromptBuilder: IPromptBuilder
+public class PromptBuilder : IPromptBuilder
 {
     public (string prompt, List<string> unusedKeys) BuildPrompt(IEnumerable<PromptParameter> promptParameter, string prompt)
     {

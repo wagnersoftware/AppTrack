@@ -63,8 +63,8 @@ namespace AppTrack.WpfUi.ViewModel
             var state = await task;
             LoggedInUser = state.User.Identity?.Name ?? string.Empty;
             IsLoggedIn = state.User.Identity?.IsAuthenticated ?? false;
-            
-            if(IsLoggedIn == false)
+
+            if (IsLoggedIn == false)
             {
                 LoggedInUser = string.Empty;
                 JobApplications.Clear();
@@ -97,7 +97,7 @@ namespace AppTrack.WpfUi.ViewModel
 
             var userId = await _userHelper.TryGetUserIdAsync();
 
-            if(userId == null)
+            if (userId == null)
             {
                 return;
             }
