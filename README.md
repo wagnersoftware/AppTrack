@@ -2,7 +2,7 @@
 
 ![AppTrack](Documentation/Screenshots/AppTrack.png)
 
-AppTrack helps me manage my own job applications and generate application texts using AI (work in progress). It features Bearer-Token Authentication, a WPF frontend, with a Blazor web frontend planned for the future. The backend is an ASP.NET Web API (all .NET 8) following Clean Architecture, CQRS, and the Mediator pattern. 
+AppTrack helps me manage my own job applications and generate application texts using AI (work in progress). It features Bearer-Token authentication, a WPF frontend, with a Blazor web frontend planned for the future. The backend is an ASP.NET Web API (all .NET 8) following Clean Architecture, CQRS, and the Mediator pattern. 
 The project is primarily intended as a playground for exploring new technologies and architectures.
 
 ## Features
@@ -38,7 +38,7 @@ The project is primarily intended as a playground for exploring new technologies
 
 - Entity Framework Core
 
-- SQLite database
+- MS SQL LocalDB
 
 
 ## Installation
@@ -47,16 +47,24 @@ The project is primarily intended as a playground for exploring new technologies
    git clone https://github.com/wagnersoftware/AppTrack.git
 2. Open the solution in Visual Studio 2022 or later.
 
-3. Restore NuGet packages.
+3. Right-click on the solution file -> Restore NuGet packages.
 
-4. Run the backend and frontend projects. (right click on solution -> Properties
+4. Right-click the project file AppTrack.Api and select Publish. Choose any directory on your local machine, apply the settings and run Publish.
 
-![Properties](Documentation/Screenshots/MultipleStartProjects.png)
+![AppTrack](Documentation/Screenshots/PublishBackend.png)
 
-5. Run the database migrations in package-manager
-   ```bash
-   update-database -context AppTrackDatabaseContext
-   update-database -context AppTrackIdentityDbContext
+5. Right-click the project file AppTrack.WpfUi and select Publish. Choose any directory on your local machine, apply the settings and run Publish.
+
+![AppTrack](Documentation/Screenshots/PublishFrontend.png)
+
+6. In the Frontend directory there is a batch file (StartAppTrack.bat) that will run the frontend and backend. you must set the APIPATH and UIPATH to your installation directory.
+
+![AppTrack](Documentation/Screenshots/StartBatchConfig.png)
+
+7. Run the batch file
+
+The application uses LocalDB that comes with Visual Studio. If you still need it, you can get it here (Express Version): https://www.microsoft.com/en-us/sql-server/sql-server-downloads
+The migration scripts run automatically on server start.
 
 ## Contributing
 
