@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:converter="clr-namespace:AppTrack.WpfUi.Converter"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="clr-namespace:AppTrack.WpfUi.Helpers"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:local="clr-namespace:AppTrack.WpfUi.View"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -40,13 +41,13 @@
                 Grid.Row="0"
                 Grid.Column="1"
                 Margin="5">
-                <TextBox Text="{Binding Model.ApiKey}">
+                <PasswordBox x:Name="PasswordBox" helpers:PasswordBoxHelper.BoundPassword="{Binding Model.ApiKey}">
                     <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="TextChanged">
+                        <i:EventTrigger EventName="PasswordChanged">
                             <i:InvokeCommandAction Command="{Binding ResetErrorsCommand}" CommandParameter="ApiKey" />
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
-                </TextBox>
+                </PasswordBox>
                 <ItemsControl ItemsSource="{Binding Errors, Converter={StaticResource ErrorsDictConverter}, ConverterParameter=ApiKey}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
