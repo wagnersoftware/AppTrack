@@ -4,6 +4,7 @@ using AppTrack.Application;
 using AppTrack.Identity;
 using AppTrack.Infrastructure;
 using AppTrack.Persistance;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -55,6 +56,13 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+// Global Authorization Policy
+builder.Services.AddAuthorization(options =>
+{
+    options.FallbackPolicy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+});
 
 var app = builder.Build();
 app.UseMiddleware<ExceptionMiddleware>();

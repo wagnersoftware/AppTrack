@@ -22,7 +22,7 @@ public partial class SetAiSettingsViewModel : AppTrackFormViewModelBase<AiSettin
     [RelayCommand]
     private void AddPromptParameter()
     {
-        var keyValueItem = new PromptParameterModel() { ParentCollection = this.Model.PromptParameter };
+        var keyValueItem = new PromptParameterModel() { ParentCollection = Model.PromptParameter };
         var editKeyItemViewModel = ActivatorUtilities.CreateInstance<EditKeyValueItemViewModel>(_serviceProvider, keyValueItem);
         var dialogResult = _windowService.ShowWindow(editKeyItemViewModel);
 
@@ -36,7 +36,7 @@ public partial class SetAiSettingsViewModel : AppTrackFormViewModelBase<AiSettin
     private void EditPromptParameter(PromptParameterModel keyValueItem)
     {
         var clone = keyValueItem.Clone();
-        clone.ParentCollection = this.Model.PromptParameter;
+        clone.ParentCollection = Model.PromptParameter;
 
         var editKeyItemViewModel = ActivatorUtilities.CreateInstance<EditKeyValueItemViewModel>(_serviceProvider, clone);
         var dialogResult = _windowService.ShowWindow(editKeyItemViewModel);
