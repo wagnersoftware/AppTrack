@@ -64,6 +64,18 @@ builder.Services.AddAuthorization(options =>
         .Build();
 });
 
+// Kestrel configuration
+builder.WebHost.UseKestrel(options =>
+{
+    options.AddServerHeader = false; //don't expose the framework type in the response header
+});
+
+// avoid captive dependency problem (eg. a scoped dependency injected into a singleton) for all environments
+builder.Host.UseDefaultServiceProvider(options =>
+{
+    options.ValidateOnBuild = true;
+});
+
 var app = builder.Build();
 app.UseMiddleware<ExceptionMiddleware>();
 
@@ -84,4 +96,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 await app.RunAsync();
+
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1118:Utility classes should not have public constructors", Justification = "For integration testing")]
+public partial class Program { }
 

@@ -1,4 +1,5 @@
-﻿using AppTrack.Application.Contracts.Mediator;
+﻿using AppTrack.Application.Contracts.Identity;
+using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Exceptions;
 using AppTrack.Application.Features.AiSettings.Dto;
@@ -10,11 +11,13 @@ public class GetAiSettingsByUserIdQueryHandler : IRequestHandler<GetAiSettingsBy
 {
     private readonly IMapper _mapper;
     private readonly IAiSettingsRepository _aiSettingsRepository;
+    private readonly IUserService _userService;
 
-    public GetAiSettingsByUserIdQueryHandler(IMapper mapper, IAiSettingsRepository aiSettingsRepository)
+    public GetAiSettingsByUserIdQueryHandler(IMapper mapper, IAiSettingsRepository aiSettingsRepository, IUserService userService)
     {
         this._mapper = mapper;
         this._aiSettingsRepository = aiSettingsRepository;
+        this._userService = userService;
     }
 
     /// <summary>
@@ -34,7 +37,14 @@ public class GetAiSettingsByUserIdQueryHandler : IRequestHandler<GetAiSettingsBy
             throw new BadRequestException($"Invalid request", validationResult);
         }
 
-        var entity = await _aiSettingsRepository.GetByUserIdWithPromptParameterAsync(request.UserId);
+        var user = await _userService.GetUser(request.UserId);
+
+        if(user is null)
+        {
+            throw new NotFoundException(nameof(user), request.UserId);
+        }
+
+        var entity = await _aiSettingsRepository.GetByUserIdWithPromptParameterAsync(user.Id);
 
         if (entity == null)
         {

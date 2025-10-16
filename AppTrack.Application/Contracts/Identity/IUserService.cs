@@ -6,5 +6,5 @@ public interface IUserService
 {
     Task<List<User>> GetUsers();
 
-    Task<User> GetUser(string userId);
+    Task<User?> GetUser(string userId);
 }

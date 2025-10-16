@@ -1,4 +1,5 @@
 ﻿using AppTrack.Api.Models;
+using AppTrack.Application.Contracts.Logging;
 using System.Net;
 using BadRequestException = AppTrack.Application.Exceptions.BadRequestException;
 using NotFoundException = AppTrack.Application.Exceptions.NotFoundException;
@@ -8,10 +9,12 @@ namespace AppTrack.Api.Middleware;
 public class ExceptionMiddleware
 {
     private readonly RequestDelegate _next;
+    private readonly IAppLogger<ExceptionMiddleware> _logger;
 
-    public ExceptionMiddleware(RequestDelegate next)
+    public ExceptionMiddleware(RequestDelegate next, IAppLogger<ExceptionMiddleware> logger)
     {
         this._next = next;
+        this._logger = logger;
     }
 
     public async Task InvokeAsync(HttpContext httpContext)
@@ -35,6 +38,7 @@ public class ExceptionMiddleware
         {
             case BadRequestException badRequestException:
                 statusCode = HttpStatusCode.BadRequest;
+                _logger.LogWarning("Validation error: {Message}", badRequestException.Message);
                 problem = new CustomProblemDetails()
                 {
                     Title = badRequestException.Message,
@@ -47,6 +51,7 @@ public class ExceptionMiddleware
                 break;
             case NotFoundException notFoundException:
                 statusCode = HttpStatusCode.NotFound;
+                _logger.LogWarning("Resource not found: {Message}", notFoundException.Message);
                 problem = new CustomProblemDetails()
                 {
                     Title = notFoundException.Message,
@@ -57,6 +62,7 @@ public class ExceptionMiddleware
 
                 break;
             default:
+                _logger.LogError(ex, "Unhandled exception occurred while processing request {Path}", httpContext.Request.Path);
                 problem = new CustomProblemDetails()
                 {
                     Title = ex.Message,
