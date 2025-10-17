@@ -6,9 +6,6 @@ using System.Text.Encodings.Web;
 
 namespace AppTrack.Api.IntegrationTests.Auth;
 
-/// <summary>
-/// Provides a authentication handler for integration tests.
-/// </summary>
 public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
     public const string AuthenticationScheme = "Test";

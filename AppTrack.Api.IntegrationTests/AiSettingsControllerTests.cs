@@ -1,4 +1,4 @@
-﻿using AppTrack.Api.IntegrationTests.WebApplicationFactory;
+﻿using AppTrack.Api.IntegrationTests;
 using AppTrack.Api.Models;
 using Shouldly;
 using System.Net;
@@ -6,19 +6,22 @@ using System.Net.Http.Json;
 
 namespace AppTrack.IntegrationTests;
 
-public class AiSettingsApiTests : IClassFixture<CustomWebApplicationFactory>
+public class AiSettingsControllerTests : IClassFixture<FakeAuthWebApplicationFactory>
 {
+    private readonly FakeAuthWebApplicationFactory _factory;
     private readonly HttpClient _client;
-    public AiSettingsApiTests(CustomWebApplicationFactory factory)
+
+    public AiSettingsControllerTests(FakeAuthWebApplicationFactory factory)
     {
-        _client = factory.CreateAuthenticatedClient();
+        _factory = factory;
+        _client = _factory.CreateAuthenticatedClient();
     }
 
     [Fact]
     public async Task GetUser_ShouldReturn404_WhenUserNotFound()
     {
         // Arrange
-        var invalidUserId = "99";
+        var invalidUserId = "999";
 
         // Act
         var response = await _client.GetAsync($"/api/ai-settings/{invalidUserId}");
