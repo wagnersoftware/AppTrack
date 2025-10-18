@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          ACCEPT_EULA: "Y"
+          SA_PASSWORD: "YourStrong!Passw0rd"
+        ports:
+          - 1433:1433
+        options: >-
+          --health-cmd "exit 0" 
+          --health-interval 10s 
+          --health-timeout 5s 
+          --health-retries 3
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore AppTrack.sln
+
+      - name: Build
+        run: dotnet build AppTrack.sln --no-restore --configuration Release
+
+      - name: Run unit & integration tests
+        env:
+          DOTNET_ENVIRONMENT: Test
+          ConnectionStrings__DefaultConnection: "Server=localhost,1433;Database=AppTrack_TestDb;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True"
+        run: dotnet test AppTrack.sln --no-build --verbosity normal --configuration Release
