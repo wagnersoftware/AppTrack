@@ -11,7 +11,6 @@ public class UserConfiguration : IEntityTypeConfiguration<ApplicationUser>
     {
         var adminId = "f8e1c1b9-3f1b-4c24-9b71-17d6a916e42e";
         var userId = "2b7cfb44-36a8-49c9-8a8a-6e9c85a2cf1b";
-        var hasher = new PasswordHasher<ApplicationUser>();
 
         builder.HasData(
             new ApplicationUser

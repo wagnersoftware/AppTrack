@@ -18,7 +18,7 @@ public class JobApplicationDefaultsRepository : GenericRepository<JobApplication
         return entityToCreate;
     }
 
-    public async Task<JobApplicationDefaults> GetByUserIdAsync(string userId)
+    public async Task<JobApplicationDefaults?> GetByUserIdAsync(string userId)
     {
         return await _context.JobApplicationDefaults.AsNoTracking().SingleOrDefaultAsync(x => x.UserId == userId);
     }

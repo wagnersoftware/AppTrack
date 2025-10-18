@@ -36,6 +36,6 @@ public class UpdateJobApplicationDefaultsCommandValidator : AbstractValidator<Up
     private async Task<bool> JobApplicationDefaultsExistsForUser(UpdateJobApplicationDefaultsCommand command, CancellationToken token)
     {
         var jobApplicationDefault = await _jobApplicationDefaultsRepository.GetByIdAsync(command.Id!);
-        return jobApplicationDefault.UserId == command.UserId;
+        return jobApplicationDefault?.UserId == command.UserId;
     }
 }

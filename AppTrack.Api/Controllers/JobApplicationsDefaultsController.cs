@@ -27,7 +27,6 @@ public class JobApplicationsDefaultsController : ControllerBase
     [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<JobApplicationDefaultsDto>> GetForUser(string userId)
     {
-        //todo für aktuellen User(me), sobald Authorisierung implementiert -> var userId = _userContext.UserId; // aus JWT / ClaimsPrincipal
         var jobApplicationDetailsDto = await _mediator.Send(new GetJobApplicationDefaultsByUserIdQuery() { UserId = userId });
         return Ok(jobApplicationDetailsDto);
     }

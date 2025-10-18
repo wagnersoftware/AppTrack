@@ -21,7 +21,6 @@ public class ApplicationTextController : ControllerBase
         this._mediator = mediator;
     }
 
-    //todo move this to job application controller
     [HttpPost(Name = "GenerateApplicationText")]
     [ProducesResponseType(typeof(GeneratedApplicationTextDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status400BadRequest)]

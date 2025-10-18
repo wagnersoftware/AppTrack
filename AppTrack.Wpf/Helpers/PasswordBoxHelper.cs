@@ -27,13 +27,9 @@ public static class PasswordBoxHelper
 
     private static void OnBoundPasswordChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-        if (d is PasswordBox passwordBox)
+        if (d is PasswordBox passwordBox && !GetIsUpdating(passwordBox))
         {
-            if (!GetIsUpdating(passwordBox)) //avoid infinite loop
-            {
-                passwordBox.Password = e.NewValue as string ?? string.Empty;
-            }
-
+            passwordBox.Password = e.NewValue as string ?? string.Empty;
         }
     }
 
