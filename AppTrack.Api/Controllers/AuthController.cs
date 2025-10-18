@@ -19,6 +19,7 @@ public class AuthController : ControllerBase
 
     [AllowAnonymous]
     [HttpPost("login")]
+    [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<AuthResponse>> Login(AuthRequest request)
     {
@@ -27,6 +28,7 @@ public class AuthController : ControllerBase
 
     [AllowAnonymous]
     [HttpPost("register")]
+    [ProducesResponseType(typeof(RegistrationResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<RegistrationResponse>> Register(RegistrationRequest request)
     {

@@ -20,14 +20,14 @@ public class AiSettingsController : ControllerBase
         this._mediator = mediator;
     }
 
-    // GET api/ai-settings/5
-    [HttpGet("{userId}", Name = "GetAiSettingsForUser")]
+    // GET api/ai-settings/?UserId=5
+    [HttpGet]
     [ProducesResponseType(typeof(AiSettingsDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<AiSettingsDto>> GetForUser(string userId)
+    public async Task<ActionResult<AiSettingsDto>> GetForUser([FromQuery] GetAiSettingsByUserIdQuery query)
     {
-        var aiSettingsDto = await _mediator.Send(new GetAiSettingsByUserIdQuery() { UserId = userId });
+        var aiSettingsDto = await _mediator.Send(query);
         return Ok(aiSettingsDto);
     }
 

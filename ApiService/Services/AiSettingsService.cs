@@ -17,7 +17,7 @@ public class AiSettingsService : BaseHttpService, IAiSettingsService
     public Task<Response<AiSettingsModel>> GetForUserAsync(string userId) =>
         TryExecuteAsync(async () =>
         {
-            var aiSettingsDto = await _client.GetAiSettingsForUserAsync(userId);
+            var aiSettingsDto = await _client.AiSettingsAsync(userId);
             return _mapper.Map<AiSettingsModel>(aiSettingsDto);
         });
 
