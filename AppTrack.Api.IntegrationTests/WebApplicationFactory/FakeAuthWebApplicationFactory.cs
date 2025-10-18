@@ -1,4 +1,5 @@
 ﻿using AppTrack.Api.IntegrationTests.Auth;
+using AppTrack.Api.IntegrationTests.Seeddata;
 using AppTrack.Identity.DBContext;
 using AppTrack.Persistance.DatabaseContext;
 using Microsoft.AspNetCore.Authentication;
@@ -73,6 +74,8 @@ public class FakeAuthWebApplicationFactory : WebApplicationFactory<Program>, IAs
 
         await mainDb.Database.MigrateAsync();
         await identityDb.Database.MigrateAsync();
+
+        await SeedTestData.SeedDataAsync(mainDb, identityDb);
     }
 
     async Task IAsyncLifetime.DisposeAsync()
