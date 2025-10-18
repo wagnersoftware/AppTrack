@@ -34,7 +34,7 @@ public class GetJobApplicationQueryHandlerTest
     {
         var handler = new GetJobApplicationsForUserQueryHandler(_mapper, _mockRepo.Object, _mockAppLogger.Object);
 
-        var result = await handler.Handle(new GetJobApplicationsForUserQuery(), CancellationToken.None);
+        var result = await handler.Handle(new GetJobApplicationsForUserQuery() { UserId = "TestUser1"}, CancellationToken.None);
 
         result.ShouldBeOfType<List<JobApplicationDto>>();
         result.Count.ShouldBe(2);

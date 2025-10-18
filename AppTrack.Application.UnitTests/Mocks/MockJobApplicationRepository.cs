@@ -14,17 +14,19 @@ public static class MockJobApplicationRepository
             {
                 Id = 1,
                 Name = "TestClient1",
+                UserId = "1"
             },
             new JobApplication()
             {
                 Id = 2,
                 Name = "TestClient2",
+                UserId = "1"
             }
         };
 
         var mockRepo = new Mock<IJobApplicationRepository>();
 
-        mockRepo.Setup(r => r.GetAsync()).ReturnsAsync(jobApplications);
+        mockRepo.Setup(r => r.GetAllForUserAsync(It.IsAny<string>())).ReturnsAsync(jobApplications);
 
         mockRepo.Setup(r => r.CreateAsync(It.IsAny<JobApplication>())).Returns((JobApplication jobApplication) =>
         {
