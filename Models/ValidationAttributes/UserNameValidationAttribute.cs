@@ -5,9 +5,9 @@ namespace AppTrack.Frontend.Models.ValidationAttributes
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
     public class UserNameValidationAttribute : ValidationAttribute
     {
-        public int MaxLength { get; set; } = 256;
+        public int MaxLength { get; set; } = 20;
 
-        public int MinLength { get; set; } = 6;
+        public int MinLength { get; set; } = 3;
 
         // Default Identity-Zeichen
         public string AllowedCharacters { get; set; } =

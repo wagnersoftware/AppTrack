@@ -41,7 +41,7 @@ public class ExceptionMiddleware
                 _logger.LogWarning("Validation error: {Message}", badRequestException.Message);
                 problem = new CustomProblemDetails()
                 {
-                    Title = badRequestException.Message,
+                    Title = badRequestException.Message.Trim(),
                     Status = (int)statusCode,
                     Detail = badRequestException.InnerException?.Message,
                     Type = nameof(BadRequestException),
@@ -54,7 +54,7 @@ public class ExceptionMiddleware
                 _logger.LogWarning("Resource not found: {Message}", notFoundException.Message);
                 problem = new CustomProblemDetails()
                 {
-                    Title = notFoundException.Message,
+                    Title = notFoundException.Message.Trim(),
                     Status = (int)statusCode,
                     Detail = notFoundException.InnerException?.Message,
                     Type = nameof(NotFoundException),
@@ -65,7 +65,7 @@ public class ExceptionMiddleware
                 _logger.LogError(ex, "Unhandled exception occurred while processing request {Path}", httpContext.Request.Path);
                 problem = new CustomProblemDetails()
                 {
-                    Title = ex.Message,
+                    Title = ex.Message.Trim(),
                     Status = (int)statusCode,
                     Detail = ex.StackTrace,
                     Type = nameof(HttpStatusCode.InternalServerError),

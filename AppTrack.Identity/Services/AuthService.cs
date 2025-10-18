@@ -1,7 +1,11 @@
 ﻿using AppTrack.Application.Contracts.Identity;
+using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Exceptions;
+using AppTrack.Application.Features.AiSettings.Commands.UpdateAiSettings;
 using AppTrack.Application.Models.Identity;
 using AppTrack.Identity.Models;
+using AppTrack.Identity.Validation;
+using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -25,6 +29,14 @@ public class AuthService : IAuthService
     }
     public async Task<AuthResponse> Login(AuthRequest request)
     {
+        var validator = new AuthRequestValidator();
+        var validationResult = await validator.ValidateAsync(request);
+
+        if (validationResult.Errors.Any())
+        {
+            throw new BadRequestException($"Invalid request", validationResult);
+        }
+
         var user = await _userManager.FindByNameAsync(request.UserName);
 
         if (user == null)
@@ -53,6 +65,14 @@ public class AuthService : IAuthService
 
     public async Task<RegistrationResponse> Register(RegistrationRequest request)
     {
+        var validator = new RegistrationRequestValidator();
+        var validationResult = await validator.ValidateAsync(request);
+
+        if (validationResult.Errors.Any())
+        {
+            throw new BadRequestException($"Invalid request", validationResult);
+        }
+
         var user = new ApplicationUser
         {
             UserName = request.UserName,
@@ -61,19 +81,19 @@ public class AuthService : IAuthService
 
         var result = await _userManager.CreateAsync(user, request.Password);
 
-        if (result.Succeeded)
+        if (result.Succeeded == false)
         {
-            await _userManager.AddToRoleAsync(user, "User");
-            return new RegistrationResponse() { UserId = user.Id };
+            StringBuilder stringBuilder = new StringBuilder();
+
+            foreach (var error in result.Errors)
+            {
+                stringBuilder.Append($"{error.Description}" + Environment.NewLine);
+            }
+            throw new BadRequestException($"User registration failed: {stringBuilder}");
         }
 
-        StringBuilder stringBuilder = new StringBuilder();
-
-        foreach (var error in result.Errors)
-        {
-            stringBuilder.Append($"{error.Description}" + Environment.NewLine);
-        }
-        throw new BadRequestException($"User registration failed: {stringBuilder}");
+        await _userManager.AddToRoleAsync(user, "User");
+        return new RegistrationResponse() { UserId = user.Id };
     }
 
     private async Task<JwtSecurityToken> GenerateToken(ApplicationUser user)

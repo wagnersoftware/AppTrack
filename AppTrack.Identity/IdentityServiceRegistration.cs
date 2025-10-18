@@ -27,6 +27,7 @@ public static class IdentityServiceRegistration
         services.AddIdentity<ApplicationUser, IdentityRole>(options =>
             {
                 options.User.RequireUniqueEmail = false;
+                options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_";
             })
             .AddEntityFrameworkStores<AppTrackIdentityDbContext>()
             .AddDefaultTokenProviders();
