@@ -48,7 +48,7 @@
                 Command="{Binding GenerateApplicationTextCommand}"
                 CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
                 DockPanel.Dock="Left">
-                Generate application text
+                Send Prompt
             </Button>
             <!--  Close Button  -->
             <Button
