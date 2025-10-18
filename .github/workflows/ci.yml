@@ -68,7 +68,7 @@ jobs:
 
       - name: Run Integration Tests
         run: |
-          dotnet test AppTrack.Api.IntegrationTests/AppTrack.Api.IntegrationTests.csproj \
+         dotnet test AppTrack.sln --configuration Release --no-build --filter "FullyQualifiedName~IntegrationTests"\
             --no-build \
             --configuration Release \
             --logger "trx;LogFileName=integration-tests.trx"
