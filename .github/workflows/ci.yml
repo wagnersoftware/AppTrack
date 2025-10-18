@@ -66,10 +66,21 @@ jobs:
           dotnet build AppTrack.Application/AppTrack.Application.csproj --no-restore --configuration Release
           dotnet build AppTrack.Persistance/AppTrack.Persistance.csproj --no-restore --configuration Release
 
-      - name: Run Integration Tests
-        run: |
-         dotnet test AppTrack.sln \
-          --configuration Release \
-          --no-build \
-          --filter "FullyQualifiedName~IntegrationTests" \
-          --logger "trx;LogFileName=integration-tests.trx"
+      - name: Run Unit Tests
+          run: dotnet test AppTrack.Application.UnitTests/AppTrack.Application.UnitTests.csproj \
+            --configuration Release \
+            --no-build \
+            --logger "trx;LogFileName=unit-tests.trx"
+
+      - name: Run Persistence Integration Tests
+          run: dotnet test AppTrack.Persistance.IntegrationTests/AppTrack.Persistance.IntegrationTests.csproj \
+            --configuration Release \
+            --no-build \
+            --logger "trx;LogFileName=persistence-integration-tests.trx"
+
+      - name: Run API Integration Tests
+          run: dotnet test AppTrack.Api.IntegrationTests/AppTrack.Api.IntegrationTests.csproj \
+            --configuration Release \
+            --no-build \
+            --logger "trx;LogFileName=api-integration-tests.trx"
+
