@@ -1,8 +1,8 @@
-﻿using AppTrack.Api.IntegrationTests.Seeddata.User;
+﻿using AppTrack.Api.IntegrationTests.SeedData.User;
 using AppTrack.Domain;
 using AppTrack.Persistance.DatabaseContext;
 
-namespace AppTrack.Api.IntegrationTests.Seeddata.AiSetttings;
+namespace AppTrack.Api.IntegrationTests.SeedData.AiSetttings;
 
 internal static class AiSettingsSeed
 {

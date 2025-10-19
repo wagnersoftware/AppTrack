@@ -1,5 +1,5 @@
 ﻿using AppTrack.Api.IntegrationTests.Auth;
-using AppTrack.Api.IntegrationTests.Seeddata;
+using AppTrack.Api.IntegrationTests.SeedData;
 using AppTrack.Identity.DBContext;
 using AppTrack.Persistance.DatabaseContext;
 using Microsoft.AspNetCore.Authentication;
