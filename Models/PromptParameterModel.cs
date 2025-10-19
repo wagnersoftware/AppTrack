@@ -10,6 +10,7 @@ public partial class PromptParameterModel : ModelBase
     [Required]
     [ObservableProperty]
     [UniqueKey("ParentCollection", "TempId")]
+    [MaxLength(50)]
     private string key = string.Empty;
 
     [Required]

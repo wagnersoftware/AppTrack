@@ -14,8 +14,6 @@ internal static class SeedTestData
 
         // --- Seed Domain Entities ---
         await AiSettingsSeed.AddAiSettingsForUser1Async(mainDb);
-
-        await identityDb.SaveChangesAsync();
-        await mainDb.SaveChangesAsync();
+        await AiSettingsSeed.AddAiSettingsForRandomUserAsync(mainDb);
     }
 }

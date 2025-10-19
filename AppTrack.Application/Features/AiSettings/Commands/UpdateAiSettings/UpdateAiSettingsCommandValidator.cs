@@ -1,4 +1,5 @@
 ﻿using AppTrack.Application.Contracts.Persistance;
+using AppTrack.Application.Features.AiSettings.Dto;
 using FluentValidation;
 
 namespace AppTrack.Application.Features.AiSettings.Commands.UpdateAiSettings;
@@ -12,36 +13,54 @@ public class UpdateAiSettingsCommandValidator : AbstractValidator<UpdateAiSettin
         this._aiSettingsRepository = aiSettingsRepository;
 
         RuleFor(x => x.Id)
-        .NotNull().WithMessage("{PropertyName} is required");
+        .GreaterThan(0).WithMessage("{PropertyName} must be greater than 0.")
+        .NotEmpty().WithMessage("{PropertyName} is required");
 
         RuleFor(x => x.UserId)
-        .NotEmpty().WithMessage("{PropertyName} is required")
-        .NotNull().WithMessage("{PropertyName} is required");
-
-        RuleFor(x => x.PromptTemplate)
-        .NotEmpty().WithMessage("{PropertyName} is required")
-        .NotNull().WithMessage("{PropertyName} is required");
+        .NotEmpty().WithMessage("UserId is required")
+        .Matches("^[a-zA-Z0-9\\-]+$").WithMessage("UserId contains invalid characters.");
 
         RuleFor(x => x.ApiKey)
-        .NotEmpty().WithMessage("{PropertyName} is required")
-        .NotNull().WithMessage("{PropertyName} is required");
-
-        RuleFor(x => x.ApiKey)
-        .NotEmpty().WithMessage("{PropertyName} is required")
-        .NotNull().WithMessage("{PropertyName} is required");
+        .Matches("^sk-[A-Za-z0-9]{20,}$")
+        .WithMessage("ApiKey must be a valid OpenAI API key.");
 
         RuleFor(x => x)
-            .MustAsync(AiSettingsExistsAndBelongsToUser)
-            .WithMessage("Ai settings not found or not assigned to this user.");
+        .CustomAsync(async (command, context, cancellationToken) =>
+        {
+            var aiSettings = await _aiSettingsRepository.GetByIdAsync(command.Id);
+            if (aiSettings is null)
+            {
+                context.AddFailure("Id", "Ai settings not found.");
+                return;
+            }
+
+            if (aiSettings.UserId != command.UserId)
+            {
+                context.AddFailure("UserId", "Ai settings not assigned to this user.");
+            }
+        });
+
+        RuleForEach(x => x.PromptParameter)
+        .SetValidator(new PromptParameterDtoValidator());
+
+        RuleFor(x => x.PromptParameter)
+        .Must(HaveUniqueKeys)
+        .WithMessage("Each prompt parameter key must be unique.");
+
     }
 
-    private async Task<bool> AiSettingsExistsAndBelongsToUser(UpdateAiSettingsCommand command, CancellationToken token)
+    private static bool HaveUniqueKeys(List<PromptParameterDto> parameters)
     {
-        var aiSettings = await _aiSettingsRepository.GetByIdAsync(command.Id);
-        if (aiSettings is null)
-        {
-            return false;
-        }
-        return aiSettings.UserId == command.UserId;
+        if (parameters == null || parameters.Count == 0)
+            return true;
+
+        var duplicateKeys = parameters
+            .GroupBy(p => p.Key)
+            .Where(g => g.Count() > 1)
+            .Select(g => g.Key)
+            .ToList();
+
+        return duplicateKeys.Count == 0;
     }
+
 }
