@@ -1,7 +1,7 @@
-﻿using AppTrack.Api.IntegrationTests.Seeddata.User;
+﻿using AppTrack.Api.IntegrationTests.SeedData.User;
 using AppTrack.Persistance.DatabaseContext;
 
-namespace AppTrack.Api.IntegrationTests.Seeddata.JobApplicationDefaults;
+namespace AppTrack.Api.IntegrationTests.SeedData.JobApplicationDefaults;
 
 internal static class JobApplicationDefaultsSeed
 {

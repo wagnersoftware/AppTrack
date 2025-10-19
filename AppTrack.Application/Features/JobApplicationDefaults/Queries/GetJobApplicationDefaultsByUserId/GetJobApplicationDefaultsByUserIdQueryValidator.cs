@@ -7,7 +7,7 @@ public class GetJobApplicationDefaultsByUserIdQueryValidator : AbstractValidator
     public GetJobApplicationDefaultsByUserIdQueryValidator()
     {
         RuleFor(x => x.UserId)
-        .NotEmpty().WithMessage("{PropertyName} is required")
-        .NotNull().WithMessage("{PropertyName} is required");
+        .NotEmpty().WithMessage("UserId is required.")
+        .Matches("^[a-zA-Z0-9\\-]+$").WithMessage("UserId contains invalid characters.");
     }
 }
