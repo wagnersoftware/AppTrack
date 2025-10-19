@@ -16,8 +16,6 @@ internal static class AiSettingsSeed
             UserId = ApplicationUserSeed.User1Id,
             ApiKey = "1234abc",
             PromptTemplate = "Hello, my name is {name} and my rate is {rate}.",
-            CreationDate = DateTime.UtcNow,
-            ModifiedDate = DateTime.UtcNow,
         };
 
         var promptParameter1 = PromptParameter.Create("name", "Daniel");
@@ -37,8 +35,6 @@ internal static class AiSettingsSeed
             UserId = Guid.NewGuid().ToString(),
             ApiKey = "1234abc",
             PromptTemplate = "Hello, my name is {name} and my rate is {rate}.",
-            CreationDate = DateTime.UtcNow,
-            ModifiedDate = DateTime.UtcNow,
         };
 
         var promptParameter1 = PromptParameter.Create("name", "Daniel");

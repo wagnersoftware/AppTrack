@@ -12,30 +12,36 @@ public class UpdateJobApplicationDefaultsCommandValidator : AbstractValidator<Up
         _jobApplicationDefaultsRepository = jobApplicationDefaultsRepository;
 
         RuleFor(x => x.Id)
-        .NotNull().WithMessage("{PropertyName} is required");
+        .GreaterThan(0).WithMessage("{PropertyName} must be greater than 0.")
+        .NotEmpty().WithMessage("{PropertyName} is required");
 
         RuleFor(x => x.UserId)
-        .NotEmpty().WithMessage("{PropertyName} is required")
-        .NotNull().WithMessage("{PropertyName} is required");
+        .NotEmpty().WithMessage("UserId is required")
+        .Matches("^[a-zA-Z0-9\\-]+$").WithMessage("UserId contains invalid characters.");
 
         RuleFor(x => x)
-        .MustAsync(JobApplicationDefaultsExists)
-        .WithMessage("Job application doesn't exist");
+        .CustomAsync(async (command, context, cancellationToken) =>
+        {
+            var jobApplicationDefaults = await _jobApplicationDefaultsRepository.GetByIdAsync(command.Id);
+            if (jobApplicationDefaults is null)
+            {
+                context.AddFailure("Id", "Job Application Defaults not found.");
+                return;
+            }
 
-        RuleFor(x => x)
-        .MustAsync(JobApplicationDefaultsExistsForUser)
-        .WithMessage("The requested job application defaults don't match the use id");
-    }
+            if (jobApplicationDefaults.UserId != command.UserId)
+            {
+                context.AddFailure("UserId", "Job Application Defaults not assigned to this user.");
+            }
+        });
 
-    private async Task<bool> JobApplicationDefaultsExists(UpdateJobApplicationDefaultsCommand command, CancellationToken token)
-    {
-        var jobApplicationDefault = await _jobApplicationDefaultsRepository.GetByIdAsync(command.Id!);
-        return jobApplicationDefault != null;
-    }
+        RuleFor(x => x.Name)
+            .MaximumLength(50).WithMessage("Name must not exceed 50 characters.");
 
-    private async Task<bool> JobApplicationDefaultsExistsForUser(UpdateJobApplicationDefaultsCommand command, CancellationToken token)
-    {
-        var jobApplicationDefault = await _jobApplicationDefaultsRepository.GetByIdAsync(command.Id!);
-        return jobApplicationDefault?.UserId == command.UserId;
+        RuleFor(x => x.Position)
+            .MaximumLength(50).WithMessage("Position must not exceed 50 characters.");
+
+        RuleFor(x => x.Location)
+            .MaximumLength(50).WithMessage("Location must not exceed 50 characters.");
     }
 }
