@@ -9,7 +9,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="Defaults"
     Width="400"
-    Height="240"
+    Height="280"
     mc:Ignorable="d">
     <Window.Resources>
         <converter:ErrorsDictionaryConverter x:Key="ErrorsDictConverter" />
@@ -77,6 +77,36 @@
                         </i:Interaction.Triggers>
                     </TextBox>
                     <ItemsControl ItemsSource="{Binding Errors, Converter={StaticResource ErrorsDictConverter}, ConverterParameter=Position}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    FontSize="12"
+                                    Foreground="Red"
+                                    Text="{Binding}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+                <!--  Position  -->
+                <Label
+                    Grid.Row="2"
+                    Grid.Column="0"
+                    Margin="0,5,5,0"
+                    HorizontalAlignment="Right">
+                    Location:
+                </Label>
+                <StackPanel
+                    Grid.Row="2"
+                    Grid.Column="1"
+                    Margin="5">
+                    <TextBox Text="{Binding Model.Location}" ToolTip="{Binding Model.Location}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="TextChanged">
+                                <i:InvokeCommandAction Command="{Binding ResetErrorsCommand}" CommandParameter="Location" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </TextBox>
+                    <ItemsControl ItemsSource="{Binding Errors, Converter={StaticResource ErrorsDictConverter}, ConverterParameter=Location}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock

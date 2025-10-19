@@ -10,7 +10,7 @@ public partial class PromptParameterModel : ModelBase
     [Required]
     [ObservableProperty]
     [UniqueKey("ParentCollection", "TempId")]
-    [MaxLength(50)]
+    [MaxLength(50, ErrorMessage = "{0} must not exceed 50 characters.")]
     private string key = string.Empty;
 
     [Required]

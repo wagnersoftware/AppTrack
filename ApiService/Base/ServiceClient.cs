@@ -1776,6 +1776,9 @@ namespace AppTrack.Frontend.ApiService.Base
         [System.Text.Json.Serialization.JsonPropertyName("position")]
         public string Position { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("location")]
+        public string Location { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("userId")]
         public string UserId { get; set; }
 
@@ -1952,6 +1955,9 @@ namespace AppTrack.Frontend.ApiService.Base
 
         [System.Text.Json.Serialization.JsonPropertyName("position")]
         public string Position { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("location")]
+        public string Location { get; set; }
 
     }
 

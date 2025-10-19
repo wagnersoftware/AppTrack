@@ -17,6 +17,7 @@ public class CreateJobApplicationViewModel : JobApplicationViewModelBase
     {
         base.Model.Name = jobApplicationDefaults.Name;
         base.Model.Position = jobApplicationDefaults.Position;
+        base.Model.Location = jobApplicationDefaults.Location;
         base.Model.StartDate = DateOnly.FromDateTime(DateTime.Today);
     }
 }
