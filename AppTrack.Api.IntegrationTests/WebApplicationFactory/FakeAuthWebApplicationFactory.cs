@@ -74,8 +74,6 @@ public class FakeAuthWebApplicationFactory : WebApplicationFactory<Program>, IAs
 
         await mainDb.Database.MigrateAsync();
         await identityDb.Database.MigrateAsync();
-
-        await SeedTestData.SeedDataAsync(mainDb, identityDb);
     }
 
     async Task IAsyncLifetime.DisposeAsync()

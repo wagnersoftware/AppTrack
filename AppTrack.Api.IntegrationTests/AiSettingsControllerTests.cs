@@ -1,4 +1,4 @@
-﻿using AppTrack.Api.IntegrationTests.Seeddata.AiSetttings;
+﻿using AppTrack.Api.IntegrationTests.Seeddata;
 using AppTrack.Api.IntegrationTests.Seeddata.User;
 using AppTrack.Api.Models;
 using AppTrack.Application.Features.AiSettings.Commands.UpdateAiSettings;
@@ -25,7 +25,7 @@ public class AiSettingsControllerTests : IClassFixture<FakeAuthWebApplicationFac
     public async Task GetAiSettings_ShouldReturnAiSettings_WhenUserExists()
     {
         // Arrange
-        var validUserId = ApplicationUserSeed.User1Id;
+        var validUserId = await ApplicationUserSeedHelper.CreateTestUserAsync(_factory.Services);
         // Act
         var response = await _client.GetAsync($"/api/ai-settings?UserId={validUserId}");
         // Assert
@@ -71,11 +71,13 @@ public class AiSettingsControllerTests : IClassFixture<FakeAuthWebApplicationFac
     [Fact]
     public async Task UpdateAiSettings_ShouldReturn400_WhenIdIsZero()
     {
+        var userId = await ApplicationUserSeedHelper.CreateTestUserAsync(_factory.Services);
+
         // Arrange
         var command = new UpdateAiSettingsCommand
         {
             Id = 0,
-            UserId = ApplicationUserSeed.User1Id,
+            UserId = userId,
             ApiKey = "sk-validkey1234567890"
         };
 
@@ -95,10 +97,12 @@ public class AiSettingsControllerTests : IClassFixture<FakeAuthWebApplicationFac
     [Fact]
     public async Task UpdateAiSettings_ShouldReturn400_WhenUserIdIsEmpty()
     {
+        var (_, aiSettingsId) = await SeedHelper.CreateUserWithAiSettingsAsync(_factory.Services);
+
         // Arrange
         var command = new UpdateAiSettingsCommand
         {
-            Id = AiSettingsSeed.AiSettings1Id,
+            Id = aiSettingsId,
             UserId = "",
             ApiKey = "sk-validkey1234567890"
         };
@@ -118,10 +122,12 @@ public class AiSettingsControllerTests : IClassFixture<FakeAuthWebApplicationFac
     [Fact]
     public async Task UpdateAiSettings_ShouldReturn400_WhenUserIdHasInvalidCharacters()
     {
+        var (_, aiSettingsId) = await SeedHelper.CreateUserWithAiSettingsAsync(_factory.Services);
+
         // Arrange
         var command = new UpdateAiSettingsCommand
         {
-            Id = AiSettingsSeed.AiSettings1Id,
+            Id = aiSettingsId,
             UserId = "user@#!",
             ApiKey = "sk-validkey1234567890"
         };
@@ -141,11 +147,13 @@ public class AiSettingsControllerTests : IClassFixture<FakeAuthWebApplicationFac
     [Fact]
     public async Task UpdateAiSettings_ShouldReturn400_WhenApiKeyIsInvalid()
     {
+        var (userId, aiSettingsId) = await SeedHelper.CreateUserWithAiSettingsAsync(_factory.Services);
+
         // Arrange
         var command = new UpdateAiSettingsCommand
         {
-            Id = AiSettingsSeed.AiSettings1Id,
-            UserId = ApplicationUserSeed.User1Id,
+            Id = aiSettingsId,
+            UserId = userId,
             ApiKey = "invalid-key"
         };
 
@@ -164,11 +172,13 @@ public class AiSettingsControllerTests : IClassFixture<FakeAuthWebApplicationFac
     [Fact]
     public async Task UpdateAiSettings_ShouldReturn400_WhenAiSettingsDoesNotExist()
     {
+        var userId = await ApplicationUserSeedHelper.CreateTestUserAsync(_factory.Services);
+
         // Arrange
         var command = new UpdateAiSettingsCommand
         {
             Id = 9999, // non-existent
-            UserId = ApplicationUserSeed.User1Id,
+            UserId = userId,
             ApiKey = "sk-validkey1234567890"
         };
 
@@ -188,11 +198,14 @@ public class AiSettingsControllerTests : IClassFixture<FakeAuthWebApplicationFac
     [Fact]
     public async Task UpdateAiSettings_ShouldReturn400_WhenAiSettingsUserMismatch()
     {
+        var randomUserId = await ApplicationUserSeedHelper.CreateTestUserAsync(_factory.Services);
+        var (_, aiSettingsId) = await SeedHelper.CreateUserWithAiSettingsAsync(_factory.Services);
+
         // Arrange
         var command = new UpdateAiSettingsCommand
         {
-            Id = AiSettingsSeed.AiSettings2Id,
-            UserId = ApplicationUserSeed.User1Id, // belongs to another user
+            Id = aiSettingsId,
+            UserId = randomUserId, // belongs to another user
             ApiKey = "sk-validkey1234567890"
         };
 
@@ -212,11 +225,13 @@ public class AiSettingsControllerTests : IClassFixture<FakeAuthWebApplicationFac
     [Fact]
     public async Task UpdateAiSettings_ShouldReturn200_WhenRequestIsValid()
     {
+
         // Arrange
+        var (userId, aiSettingsId) = await SeedHelper.CreateUserWithAiSettingsAsync(_factory.Services);
         var validRequest = new UpdateAiSettingsCommand
         {
-            Id = AiSettingsSeed.AiSettings1Id,
-            UserId = ApplicationUserSeed.User1Id,
+            Id = aiSettingsId,
+            UserId = userId,
             ApiKey = "sk-ABCDEFGHIJKLMNOPQRST",
             PromptParameter = new List<PromptParameterDto>
                 {
@@ -236,10 +251,12 @@ public class AiSettingsControllerTests : IClassFixture<FakeAuthWebApplicationFac
     public async Task UpdateAiSettings_ShouldReturn400_WhenDuplicateKeysExist()
     {
         // Arrange
+        var (userId, aiSettingsId) = await SeedHelper.CreateUserWithAiSettingsAsync(_factory.Services);
+
         var invalidRequest = new UpdateAiSettingsCommand
         {
-            Id = AiSettingsSeed.AiSettings1Id,
-            UserId = ApplicationUserSeed.User1Id,
+            Id = aiSettingsId,
+            UserId = userId,
             ApiKey = "sk-ABCDEFGHIJKLMNOPQRST",
             PromptParameter = new List<PromptParameterDto>
                 {
@@ -265,10 +282,12 @@ public class AiSettingsControllerTests : IClassFixture<FakeAuthWebApplicationFac
     public async Task UpdateAiSettings_ShouldReturn400_WhenValueIsEmpty()
     {
         // Arrange
+        var (userId, aiSettingsId) = await SeedHelper.CreateUserWithAiSettingsAsync(_factory.Services);
+
         var invalidRequest = new UpdateAiSettingsCommand
         {
-            Id = AiSettingsSeed.AiSettings1Id,
-            UserId = ApplicationUserSeed.User1Id,
+            Id = aiSettingsId,
+            UserId = userId,
             ApiKey = "sk-ABCDEFGHIJKLMNOPQRST",
             PromptParameter = new List<PromptParameterDto>
                 {
@@ -292,10 +311,12 @@ public class AiSettingsControllerTests : IClassFixture<FakeAuthWebApplicationFac
     public async Task UpdateAiSettings_ShouldReturn400_WhenKeyIsEmpty()
     {
         // Arrange
+        var (userId, aiSettingsId) = await SeedHelper.CreateUserWithAiSettingsAsync(_factory.Services);
+
         var invalidRequest = new UpdateAiSettingsCommand
         {
-            Id = AiSettingsSeed.AiSettings1Id,
-            UserId = ApplicationUserSeed.User1Id,
+            Id = aiSettingsId,
+            UserId = userId,
             ApiKey = "sk-ABCDEFGHIJKLMNOPQRST",
             PromptParameter = new List<PromptParameterDto>
                 {
