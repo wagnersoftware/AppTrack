@@ -32,7 +32,9 @@ The project is primarily intended as a playground for exploring new technologies
 
 - ModernWpfUI controls
 
-- Unit and integration tests
+- Unit tests with xUnit, Moq and Shouldly
+
+- Integration tests with Docker Testcontainers, Xunit and Shouldly
 
 - Static code analysis with SonarAnalyzer.CSharp
 
