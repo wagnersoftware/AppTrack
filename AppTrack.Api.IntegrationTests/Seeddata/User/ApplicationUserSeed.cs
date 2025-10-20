@@ -2,7 +2,7 @@
 using AppTrack.Identity.Models;
 using Microsoft.AspNetCore.Identity;
 
-namespace AppTrack.Api.IntegrationTests.Seeddata.User
+namespace AppTrack.Api.IntegrationTests.SeedData.User
 {
     internal static class ApplicationUserSeed
     {

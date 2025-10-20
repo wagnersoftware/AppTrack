@@ -1,10 +1,10 @@
-﻿using AppTrack.Api.IntegrationTests.Seeddata.AiSetttings;
-using AppTrack.Api.IntegrationTests.Seeddata.JobApplicationDefaults;
-using AppTrack.Api.IntegrationTests.Seeddata.User;
+﻿using AppTrack.Api.IntegrationTests.SeedData.AiSetttings;
+using AppTrack.Api.IntegrationTests.SeedData.JobApplicationDefaults;
+using AppTrack.Api.IntegrationTests.SeedData.User;
 using AppTrack.Identity.DBContext;
 using AppTrack.Persistance.DatabaseContext;
 
-namespace AppTrack.Api.IntegrationTests.Seeddata;
+namespace AppTrack.Api.IntegrationTests.SeedData;
 
 internal static class SeedTestData
 {

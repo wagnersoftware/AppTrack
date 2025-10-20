@@ -1,5 +1,5 @@
-﻿using AppTrack.Api.IntegrationTests.Seeddata.AiSetttings;
-using AppTrack.Api.IntegrationTests.Seeddata.User;
+﻿using AppTrack.Api.IntegrationTests.SeedData.AiSetttings;
+using AppTrack.Api.IntegrationTests.SeedData.User;
 using AppTrack.Api.Models;
 using AppTrack.Application.Features.AiSettings.Commands.UpdateAiSettings;
 using AppTrack.Application.Features.AiSettings.Dto;
