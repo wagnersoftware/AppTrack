@@ -6,7 +6,6 @@ using AppTrack.Application.Features.AiSettings.Dto;
 using Shouldly;
 using System.Net;
 using System.Net.Http.Json;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace AppTrack.Api.IntegrationTests;
 
