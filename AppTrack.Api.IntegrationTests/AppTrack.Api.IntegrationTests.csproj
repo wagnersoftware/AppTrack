@@ -10,15 +10,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="AiSettingsControllerTests\**" />
-    <Compile Remove="JobApplicationDefaultsControllerTests\**" />
-    <EmbeddedResource Remove="AiSettingsControllerTests\**" />
-    <EmbeddedResource Remove="JobApplicationDefaultsControllerTests\**" />
-    <None Remove="AiSettingsControllerTests\**" />
-    <None Remove="JobApplicationDefaultsControllerTests\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.21" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />

@@ -7,14 +7,14 @@ using Shouldly;
 using System.Net;
 using System.Net.Http.Json;
 
-namespace AppTrack.Api.IntegrationTests;
+namespace AppTrack.Api.IntegrationTests.AiSettingsControllerTests;
 
-public class AiSettingsControllerTests : IClassFixture<FakeAuthWebApplicationFactory>
+public class UpdateAiSettingsTests : IClassFixture<FakeAuthWebApplicationFactory>
 {
     private readonly FakeAuthWebApplicationFactory _factory;
     private readonly HttpClient _client;
 
-    public AiSettingsControllerTests(FakeAuthWebApplicationFactory factory)
+    public UpdateAiSettingsTests(FakeAuthWebApplicationFactory factory)
     {
         _factory = factory;
         _client = _factory.CreateAuthenticatedClient();
@@ -118,7 +118,7 @@ public class AiSettingsControllerTests : IClassFixture<FakeAuthWebApplicationFac
         var problem = await response.Content.ReadFromJsonAsync<CustomProblemDetails>();
         problem.ShouldNotBeNull();
         problem.Errors.ShouldContainKey("ApiKey");
-        problem.Errors["ApiKey"].ShouldContain("ApiKey must be a valid OpenAI API key.");
+        problem.Errors["ApiKey"].ShouldContain("ApiKey must be empty or a valid OpenAI API key.");
     }
 
     [Fact]

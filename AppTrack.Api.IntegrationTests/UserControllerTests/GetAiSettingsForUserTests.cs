@@ -1,4 +1,5 @@
 ﻿
+using AppTrack.Api.IntegrationTests.Seeddata;
 using AppTrack.Api.IntegrationTests.Seeddata.User;
 using AppTrack.Api.Models;
 using AppTrack.Application.Features.AiSettings.Dto;
@@ -21,7 +22,7 @@ public class GetAiSettingsForUserTests : IClassFixture<FakeAuthWebApplicationFac
 
 
     [Fact]
-    public async Task GetAiSettings_ShouldReturnAiSettings_WhenUserExists()
+    public async Task GetAiSettings_ShouldCreateAiSettings_WhenUserExists()
     {
         // Arrange
         var validUserId = await ApplicationUserSeedHelper.CreateTestUserAsync(_factory.Services);
@@ -32,6 +33,21 @@ public class GetAiSettingsForUserTests : IClassFixture<FakeAuthWebApplicationFac
         var aiSettings = await response.Content.ReadFromJsonAsync<AiSettingsDto>();
         aiSettings.ShouldNotBeNull();
         aiSettings.UserId.ShouldBe(validUserId);
+    }
+
+    [Fact]
+    public async Task GetAiSettings_ShouldReturnAiSettingsForUser_WhenAiSettingsExist()
+    {
+        // Arrange
+        var (userId, aiSettingsId) = await SeedHelper.CreateUserWithAiSettingsAsync(_factory.Services);
+        // Act
+        var response = await _client.GetAsync($"/api/users/{userId}/ai-settings");
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var aiSettings = await response.Content.ReadFromJsonAsync<AiSettingsDto>();
+        aiSettings.ShouldNotBeNull();
+        aiSettings.UserId.ShouldBe(userId);
+        aiSettings.Id.ShouldBe(aiSettingsId);
     }
 
     [Fact]

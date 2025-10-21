@@ -1,22 +1,19 @@
 ﻿using AppTrack.Api.IntegrationTests.Seeddata;
-using AppTrack.Api.IntegrationTests.Seeddata.JobApplicationDefaults;
 using AppTrack.Api.IntegrationTests.Seeddata.User;
 using AppTrack.Api.Models;
 using AppTrack.Application.Features.JobApplicationDefaults.Commands.UpdateApplicationDefaults;
-using AppTrack.Application.Features.JobApplicationDefaults.Dto;
-using AppTrack.Application.Features.JobApplicationDefaults.Queries.GetJobApplicationDefaultsByUserId;
 using Shouldly;
 using System.Net;
 using System.Net.Http.Json;
 
-namespace AppTrack.Api.IntegrationTests;
+namespace AppTrack.Api.IntegrationTests.JobApplicationDefaultsControllerTests;
 
-public class UpdateJobApplicationDefaultsIntegrationTests : IClassFixture<FakeAuthWebApplicationFactory>
+public class UpdateJobApplicationDefaultsTests : IClassFixture<FakeAuthWebApplicationFactory>
 {
     private readonly HttpClient _client;
     private readonly FakeAuthWebApplicationFactory _factory;
 
-    public UpdateJobApplicationDefaultsIntegrationTests(FakeAuthWebApplicationFactory factory)
+    public UpdateJobApplicationDefaultsTests(FakeAuthWebApplicationFactory factory)
     {
         _client = factory.CreateAuthenticatedClient();
         this._factory = factory;
@@ -37,7 +34,7 @@ public class UpdateJobApplicationDefaultsIntegrationTests : IClassFixture<FakeAu
         };
 
         // Act
-        var response = await _client.PutAsJsonAsync($"/api/JobApplicationsDefaults/{command.Id}", command);
+        var response = await _client.PutAsJsonAsync($"/api/job-application-defaults/{command.Id}", command);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
@@ -58,7 +55,7 @@ public class UpdateJobApplicationDefaultsIntegrationTests : IClassFixture<FakeAu
         };
 
         // Act
-        var response = await _client.PutAsJsonAsync($"/api/JobApplicationsDefaults/{command.Id}", command);
+        var response = await _client.PutAsJsonAsync($"/api/job-application-defaults/{command.Id}", command);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
@@ -86,7 +83,7 @@ public class UpdateJobApplicationDefaultsIntegrationTests : IClassFixture<FakeAu
         };
 
         // Act
-        var response = await _client.PutAsJsonAsync($"/api/JobApplicationsDefaults/{command.Id}", command);
+        var response = await _client.PutAsJsonAsync($"/api/job-application-defaults/{command.Id}", command);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
@@ -116,7 +113,7 @@ public class UpdateJobApplicationDefaultsIntegrationTests : IClassFixture<FakeAu
         };
 
         // Act
-        var response = await _client.PutAsJsonAsync($"/api/JobApplicationsDefaults/{command.Id}", command);
+        var response = await _client.PutAsJsonAsync($"/api/job-application-defaults/{command.Id}", command);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
@@ -134,7 +131,7 @@ public class UpdateJobApplicationDefaultsIntegrationTests : IClassFixture<FakeAu
         var userId = await ApplicationUserSeedHelper.CreateTestUserAsync(_factory.Services);
         var command = new UpdateJobApplicationDefaultsCommand
         {
-            Id = 9999, 
+            Id = 9999,
             UserId = userId,
             Name = "Valid",
             Position = "Valid",
@@ -142,7 +139,7 @@ public class UpdateJobApplicationDefaultsIntegrationTests : IClassFixture<FakeAu
         };
 
         // Act
-        var response = await _client.PutAsJsonAsync($"/api/JobApplicationsDefaults/{command.Id}", command);
+        var response = await _client.PutAsJsonAsync($"/api/job-application-defaults/{command.Id}", command);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
@@ -161,14 +158,14 @@ public class UpdateJobApplicationDefaultsIntegrationTests : IClassFixture<FakeAu
         var command = new UpdateJobApplicationDefaultsCommand
         {
             Id = defaultsId,
-            UserId = randomUserId, 
+            UserId = randomUserId,
             Name = "Valid",
             Position = "Valid",
             Location = "Valid"
         };
 
         // Act
-        var response = await _client.PutAsJsonAsync($"/api/JobApplicationsDefaults/{command.Id}", command);
+        var response = await _client.PutAsJsonAsync($"/api/job-application-defaults/{command.Id}", command);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
@@ -177,50 +174,5 @@ public class UpdateJobApplicationDefaultsIntegrationTests : IClassFixture<FakeAu
         problem.Errors.ShouldContainKey("UserId");
         problem.Errors["UserId"].Any(msg => msg.Contains("not assigned to this user")).ShouldBeTrue();
     }
-
-    [Fact]
-    public async Task GetJobApplicationDefaults_ShouldCreateDefaultsSettings_WhenNotExisting()
-    {
-        var command = new GetJobApplicationDefaultsByUserIdQuery
-        {
-            UserId = Guid.NewGuid().ToString(), // random user
-        };
-
-        var response = await _client.GetAsync($"/api/JobApplicationsDefaults/{command.UserId}");
-
-        response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        var result = await response.Content.ReadFromJsonAsync<JobApplicationDefaultsDto>();
-        result.ShouldNotBeNull();
-        result.UserId.ShouldBe(command.UserId);
-    }
-
-    [Fact]
-    public async Task GetJobApplicationDefaults_ShouldReturn400_WhenUserIdIsInvalid()
-    {
-        var command = new GetJobApplicationDefaultsByUserIdQuery
-        {
-            UserId = "invalidUerId!#"
-        };
-
-        var response = await _client.GetAsync($"/api/JobApplicationsDefaults/{command.UserId}");
-
-        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
-        var problem = await response.Content.ReadFromJsonAsync<CustomProblemDetails>();
-        problem.ShouldNotBeNull();
-        problem.Errors.ShouldContainKey("UserId");
-        problem.Errors["UserId"].Any(msg => msg.Contains("UserId contains invalid characters.")).ShouldBeTrue();
-    }
-
-    [Fact]
-    public async Task GetJobApplicationDefaults_ShouldReturn404_WhenUserIdIsEmpty()
-    {
-        var command = new GetJobApplicationDefaultsByUserIdQuery
-        {
-            UserId = ""
-        };
-
-        var response = await _client.GetAsync($"/api/JobApplicationsDefaults/{command.UserId}");
-
-        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
-    }
 }
+
