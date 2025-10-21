@@ -47,21 +47,21 @@ namespace AppTrack.Frontend.ApiService.Base
 
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<GeneratedApplicationTextDto> GenerateApplicationTextAsync(GenerateApplicationTextCommand body);
+        System.Threading.Tasks.Task<GeneratedApplicationTextDto> ApplicationTextsAsync(GenerateApplicationTextCommand body);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<GeneratedApplicationTextDto> GenerateApplicationTextAsync(GenerateApplicationTextCommand body, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<GeneratedApplicationTextDto> ApplicationTextsAsync(GenerateApplicationTextCommand body, System.Threading.CancellationToken cancellationToken);
 
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<GeneratedPromptDto> GeneratePromptAsync(GeneratePromptQuery body);
+        System.Threading.Tasks.Task<GeneratedPromptDto> GenerateAsync(GeneratePromptQuery body);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<GeneratedPromptDto> GeneratePromptAsync(GeneratePromptQuery body, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<GeneratedPromptDto> GenerateAsync(GeneratePromptQuery body, System.Threading.CancellationToken cancellationToken);
 
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
@@ -382,15 +382,15 @@ namespace AppTrack.Frontend.ApiService.Base
 
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<GeneratedApplicationTextDto> GenerateApplicationTextAsync(GenerateApplicationTextCommand body)
+        public virtual System.Threading.Tasks.Task<GeneratedApplicationTextDto> ApplicationTextsAsync(GenerateApplicationTextCommand body)
         {
-            return GenerateApplicationTextAsync(body, System.Threading.CancellationToken.None);
+            return ApplicationTextsAsync(body, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<GeneratedApplicationTextDto> GenerateApplicationTextAsync(GenerateApplicationTextCommand body, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<GeneratedApplicationTextDto> ApplicationTextsAsync(GenerateApplicationTextCommand body, System.Threading.CancellationToken cancellationToken)
         {
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -407,8 +407,8 @@ namespace AppTrack.Frontend.ApiService.Base
 
                     var urlBuilder_ = new System.Text.StringBuilder();
                 
-                    // Operation Path: "api/ApplicationText"
-                    urlBuilder_.Append("api/ApplicationText");
+                    // Operation Path: "api/application-texts"
+                    urlBuilder_.Append("api/application-texts");
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -474,15 +474,15 @@ namespace AppTrack.Frontend.ApiService.Base
 
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<GeneratedPromptDto> GeneratePromptAsync(GeneratePromptQuery body)
+        public virtual System.Threading.Tasks.Task<GeneratedPromptDto> GenerateAsync(GeneratePromptQuery body)
         {
-            return GeneratePromptAsync(body, System.Threading.CancellationToken.None);
+            return GenerateAsync(body, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<GeneratedPromptDto> GeneratePromptAsync(GeneratePromptQuery body, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<GeneratedPromptDto> GenerateAsync(GeneratePromptQuery body, System.Threading.CancellationToken cancellationToken)
         {
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -494,13 +494,13 @@ namespace AppTrack.Frontend.ApiService.Base
                     var content_ = new System.Net.Http.ByteArrayContent(json_);
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
                     request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Method = new System.Net.Http.HttpMethod("POST");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     var urlBuilder_ = new System.Text.StringBuilder();
                 
-                    // Operation Path: "api/ApplicationText"
-                    urlBuilder_.Append("api/ApplicationText");
+                    // Operation Path: "api/application-texts/generate"
+                    urlBuilder_.Append("api/application-texts/generate");
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
