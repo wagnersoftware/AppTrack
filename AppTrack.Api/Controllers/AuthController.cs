@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AppTrack.Api.Controllers;
 
-[Route("api/[controller]")]
+[Route("api/authentication")]
 [ApiController]
 public class AuthController : ControllerBase
 {
@@ -20,18 +20,22 @@ public class AuthController : ControllerBase
     [AllowAnonymous]
     [HttpPost("login")]
     [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<AuthResponse>> Login(AuthRequest request)
+    [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<AuthResponse>> Login([FromBody]AuthRequest request)
     {
-        return Ok(await _authService.Login(request));
+        var result = await _authService.Login(request);
+        return Ok(result);
     }
 
     [AllowAnonymous]
     [HttpPost("register")]
-    [ProducesResponseType(typeof(RegistrationResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<RegistrationResponse>> Register(RegistrationRequest request)
+    [ProducesResponseType(typeof(RegistrationResponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status409Conflict)]
+    public async Task<ActionResult<RegistrationResponse>> Register([FromBody]RegistrationRequest request)
     {
-        return Ok(await _authService.Register(request));
+        var result = await _authService.Register(request);
+        return CreatedAtAction(nameof(Register), new { id = result.UserId }, result);
     }
 }

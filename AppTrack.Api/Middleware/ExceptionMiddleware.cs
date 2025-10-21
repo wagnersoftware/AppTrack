@@ -1,5 +1,6 @@
 ﻿using AppTrack.Api.Models;
 using AppTrack.Application.Contracts.Logging;
+using AppTrack.Application.Exceptions;
 using System.Net;
 using BadRequestException = AppTrack.Application.Exceptions.BadRequestException;
 using NotFoundException = AppTrack.Application.Exceptions.NotFoundException;
@@ -58,6 +59,19 @@ public class ExceptionMiddleware
                     Status = (int)statusCode,
                     Detail = notFoundException.InnerException?.Message,
                     Type = nameof(NotFoundException),
+                };
+
+                break;
+
+            case ConflictException conflictException:
+                statusCode = HttpStatusCode.Conflict;
+                _logger.LogWarning("Resource conflict: {Message}", conflictException.Message);
+                problem = new CustomProblemDetails()
+                {
+                    Title = conflictException.Message.Trim(),
+                    Status = (int)statusCode,
+                    Detail = conflictException.InnerException?.Message,
+                    Type = nameof(ConflictException),
                 };
 
                 break;
