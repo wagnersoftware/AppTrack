@@ -24,6 +24,7 @@ public class ApplicationTextController : ControllerBase
     [HttpPost(Name = "GenerateApplicationText")]
     [ProducesResponseType(typeof(GeneratedApplicationTextDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<GeneratedApplicationTextDto>> GenerateApplicationText([FromBody] GenerateApplicationTextCommand command)
     {
         var response = await _mediator.Send(command);
@@ -33,6 +34,7 @@ public class ApplicationTextController : ControllerBase
     [HttpGet(Name = "GeneratePrompt")]
     [ProducesResponseType(typeof(GeneratedPromptDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<GeneratedPromptDto>> GeneratePrompt([FromBody] GeneratePromptQuery query)
     {
         var response = await _mediator.Send(query);

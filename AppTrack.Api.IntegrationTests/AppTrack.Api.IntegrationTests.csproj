@@ -27,4 +27,9 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="AiSettingsControllerTests\" />
+    <Folder Include="JobApplicationDefaultsControllerTests\" />
+  </ItemGroup>
+
 </Project>

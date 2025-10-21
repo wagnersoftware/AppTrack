@@ -21,53 +21,6 @@ public class AiSettingsControllerTests : IClassFixture<FakeAuthWebApplicationFac
     }
 
     [Fact]
-    public async Task GetAiSettings_ShouldReturnAiSettings_WhenUserExists()
-    {
-        // Arrange
-        var validUserId = await ApplicationUserSeedHelper.CreateTestUserAsync(_factory.Services);
-        // Act
-        var response = await _client.GetAsync($"/api/ai-settings?UserId={validUserId}");
-        // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        var aiSettings = await response.Content.ReadFromJsonAsync<AiSettingsDto>();
-        aiSettings.ShouldNotBeNull();
-        aiSettings.UserId.ShouldBe(validUserId);
-    }
-
-    [Fact]
-    public async Task GetAiSettings_ShouldReturn404_WhenUserNotFound()
-    {
-        // Arrange
-        var invalidUserId = "999";
-        // Act
-        var response = await _client.GetAsync($"/api/ai-settings?UserId={invalidUserId}");
-        // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
-        var problem = await response.Content.ReadFromJsonAsync<CustomProblemDetails>();
-        problem?.Title.ShouldBe($"user {invalidUserId} not found");
-    }
-
-    [Fact]
-    public async Task GetAiSettings_ShouldReturn400_WhenUserIdIsEmpty()
-    {
-        // Arrange
-        var emptyUserId = string.Empty;
-
-        // Act
-        var response = await _client.GetAsync($"/api/ai-settings?UserId={emptyUserId}");
-
-        // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
-
-        var problem = await response.Content.ReadFromJsonAsync<CustomProblemDetails>();
-        problem.ShouldNotBeNull();
-        problem.Title.ShouldBe("One or more validation errors occurred.");
-
-        problem.Errors.ShouldContainKey("UserId");
-        problem.Errors["UserId"].ShouldContain("The UserId field is required.");
-    }
-
-    [Fact]
     public async Task UpdateAiSettings_ShouldReturn400_WhenIdIsZero()
     {
         var userId = await ApplicationUserSeedHelper.CreateTestUserAsync(_factory.Services);

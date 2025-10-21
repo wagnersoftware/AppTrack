@@ -17,7 +17,7 @@ public class JobApplicationDefaultsService : BaseHttpService, IJobApplicationDef
     public Task<Response<JobApplicationDefaultsModel>> GetForUserAsync(string userId) =>
         TryExecuteAsync(async () =>
         {
-            var jobApplicationDefaults = await _client.GetJobApplicationDefaultsForUserAsync(userId);
+            var jobApplicationDefaults = await _client.JobApplicationDefaultsGETAsync(userId);
             return _mapper.Map<JobApplicationDefaultsModel>(jobApplicationDefaults);
         });
 
@@ -26,7 +26,7 @@ public class JobApplicationDefaultsService : BaseHttpService, IJobApplicationDef
         TryExecuteAsync<JobApplicationDefaultsModel>(async () =>
         {
             var command = _mapper.Map<UpdateJobApplicationDefaultsCommand>(jobApplicationDefaultsModel);
-            await _client.UpdateJobApplicationDefaultsAsync(id, command);
+            await _client.JobApplicationDefaultsPUTAsync(id, command);
         });
 }
 
