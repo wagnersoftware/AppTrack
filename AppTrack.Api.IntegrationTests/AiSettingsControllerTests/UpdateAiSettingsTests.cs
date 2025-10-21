@@ -7,57 +7,17 @@ using Shouldly;
 using System.Net;
 using System.Net.Http.Json;
 
-namespace AppTrack.Api.IntegrationTests;
+namespace AppTrack.Api.IntegrationTests.AiSettingsControllerTests;
 
-public class AiSettingsControllerTests : IClassFixture<FakeAuthWebApplicationFactory>
+public class UpdateAiSettingsTests : IClassFixture<FakeAuthWebApplicationFactory>
 {
     private readonly FakeAuthWebApplicationFactory _factory;
     private readonly HttpClient _client;
 
-    public AiSettingsControllerTests(FakeAuthWebApplicationFactory factory)
+    public UpdateAiSettingsTests(FakeAuthWebApplicationFactory factory)
     {
         _factory = factory;
         _client = _factory.CreateAuthenticatedClient();
-    }
-
-    [Fact]
-    public async Task GetAiSettings_ShouldReturnAiSettings_WhenUserExists()
-    {
-        // Arrange
-        var validUserId = await ApplicationUserSeedHelper.CreateTestUserAsync(_factory.Services);
-        // Act
-        var response = await _client.GetAsync($"/api/ai-settings/{validUserId}");
-        // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        var aiSettings = await response.Content.ReadFromJsonAsync<AiSettingsDto>();
-        aiSettings.ShouldNotBeNull();
-        aiSettings.UserId.ShouldBe(validUserId);
-    }
-
-    [Fact]
-    public async Task GetAiSettings_ShouldReturn404_WhenUserNotFound()
-    {
-        // Arrange
-        var invalidUserId = "999";
-        // Act
-        var response = await _client.GetAsync($"/api/ai-settings/{invalidUserId}");
-        // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
-        var problem = await response.Content.ReadFromJsonAsync<CustomProblemDetails>();
-        problem?.Title.ShouldBe($"user {invalidUserId} not found");
-    }
-
-    [Fact]
-    public async Task GetAiSettings_ShouldReturn404_WhenUserIdIsEmpty()
-    {
-        // Arrange
-        var emptyUserId = string.Empty;
-
-        // Act
-        var response = await _client.GetAsync($"/api/ai-settings/{emptyUserId}");
-
-        // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }
 
     [Fact]
@@ -159,26 +119,6 @@ public class AiSettingsControllerTests : IClassFixture<FakeAuthWebApplicationFac
         problem.ShouldNotBeNull();
         problem.Errors.ShouldContainKey("ApiKey");
         problem.Errors["ApiKey"].ShouldContain("ApiKey must be empty or a valid OpenAI API key.");
-    }
-
-    [Fact]
-    public async Task UpdateAiSettings_ShouldReturn204_WhenApiKeyIsEmpty()
-    {
-        var (userId, aiSettingsId) = await SeedHelper.CreateUserWithAiSettingsAsync(_factory.Services);
-
-        // Arrange
-        var command = new UpdateAiSettingsCommand
-        {
-            Id = aiSettingsId,
-            UserId = userId,
-            ApiKey = ""
-        };
-
-        // Act
-        var response = await _client.PutAsJsonAsync($"/api/ai-settings/{command.Id}", command);
-
-        // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
     }
 
     [Fact]

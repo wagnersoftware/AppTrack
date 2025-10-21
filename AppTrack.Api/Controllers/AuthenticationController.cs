@@ -8,11 +8,11 @@ namespace AppTrack.Api.Controllers;
 
 [Route("api/authentication")]
 [ApiController]
-public class AuthController : ControllerBase
+public class AuthenticationController : ControllerBase
 {
     private readonly IAuthService _authService;
 
-    public AuthController(IAuthService authService)
+    public AuthenticationController(IAuthService authService)
     {
         this._authService = authService;
     }
@@ -30,12 +30,12 @@ public class AuthController : ControllerBase
 
     [AllowAnonymous]
     [HttpPost("register")]
-    [ProducesResponseType(typeof(RegistrationResponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(RegistrationResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status409Conflict)]
     public async Task<ActionResult<RegistrationResponse>> Register([FromBody]RegistrationRequest request)
     {
         var result = await _authService.Register(request);
-        return CreatedAtAction(nameof(Register), new { id = result.UserId }, result);
+        return Ok(result);
     }
 }

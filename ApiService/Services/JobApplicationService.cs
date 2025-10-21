@@ -39,7 +39,7 @@ public class JobApplicationService : BaseHttpService, IJobApplicationService
     public Task<Response<List<JobApplicationModel>>> GetJobApplicationsForUserAsync(string userId) =>
         TryExecuteAsync(async () =>
         {
-            var jobApplicationDtos = await _client.ForUserAsync(userId);
+            var jobApplicationDtos = await _client.JobApplicationsAllAsync(userId);
             return _mapper.Map<List<JobApplicationModel>>(jobApplicationDtos);
         });
 
@@ -49,7 +49,7 @@ public class JobApplicationService : BaseHttpService, IJobApplicationService
         {
             var jobApplicationCommand = _mapper.Map<UpdateJobApplicationCommand>(jobApplicationModel);
             jobApplicationCommand.UserId = userId;
-            var jobApplicationDto = await _client.JobApplicationsPUTAsync(id.ToString(), jobApplicationCommand);
+            var jobApplicationDto = await _client.JobApplicationsPUTAsync(id, jobApplicationCommand);
             return _mapper.Map<JobApplicationModel>(jobApplicationDto);
         });
 }

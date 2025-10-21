@@ -1,14 +1,12 @@
 ﻿using AppTrack.Api.Models;
 using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Features.JobApplicationDefaults.Commands.UpdateApplicationDefaults;
-using AppTrack.Application.Features.JobApplicationDefaults.Dto;
-using AppTrack.Application.Features.JobApplicationDefaults.Queries.GetJobApplicationDefaultsByUserId;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AppTrack.Api.Controllers;
 
-[Route("api/[controller]")]
+[Route("api/job-application-defaults")]
 [ApiController]
 [Authorize]
 public class JobApplicationsDefaultsController : ControllerBase
@@ -20,22 +18,12 @@ public class JobApplicationsDefaultsController : ControllerBase
         this._mediator = mediator;
     }
 
-    // GET api/<JobApplicationsController>/5
-    [HttpGet("{userId}", Name = "GetJobApplicationDefaultsForUser")]
-    [ProducesResponseType(typeof(JobApplicationDefaultsDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<JobApplicationDefaultsDto>> GetForUser(string userId)
-    {
-        var jobApplicationDetailsDto = await _mediator.Send(new GetJobApplicationDefaultsByUserIdQuery() { UserId = userId });
-        return Ok(jobApplicationDetailsDto);
-    }
-
-    // GET api/<JobApplicationsController>/5
-    [HttpPut("{id}", Name = "UpdateJobApplicationDefaults")]
+    // GET api/job-application-defaults/5
+    [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult> Put([FromRoute] int id, [FromBody] UpdateJobApplicationDefaultsCommand updateJobApplicationDefaultsCommand)
     {
         if (id != updateJobApplicationDefaultsCommand.Id)
