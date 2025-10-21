@@ -29,21 +29,21 @@ namespace AppTrack.Frontend.ApiService.Base
     {
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<AiSettingsDto> AiSettingsAsync(string userId);
+        System.Threading.Tasks.Task<AiSettingsDto> AiSettingsGETAsync(string userId);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<AiSettingsDto> AiSettingsAsync(string userId, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<AiSettingsDto> AiSettingsGETAsync(string userId, System.Threading.CancellationToken cancellationToken);
 
         /// <returns>No Content</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task UpdateAiSettingsAsync(int id, UpdateAiSettingsCommand body);
+        System.Threading.Tasks.Task AiSettingsPUTAsync(int id, UpdateAiSettingsCommand body);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>No Content</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task UpdateAiSettingsAsync(int id, UpdateAiSettingsCommand body, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task AiSettingsPUTAsync(int id, UpdateAiSettingsCommand body, System.Threading.CancellationToken cancellationToken);
 
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
@@ -180,16 +180,19 @@ namespace AppTrack.Frontend.ApiService.Base
 
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<AiSettingsDto> AiSettingsAsync(string userId)
+        public virtual System.Threading.Tasks.Task<AiSettingsDto> AiSettingsGETAsync(string userId)
         {
-            return AiSettingsAsync(userId, System.Threading.CancellationToken.None);
+            return AiSettingsGETAsync(userId, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<AiSettingsDto> AiSettingsAsync(string userId, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<AiSettingsDto> AiSettingsGETAsync(string userId, System.Threading.CancellationToken cancellationToken)
         {
+            if (userId == null)
+                throw new System.ArgumentNullException("userId");
+
             var client_ = _httpClient;
             var disposeClient_ = false;
             try
@@ -201,14 +204,9 @@ namespace AppTrack.Frontend.ApiService.Base
 
                     var urlBuilder_ = new System.Text.StringBuilder();
                 
-                    // Operation Path: "api/Ai-settings"
-                    urlBuilder_.Append("api/Ai-settings");
-                    urlBuilder_.Append('?');
-                    if (userId != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("UserId")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(userId, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    urlBuilder_.Length--;
+                    // Operation Path: "api/ai-settings/{userId}"
+                    urlBuilder_.Append("api/ai-settings/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(userId, System.Globalization.CultureInfo.InvariantCulture)));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -284,15 +282,15 @@ namespace AppTrack.Frontend.ApiService.Base
 
         /// <returns>No Content</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task UpdateAiSettingsAsync(int id, UpdateAiSettingsCommand body)
+        public virtual System.Threading.Tasks.Task AiSettingsPUTAsync(int id, UpdateAiSettingsCommand body)
         {
-            return UpdateAiSettingsAsync(id, body, System.Threading.CancellationToken.None);
+            return AiSettingsPUTAsync(id, body, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>No Content</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task UpdateAiSettingsAsync(int id, UpdateAiSettingsCommand body, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task AiSettingsPUTAsync(int id, UpdateAiSettingsCommand body, System.Threading.CancellationToken cancellationToken)
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -311,8 +309,8 @@ namespace AppTrack.Frontend.ApiService.Base
 
                     var urlBuilder_ = new System.Text.StringBuilder();
                 
-                    // Operation Path: "api/Ai-settings/{id}"
-                    urlBuilder_.Append("api/Ai-settings/");
+                    // Operation Path: "api/ai-settings/{id}"
+                    urlBuilder_.Append("api/ai-settings/");
                     urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
                     PrepareRequest(client_, request_, urlBuilder_);
