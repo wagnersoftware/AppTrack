@@ -42,6 +42,8 @@ The project is primarily intended as a playground for exploring new technologies
 
 - MS SQL LocalDB
 
+- CI Pipeline with GitHub Actions
+
 
 ## Installation
 1. Clone the repository:
