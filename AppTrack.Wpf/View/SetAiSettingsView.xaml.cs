@@ -1,4 +1,5 @@
-﻿using AppTrack.WpfUi.ViewModel;
+﻿using AppTrack.WpfUi.Helpers;
+using AppTrack.WpfUi.ViewModel;
 using System.Windows;
 
 namespace AppTrack.WpfUi.View;
@@ -12,5 +13,11 @@ public partial class SetAiSettingsView : Window
     {
         InitializeComponent();
         this.DataContext = viewModel;
+
+        PasswordBox.PasswordChanged += (s, e) =>
+        {
+            PasswordBoxHelper.PasswordBox_PasswordChanged(s, e);
+            viewModel.Model.ApiKey = PasswordBox.Password;
+        };
     }
 }
