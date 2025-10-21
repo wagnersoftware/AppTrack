@@ -83,6 +83,11 @@ public class AuthService : IAuthService
 
         if (result.Succeeded == false)
         {
+            if (result.Errors.Any(e => e.Code == "DuplicateUserName"))
+            {
+                throw new ConflictException("User with this username or email already exists.");
+            }
+
             StringBuilder stringBuilder = new StringBuilder();
 
             foreach (var error in result.Errors)
