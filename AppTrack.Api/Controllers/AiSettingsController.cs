@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AppTrack.Api.Controllers;
 
-[Route("api/Ai-settings")]
+[Route("api/ai-settings")]
 [ApiController]
 [Authorize]
 public class AiSettingsController : ControllerBase
@@ -20,19 +20,20 @@ public class AiSettingsController : ControllerBase
         this._mediator = mediator;
     }
 
-    // GET api/ai-settings/?UserId=5
-    [HttpGet]
+    // GET api/ai-settings/5
+    [HttpGet("{userId}")]
     [ProducesResponseType(typeof(AiSettingsDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<AiSettingsDto>> GetForUser([FromQuery] GetAiSettingsByUserIdQuery query)
+    public async Task<ActionResult<AiSettingsDto>> Get([FromRoute] string userId)
     {
+        var query = new GetAiSettingsByUserIdQuery() { UserId = userId };
         var aiSettingsDto = await _mediator.Send(query);
         return Ok(aiSettingsDto);
     }
 
     // PUT api/ai-settings/5
-    [HttpPut("{id}", Name = "UpdateAiSettings")]
+    [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status404NotFound)]
