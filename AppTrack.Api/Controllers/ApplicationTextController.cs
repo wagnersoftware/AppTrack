@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AppTrack.Api.Controllers;
 
-[Route("api/[controller]")]
+[Route("api/application-texts")]
 [ApiController]
 [Authorize]
 public class ApplicationTextController : ControllerBase
@@ -21,7 +21,8 @@ public class ApplicationTextController : ControllerBase
         this._mediator = mediator;
     }
 
-    [HttpPost(Name = "GenerateApplicationText")]
+    // POST /api/application-texts
+    [HttpPost]
     [ProducesResponseType(typeof(GeneratedApplicationTextDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<GeneratedApplicationTextDto>> GenerateApplicationText([FromBody] GenerateApplicationTextCommand command)
@@ -30,12 +31,13 @@ public class ApplicationTextController : ControllerBase
         return Ok(response);
     }
 
-    [HttpGet(Name = "GeneratePrompt")]
+    // POST /api/prompts/generate
+    [HttpPost("generate")]
     [ProducesResponseType(typeof(GeneratedPromptDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<GeneratedPromptDto>> GeneratePrompt([FromBody] GeneratePromptQuery query)
     {
-        var response = await _mediator.Send(query);
-        return Ok(response);
+        var result = await _mediator.Send(query);
+        return Ok(result);
     }
 }
