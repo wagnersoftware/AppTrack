@@ -41,6 +41,7 @@ public partial class JobApplicationModel : ModelBase
     private string applicationText = string.Empty;
 
     [RegularExpression(@"^\d+$", ErrorMessage = "{0} must be a number.")]
+    [MaxLength(10, ErrorMessage = "{0} must not exceed 10 characters.")]
     public string DurationInMonths { get; set; } = string.Empty;
 
     public static Array JobApplicationStatusValues => Enum.GetValues(typeof(JobApplicationStatus));
