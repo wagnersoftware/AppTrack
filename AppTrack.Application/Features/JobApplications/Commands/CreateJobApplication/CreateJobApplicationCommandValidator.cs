@@ -7,14 +7,17 @@ public class CreateJobApplicationCommandValidator : AbstractValidator<CreateJobA
     public CreateJobApplicationCommandValidator()
     {
         RuleFor(x => x.Name)
+            .MaximumLength(200).WithMessage("{PropertyName}} must not exceed 200 characters.")
             .NotEmpty().WithMessage("{PropertyName} is required")
             .NotNull().WithMessage("{PropertyName} is required");
 
         RuleFor(x => x.Position)
+            .MaximumLength(200).WithMessage("{PropertyName}} must not exceed 200 characters.")
             .NotEmpty().WithMessage("{PropertyName} is required")
             .NotNull().WithMessage("{PropertyName} is required");
 
         RuleFor(x => x.URL)
+            .MaximumLength(1000).WithMessage("{PropertyName}} must not exceed 200 characters.")
             .NotEmpty().WithMessage("{PropertyName} is required")
             .NotNull().WithMessage("{PropertyName} is required")
             .Must(BeAValidUrl).WithMessage("{PropertyName} must be a valid URL");
@@ -28,10 +31,12 @@ public class CreateJobApplicationCommandValidator : AbstractValidator<CreateJobA
             .NotNull().WithMessage("{PropertyName} is required");
 
         RuleFor(x => x.Location)
+            .MaximumLength(200).WithMessage("{PropertyName}} must not exceed 200 characters.")
             .NotEmpty().WithMessage("{PropertyName} is required")
             .NotNull().WithMessage("{PropertyName} is required");
 
         RuleFor(x => x.ContactPerson)
+            .MaximumLength(200).WithMessage("ContactPerson must not exceed 200 characters.")
             .NotEmpty().WithMessage("{PropertyName} is required")
             .NotNull().WithMessage("{PropertyName} is required");
 

@@ -8,19 +8,33 @@ public class JobApplicationConfiguration : IEntityTypeConfiguration<JobApplicati
 {
     public void Configure(EntityTypeBuilder<JobApplication> builder)
     {
-        builder.HasData(
-            new JobApplication()
-            {
-                Id = 1,
-                Name = "TestClient1",
-                Position = "Developer1",
-                ApplicationText = "ApplicationText1",
-                Status = Domain.Enums.JobApplicationStatus.Rejected,
-                URL = "www.testURL.de"
-            });
-
         builder.Property(x => x.Name)
             .IsRequired()
-            .HasMaxLength(50);
+            .HasMaxLength(200);
+
+        builder.Property(x => x.Position)
+            .IsRequired()
+            .HasMaxLength(200);
+
+        builder.Property(x => x.URL)
+            .IsRequired()
+            .HasMaxLength(1000);
+
+        builder.Property(x => x.Location)
+            .IsRequired()
+            .HasMaxLength(200);
+
+        builder.Property(x => x.ContactPerson)
+            .IsRequired()
+            .HasMaxLength(200);
+
+        builder.Property(e => e.StartDate)
+            .IsRequired();
+
+        builder.Property(e => e.Status)
+            .IsRequired();
+
+        builder.Property(x => x.DurationInMonths)
+            .HasMaxLength(10);
     }
 }

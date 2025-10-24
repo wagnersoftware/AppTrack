@@ -1,6 +1,7 @@
 ﻿using AppTrack.Domain;
 using AppTrack.Domain.Common;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AppTrack.Persistance.DatabaseContext;
 
@@ -26,7 +27,6 @@ public class AppTrackDatabaseContext : DbContext
             .WithOne(p => p.AISettings)
             .HasForeignKey(p => p.AISettingsId)
             .OnDelete(DeleteBehavior.Cascade);
-
 
         base.OnModelCreating(modelBuilder);
 

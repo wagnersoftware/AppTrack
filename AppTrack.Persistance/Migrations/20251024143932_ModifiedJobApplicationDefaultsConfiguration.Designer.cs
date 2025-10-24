@@ -4,6 +4,7 @@ using AppTrack.Persistance.DatabaseContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AppTrack.Persistance.Migrations
 {
     [DbContext(typeof(AppTrackDatabaseContext))]
-    partial class AppTrackDatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20251024143932_ModifiedJobApplicationDefaultsConfiguration")]
+    partial class ModifiedJobApplicationDefaultsConfiguration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -175,8 +178,7 @@ namespace AppTrack.Persistance.Migrations
 
                     b.Property<string>("Key")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("ModifiedDate")
                         .HasColumnType("datetime2");
@@ -187,8 +189,7 @@ namespace AppTrack.Persistance.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AISettingsId", "Key")
-                        .IsUnique();
+                    b.HasIndex("AISettingsId");
 
                     b.ToTable("PromptParameter");
                 });

@@ -36,12 +36,12 @@ public class UpdateJobApplicationDefaultsCommandValidator : AbstractValidator<Up
         });
 
         RuleFor(x => x.Name)
-            .MaximumLength(50).WithMessage("Name must not exceed 50 characters.");
+            .MaximumLength(200).WithMessage("Name must not exceed 200 characters.");
 
         RuleFor(x => x.Position)
-            .MaximumLength(50).WithMessage("Position must not exceed 50 characters.");
+            .MaximumLength(200).WithMessage("Name must not exceed 200 characters.");
 
         RuleFor(x => x.Location)
-            .MaximumLength(50).WithMessage("Location must not exceed 50 characters.");
+            .MaximumLength(200).WithMessage("Name must not exceed 200 characters.");
     }
 }

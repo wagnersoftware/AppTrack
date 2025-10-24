@@ -4,6 +4,7 @@ using AppTrack.Persistance.DatabaseContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AppTrack.Persistance.Migrations
 {
     [DbContext(typeof(AppTrackDatabaseContext))]
-    partial class AppTrackDatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20251024142239_ModifiedAiSettingsConfiguration")]
+    partial class ModifiedAiSettingsConfiguration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -134,21 +137,18 @@ namespace AppTrack.Persistance.Migrations
 
                     b.Property<string>("Location")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("ModifiedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Position")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -175,8 +175,7 @@ namespace AppTrack.Persistance.Migrations
 
                     b.Property<string>("Key")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("ModifiedDate")
                         .HasColumnType("datetime2");
@@ -187,8 +186,7 @@ namespace AppTrack.Persistance.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AISettingsId", "Key")
-                        .IsUnique();
+                    b.HasIndex("AISettingsId");
 
                     b.ToTable("PromptParameter");
                 });

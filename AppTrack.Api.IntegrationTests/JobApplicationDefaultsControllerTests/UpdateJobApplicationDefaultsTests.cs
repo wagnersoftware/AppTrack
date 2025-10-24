@@ -102,7 +102,7 @@ public class UpdateJobApplicationDefaultsTests : IClassFixture<FakeAuthWebApplic
     {
         //Arrange
         var (userId, defaultsId) = await SeedHelper.CreateUserWithJobDefaultsAsync(_factory.Services);
-        var longValue = new string('x', 51);
+        var longValue = new string('x', 201);
         var command = new UpdateJobApplicationDefaultsCommand
         {
             Id = defaultsId,
@@ -121,7 +121,7 @@ public class UpdateJobApplicationDefaultsTests : IClassFixture<FakeAuthWebApplic
         problem.ShouldNotBeNull();
 
         problem.Errors.ShouldContainKey(propertyName);
-        problem.Errors[propertyName].Any(msg => msg.Contains("must not exceed 50 characters")).ShouldBeTrue();
+        problem.Errors[propertyName].Any(msg => msg.Contains("must not exceed 200 characters")).ShouldBeTrue();
     }
 
     [Fact]

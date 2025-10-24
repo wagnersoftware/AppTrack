@@ -22,6 +22,7 @@ public class UpdateAiSettingsCommandValidator : AbstractValidator<UpdateAiSettin
         .Matches("^[a-zA-Z0-9\\-]+$").WithMessage("UserId contains invalid characters.");
 
         RuleFor(x => x.ApiKey)
+        .MaximumLength(200).WithMessage("ApiKey must not exceed 200 characters.")
         .Must(apiKey => string.IsNullOrEmpty(apiKey) || Regex.IsMatch(apiKey, "^sk-[A-Za-z0-9]{20,}$"))
         .WithMessage("ApiKey must be empty or a valid OpenAI API key.");
 
