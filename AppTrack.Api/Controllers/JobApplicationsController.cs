@@ -69,9 +69,9 @@ public class JobApplicationsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult> DeleteAsync(int id)
+    public async Task<ActionResult> DeleteAsync([FromRoute] int id, [FromQuery]string userId)
     {
-        await _mediator.Send(new DeleteJobApplicationCommand() { Id = id });
+        await _mediator.Send(new DeleteJobApplicationCommand() { Id = id, UserId = userId });
         return NoContent();
     }
 }

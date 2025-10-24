@@ -8,4 +8,6 @@ namespace AppTrack.Application.Features.JobApplications.Commands.DeleteJobApplic
 public class DeleteJobApplicationCommand : IRequest<Unit>
 {
     public int Id { get; set; }
+
+    public string UserId { get; set; } = string.Empty;
 }

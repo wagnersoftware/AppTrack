@@ -1,4 +1,5 @@
 ﻿using AppTrack.Application.Contracts.Persistance;
+using AppTrack.Application.Features.JobApplications.Commands.UpdateJobApplication;
 using FluentValidation;
 
 namespace AppTrack.Application.Features.JobApplications.Commands.DeleteJobApplication;
@@ -16,14 +17,13 @@ public class DeleteJobApplicationCommandValidator : AbstractValidator<DeleteJobA
             .NotNull().WithMessage("{PropertyName} is required");
 
         RuleFor(x => x)
-            .MustAsync(JobApplicationExists)
-            .WithMessage("Job application doesn't exist");
-
+            .MustAsync(JobApplicationExistsForUser)
+            .WithMessage("Job application doesn't exist for user");
     }
 
-    private async Task<bool> JobApplicationExists(DeleteJobApplicationCommand command, CancellationToken token)
+    private async Task<bool> JobApplicationExistsForUser(DeleteJobApplicationCommand command, CancellationToken token)
     {
         var jobApplication = await _jobApplicationRepository.GetByIdAsync(command.Id);
-        return jobApplication != null;
+        return jobApplication != null && jobApplication.UserId == command.UserId;
     }
 }

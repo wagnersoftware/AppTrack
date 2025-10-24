@@ -55,9 +55,9 @@ public class UpdateJobApplicationCommandValidator : AbstractValidator<UpdateJobA
             .Must(value => string.IsNullOrEmpty(value) || int.TryParse(value, out _))
             .WithMessage("{PropertyName} must be a valid number.");
 
-        RuleFor(x => x)
-                .MustAsync(JobApplicationExistsForUser)
-                .WithMessage("Job application doesn't exist for user");
+    RuleFor(x => x)
+            .MustAsync(JobApplicationExistsForUser)
+            .WithMessage("Job application doesn't exist for user");
     }
 
     private async Task<bool> JobApplicationExistsForUser(UpdateJobApplicationCommand command, CancellationToken token)

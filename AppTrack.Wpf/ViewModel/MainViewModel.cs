@@ -142,7 +142,14 @@ namespace AppTrack.WpfUi.ViewModel
                 return;
             }
 
-            var apiResponse = await _jobApplicationService.DeleteJobApplicationAsync(id);
+            var userId = await _userHelper.TryGetUserIdAsync();
+
+            if (userId == null)
+            {
+                return;
+            }
+
+            var apiResponse = await _jobApplicationService.DeleteJobApplicationAsync(id, userId);
 
             if (apiResponse.Success == false)
             {
