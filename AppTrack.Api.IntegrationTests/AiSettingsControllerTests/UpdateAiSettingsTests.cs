@@ -260,7 +260,7 @@ public class UpdateAiSettingsTests : IClassFixture<FakeAuthWebApplicationFactory
     }
 
     [Fact]
-    public async Task UpdateAiSettings_ShouldReturn400_WhenKeyIsEmpty()
+    public async Task UpdateAiSettings_ShouldReturn400_WhenPromptParameterKeyIsEmpty()
     {
         // Arrange
         var (userId, aiSettingsId) = await SeedHelper.CreateUserWithAiSettingsAsync(_factory.Services);
@@ -286,5 +286,40 @@ public class UpdateAiSettingsTests : IClassFixture<FakeAuthWebApplicationFactory
         problem.ShouldNotBeNull();
         problem.Errors.ShouldContainKey("PromptParameter[0].Key");
         problem.Errors["PromptParameter[0].Key"].ShouldContain("Key is required.");
+    }
+
+    [Fact]
+    public async Task UpdateAiSettings_ShouldReturn400_WhenApiKeyExceedsMaxChars()
+    {
+        // Arrange
+        var (userId, aiSettingsId) = await SeedHelper.CreateUserWithAiSettingsAsync(_factory.Services);
+
+        string prefix = "sk-";
+        int totalLength = 201;
+        int remainingLength = totalLength - prefix.Length;
+        string rest = new string('a', remainingLength);
+        string invalidApiKey = prefix + rest;
+
+        var invalidRequest = new UpdateAiSettingsCommand
+        {
+            Id = aiSettingsId,
+            UserId = userId,
+            ApiKey = invalidApiKey,
+            PromptParameter = new List<PromptParameterDto>
+                {
+                    new() { Key = "", Value = "TestValue" }
+                }
+        };
+
+        // Act
+        var response = await _client.PutAsJsonAsync($"/api/ai-settings/{invalidRequest.Id}", invalidRequest);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+
+        var problem = await response.Content.ReadFromJsonAsync<CustomProblemDetails>();
+        problem.ShouldNotBeNull();
+        problem.Errors.ShouldContainKey("ApiKey");
+        problem.Errors["ApiKey"].ShouldContain("ApiKey must not exceed 200 characters.");
     }
 }

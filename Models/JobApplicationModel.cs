@@ -7,22 +7,27 @@ namespace AppTrack.Frontend.Models;
 public partial class JobApplicationModel : ModelBase
 {
     [Required]
+    [MaxLength(200, ErrorMessage = "{0} must not exceed 200 characters.")]
     public string Name { get; set; } = string.Empty;
 
     [Required]
+    [MaxLength(200, ErrorMessage = "{0} must not exceed 200 characters.")]
     public string Position { get; set; } = string.Empty;
 
     [Required]
     [Url]
+    [MaxLength(1000, ErrorMessage = "{0} must not exceed 1000 characters.")]
     public string URL { get; set; } = string.Empty;
 
     [Required]
     public string JobDescription { get; set; } = string.Empty;
 
     [Required]
+    [MaxLength(200, ErrorMessage = "{0} must not exceed 200 characters.")]
     public string Location { get; set; } = string.Empty;
 
     [Required]
+    [MaxLength(200, ErrorMessage = "{0} must not exceed 200 characters.")]
     public string ContactPerson { get; set; } = string.Empty;
 
     [Required]

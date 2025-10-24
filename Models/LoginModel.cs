@@ -6,6 +6,7 @@ namespace AppTrack.Frontend.Models;
 public class LoginModel : ModelBase
 {
     [Required]
+    [MaxLength(256, ErrorMessage = "{0} must not exceed 256 characters.")]
     public string UserName { get; set; } = string.Empty;
 
     [Required]
