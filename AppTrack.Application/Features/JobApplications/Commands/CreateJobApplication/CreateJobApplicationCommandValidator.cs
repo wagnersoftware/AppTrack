@@ -17,7 +17,7 @@ public class CreateJobApplicationCommandValidator : AbstractValidator<CreateJobA
             .NotNull().WithMessage("{PropertyName} is required");
 
         RuleFor(x => x.URL)
-            .MaximumLength(1000).WithMessage("{PropertyName}} must not exceed 200 characters.")
+            .MaximumLength(1000).WithMessage("{PropertyName}} must not exceed 1000 characters.")
             .NotEmpty().WithMessage("{PropertyName} is required")
             .NotNull().WithMessage("{PropertyName} is required")
             .Must(BeAValidUrl).WithMessage("{PropertyName} must be a valid URL");
