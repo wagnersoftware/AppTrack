@@ -1,11 +1,23 @@
 ﻿using AppTrack.Api.IntegrationTests.Seeddata.JobApplicationDefaults;
 using AppTrack.Api.IntegrationTests.SeedData.AiSettings;
+using AppTrack.Api.IntegrationTests.SeedData.JobApplication;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AppTrack.Api.IntegrationTests.Seeddata;
 
 internal static class SeedHelper
 {
+
+    internal static async Task<(string userId, int defaultsId)> CreateUserWithJobApplicationAsync(IServiceProvider services)
+    {
+        using var scope = services.CreateScope();
+
+        var userId = await User.ApplicationUserSeedHelper.CreateTestUserAsync(services);
+        var jobApplicationId = await JobApplicationSeedsHelper.CreateJobApplicationForUserAsync(services, userId);
+
+        return (userId, jobApplicationId);
+    }
+
     /// <summary>
     /// Asynchronously creates a test user and associated job application defaults, returning their identifiers.
     /// </summary>

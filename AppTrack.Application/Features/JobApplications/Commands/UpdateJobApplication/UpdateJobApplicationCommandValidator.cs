@@ -10,16 +10,18 @@ public class UpdateJobApplicationCommandValidator : AbstractValidator<UpdateJobA
     public UpdateJobApplicationCommandValidator(IJobApplicationRepository jobApplicationRepository)
     {
         this._jobApplicationRepository = jobApplicationRepository;
-
         RuleFor(x => x.Name)
+            .MaximumLength(200).WithMessage("{PropertyName}} must not exceed 200 characters.")
             .NotEmpty().WithMessage("{PropertyName} is required")
             .NotNull().WithMessage("{PropertyName} is required");
 
         RuleFor(x => x.Position)
+            .MaximumLength(200).WithMessage("{PropertyName}} must not exceed 200 characters.")
             .NotEmpty().WithMessage("{PropertyName} is required")
             .NotNull().WithMessage("{PropertyName} is required");
 
         RuleFor(x => x.URL)
+            .MaximumLength(1000).WithMessage("{PropertyName}} must not exceed 1000 characters.")
             .NotEmpty().WithMessage("{PropertyName} is required")
             .NotNull().WithMessage("{PropertyName} is required")
             .Must(BeAValidUrl).WithMessage("{PropertyName} must be a valid URL");
@@ -33,10 +35,12 @@ public class UpdateJobApplicationCommandValidator : AbstractValidator<UpdateJobA
             .NotNull().WithMessage("{PropertyName} is required");
 
         RuleFor(x => x.Location)
+            .MaximumLength(200).WithMessage("{PropertyName}} must not exceed 200 characters.")
             .NotEmpty().WithMessage("{PropertyName} is required")
             .NotNull().WithMessage("{PropertyName} is required");
 
         RuleFor(x => x.ContactPerson)
+            .MaximumLength(200).WithMessage("ContactPerson must not exceed 200 characters.")
             .NotEmpty().WithMessage("{PropertyName} is required")
             .NotNull().WithMessage("{PropertyName} is required");
 
@@ -52,8 +56,8 @@ public class UpdateJobApplicationCommandValidator : AbstractValidator<UpdateJobA
             .WithMessage("{PropertyName} must be a valid number.");
 
         RuleFor(x => x)
-            .MustAsync(JobApplicationExistsForUser)
-            .WithMessage("Job application doesn't exist for user");
+                .MustAsync(JobApplicationExistsForUser)
+                .WithMessage("Job application doesn't exist for user");
     }
 
     private async Task<bool> JobApplicationExistsForUser(UpdateJobApplicationCommand command, CancellationToken token)

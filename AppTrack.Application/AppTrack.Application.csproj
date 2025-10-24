@@ -23,4 +23,8 @@
     <ProjectReference Include="..\AppTrack.Domain\AppTrack.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Features\CommonValidators\" />
+  </ItemGroup>
+
 </Project>

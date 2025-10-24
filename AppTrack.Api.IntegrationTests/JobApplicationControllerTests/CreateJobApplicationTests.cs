@@ -6,7 +6,7 @@ using Shouldly;
 using System.Net;
 using System.Net.Http.Json;
 
-namespace AppTrack.Api.IntegrationTests;
+namespace AppTrack.Api.IntegrationTests.JobApplicationControllerTests;
 
 public class CreateJobApplicationTests : IClassFixture<FakeAuthWebApplicationFactory>
 {
