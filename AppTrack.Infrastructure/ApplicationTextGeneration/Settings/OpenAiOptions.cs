@@ -12,5 +12,8 @@ public class OpenAiOptions
     [Required]
     [Url]
     public string ApiUrl { get; set; } = string.Empty;
+
+    [Required]
+    public int TimeoutInSeconds { get; set; }
 }
 

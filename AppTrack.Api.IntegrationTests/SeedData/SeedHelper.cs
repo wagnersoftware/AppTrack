@@ -7,7 +7,23 @@ namespace AppTrack.Api.IntegrationTests.Seeddata;
 
 internal static class SeedHelper
 {
+    /// <summary>
+    /// Creates a new test user asynchronously using the provided service provider.
+    /// </summary>
+    /// <param name="services">The service provider used to resolve dependencies required for user creation. Must not be null.</param>
+    /// <returns>A tuple containing the unique identifier of the newly created user.</returns>
+    public static async Task<string> CreateUserAsync(IServiceProvider services)
+    {   
+        using var scope = services.CreateScope();
+        var userId = await User.ApplicationUserSeedHelper.CreateTestUserAsync(services);
+        return userId;
+    }
 
+    /// <summary>
+    /// Creates a new test user and an associated job application asynchronously, returning their identifiers.
+    /// </summary>
+    /// <param name="services">The service provider used to resolve dependencies required for user and job application creation.</param>
+    /// <returns>A tuple containing the user identifier and the job application identifier for the newly created entities.</returns>
     internal static async Task<(string userId, int defaultsId)> CreateUserWithJobApplicationAsync(IServiceProvider services)
     {
         using var scope = services.CreateScope();

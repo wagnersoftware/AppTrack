@@ -6,4 +6,6 @@ namespace AppTrack.Application.Features.JobApplications.Queries.GetJobApplicatio
 public class GetJobApplicationByIdQuery : IRequest<JobApplicationDto>
 {
     public int Id { get; set; }
+
+    public string UserId { get; set; } = string.Empty;
 }
