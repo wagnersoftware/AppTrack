@@ -3,6 +3,7 @@ using AppTrack.Api.Middleware;
 using AppTrack.Application;
 using AppTrack.Identity;
 using AppTrack.Infrastructure;
+using AppTrack.Infrastructure.ApplicationTextGeneration;
 using AppTrack.Persistance;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.OpenApi.Models;
@@ -23,6 +24,13 @@ builder.Services.AddCors(options =>
     .AllowAnyHeader()
     .AllowAnyMethod());
 });
+
+builder.Services.AddOptions<OpenAiOptions>()
+    .Bind(builder.Configuration.GetSection("OpenAiSettings"))
+    .ValidateDataAnnotations() 
+    .ValidateOnStart();      
+
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>

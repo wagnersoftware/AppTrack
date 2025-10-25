@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <PreserveCompilationContext>true</PreserveCompilationContext>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <UserSecretsId>4c27de37-426e-4993-9c2a-f26ff6af7f45</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

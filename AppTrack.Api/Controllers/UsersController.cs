@@ -53,7 +53,7 @@ public class UsersController : ControllerBase
     [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult<JobApplicationDefaultsDto>> GetJobApplicationDefaults(string userId)
+    public async Task<ActionResult<JobApplicationDefaultsDto>> GetJobApplicationDefaults([FromRoute]string userId)
     {
         var jobApplicationDetailsDto = await _mediator.Send(new GetJobApplicationDefaultsByUserIdQuery() { UserId = userId });
         return Ok(jobApplicationDetailsDto);
