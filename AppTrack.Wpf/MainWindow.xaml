@@ -84,6 +84,20 @@
                 </Grid>
             </ui:CommandBar.Content>
         </ui:CommandBar>
+        <!--  Filter combo box  -->
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+            <TextBlock
+                Margin="20,10,2,2"
+                FontWeight="SemiBold"
+                Text="Filter by status:" />
+            <ComboBox
+                Width="180"
+                Margin="10,2,2,2"
+                DisplayMemberPath="DisplayName"
+                ItemsSource="{Binding AvailableStatuses}"
+                SelectedValue="{Binding SelectedStatus, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                SelectedValuePath="Status" />
+        </StackPanel>
         <Grid DockPanel.Dock="Bottom">
             <!--  DataGrid  -->
             <DataGrid
@@ -96,7 +110,7 @@
                 Focusable="False"
                 IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolConverter}}"
                 IsReadOnly="True"
-                ItemsSource="{Binding JobApplications}"
+                ItemsSource="{Binding JobApplicationsView}"
                 RowHeight="40"
                 SelectionMode="Single">
                 <!--  Set opacity when loading indicator is active  -->

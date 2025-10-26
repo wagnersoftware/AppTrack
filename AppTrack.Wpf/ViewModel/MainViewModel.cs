@@ -9,7 +9,9 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Windows;
+using System.Windows.Data;
 
 namespace AppTrack.WpfUi.ViewModel;
 
@@ -26,7 +28,11 @@ public partial class MainViewModel : ObservableObject
     private readonly ApiAuthenticationStateProvider _apiAuthenticationStateProvider;
     private readonly IUserHelper _userHelper;
 
-    public ObservableCollection<JobApplicationModel> JobApplications { get; set; } = new();
+    //Binding for Datagrid to enable filtering
+    public ICollectionView JobApplicationsView { get; set; }
+
+    
+    public ObservableCollection<JobApplicationModel> JobApplications { get; set; }
 
     [ObservableProperty]
     private bool isLoggedIn = false;
@@ -36,6 +42,12 @@ public partial class MainViewModel : ObservableObject
 
     [ObservableProperty]
     private bool isLoading;
+
+    [ObservableProperty]
+    private JobApplicationModel.JobApplicationStatus? selectedStatus;
+
+    [ObservableProperty]
+    private IEnumerable<StatusOption> availableStatuses;
 
     private CancellationTokenSource? _cts;
 
@@ -60,20 +72,22 @@ public partial class MainViewModel : ObservableObject
         this._authenticationService = authenticationService;
         this._apiAuthenticationStateProvider = apiAuthenticationStateProvider;
         this._userHelper = userHelper;
+
         _apiAuthenticationStateProvider.AuthenticationStateChanged += ApiAuthenticationStateProvider_AuthenticationStateChanged;
-    }
 
-    private async void ApiAuthenticationStateProvider_AuthenticationStateChanged(Task<AuthenticationState> task)
-    {
-        var state = await task;
-        LoggedInUser = state.User.Identity?.Name ?? string.Empty;
-        IsLoggedIn = state.User.Identity?.IsAuthenticated ?? false;
+        JobApplications = new ObservableCollection<JobApplicationModel>();
+        JobApplicationsView = CollectionViewSource.GetDefaultView(JobApplications);
+        JobApplicationsView.Filter = FilterByStatus;
 
-        if (IsLoggedIn == false)
-        {
-            LoggedInUser = string.Empty;
-            JobApplications.Clear();
-        }
+        // Set up available statuses for filtering
+        AvailableStatuses = new List<StatusOption>
+            {
+                new StatusOption { Status = null, DisplayName = "All" }
+            }
+        .Concat(Enum.GetValues(typeof(JobApplicationModel.JobApplicationStatus))
+                 .Cast<JobApplicationModel.JobApplicationStatus>()
+                 .Select(s => new StatusOption { Status = s, DisplayName = s.ToString() }))
+        .ToList();
     }
 
     public async Task LoadJobApplicationsForUserAsync()
@@ -93,7 +107,53 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
-        apiResponse.Data?.ForEach(x => JobApplications.Add(x));
+        JobApplications.Clear();
+        foreach (var x in apiResponse.Data ?? [])
+            JobApplications.Add(x);
+
+        JobApplicationsView.Refresh();
+    }
+
+    /// <summary>
+    /// Determines whether the specified object represents a job application with a status matching the selected status
+    /// filter.
+    /// </summary>
+    /// <remarks>If <see cref="SelectedStatus"/> is null, all job applications are included regardless of
+    /// their status. Objects that are not of type <see cref="JobApplicationModel"/> are always excluded.</remarks>
+    /// <param name="obj">The object to evaluate. Must be a <see cref="JobApplicationModel"/> instance to be considered for filtering.</param>
+    /// <returns>true if the object is a <see cref="JobApplicationModel"/> and its status matches the selected status filter, or
+    /// if no status filter is selected; otherwise, false.</returns>
+    private bool FilterByStatus(object obj)
+    {
+        if (obj is not JobApplicationModel app)
+            return false;
+
+        if (SelectedStatus == null) // show all
+            return true;
+
+        return app.Status == SelectedStatus;
+    }
+
+    /// <summary>
+    /// Handles changes to the selected job application status and refreshes the job applications view accordingly.
+    /// </summary>
+    /// <param name="value">The newly selected job application status. Can be null to indicate no status is selected.</param>
+    partial void OnSelectedStatusChanged(JobApplicationModel.JobApplicationStatus? value)
+    {
+        JobApplicationsView?.Refresh();
+    }
+
+    private async void ApiAuthenticationStateProvider_AuthenticationStateChanged(Task<AuthenticationState> task)
+    {
+        var state = await task;
+        LoggedInUser = state.User.Identity?.Name ?? string.Empty;
+        IsLoggedIn = state.User.Identity?.IsAuthenticated ?? false;
+
+        if (IsLoggedIn == false)
+        {
+            LoggedInUser = string.Empty;
+            JobApplications.Clear();
+        }
     }
 
     [RelayCommand]
