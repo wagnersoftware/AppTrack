@@ -313,6 +313,13 @@
                         FontWeight="SemiBold"
                         Foreground="Black"
                         Text="Loading..." />
+                    <Button
+                        Width="120"
+                        Margin="0,20,0,0"
+                        HorizontalAlignment="Center"
+                        Command="{Binding CancelOperationCommand}"
+                        Content="Cancel"
+                        Style="{StaticResource AccentButtonStyle}" />
                 </StackPanel>
             </Grid>
         </Grid>

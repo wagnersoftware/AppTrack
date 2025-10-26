@@ -25,6 +25,7 @@ public class GenerateApplicationTextCommandHandler : IRequestHandler<GenerateApp
 
     public async Task<GeneratedApplicationTextDto> Handle(GenerateApplicationTextCommand request, CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var validator = new GenerateApplicationTextCommandValidator(_jobApplicationRepository, _aiSettingsRepository);
         var validationResult = await validator.ValidateAsync(request);
 
@@ -34,6 +35,7 @@ public class GenerateApplicationTextCommandHandler : IRequestHandler<GenerateApp
         }
 
         //get Ai settings
+        cancellationToken.ThrowIfCancellationRequested();
         var aiSettings = await _aiSettingsRepository.GetByUserIdWithPromptParameterAsync(request.UserId);
         _applicationTextGenerator.SetApiKey(aiSettings!.ApiKey);
 

@@ -11,337 +11,347 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Collections.ObjectModel;
 using System.Windows;
 
-namespace AppTrack.WpfUi.ViewModel
+namespace AppTrack.WpfUi.ViewModel;
+
+public partial class MainViewModel : ObservableObject
 {
-    public partial class MainViewModel : ObservableObject
+    private readonly IJobApplicationService _jobApplicationService;
+    private readonly IJobApplicationDefaultsService _jobApplicationDefaultsService;
+    private readonly IWindowService _windowService;
+    private readonly IServiceProvider _serviceProvider;
+    private readonly IAiSettingsService _aiSettingsService;
+    private readonly IApplicationTextService _applicationTextService;
+    private readonly IMessageBoxService _messageBoxService;
+    private readonly IAuthenticationService _authenticationService;
+    private readonly ApiAuthenticationStateProvider _apiAuthenticationStateProvider;
+    private readonly IUserHelper _userHelper;
+
+    public ObservableCollection<JobApplicationModel> JobApplications { get; set; } = new();
+
+    [ObservableProperty]
+    private bool isLoggedIn = false;
+
+    [ObservableProperty]
+    private string loggedInUser = string.Empty;
+
+    [ObservableProperty]
+    private bool isLoading;
+
+    private CancellationTokenSource? _cts;
+
+    public MainViewModel(IJobApplicationService jobApplicationService,
+                         IJobApplicationDefaultsService jobApplicationDefaultsService,
+                         IWindowService windowService,
+                         IServiceProvider serviceProvider,
+                         IAiSettingsService aiSettingsService,
+                         IApplicationTextService applicationTextService,
+                         IMessageBoxService messageBoxService,
+                         IAuthenticationService authenticationService,
+                         ApiAuthenticationStateProvider apiAuthenticationStateProvider,
+                         IUserHelper userHelper)
     {
-        private readonly IJobApplicationService _jobApplicationService;
-        private readonly IJobApplicationDefaultsService _jobApplicationDefaultsService;
-        private readonly IWindowService _windowService;
-        private readonly IServiceProvider _serviceProvider;
-        private readonly IAiSettingsService _aiSettingsService;
-        private readonly IApplicationTextService _applicationTextService;
-        private readonly IMessageBoxService _messageBoxService;
-        private readonly IAuthenticationService _authenticationService;
-        private readonly ApiAuthenticationStateProvider _apiAuthenticationStateProvider;
-        private readonly IUserHelper _userHelper;
+        this._jobApplicationService = jobApplicationService;
+        this._jobApplicationDefaultsService = jobApplicationDefaultsService;
+        this._windowService = windowService;
+        this._serviceProvider = serviceProvider;
+        this._aiSettingsService = aiSettingsService;
+        this._applicationTextService = applicationTextService;
+        this._messageBoxService = messageBoxService;
+        this._authenticationService = authenticationService;
+        this._apiAuthenticationStateProvider = apiAuthenticationStateProvider;
+        this._userHelper = userHelper;
+        _apiAuthenticationStateProvider.AuthenticationStateChanged += ApiAuthenticationStateProvider_AuthenticationStateChanged;
+    }
 
-        public ObservableCollection<JobApplicationModel> JobApplications { get; set; } = new();
+    private async void ApiAuthenticationStateProvider_AuthenticationStateChanged(Task<AuthenticationState> task)
+    {
+        var state = await task;
+        LoggedInUser = state.User.Identity?.Name ?? string.Empty;
+        IsLoggedIn = state.User.Identity?.IsAuthenticated ?? false;
 
-        [ObservableProperty]
-        private bool isLoggedIn = false;
-
-        [ObservableProperty]
-        private string loggedInUser = string.Empty;
-
-        [ObservableProperty]
-        private bool isLoading;
-
-        public MainViewModel(IJobApplicationService jobApplicationService,
-                             IJobApplicationDefaultsService jobApplicationDefaultsService,
-                             IWindowService windowService,
-                             IServiceProvider serviceProvider,
-                             IAiSettingsService aiSettingsService,
-                             IApplicationTextService applicationTextService,
-                             IMessageBoxService messageBoxService,
-                             IAuthenticationService authenticationService,
-                             ApiAuthenticationStateProvider apiAuthenticationStateProvider,
-                             IUserHelper userHelper)
+        if (IsLoggedIn == false)
         {
-            this._jobApplicationService = jobApplicationService;
-            this._jobApplicationDefaultsService = jobApplicationDefaultsService;
-            this._windowService = windowService;
-            this._serviceProvider = serviceProvider;
-            this._aiSettingsService = aiSettingsService;
-            this._applicationTextService = applicationTextService;
-            this._messageBoxService = messageBoxService;
-            this._authenticationService = authenticationService;
-            this._apiAuthenticationStateProvider = apiAuthenticationStateProvider;
-            this._userHelper = userHelper;
-            _apiAuthenticationStateProvider.AuthenticationStateChanged += ApiAuthenticationStateProvider_AuthenticationStateChanged;
+            LoggedInUser = string.Empty;
+            JobApplications.Clear();
+        }
+    }
+
+    public async Task LoadJobApplicationsForUserAsync()
+    {
+        var userId = await _userHelper.TryGetUserIdAsync();
+
+        if (userId == null)
+        {
+            return;
         }
 
-        private async void ApiAuthenticationStateProvider_AuthenticationStateChanged(Task<AuthenticationState> task)
-        {
-            var state = await task;
-            LoggedInUser = state.User.Identity?.Name ?? string.Empty;
-            IsLoggedIn = state.User.Identity?.IsAuthenticated ?? false;
+        var apiResponse = await _jobApplicationService.GetJobApplicationsForUserAsync(userId);
 
-            if (IsLoggedIn == false)
-            {
-                LoggedInUser = string.Empty;
-                JobApplications.Clear();
-            }
+        if (apiResponse.Success == false)
+        {
+            _messageBoxService.ShowErrorMessageBox(apiResponse);
+            return;
         }
 
-        public async Task LoadJobApplicationsForUserAsync()
+        apiResponse.Data?.ForEach(x => JobApplications.Add(x));
+    }
+
+    [RelayCommand]
+    private async Task CreateJobApplication()
+    {
+
+        var userId = await _userHelper.TryGetUserIdAsync();
+
+        if (userId == null)
         {
-            var userId = await _userHelper.TryGetUserIdAsync();
-
-            if (userId == null)
-            {
-                return;
-            }
-
-            var apiResponse = await _jobApplicationService.GetJobApplicationsForUserAsync(userId);
-
-            if (apiResponse.Success == false)
-            {
-                _messageBoxService.ShowErrorMessageBox(apiResponse);
-                return;
-            }
-
-            apiResponse.Data?.ForEach(x => JobApplications.Add(x));
+            return;
         }
 
-        [RelayCommand]
-        private async Task CreateJobApplication()
+        var response = await _jobApplicationDefaultsService.GetForUserAsync(userId);
+
+        if (response.Success == false)
         {
-
-            var userId = await _userHelper.TryGetUserIdAsync();
-
-            if (userId == null)
-            {
-                return;
-            }
-
-            var response = await _jobApplicationDefaultsService.GetForUserAsync(userId);
-
-            if (response.Success == false)
-            {
-                _messageBoxService.ShowErrorMessageBox(response);
-                return;
-            }
-
-            var createJobApplicationViewModel = _serviceProvider.GetRequiredService<CreateJobApplicationViewModel>();
-            createJobApplicationViewModel.SetDefaults(response.Data!);
-
-            var windowResult = _windowService.ShowWindow(createJobApplicationViewModel);
-
-            if (windowResult == false)
-            {
-                return;
-            }
-
-            var apiResponse = await _jobApplicationService.CreateJobApplicationForUserAsync(createJobApplicationViewModel.Model, userId);
-
-            if (apiResponse.Success == false)
-            {
-                _messageBoxService.ShowErrorMessageBox(apiResponse);
-                return;
-            }
-
-            JobApplications.Add(apiResponse.Data!);
-
+            _messageBoxService.ShowErrorMessageBox(response);
+            return;
         }
 
-        [RelayCommand]
-        private async Task DeleteJobApplication(int id)
+        var createJobApplicationViewModel = _serviceProvider.GetRequiredService<CreateJobApplicationViewModel>();
+        createJobApplicationViewModel.SetDefaults(response.Data!);
+
+        var windowResult = _windowService.ShowWindow(createJobApplicationViewModel);
+
+        if (windowResult == false)
         {
-            var dialogResult = _messageBoxService.ShowQuestionMessageBox($"Do you really want to delete application with id: {id}", "Delete application");
-
-            if (dialogResult == MessageBoxResult.No || dialogResult == MessageBoxResult.Cancel)
-            {
-                return;
-            }
-
-            var userId = await _userHelper.TryGetUserIdAsync();
-
-            if (userId == null)
-            {
-                return;
-            }
-
-            var apiResponse = await _jobApplicationService.DeleteJobApplicationAsync(id, userId);
-
-            if (apiResponse.Success == false)
-            {
-                _messageBoxService.ShowErrorMessageBox(apiResponse);
-                return;
-            }
-
-            var jobApplicationToRemove = JobApplications.SingleOrDefault(x => x.Id == id);
-
-            if (jobApplicationToRemove != null)
-            {
-                JobApplications.Remove(jobApplicationToRemove);
-            }
-
+            return;
         }
 
-        [RelayCommand]
-        private async Task EditJobApplication(JobApplicationModel jobApplicationModel)
+        var apiResponse = await _jobApplicationService.CreateJobApplicationForUserAsync(createJobApplicationViewModel.Model, userId);
+
+        if (apiResponse.Success == false)
         {
-            var editJobApplicationViewModel = ActivatorUtilities.CreateInstance<EditJobApplicationViewModel>(_serviceProvider, jobApplicationModel);
-            var windowResult = _windowService.ShowWindow(editJobApplicationViewModel);
-
-            if (windowResult == false)
-            {
-                return;
-            }
-
-            var userId = await _userHelper.TryGetUserIdAsync();
-
-            if (userId == null)
-            {
-                return;
-            }
-
-            var apiResponse = await _jobApplicationService.UpdateJobApplicationAsync(jobApplicationModel.Id, userId, jobApplicationModel);
-
-            if (apiResponse.Success == false)
-            {
-                _messageBoxService.ShowErrorMessageBox(apiResponse);
-                return;
-            }
-
-            int index = JobApplications.IndexOf(jobApplicationModel);
-            JobApplications.RemoveAt(index);
-            JobApplications.Insert(index, apiResponse.Data!);
-
+            _messageBoxService.ShowErrorMessageBox(apiResponse);
+            return;
         }
 
-        [RelayCommand]
-        private async Task GenerateApplicationText(JobApplicationModel jobApplicationModel)
+        JobApplications.Add(apiResponse.Data!);
+
+    }
+
+    [RelayCommand]
+    private async Task DeleteJobApplication(int id)
+    {
+        var dialogResult = _messageBoxService.ShowQuestionMessageBox($"Do you really want to delete application with id: {id}", "Delete application");
+
+        if (dialogResult == MessageBoxResult.No || dialogResult == MessageBoxResult.Cancel)
         {
-            var userId = await _userHelper.TryGetUserIdAsync();
-
-            if (userId == null)
-            {
-                return;
-            }
-
-            try
-            {
-                IsLoading = true;
-                var generatedPromptResponse = await _applicationTextService.GeneratePrompt(jobApplicationModel.Id, userId);
-                IsLoading = false;
-
-                if (generatedPromptResponse.Success == false)
-                {
-                    _messageBoxService.ShowErrorMessageBox(generatedPromptResponse);
-                    return;
-                }
-
-                var generatedPromptViewModel = ActivatorUtilities.CreateInstance<GeneratedPromptViewModel>(_serviceProvider, generatedPromptResponse.Data!);
-                var promptDialogResult = _windowService.ShowWindow(generatedPromptViewModel);
-
-                if (promptDialogResult == false)
-                {
-                    return;
-                }
-
-                IsLoading = true;
-                var applicationTextResponse = await _applicationTextService.GenerateApplicationText(generatedPromptViewModel.Text, userId, jobApplicationModel.Id);
-                IsLoading = false;
-
-                if (applicationTextResponse.Success == false)
-                {
-                    _messageBoxService.ShowErrorMessageBox(applicationTextResponse);
-                    return;
-                }
-
-                jobApplicationModel.ApplicationText = applicationTextResponse.Data!.Text;
-
-                var textViewModel = ActivatorUtilities.CreateInstance<ApplicationTextViewModel>(_serviceProvider, applicationTextResponse.Data);
-                _windowService.ShowWindow(textViewModel);
-            }
-            finally
-            {
-                IsLoading = false;
-            }
+            return;
         }
 
-        [RelayCommand]
-        private async Task SetDefaults()
+        var userId = await _userHelper.TryGetUserIdAsync();
+
+        if (userId == null)
         {
-            var userId = await _userHelper.TryGetUserIdAsync();
-
-            if (userId == null)
-            {
-                return;
-            }
-
-            var apiResponse = await _jobApplicationDefaultsService.GetForUserAsync(userId);
-
-            if (apiResponse.Success == false)
-            {
-                _messageBoxService.ShowErrorMessageBox(apiResponse);
-                return;
-            }
-
-            var jobApplicatiobDefaultsViewModel = ActivatorUtilities.CreateInstance<SetJobApplicationDefaultsViewModel>(_serviceProvider, apiResponse.Data!);
-            var windowResult = _windowService.ShowWindow(jobApplicatiobDefaultsViewModel);
-
-            if (windowResult == false)
-            {
-                return;
-            }
-
-            apiResponse = await _jobApplicationDefaultsService.UpdateAsync(apiResponse.Data!.Id, apiResponse.Data);
-
-            if (apiResponse.Success == false)
-            {
-                _messageBoxService.ShowErrorMessageBox(apiResponse);
-            }
+            return;
         }
 
-        [RelayCommand]
-        private async Task OpenAiSettings()
-        {
-            var userId = await _userHelper.TryGetUserIdAsync();
+        var apiResponse = await _jobApplicationService.DeleteJobApplicationAsync(id, userId);
 
-            if (userId == null)
+        if (apiResponse.Success == false)
+        {
+            _messageBoxService.ShowErrorMessageBox(apiResponse);
+            return;
+        }
+
+        var jobApplicationToRemove = JobApplications.SingleOrDefault(x => x.Id == id);
+
+        if (jobApplicationToRemove != null)
+        {
+            JobApplications.Remove(jobApplicationToRemove);
+        }
+
+    }
+
+    [RelayCommand]
+    private async Task EditJobApplication(JobApplicationModel jobApplicationModel)
+    {
+        var editJobApplicationViewModel = ActivatorUtilities.CreateInstance<EditJobApplicationViewModel>(_serviceProvider, jobApplicationModel);
+        var windowResult = _windowService.ShowWindow(editJobApplicationViewModel);
+
+        if (windowResult == false)
+        {
+            return;
+        }
+
+        var userId = await _userHelper.TryGetUserIdAsync();
+
+        if (userId == null)
+        {
+            return;
+        }
+
+        var apiResponse = await _jobApplicationService.UpdateJobApplicationAsync(jobApplicationModel.Id, userId, jobApplicationModel);
+
+        if (apiResponse.Success == false)
+        {
+            _messageBoxService.ShowErrorMessageBox(apiResponse);
+            return;
+        }
+
+        int index = JobApplications.IndexOf(jobApplicationModel);
+        JobApplications.RemoveAt(index);
+        JobApplications.Insert(index, apiResponse.Data!);
+
+    }
+
+    [RelayCommand]
+    private async Task GenerateApplicationText(JobApplicationModel jobApplicationModel)
+    {
+        var userId = await _userHelper.TryGetUserIdAsync();
+
+        if (userId == null)
+        {
+            return;
+        }
+
+        try
+        {
+            _cts = new CancellationTokenSource();
+
+            IsLoading = true;
+            var generatedPromptResponse = await _applicationTextService.GeneratePrompt(jobApplicationModel.Id, userId);
+            IsLoading = false;
+
+            if (generatedPromptResponse.Success == false)
+            {
+                _messageBoxService.ShowErrorMessageBox(generatedPromptResponse);
+                return;
+            }
+
+            var generatedPromptViewModel = ActivatorUtilities.CreateInstance<GeneratedPromptViewModel>(_serviceProvider, generatedPromptResponse.Data!);
+            var promptDialogResult = _windowService.ShowWindow(generatedPromptViewModel);
+
+            if (promptDialogResult == false)
             {
                 return;
             }
 
-            var apiResponse = await _aiSettingsService.GetForUserAsync(userId);
+            IsLoading = true;
+            var applicationTextResponse = await _applicationTextService.GenerateApplicationText(generatedPromptViewModel.Text, userId, jobApplicationModel.Id, _cts.Token);
+            IsLoading = false;
 
-            if (apiResponse.Success == false)
+            if (applicationTextResponse.Success == false)
             {
-                _messageBoxService.ShowErrorMessageBox(apiResponse);
+                _messageBoxService.ShowErrorMessageBox(applicationTextResponse);
                 return;
             }
 
-            var setAiSettingsViewModel = ActivatorUtilities.CreateInstance<SetAiSettingsViewModel>(_serviceProvider, apiResponse.Data!);
-            var windowResult = _windowService.ShowWindow(setAiSettingsViewModel);
+            jobApplicationModel.ApplicationText = applicationTextResponse.Data!.Text;
 
-            if (windowResult == false)
-            {
-                return;
-            }
-
-            apiResponse = await _aiSettingsService.UpdateAsync(apiResponse.Data!.Id, apiResponse.Data);
-
-            if (apiResponse.Success == false)
-            {
-                _messageBoxService.ShowErrorMessageBox(apiResponse);
-            }
+            var textViewModel = ActivatorUtilities.CreateInstance<ApplicationTextViewModel>(_serviceProvider, applicationTextResponse.Data);
+            _windowService.ShowWindow(textViewModel);
         }
-
-        [RelayCommand]
-        private void Logout()
+        finally
         {
-            _authenticationService.Logout();
+            IsLoading = false;
+            _cts?.Dispose();
+            _cts = null;
         }
+    }
 
-        [RelayCommand]
-        private async Task Login()
+    [RelayCommand]
+    private async Task SetDefaults()
+    {
+        var userId = await _userHelper.TryGetUserIdAsync();
+
+        if (userId == null)
         {
-            var loginViewModel = _serviceProvider.GetRequiredService<LoginViewModel>();
-            var isLoginSuccessful = _windowService.ShowWindow(loginViewModel);
-
-            if (isLoginSuccessful == true)
-            {
-                await LoadJobApplicationsForUserAsync();
-            }
+            return;
         }
 
-        [RelayCommand]
-        private void Exit()
+        var apiResponse = await _jobApplicationDefaultsService.GetForUserAsync(userId);
+
+        if (apiResponse.Success == false)
         {
-            Application.Current.Shutdown();
+            _messageBoxService.ShowErrorMessageBox(apiResponse);
+            return;
         }
+
+        var jobApplicatiobDefaultsViewModel = ActivatorUtilities.CreateInstance<SetJobApplicationDefaultsViewModel>(_serviceProvider, apiResponse.Data!);
+        var windowResult = _windowService.ShowWindow(jobApplicatiobDefaultsViewModel);
+
+        if (windowResult == false)
+        {
+            return;
+        }
+
+        apiResponse = await _jobApplicationDefaultsService.UpdateAsync(apiResponse.Data!.Id, apiResponse.Data);
+
+        if (apiResponse.Success == false)
+        {
+            _messageBoxService.ShowErrorMessageBox(apiResponse);
+        }
+    }
+
+    [RelayCommand]
+    private async Task OpenAiSettings()
+    {
+        var userId = await _userHelper.TryGetUserIdAsync();
+
+        if (userId == null)
+        {
+            return;
+        }
+
+        var apiResponse = await _aiSettingsService.GetForUserAsync(userId);
+
+        if (apiResponse.Success == false)
+        {
+            _messageBoxService.ShowErrorMessageBox(apiResponse);
+            return;
+        }
+
+        var setAiSettingsViewModel = ActivatorUtilities.CreateInstance<SetAiSettingsViewModel>(_serviceProvider, apiResponse.Data!);
+        var windowResult = _windowService.ShowWindow(setAiSettingsViewModel);
+
+        if (windowResult == false)
+        {
+            return;
+        }
+
+        apiResponse = await _aiSettingsService.UpdateAsync(apiResponse.Data!.Id, apiResponse.Data);
+
+        if (apiResponse.Success == false)
+        {
+            _messageBoxService.ShowErrorMessageBox(apiResponse);
+        }
+    }
+
+    [RelayCommand]
+    private async Task Login()
+    {
+        var loginViewModel = _serviceProvider.GetRequiredService<LoginViewModel>();
+        var isLoginSuccessful = _windowService.ShowWindow(loginViewModel);
+
+        if (isLoginSuccessful == true)
+        {
+            await LoadJobApplicationsForUserAsync();
+        }
+    }
+    [RelayCommand]
+    private void Logout()
+    {
+        _authenticationService.Logout();
+    }
+
+    [RelayCommand]
+    private void CancelOperation()
+    {
+        _cts?.Cancel();
+    }
+
+    [RelayCommand]
+    private void Exit()
+    {
+        Application.Current.Shutdown();
     }
 }

@@ -51,6 +51,10 @@ public class BaseHttpService
             var result = await action();
             return new Response<T> { Success = true, Data = result };
         }
+        catch (OperationCanceledException)
+        {
+            return new Response<T> { Success = false, ErrorMessage = "Operation canceled." };
+        }
         catch (ApiException e)
         {
             return ConvertApiException<T>(e);
@@ -64,6 +68,10 @@ public class BaseHttpService
             await AddBearerTokenAsync();
             await action();
             return new Response<T> { Success = true };
+        }
+        catch (OperationCanceledException)
+        {
+            return new Response<T> { Success = false, ErrorMessage = "Operation canceled." };
         }
         catch (ApiException e)
         {
