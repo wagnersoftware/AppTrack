@@ -34,6 +34,9 @@ namespace AppTrack.WpfUi.ViewModel
         [ObservableProperty]
         private string loggedInUser = string.Empty;
 
+        [ObservableProperty]
+        private bool isLoading;
+
         public MainViewModel(IJobApplicationService jobApplicationService,
                              IJobApplicationDefaultsService jobApplicationDefaultsService,
                              IWindowService windowService,
@@ -208,34 +211,45 @@ namespace AppTrack.WpfUi.ViewModel
                 return;
             }
 
-            var generatedPromptResponse = await _applicationTextService.GeneratePrompt(jobApplicationModel.Id, userId);
-
-            if (generatedPromptResponse.Success == false)
+            try
             {
-                _messageBoxService.ShowErrorMessageBox(generatedPromptResponse);
-                return;
+                IsLoading = true;
+                var generatedPromptResponse = await _applicationTextService.GeneratePrompt(jobApplicationModel.Id, userId);
+                IsLoading = false;
+
+                if (generatedPromptResponse.Success == false)
+                {
+                    _messageBoxService.ShowErrorMessageBox(generatedPromptResponse);
+                    return;
+                }
+
+                var generatedPromptViewModel = ActivatorUtilities.CreateInstance<GeneratedPromptViewModel>(_serviceProvider, generatedPromptResponse.Data!);
+                var promptDialogResult = _windowService.ShowWindow(generatedPromptViewModel);
+
+                if (promptDialogResult == false)
+                {
+                    return;
+                }
+
+                IsLoading = true;
+                var applicationTextResponse = await _applicationTextService.GenerateApplicationText(generatedPromptViewModel.Text, userId, jobApplicationModel.Id);
+                IsLoading = false;
+
+                if (applicationTextResponse.Success == false)
+                {
+                    _messageBoxService.ShowErrorMessageBox(applicationTextResponse);
+                    return;
+                }
+
+                jobApplicationModel.ApplicationText = applicationTextResponse.Data!.Text;
+
+                var textViewModel = ActivatorUtilities.CreateInstance<ApplicationTextViewModel>(_serviceProvider, applicationTextResponse.Data);
+                _windowService.ShowWindow(textViewModel);
             }
-
-            var generatedPromptViewModel = ActivatorUtilities.CreateInstance<GeneratedPromptViewModel>(_serviceProvider, generatedPromptResponse.Data!);
-            var promptDialogResult = _windowService.ShowWindow(generatedPromptViewModel);
-
-            if (promptDialogResult == false)
+            finally
             {
-                return;
+                IsLoading = false;
             }
-
-            var applicationTextResponse = await _applicationTextService.GenerateApplicationText(generatedPromptViewModel.Text, userId, jobApplicationModel.Id);
-
-            if (applicationTextResponse.Success == false)
-            {
-                _messageBoxService.ShowErrorMessageBox(applicationTextResponse);
-                return;
-            }
-
-            jobApplicationModel.ApplicationText = applicationTextResponse.Data!.Text;
-
-            var textViewModel = ActivatorUtilities.CreateInstance<ApplicationTextViewModel>(_serviceProvider, applicationTextResponse.Data);
-            _windowService.ShowWindow(textViewModel);
         }
 
         [RelayCommand]
