@@ -30,9 +30,9 @@ public class JobApplicationsController : ControllerBase
     [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult<JobApplicationDto>> Get(int id)
+    public async Task<ActionResult<JobApplicationDto>> Get([FromRoute] int id, [FromQuery] string userId)
     {
-        var jobApplicationDto = await _mediator.Send(new GetJobApplicationByIdQuery() { Id = id });
+        var jobApplicationDto = await _mediator.Send(new GetJobApplicationByIdQuery() { Id = id, UserId= userId});
         return Ok(jobApplicationDto);
     }
 
@@ -53,7 +53,7 @@ public class JobApplicationsController : ControllerBase
     [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult<JobApplicationDto>> Put(int id, [FromBody] UpdateJobApplicationCommand command)
+    public async Task<ActionResult<JobApplicationDto>> Put([FromRoute]int id, [FromBody] UpdateJobApplicationCommand command)
     {
         if (id != command.Id)
         {
@@ -69,9 +69,9 @@ public class JobApplicationsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult> DeleteAsync(int id)
+    public async Task<ActionResult> DeleteAsync([FromRoute] int id, [FromQuery]string userId)
     {
-        await _mediator.Send(new DeleteJobApplicationCommand() { Id = id });
+        await _mediator.Send(new DeleteJobApplicationCommand() { Id = id, UserId = userId });
         return NoContent();
     }
 }

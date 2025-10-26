@@ -1,6 +1,6 @@
 ﻿using AppTrack.Application.Contracts.ApplicationTextGenerator;
 using AppTrack.Infrastructure.ApplicationTextGeneration.OpAiModels;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
@@ -12,10 +12,11 @@ public class OpenAiApplicationTextGenerator : IApplicationTextGenerator
     private string? _apiKey;
     private readonly string _openAiUrl;
 
-    public OpenAiApplicationTextGenerator(HttpClient httpClient, IConfiguration configuration)
+    public OpenAiApplicationTextGenerator(HttpClient httpClient, IOptions<OpenAiOptions> openAiOptions)
     {
         _httpClient = httpClient;
-        _openAiUrl = configuration["OpenAi:ApiUrl"] ?? throw new InvalidOperationException("OpenAI API URL is not configured.");
+        _httpClient.Timeout = TimeSpan.FromSeconds(openAiOptions.Value.TimeoutInSeconds);
+        _openAiUrl = openAiOptions.Value.ApiUrl ?? throw new InvalidOperationException("OpenAI API URL is not configured.");
     }
 
     public void SetApiKey(string apiKey) => _apiKey = apiKey;

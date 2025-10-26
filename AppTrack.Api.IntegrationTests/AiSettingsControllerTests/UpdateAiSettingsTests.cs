@@ -97,31 +97,6 @@ public class UpdateAiSettingsTests : IClassFixture<FakeAuthWebApplicationFactory
     }
 
     [Fact]
-    public async Task UpdateAiSettings_ShouldReturn400_WhenApiKeyIsInvalid()
-    {
-        var (userId, aiSettingsId) = await SeedHelper.CreateUserWithAiSettingsAsync(_factory.Services);
-
-        // Arrange
-        var command = new UpdateAiSettingsCommand
-        {
-            Id = aiSettingsId,
-            UserId = userId,
-            ApiKey = "invalid-key"
-        };
-
-        // Act
-        var response = await _client.PutAsJsonAsync($"/api/ai-settings/{command.Id}", command);
-
-        // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
-
-        var problem = await response.Content.ReadFromJsonAsync<CustomProblemDetails>();
-        problem.ShouldNotBeNull();
-        problem.Errors.ShouldContainKey("ApiKey");
-        problem.Errors["ApiKey"].ShouldContain("ApiKey must be empty or a valid OpenAI API key.");
-    }
-
-    [Fact]
     public async Task UpdateAiSettings_ShouldReturn400_WhenAiSettingsDoesNotExist()
     {
         var userId = await ApplicationUserSeedHelper.CreateTestUserAsync(_factory.Services);

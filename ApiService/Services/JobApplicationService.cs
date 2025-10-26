@@ -23,16 +23,16 @@ public class JobApplicationService : BaseHttpService, IJobApplicationService
             return _mapper.Map<JobApplicationModel>(jobApplicationDto);
         });
 
-    public Task<Response<JobApplicationModel>> DeleteJobApplicationAsync(int id) =>
+    public Task<Response<JobApplicationModel>> DeleteJobApplicationAsync(int id, string userId) =>
         TryExecuteAsync<JobApplicationModel>(async () =>
         {
-            await _client.JobApplicationsDELETEAsync(id);
+            await _client.JobApplicationsDELETEAsync(id, userId);
         });
 
-    public Task<Response<JobApplicationModel>> GetJobApplicationByIdAsync(int id) =>
+    public Task<Response<JobApplicationModel>> GetJobApplicationByIdAsync(int id, string userId) =>
         TryExecuteAsync(async () =>
         {
-            var jobApplicationDtos = await _client.JobApplicationsGETAsync(id);
+            var jobApplicationDtos = await _client.JobApplicationsGETAsync(id, userId);
             return _mapper.Map<JobApplicationModel>(jobApplicationDtos);
         });
 

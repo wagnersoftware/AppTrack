@@ -5,6 +5,7 @@ namespace AppTrack.Application.Features.JobApplications.Dto;
 public class JobApplicationDto
 {
     public int Id { get; set; }
+    public string UserId { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public string Position { get; set; } = string.Empty;
     public string URL { get; set; } = string.Empty;

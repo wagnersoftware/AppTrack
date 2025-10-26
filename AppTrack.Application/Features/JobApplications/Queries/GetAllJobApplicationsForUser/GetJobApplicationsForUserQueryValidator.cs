@@ -7,7 +7,6 @@ public class GetJobApplicationsForUserQueryValidator : AbstractValidator<GetJobA
     public GetJobApplicationsForUserQueryValidator()
     {
         RuleFor(x => x.UserId)
-            .NotEmpty().WithMessage("{PropertyName} is required")
-            .NotNull().WithMessage("{PropertyName} is required");
+            .NotEmpty().WithMessage("{PropertyName} is required");
     }
 }

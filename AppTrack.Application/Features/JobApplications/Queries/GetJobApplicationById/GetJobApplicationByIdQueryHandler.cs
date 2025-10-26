@@ -19,7 +19,7 @@ public class GetJobApplicationByIdQueryHandler : IRequestHandler<GetJobApplicati
 
     public async Task<JobApplicationDto> Handle(GetJobApplicationByIdQuery request, CancellationToken cancellationToken)
     {
-        var validator = new GetJobApplicationByIdQueryValidator();
+        var validator = new GetJobApplicationByIdQueryValidator(_jobApplicationRepository);
         var validationResult = await validator.ValidateAsync(request);
 
         if (validationResult.Errors.Any())
