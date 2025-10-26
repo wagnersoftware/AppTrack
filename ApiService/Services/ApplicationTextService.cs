@@ -11,11 +11,11 @@ namespace AppTrack.Frontend.ApiService.Services
         {
         }
 
-        public Task<Response<ApplicationTextModel>> GenerateApplicationText(string prompt, string userId, int jobApplicationId) =>
+        public Task<Response<ApplicationTextModel>> GenerateApplicationText(string prompt, string userId, int jobApplicationId, CancellationToken token) =>
             TryExecuteAsync(async () =>
             {
                 var command = new GenerateApplicationTextCommand() { UserId = userId, Prompt = prompt, JobApplicationId = jobApplicationId };
-                var generatedTextDto = await _client.ApplicationTextsAsync(command);
+                var generatedTextDto = await _client.ApplicationTextsAsync(command, token);
                 return new ApplicationTextModel()
                 {
                     Text = generatedTextDto.ApplicationText,

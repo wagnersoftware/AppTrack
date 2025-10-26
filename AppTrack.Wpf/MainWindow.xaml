@@ -21,6 +21,7 @@
 
     <Window.Resources>
         <converter:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <converter:InverseBoolConverter x:Key="InverseBoolConverter" />
     </Window.Resources>
     <DockPanel Margin="10">
         <!--  Login information  -->
@@ -83,209 +84,244 @@
                 </Grid>
             </ui:CommandBar.Content>
         </ui:CommandBar>
-        <!--  DataGrid  -->
-        <DataGrid
-            MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Window}}"
-            Margin="0,20,0,0"
-            d:ItemsSource="{d:SampleData}"
-            AlternatingRowBackground="LightGray"
-            AutoGenerateColumns="False"
-            ColumnWidth="*"
-            Focusable="False"
-            IsReadOnly="True"
-            ItemsSource="{Binding JobApplications}"
-            RowHeight="40"
-            SelectionMode="Single">
-            <!--  Disable visual selection effects  -->
-            <DataGrid.RowStyle>
-                <Style TargetType="DataGridRow">
-                    <Setter Property="Background" Value="Transparent" />
-                    <Setter Property="BorderBrush" Value="Transparent" />
-                    <Setter Property="Foreground" Value="Black" />
-                    <Style.Triggers>
-                        <Trigger Property="IsSelected" Value="True">
-                            <Setter Property="Background" Value="Transparent" />
-                            <Setter Property="BorderBrush" Value="Transparent" />
-                            <Setter Property="Foreground" Value="Black" />
-                        </Trigger>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="Transparent" />
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </DataGrid.RowStyle>
-            <DataGrid.Columns>
-                <!--  Id  -->
-                <DataGridTextColumn
-                    Width="0.4*"
-                    Binding="{Binding Id}"
-                    Header="Id">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="ToolTip" Value="{Binding Id}" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-                <!--  Name  -->
-                <DataGridTextColumn
-                    Width="*"
-                    Binding="{Binding Name}"
-                    Header="Name">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="ToolTip" Value="{Binding Name}" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-                <!--  Status  -->
-                <DataGridTextColumn
-                    Width="1.3*"
-                    Binding="{Binding Status}"
-                    Header="Status">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="ToolTip" Value="{Binding Status}" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-                <!--  URL  -->
-                <DataGridTextColumn
-                    Width="1.5*"
-                    Binding="{Binding URL}"
-                    Header="URL">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="ToolTip" Value="{Binding URL}" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-                <!--  Position  -->
-                <DataGridTextColumn
-                    Width="*"
-                    Binding="{Binding Position}"
-                    Header="Position">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="ToolTip" Value="{Binding Position}" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-                <!--  Job Description  -->
-                <DataGridTextColumn
-                    Width="1.5*"
-                    Binding="{Binding JobDescription}"
-                    Header="Job Description">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="ToolTip" Value="{Binding JobDescription}" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-                <!--  Location  -->
-                <DataGridTextColumn
-                    Width="*"
-                    Binding="{Binding Location}"
-                    Header="Location">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="ToolTip" Value="{Binding Location}" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-                <!--  Start Date  -->
-                <DataGridTextColumn
-                    Width="*"
-                    Binding="{Binding StartDate}"
-                    Header="Start date">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="ToolTip" Value="{Binding StartDate}" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-                <!--  Duration in months  -->
-                <DataGridTextColumn
-                    Width="0.8*"
-                    Binding="{Binding DurationInMonths}"
-                    Header="Duration(months)">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="ToolTip" Value="{Binding DurationInMonths}" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-                <!--  Contact Person  -->
-                <DataGridTextColumn
-                    Width="*"
-                    Binding="{Binding ContactPerson}"
-                    Header="Contact Person">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="ToolTip" Value="{Binding ContactPerson}" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-                <!--  ApplicationText  -->
-                <DataGridTextColumn
-                    Width="3*"
-                    Binding="{Binding ApplicationText}"
-                    Header="Application Text">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="ToolTip" Value="{Binding ApplicationText}" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-                <!--  CreationDate  -->
-                <DataGridTextColumn
-                    Width="1.6*"
-                    Binding="{Binding CreationDate}"
-                    Header="Created">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="ToolTip" Value="{Binding CreationDate}" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-                <!--  ModifiedDate  -->
-                <DataGridTextColumn
-                    Width="1.6*"
-                    Binding="{Binding ModifiedDate}"
-                    Header="Modified">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="ToolTip" Value="{Binding ModifiedDate}" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-                <!--  Functions  -->
-                <DataGridTemplateColumn
-                    Width="2.5*"
-                    CanUserResize="False"
-                    Header="Functions">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
-                                <Button
-                                    Margin="5"
-                                    Command="{Binding DataContext.EditJobApplicationCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                    CommandParameter="{Binding}"
-                                    Content="Edit" />
-                                <Button
-                                    Margin="5"
-                                    Command="{Binding DataContext.GenerateApplicationTextCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                    CommandParameter="{Binding}"
-                                    Content="Generate Text" />
-                                <Button
-                                    Margin="5"
-                                    Command="{Binding DataContext.DeleteJobApplicationCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                    CommandParameter="{Binding Id}"
-                                    Content="Delete" />
-                            </StackPanel>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-            </DataGrid.Columns>
-        </DataGrid>
+        <Grid DockPanel.Dock="Bottom">
+            <!--  DataGrid  -->
+            <DataGrid
+                MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Window}}"
+                Margin="0,20,0,0"
+                d:ItemsSource="{d:SampleData}"
+                AlternatingRowBackground="LightGray"
+                AutoGenerateColumns="False"
+                ColumnWidth="*"
+                Focusable="False"
+                IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolConverter}}"
+                IsReadOnly="True"
+                ItemsSource="{Binding JobApplications}"
+                RowHeight="40"
+                SelectionMode="Single">
+                <!--  Set opacity when loading indicator is active  -->
+                <DataGrid.Style>
+                    <Style BasedOn="{StaticResource {x:Type DataGrid}}" TargetType="DataGrid">
+                        <Style.Triggers>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.4" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.Style>
+                <!--  Disable visual selection effects  -->
+                <DataGrid.RowStyle>
+                    <Style TargetType="DataGridRow">
+                        <Setter Property="Background" Value="Transparent" />
+                        <Setter Property="BorderBrush" Value="Transparent" />
+                        <Setter Property="Foreground" Value="Black" />
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="Transparent" />
+                                <Setter Property="BorderBrush" Value="Transparent" />
+                                <Setter Property="Foreground" Value="Black" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="Transparent" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.RowStyle>
+                <DataGrid.Columns>
+                    <!--  Id  -->
+                    <DataGridTextColumn
+                        Width="0.4*"
+                        Binding="{Binding Id}"
+                        Header="Id">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="ToolTip" Value="{Binding Id}" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <!--  Name  -->
+                    <DataGridTextColumn
+                        Width="*"
+                        Binding="{Binding Name}"
+                        Header="Name">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="ToolTip" Value="{Binding Name}" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <!--  Status  -->
+                    <DataGridTextColumn
+                        Width="1.3*"
+                        Binding="{Binding Status}"
+                        Header="Status">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="ToolTip" Value="{Binding Status}" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <!--  URL  -->
+                    <DataGridTextColumn
+                        Width="1.5*"
+                        Binding="{Binding URL}"
+                        Header="URL">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="ToolTip" Value="{Binding URL}" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <!--  Position  -->
+                    <DataGridTextColumn
+                        Width="*"
+                        Binding="{Binding Position}"
+                        Header="Position">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="ToolTip" Value="{Binding Position}" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <!--  Job Description  -->
+                    <DataGridTextColumn
+                        Width="1.5*"
+                        Binding="{Binding JobDescription}"
+                        Header="Job Description">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="ToolTip" Value="{Binding JobDescription}" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <!--  Location  -->
+                    <DataGridTextColumn
+                        Width="*"
+                        Binding="{Binding Location}"
+                        Header="Location">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="ToolTip" Value="{Binding Location}" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <!--  Start Date  -->
+                    <DataGridTextColumn
+                        Width="*"
+                        Binding="{Binding StartDate}"
+                        Header="Start date">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="ToolTip" Value="{Binding StartDate}" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <!--  Duration in months  -->
+                    <DataGridTextColumn
+                        Width="0.8*"
+                        Binding="{Binding DurationInMonths}"
+                        Header="Duration(months)">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="ToolTip" Value="{Binding DurationInMonths}" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <!--  Contact Person  -->
+                    <DataGridTextColumn
+                        Width="*"
+                        Binding="{Binding ContactPerson}"
+                        Header="Contact Person">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="ToolTip" Value="{Binding ContactPerson}" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <!--  ApplicationText  -->
+                    <DataGridTextColumn
+                        Width="3*"
+                        Binding="{Binding ApplicationText}"
+                        Header="Application Text">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="ToolTip" Value="{Binding ApplicationText}" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <!--  CreationDate  -->
+                    <DataGridTextColumn
+                        Width="1.6*"
+                        Binding="{Binding CreationDate}"
+                        Header="Created">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="ToolTip" Value="{Binding CreationDate}" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <!--  ModifiedDate  -->
+                    <DataGridTextColumn
+                        Width="1.6*"
+                        Binding="{Binding ModifiedDate}"
+                        Header="Modified">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="ToolTip" Value="{Binding ModifiedDate}" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <!--  Functions  -->
+                    <DataGridTemplateColumn
+                        Width="2.5*"
+                        CanUserResize="False"
+                        Header="Functions">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
+                                    <Button
+                                        Margin="5"
+                                        Command="{Binding DataContext.EditJobApplicationCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                        CommandParameter="{Binding}"
+                                        Content="Edit" />
+                                    <Button
+                                        Margin="5"
+                                        Command="{Binding DataContext.GenerateApplicationTextCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                        CommandParameter="{Binding}"
+                                        Content="Generate Text" />
+                                    <Button
+                                        Margin="5"
+                                        Command="{Binding DataContext.DeleteJobApplicationCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                        CommandParameter="{Binding Id}"
+                                        Content="Delete" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+            <!--  Loading Indicator  -->
+            <Grid Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibilityConverter}}">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <ui:ProgressRing
+                        Width="60"
+                        Height="60"
+                        IsActive="True" />
+                    <TextBlock
+                        Margin="0,10,0,0"
+                        HorizontalAlignment="Center"
+                        FontWeight="SemiBold"
+                        Foreground="Black"
+                        Text="Loading..." />
+                    <Button
+                        Width="120"
+                        Margin="0,20,0,0"
+                        HorizontalAlignment="Center"
+                        Command="{Binding CancelOperationCommand}"
+                        Content="Cancel"
+                        Style="{StaticResource AccentButtonStyle}" />
+                </StackPanel>
+            </Grid>
+        </Grid>
     </DockPanel>
 </Window>

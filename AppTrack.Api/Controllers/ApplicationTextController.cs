@@ -26,9 +26,9 @@ public class ApplicationTextController : ControllerBase
     [ProducesResponseType(typeof(GeneratedApplicationTextDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult<GeneratedApplicationTextDto>> GenerateApplicationText([FromBody] GenerateApplicationTextCommand command)
+    public async Task<ActionResult<GeneratedApplicationTextDto>> GenerateApplicationText([FromBody] GenerateApplicationTextCommand command, CancellationToken token)
     {
-        var response = await _mediator.Send(command);
+        var response = await _mediator.Send(command, token);
         return Ok(response);
     }
 
