@@ -11,6 +11,8 @@ using AppTrack.WpfUi.ViewModel;
 using AppTrack.WpfUi.WindowService;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Globalization;
+using System.Text.RegularExpressions;
 using System.Windows;
 
 namespace AppTrack.Wpf;
@@ -83,6 +85,8 @@ public partial class App : Application
         mainWindow.Show();
         base.OnStartup(e);
 
+        SetCulture();
+
         var windowService = ServiceProvider.GetRequiredService<IWindowService>();
         var loginViewModel = ServiceProvider.GetRequiredService<LoginViewModel>();
         var isLoginSuccessful = windowService.ShowWindow(loginViewModel);
@@ -96,5 +100,18 @@ public partial class App : Application
         {
             Application.Current.Shutdown();
         }
+    }
+
+    private static void SetCulture()
+    {
+        CultureInfo culture = CultureInfo.CurrentCulture;
+        Thread.CurrentThread.CurrentCulture = culture;
+        Thread.CurrentThread.CurrentUICulture = culture;
+
+        FrameworkElement.LanguageProperty.OverrideMetadata(
+            typeof(FrameworkElement),
+            new FrameworkPropertyMetadata(
+                System.Windows.Markup.XmlLanguage.GetLanguage(culture.IetfLanguageTag))
+        );
     }
 }
