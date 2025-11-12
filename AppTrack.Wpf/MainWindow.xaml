@@ -46,7 +46,7 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <!--  <Add jobApplication and setting buttons  -->
+                    <!--  <Add JobApplication and setting buttons  -->
                     <StackPanel Grid.Column="0" Orientation="Horizontal">
                         <ui:AppBarButton
                             Command="{Binding CreateJobApplicationCommand}"
@@ -94,6 +94,7 @@
                 Width="180"
                 Margin="10,2,2,2"
                 DisplayMemberPath="DisplayName"
+                IsEnabled="{Binding IsLoggedIn}"
                 ItemsSource="{Binding AvailableStatuses}"
                 SelectedValue="{Binding SelectedStatus, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 SelectedValuePath="Status" />
