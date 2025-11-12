@@ -28,6 +28,28 @@ public class AppTrackDatabaseContext : DbContext
             .HasForeignKey(p => p.AISettingsId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        modelBuilder.Entity<JobApplication>()
+            .Property(a => a.CreationDate)
+            .HasConversion(
+                v => v.ToUniversalTime(),
+                v => DateTime.SpecifyKind(v, DateTimeKind.Utc)
+            );
+
+        modelBuilder.Entity<JobApplication>()
+            .Property(a => a.ModifiedDate)
+            .HasConversion(
+                v => v.ToUniversalTime(),
+                v => DateTime.SpecifyKind(v, DateTimeKind.Utc)
+            );
+
+        modelBuilder.Entity<JobApplication>()
+            .Property(a => a.StartDate)
+            .HasConversion(
+                v => v.ToUniversalTime(),
+                v => DateTime.SpecifyKind(v, DateTimeKind.Utc)
+            );
+
+
         base.OnModelCreating(modelBuilder);
 
     }

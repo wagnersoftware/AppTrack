@@ -32,7 +32,7 @@ namespace AppTrack.Persistance.IntegrationTests
             await _appTrackDatabaseContext.SaveChangesAsync();
 
             //Assert
-            jobApplication.CreationDate.ShouldNotBeNull();
+            jobApplication.CreationDate.Kind.ShouldBe(DateTimeKind.Utc);
         }
 
         [Fact]
@@ -50,7 +50,7 @@ namespace AppTrack.Persistance.IntegrationTests
             await _appTrackDatabaseContext.SaveChangesAsync();
 
             //Assert
-            jobApplication.ModifiedDate.ShouldNotBeNull();
+            jobApplication.ModifiedDate.Kind.ShouldBe(DateTimeKind.Utc);
         }
     }
 }
