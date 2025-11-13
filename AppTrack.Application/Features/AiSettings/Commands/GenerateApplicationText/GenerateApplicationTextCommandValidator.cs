@@ -1,17 +1,21 @@
 ﻿using AppTrack.Application.Contracts.Persistance;
 using FluentValidation;
 
-namespace AppTrack.Application.Features.ApplicationText.Query;
+namespace AppTrack.Application.Features.AiSettings.Commands.GenerateApplicationText;
 
-public class GeneratePromptQueryValidator : AbstractValidator<GeneratePromptQuery>
+public class GenerateApplicationTextCommandValidator : AbstractValidator<GenerateApplicationTextCommand>
 {
     private readonly IJobApplicationRepository _jobApplicationRepository;
     private readonly IAiSettingsRepository _aiSettingsRepository;
 
-    public GeneratePromptQueryValidator(IJobApplicationRepository jobApplicationRepository, IAiSettingsRepository aiSettingsRepository)
+    public GenerateApplicationTextCommandValidator(IJobApplicationRepository jobApplicationRepository, IAiSettingsRepository aiSettingsRepository)
     {
         _jobApplicationRepository = jobApplicationRepository;
         _aiSettingsRepository = aiSettingsRepository;
+
+        RuleFor(x => x.Prompt)
+            .NotEmpty().WithMessage("{PropertyName} is required")
+            .NotNull().WithMessage("{PropertyName} is required");
 
         RuleFor(x => x.UserId)
             .NotEmpty().WithMessage("{PropertyName} is required")
@@ -29,15 +33,15 @@ public class GeneratePromptQueryValidator : AbstractValidator<GeneratePromptQuer
             .CustomAsync(ValidateAiSettings);
     }
 
-    private async Task<bool> JobApplicationExists(GeneratePromptQuery query, CancellationToken token)
+    private async Task<bool> JobApplicationExists(GenerateApplicationTextCommand command, CancellationToken token)
     {
-        var jobApplication = await _jobApplicationRepository.GetByIdAsync(query.JobApplicationId);
+        var jobApplication = await _jobApplicationRepository.GetByIdAsync(command.JobApplicationId);
         return jobApplication != null;
     }
 
-    private async Task ValidateAiSettings(GeneratePromptQuery query, ValidationContext<GeneratePromptQuery> context, CancellationToken token)
+    private async Task ValidateAiSettings(GenerateApplicationTextCommand command, ValidationContext<GenerateApplicationTextCommand> context, CancellationToken token)
     {
-        var aiSettings = await _aiSettingsRepository.GetByUserIdWithPromptParameterAsync(query.UserId);
+        var aiSettings = await _aiSettingsRepository.GetByUserIdWithPromptParameterAsync(command.UserId);
 
         if (aiSettings == null)
         {
@@ -48,8 +52,6 @@ public class GeneratePromptQueryValidator : AbstractValidator<GeneratePromptQuer
         if (string.IsNullOrWhiteSpace(aiSettings.ApiKey))
             context.AddFailure("ApiKey in AI settings is missing.");
 
-        if (string.IsNullOrWhiteSpace(aiSettings.PromptTemplate))
-            context.AddFailure("Prompt in AI settings is missing.");
-
     }
 }
+

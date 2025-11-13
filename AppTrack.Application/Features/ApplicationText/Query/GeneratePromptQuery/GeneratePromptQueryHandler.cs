@@ -6,7 +6,7 @@ using AppTrack.Application.Features.ApplicationText.Dto;
 using AppTrack.Domain.Contracts;
 using AppTrack.Domain.Extensions;
 
-namespace AppTrack.Application.Features.ApplicationText.Query;
+namespace AppTrack.Application.Features.ApplicationText.Query.GeneratePromptQuery;
 
 public class GeneratePromptQueryHandler : IRequestHandler<GeneratePromptQuery, GeneratedPromptDto>
 {

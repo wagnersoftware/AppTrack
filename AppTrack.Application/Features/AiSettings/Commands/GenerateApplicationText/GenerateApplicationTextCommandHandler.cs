@@ -5,7 +5,7 @@ using AppTrack.Application.Exceptions;
 using AppTrack.Application.Features.JobApplications.Dto;
 using AppTrack.Domain.Contracts;
 
-namespace AppTrack.Application.Features.JobApplications.Commands.GenerateApplicationText;
+namespace AppTrack.Application.Features.AiSettings.Commands.GenerateApplicationText;
 
 public class GenerateApplicationTextCommandHandler : IRequestHandler<GenerateApplicationTextCommand, GeneratedApplicationTextDto>
 {
