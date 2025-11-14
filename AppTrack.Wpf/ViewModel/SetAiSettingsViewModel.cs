@@ -1,23 +1,29 @@
 ﻿using AppTrack.Frontend.Models;
 using AppTrack.Frontend.Models.ModelValidator;
+using AppTrack.WpfUi.Cache;
 using AppTrack.WpfUi.ViewModel.Base;
 using AppTrack.WpfUi.WindowService;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AppTrack.WpfUi.ViewModel;
 
-public partial class SetAiSettingsViewModel : AppTrackFormViewModelBase<AiSettingsModel>
+public partial class SetAiSettingsViewModel(
+    IModelValidator<AiSettingsModel> modelValidator,
+    AiSettingsModel model,
+    IWindowService windowService,
+    IServiceProvider serviceProvider, 
+    IChatModelStore chatModelStore) : AppTrackFormViewModelBase<AiSettingsModel>(modelValidator, model)
 {
-    private readonly IWindowService _windowService;
-    private readonly IServiceProvider _serviceProvider;
+    private readonly IWindowService _windowService = windowService;
+    private readonly IServiceProvider _serviceProvider = serviceProvider;
 
-    public SetAiSettingsViewModel(IModelValidator<AiSettingsModel> modelValidator, AiSettingsModel model, IWindowService windowService, IServiceProvider serviceProvider) : base(modelValidator, model)
-    {
-        this._windowService = windowService;
-        this._serviceProvider = serviceProvider;
-    }
+    [ObservableProperty]
+    private IReadOnlyList<ChatModel> chatModels = chatModelStore.ChatModels;
 
+    [ObservableProperty]
+    private ChatModel selectedChatModel = new ChatModel();
 
     [RelayCommand]
     private void AddPromptParameter()

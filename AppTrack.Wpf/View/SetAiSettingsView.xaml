@@ -21,6 +21,7 @@
                 <RowDefinition />
                 <RowDefinition />
                 <RowDefinition />
+                <RowDefinition />
                 <RowDefinition Height="*" />
                 <RowDefinition />
             </Grid.RowDefinitions>
@@ -59,9 +60,28 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </StackPanel>
-            <!--  Prompt parameter  -->
+            <!--  ChatModels- Combobox  -->
             <Label
                 Grid.Row="1"
+                Grid.Column="0"
+                Margin="0,5,5,0"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top">
+                Chat Models:
+            </Label>
+            <StackPanel
+                Grid.Row="1"
+                Grid.Column="1"
+                Margin="5">
+                <ComboBox
+                    Width="150"
+                    DisplayMemberPath="Name"
+                    ItemsSource="{Binding ChatModels}"
+                    SelectedItem="{Binding SelectedChatModel}" />
+            </StackPanel>
+            <!--  Prompt parameter  -->
+            <Label
+                Grid.Row="2"
                 Grid.Column="0"
                 Margin="0,5,5,0"
                 HorizontalAlignment="Right"
@@ -69,7 +89,7 @@
                 Prompt Parameter:
             </Label>
             <Border
-                Grid.Row="1"
+                Grid.Row="2"
                 Grid.Column="1"
                 Height="250"
                 Margin="5"
@@ -134,14 +154,14 @@
             </Border>
             <!--  Add Prompt Parameter Button  -->
             <Button
-                Grid.Row="2"
+                Grid.Row="3"
                 Grid.Column="1"
                 Margin="5"
                 Command="{Binding AddPromptParameterCommand}"
                 Content="Add" />
             <!--  Prompt  -->
             <Label
-                Grid.Row="3"
+                Grid.Row="4"
                 Grid.Column="0"
                 Margin="0,5,5,0"
                 HorizontalAlignment="Right"
@@ -177,7 +197,7 @@
                 </ItemsControl>
             </StackPanel>
             <!--  Buttons  -->
-            <StackPanel Grid.Row="4" Grid.ColumnSpan="2">
+            <StackPanel Grid.Row="5" Grid.ColumnSpan="2">
                 <Button
                     Width="150"
                     Margin="5,20,5,5"
