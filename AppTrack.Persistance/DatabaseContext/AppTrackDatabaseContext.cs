@@ -28,15 +28,20 @@ public class AppTrackDatabaseContext : DbContext
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        foreach (var entry in base.ChangeTracker.Entries<BaseEntity>().Where((entry => entry.State == EntityState.Added || entry.State == EntityState.Modified)))
-        {
-            entry.Entity.ModifiedDate = DateTime.Now;
-
-            if (entry.State == EntityState.Added)
+        base.ChangeTracker
+            .Entries<BaseEntity>()
+            .Where(entry => entry.State is EntityState.Added or EntityState.Modified)
+            .ToList()
+            .ForEach(entry =>
             {
-                entry.Entity.CreationDate = DateTime.Now;
-            }
-        }
+                entry.Entity.ModifiedDate = DateTime.Now;
+
+                if (entry.Entity.CreationDate == null)
+                {
+                    entry.Entity.CreationDate = DateTime.Now;
+                }
+            });
+
         return base.SaveChangesAsync(cancellationToken);
     }
 }

@@ -23,6 +23,11 @@ internal static class AiSettingsSeedsHelper
             UserId = userId,
             ApiKey = "1234abc",
             PromptTemplate = "Hello, my name is {name} and my rate is {rate}.",
+            PromptParameter = new List<PromptParameter>()
+            {
+                PromptParameter.Create("key1", "value1"),
+                PromptParameter.Create("key2", "value2"),
+            }
         };
 
         var promptParameter1 = PromptParameter.Create("name", "Daniel");
