@@ -44,14 +44,6 @@ public class ChatModelsConfiguration : IEntityTypeConfiguration<ChatModel>
             new ChatModel
             {
                 Id = 3,
-                Name = "ChatGPT 4 (32k)",
-                ApiModelName = "gpt-4-32k",
-                Description = "Handles long documents, perfect for extensive resumes or detailed cover letters",
-                IsActive = false
-            },
-            new ChatModel
-            {
-                Id = 4,
                 Name = "ChatGPT 4 Mini",
                 ApiModelName = "gpt-4o-mini",
                 Description = "Lightweight model for quick suggestions or interactive text generation",

@@ -10,7 +10,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="AI Settings"
     Width="1000"
-    Height="1200"
+    Height="1250"
     mc:Ignorable="d">
     <Window.Resources>
         <converter:ErrorsDictionaryConverter x:Key="ErrorsDictConverter" />
@@ -22,8 +22,8 @@
                 <RowDefinition />
                 <RowDefinition />
                 <RowDefinition />
-                <RowDefinition Height="*" />
                 <RowDefinition />
+                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
@@ -75,9 +75,18 @@
                 Margin="5">
                 <ComboBox
                     Width="150"
-                    DisplayMemberPath="Name"
                     ItemsSource="{Binding ChatModels}"
-                    SelectedItem="{Binding SelectedChatModel}" />
+                    SelectedItem="{Binding SelectedChatModel}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}" ToolTip="{Binding Description}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                    <ComboBox.ToolTip>
+                        <TextBlock Text="{Binding SelectedChatModel.Description}" />
+                    </ComboBox.ToolTip>
+                </ComboBox>
+
             </StackPanel>
             <!--  Prompt parameter  -->
             <Label
@@ -169,7 +178,7 @@
                 Prompt:
             </Label>
             <StackPanel
-                Grid.Row="3"
+                Grid.Row="4"
                 Grid.Column="1"
                 Margin="5">
                 <TextBox

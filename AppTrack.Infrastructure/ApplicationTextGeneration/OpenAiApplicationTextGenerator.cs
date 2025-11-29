@@ -21,7 +21,7 @@ public class OpenAiApplicationTextGenerator : IApplicationTextGenerator
 
     public void SetApiKey(string apiKey) => _apiKey = apiKey;
 
-    public async Task<string> GenerateApplicationTextAsync(string prompt, CancellationToken cancellationToken = default)
+    public async Task<string> GenerateApplicationTextAsync(string prompt, string modelName, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(_apiKey))
         {
@@ -33,7 +33,7 @@ public class OpenAiApplicationTextGenerator : IApplicationTextGenerator
 
         request.Content = JsonContent.Create(new
         {
-            model = "gpt-4o-mini",
+            model = modelName,
             messages = new[]
             {
                 new { role = "system", content = "You are an assistant that writes professional job applications." },

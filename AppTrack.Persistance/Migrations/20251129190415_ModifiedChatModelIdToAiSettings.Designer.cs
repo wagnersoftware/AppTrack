@@ -4,6 +4,7 @@ using AppTrack.Persistance.DatabaseContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AppTrack.Persistance.Migrations
 {
     [DbContext(typeof(AppTrackDatabaseContext))]
-    partial class AppTrackDatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20251129190415_ModifiedChatModelIdToAiSettings")]
+    partial class ModifiedChatModelIdToAiSettings
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -115,6 +118,14 @@ namespace AppTrack.Persistance.Migrations
                         new
                         {
                             Id = 3,
+                            ApiModelName = "gpt-4-32k",
+                            Description = "Handles long documents, perfect for extensive resumes or detailed cover letters",
+                            IsActive = false,
+                            Name = "ChatGPT 4 (32k)"
+                        },
+                        new
+                        {
+                            Id = 4,
                             ApiModelName = "gpt-4o-mini",
                             Description = "Lightweight model for quick suggestions or interactive text generation",
                             IsActive = false,

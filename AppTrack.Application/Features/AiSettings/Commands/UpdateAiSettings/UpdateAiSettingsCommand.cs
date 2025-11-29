@@ -6,6 +6,7 @@ namespace AppTrack.Application.Features.AiSettings.Commands.UpdateAiSettings;
 
 public class UpdateAiSettingsCommand : IRequest<Unit>
 {
+    public int SelectedChatModelId { get; set; }
     public int Id { get; set; }
     public string ApiKey { get; set; } = string.Empty;
     public string PromptTemplate { get; set; } = string.Empty;

@@ -3,7 +3,6 @@ using AppTrack.Frontend.Models;
 using AppTrack.WpfUi.MessageBoxService;
 
 namespace AppTrack.WpfUi.Cache;
-
 public class ChatModelStore : IChatModelStore
 {
     private readonly IChatModelsService _chatModelsService;
@@ -17,7 +16,7 @@ public class ChatModelStore : IChatModelStore
         this._messageBoxService = messageBoxService;
     }
 
-    public async Task Initialize()
+    public async Task GetChatModelsAsync()
     {
         var apiResponse = await _chatModelsService.GetChatModels();
 

@@ -6,5 +6,5 @@ public interface IChatModelStore
 {
     IReadOnlyList<ChatModel> ChatModels { get; }
 
-    Task Initialize();
+    Task GetChatModelsAsync();
 }

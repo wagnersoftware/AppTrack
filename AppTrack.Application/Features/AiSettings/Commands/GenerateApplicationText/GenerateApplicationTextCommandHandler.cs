@@ -12,21 +12,24 @@ public class GenerateApplicationTextCommandHandler : IRequestHandler<GenerateApp
     private readonly IApplicationTextGenerator _applicationTextGenerator;
     private readonly IAiSettingsRepository _aiSettingsRepository;
     private readonly IJobApplicationRepository _jobApplicationRepository;
+    private readonly IChatModelRepository _chatModelRepository;
 
     public GenerateApplicationTextCommandHandler(IApplicationTextGenerator applicationTextGenerator,
                                                  IAiSettingsRepository aiSettingsRepository,
                                                  IJobApplicationRepository jobApplicationRepository,
+                                                 IChatModelRepository chatModelRepository,
                                                  IPromptBuilder promptBuilder)
     {
         this._applicationTextGenerator = applicationTextGenerator;
         this._aiSettingsRepository = aiSettingsRepository;
         this._jobApplicationRepository = jobApplicationRepository;
+        this._chatModelRepository = chatModelRepository;
     }
 
     public async Task<GeneratedApplicationTextDto> Handle(GenerateApplicationTextCommand request, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        var validator = new GenerateApplicationTextCommandValidator(_jobApplicationRepository, _aiSettingsRepository);
+        var validator = new GenerateApplicationTextCommandValidator(_jobApplicationRepository, _aiSettingsRepository, _chatModelRepository);
         var validationResult = await validator.ValidateAsync(request);
 
         if (validationResult.Errors.Any())
@@ -37,10 +40,12 @@ public class GenerateApplicationTextCommandHandler : IRequestHandler<GenerateApp
         //get Ai settings
         cancellationToken.ThrowIfCancellationRequested();
         var aiSettings = await _aiSettingsRepository.GetByUserIdWithPromptParameterAsync(request.UserId);
-        _applicationTextGenerator.SetApiKey(aiSettings!.ApiKey);
+        var chatModel= await _chatModelRepository.GetByIdAsync(aiSettings!.SelectedChatModelId);
+        var chatModelName = chatModel!.ApiModelName;
 
         //generate application text
-        var generatedApplicationText = await _applicationTextGenerator.GenerateApplicationTextAsync(request.Prompt, cancellationToken);
+        _applicationTextGenerator.SetApiKey(aiSettings!.ApiKey);
+        var generatedApplicationText = await _applicationTextGenerator.GenerateApplicationTextAsync(request.Prompt, chatModelName, cancellationToken);
 
         //update the job application with generated text
         var jobApplication = await _jobApplicationRepository.GetByIdAsync(request.JobApplicationId);

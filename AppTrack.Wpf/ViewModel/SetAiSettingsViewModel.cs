@@ -6,24 +6,48 @@ using AppTrack.WpfUi.WindowService;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
+using System.Windows;
 
 namespace AppTrack.WpfUi.ViewModel;
 
-public partial class SetAiSettingsViewModel(
-    IModelValidator<AiSettingsModel> modelValidator,
-    AiSettingsModel model,
-    IWindowService windowService,
-    IServiceProvider serviceProvider, 
-    IChatModelStore chatModelStore) : AppTrackFormViewModelBase<AiSettingsModel>(modelValidator, model)
+public partial class SetAiSettingsViewModel : AppTrackFormViewModelBase<AiSettingsModel>
 {
-    private readonly IWindowService _windowService = windowService;
-    private readonly IServiceProvider _serviceProvider = serviceProvider;
+    private readonly IWindowService _windowService;
+    private readonly IServiceProvider _serviceProvider;
 
     [ObservableProperty]
-    private IReadOnlyList<ChatModel> chatModels = chatModelStore.ChatModels;
+    private IReadOnlyList<ChatModel> chatModels;
 
     [ObservableProperty]
     private ChatModel selectedChatModel = new ChatModel();
+
+    public SetAiSettingsViewModel(
+            IModelValidator<AiSettingsModel> modelValidator,
+            AiSettingsModel model,
+            IWindowService windowService,
+            IServiceProvider serviceProvider,
+            IChatModelStore chatModelStore) : base(modelValidator, model)
+    {
+        _windowService = windowService;
+        _serviceProvider = serviceProvider;
+        chatModels = chatModelStore.ChatModels;
+
+        if (ChatModels.Count > 0)
+        {
+            //set default 
+            if(Model.SelectedChatModelId == 0)
+            {
+                Model.SelectedChatModelId = 1;
+            }
+            SelectedChatModel = ChatModels.SingleOrDefault(x => x.Id == Model.SelectedChatModelId) ?? new ChatModel();            
+        }
+    }
+
+    protected override async Task Save(Window window)
+    {
+        Model.SelectedChatModelId = SelectedChatModel.Id;
+        await base.Save(window);
+    }
 
     [RelayCommand]
     private void AddPromptParameter()

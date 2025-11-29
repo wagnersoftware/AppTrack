@@ -7,11 +7,16 @@ public class GenerateApplicationTextCommandValidator : AbstractValidator<Generat
 {
     private readonly IJobApplicationRepository _jobApplicationRepository;
     private readonly IAiSettingsRepository _aiSettingsRepository;
+    private readonly IChatModelRepository _chatModelRepository;
 
-    public GenerateApplicationTextCommandValidator(IJobApplicationRepository jobApplicationRepository, IAiSettingsRepository aiSettingsRepository)
+    public GenerateApplicationTextCommandValidator(
+        IJobApplicationRepository jobApplicationRepository, 
+        IAiSettingsRepository aiSettingsRepository,
+        IChatModelRepository chatModelRepository)
     {
         _jobApplicationRepository = jobApplicationRepository;
         _aiSettingsRepository = aiSettingsRepository;
+        _chatModelRepository = chatModelRepository;
 
         RuleFor(x => x.Prompt)
             .NotEmpty().WithMessage("{PropertyName} is required")
@@ -39,9 +44,13 @@ public class GenerateApplicationTextCommandValidator : AbstractValidator<Generat
         return jobApplication != null;
     }
 
-    private async Task ValidateAiSettings(GenerateApplicationTextCommand command, ValidationContext<GenerateApplicationTextCommand> context, CancellationToken token)
+    private async Task ValidateAiSettings(
+        GenerateApplicationTextCommand command,
+        ValidationContext<GenerateApplicationTextCommand> context,
+        CancellationToken token)
     {
-        var aiSettings = await _aiSettingsRepository.GetByUserIdWithPromptParameterAsync(command.UserId);
+        var aiSettings = await _aiSettingsRepository
+            .GetByUserIdWithPromptParameterAsync(command.UserId);
 
         if (aiSettings == null)
         {
@@ -52,6 +61,17 @@ public class GenerateApplicationTextCommandValidator : AbstractValidator<Generat
         if (string.IsNullOrWhiteSpace(aiSettings.ApiKey))
             context.AddFailure("ApiKey in AI settings is missing.");
 
+        var chatModel = await _chatModelRepository.GetByIdAsync(aiSettings.SelectedChatModelId);
+
+        if (chatModel == null)
+        {
+            context.AddFailure("No ChatModel configured on server.");
+            return;
+        }
+
+        if (chatModel!.ApiModelName == null)
+        {
+            context.AddFailure("No model name for chat api set.");
+        }
     }
 }
-

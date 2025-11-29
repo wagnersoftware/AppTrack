@@ -3,6 +3,7 @@ using AppTrack.Frontend.ApiService.Contracts;
 using AppTrack.Frontend.Models;
 using AppTrack.Frontend.Models.ModelValidator;
 using AppTrack.WpfUi.Cache;
+using AppTrack.WpfUi.Configuration;
 using AppTrack.WpfUi.Contracts;
 using AppTrack.WpfUi.CredentialManagement;
 using AppTrack.WpfUi.Helpers;
@@ -12,6 +13,7 @@ using AppTrack.WpfUi.ViewModel;
 using AppTrack.WpfUi.WindowService;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using System.Windows;
 
 namespace AppTrack.Wpf;
@@ -38,6 +40,9 @@ public partial class App : Application
 
         var services = new ServiceCollection();
 
+        //add options
+        services.Configure<ApiSettings>(Configuration.GetSection("ApiSettings"));
+
         //api services
         services.AddApiServiceServices(Configuration);
 
@@ -53,6 +58,7 @@ public partial class App : Application
         services.AddSingleton<IUserHelper, UserHelper>();
         services.AddSingleton<IChatModelStore, ChatModelStore>();
         services.AddSingleton<ITokenStorage, WpfTokenStorage>();
+        services.AddSingleton<IApiHealthChecker, ApiHealthChecker>();
 
         // viewmodels
         services.AddSingleton<MainViewModel>();
@@ -89,8 +95,16 @@ public partial class App : Application
 
     protected override async void OnStartup(StartupEventArgs e)
     {
+        var apiSettings = ServiceProvider.GetRequiredService<IOptions<ApiSettings>>().Value;
+        var healthChecker = ServiceProvider.GetRequiredService<IApiHealthChecker>();
+
+        if (await healthChecker.WaitForBackendAsync(apiSettings.BaseUrl + "/health", apiSettings.HealthCheckRetryCount) == false)
+        {
+            return;
+        }
+
         var chatModelStore = ServiceProvider.GetRequiredService<IChatModelStore>();
-        await chatModelStore.Initialize();
+        await chatModelStore.GetChatModelsAsync();
 
         var mainWindow = ServiceProvider.GetRequiredService<MainWindow>();
         mainWindow.Show();

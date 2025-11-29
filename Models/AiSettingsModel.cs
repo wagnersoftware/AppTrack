@@ -6,7 +6,7 @@ namespace AppTrack.Frontend.Models;
 
 public partial class AiSettingsModel : ModelBase
 {
-    public List<ChatModel> ChatModels { get; set; } = new List<ChatModel>();
+    public int SelectedChatModelId { get; set; }
     public string UserId { get; set; } = string.Empty;
 
     [MaxLength(200, ErrorMessage = "{0} must not exceed 200 characters.")]
