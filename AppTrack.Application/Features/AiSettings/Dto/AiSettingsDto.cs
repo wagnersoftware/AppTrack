@@ -2,6 +2,7 @@
 
 public class AiSettingsDto
 {
+    public int SelectedChatModelId { get; set; }
     public int Id { get; set; }
 
     public string ApiKey { get; set; } = string.Empty;

@@ -1,9 +1,12 @@
 ﻿using AppTrack.Frontend.Models;
 using AppTrack.Frontend.Models.ModelValidator;
+using AppTrack.WpfUi.Cache;
 using AppTrack.WpfUi.ViewModel.Base;
 using AppTrack.WpfUi.WindowService;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
+using System.Windows;
 
 namespace AppTrack.WpfUi.ViewModel;
 
@@ -12,12 +15,39 @@ public partial class SetAiSettingsViewModel : AppTrackFormViewModelBase<AiSettin
     private readonly IWindowService _windowService;
     private readonly IServiceProvider _serviceProvider;
 
-    public SetAiSettingsViewModel(IModelValidator<AiSettingsModel> modelValidator, AiSettingsModel model, IWindowService windowService, IServiceProvider serviceProvider) : base(modelValidator, model)
+    [ObservableProperty]
+    private IReadOnlyList<ChatModel> chatModels;
+
+    [ObservableProperty]
+    private ChatModel selectedChatModel = new ChatModel();
+
+    public SetAiSettingsViewModel(
+            IModelValidator<AiSettingsModel> modelValidator,
+            AiSettingsModel model,
+            IWindowService windowService,
+            IServiceProvider serviceProvider,
+            IChatModelStore chatModelStore) : base(modelValidator, model)
     {
-        this._windowService = windowService;
-        this._serviceProvider = serviceProvider;
+        _windowService = windowService;
+        _serviceProvider = serviceProvider;
+        chatModels = chatModelStore.ChatModels;
+
+        if (ChatModels?.Count > 0)
+        {
+            //set default 
+            if(Model.SelectedChatModelId == 0)
+            {
+                Model.SelectedChatModelId = 1;
+            }
+            SelectedChatModel = ChatModels.SingleOrDefault(x => x.Id == Model.SelectedChatModelId) ?? new ChatModel();            
+        }
     }
 
+    protected override async Task Save(Window window)
+    {
+        Model.SelectedChatModelId = SelectedChatModel.Id;
+        await base.Save(window);
+    }
 
     [RelayCommand]
     private void AddPromptParameter()

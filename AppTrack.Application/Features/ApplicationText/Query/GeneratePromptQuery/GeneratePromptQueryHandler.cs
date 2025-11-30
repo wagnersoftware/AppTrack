@@ -6,7 +6,7 @@ using AppTrack.Application.Features.ApplicationText.Dto;
 using AppTrack.Domain.Contracts;
 using AppTrack.Domain.Extensions;
 
-namespace AppTrack.Application.Features.ApplicationText.Query;
+namespace AppTrack.Application.Features.ApplicationText.Query.GeneratePromptQuery;
 
 public class GeneratePromptQueryHandler : IRequestHandler<GeneratePromptQuery, GeneratedPromptDto>
 {
@@ -19,8 +19,8 @@ public class GeneratePromptQueryHandler : IRequestHandler<GeneratePromptQuery, G
     {
         this._aiSettingsRepository = aiSettingsRepository;
         this._jobApplicationRepository = jobApplicationRepository;
-        _applicationTextGenerator = applicationTextGenerator;
-        _promptBuilder = promptBuilder;
+        this._applicationTextGenerator = applicationTextGenerator;
+        this._promptBuilder = promptBuilder;
     }
 
     public async Task<GeneratedPromptDto> Handle(GeneratePromptQuery request, CancellationToken cancellationToken)

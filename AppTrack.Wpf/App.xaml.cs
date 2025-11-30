@@ -2,6 +2,8 @@
 using AppTrack.Frontend.ApiService.Contracts;
 using AppTrack.Frontend.Models;
 using AppTrack.Frontend.Models.ModelValidator;
+using AppTrack.WpfUi.Cache;
+using AppTrack.WpfUi.Configuration;
 using AppTrack.WpfUi.Contracts;
 using AppTrack.WpfUi.CredentialManagement;
 using AppTrack.WpfUi.Helpers;
@@ -11,6 +13,7 @@ using AppTrack.WpfUi.ViewModel;
 using AppTrack.WpfUi.WindowService;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using System.Windows;
 
 namespace AppTrack.Wpf;
@@ -23,7 +26,7 @@ public partial class App : Application
 
     public App()
     {
-        SetEnvironmentVariable();
+        SetEnvironmentVariables();
 
         string env = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") ?? "Production";
 
@@ -36,13 +39,26 @@ public partial class App : Application
         Configuration = builder.Build();
 
         var services = new ServiceCollection();
-        services.AddSingleton<ITokenStorage, WpfTokenStorage>();
+
+        //add options
+        services.Configure<ApiSettings>(Configuration.GetSection("ApiSettings"));
+
+        //api services
         services.AddApiServiceServices(Configuration);
+
+        //window services
         services.AddSingleton<IWindowService, WindowService>();
         services.AddSingleton<IMessageBoxService, MessageBoxService>();
+
+        //validator
         services.AddTransient(typeof(IModelValidator<>), typeof(ModelValidator<>));
+
+        //helper, cache
         services.AddSingleton<ICredentialManager, CredentialManager>();
         services.AddSingleton<IUserHelper, UserHelper>();
+        services.AddSingleton<IChatModelStore, ChatModelStore>();
+        services.AddSingleton<ITokenStorage, WpfTokenStorage>();
+        services.AddSingleton<IApiHealthChecker, ApiHealthChecker>();
 
         // viewmodels
         services.AddSingleton<MainViewModel>();
@@ -68,7 +84,7 @@ public partial class App : Application
         ServiceProvider = services.BuildServiceProvider();
     }
 
-    private static void SetEnvironmentVariable()
+    private static void SetEnvironmentVariables()
     {
 #if DEBUG
         Environment.SetEnvironmentVariable("DOTNET_ENVIRONMENT", "Development");
@@ -79,6 +95,17 @@ public partial class App : Application
 
     protected override async void OnStartup(StartupEventArgs e)
     {
+        var apiSettings = ServiceProvider.GetRequiredService<IOptions<ApiSettings>>().Value;
+        var healthChecker = ServiceProvider.GetRequiredService<IApiHealthChecker>();
+
+        if (await healthChecker.WaitForBackendAsync(apiSettings.BaseUrl + "/health", apiSettings.HealthCheckRetryCount) == false)
+        {
+            return;
+        }
+
+        var chatModelStore = ServiceProvider.GetRequiredService<IChatModelStore>();
+        await chatModelStore.GetChatModelsAsync();
+
         var mainWindow = ServiceProvider.GetRequiredService<MainWindow>();
         mainWindow.Show();
         base.OnStartup(e);

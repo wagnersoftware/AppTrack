@@ -2,6 +2,6 @@
 
 public interface IApplicationTextGenerator
 {
-    Task<string> GenerateApplicationTextAsync(string prompt, CancellationToken cancellationToken = default);
+    Task<string> GenerateApplicationTextAsync(string prompt, string modelName, CancellationToken cancellationToken = default);
     void SetApiKey(string apiKey);
 }
