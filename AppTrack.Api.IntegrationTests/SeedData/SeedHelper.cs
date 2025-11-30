@@ -62,4 +62,10 @@ internal static class SeedHelper
         var aiSettingsId = await AiSettingsSeedsHelper.CreateAiSettingsForUserAsync(services, userId);
         return (userId, aiSettingsId);
     }
+
+    internal static async Task CreateChatModels(IServiceProvider services)
+    {
+        using var scope = services.CreateScope();
+        await AiSettingsSeedsHelper.CreateChatModelsAsync(services);
+    }
 }

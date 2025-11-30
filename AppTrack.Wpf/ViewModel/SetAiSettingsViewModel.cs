@@ -32,7 +32,7 @@ public partial class SetAiSettingsViewModel : AppTrackFormViewModelBase<AiSettin
         _serviceProvider = serviceProvider;
         chatModels = chatModelStore.ChatModels;
 
-        if (ChatModels.Count > 0)
+        if (ChatModels?.Count > 0)
         {
             //set default 
             if(Model.SelectedChatModelId == 0)

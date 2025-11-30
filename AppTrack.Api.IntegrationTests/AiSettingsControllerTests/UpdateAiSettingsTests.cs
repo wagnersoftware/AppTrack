@@ -3,7 +3,12 @@ using AppTrack.Api.IntegrationTests.Seeddata.User;
 using AppTrack.Api.Models;
 using AppTrack.Application.Features.AiSettings.Commands.UpdateAiSettings;
 using AppTrack.Application.Features.AiSettings.Dto;
+using AppTrack.Application.Features.ApplicationText.Dto;
+using AppTrack.Application.Features.JobApplications.Dto;
+using AppTrack.Application.Models.Identity;
+using AppTrack.Domain;
 using Shouldly;
+using System;
 using System.Net;
 using System.Net.Http.Json;
 
@@ -296,5 +301,24 @@ public class UpdateAiSettingsTests : IClassFixture<FakeAuthWebApplicationFactory
         problem.ShouldNotBeNull();
         problem.Errors.ShouldContainKey("ApiKey");
         problem.Errors["ApiKey"].ShouldContain("ApiKey must not exceed 200 characters.");
+    }
+
+    [Fact]
+    public async Task GetChatModels_ShouldReturn200()
+    {
+        // Arrange
+        await SeedHelper.CreateChatModels(_factory.Services);
+
+        // Act
+        var response = await _client.GetAsync($"/api/ai-settings/chat-models");
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var chatModels = await response.Content.ReadFromJsonAsync<List<ChatModelDto>>();
+        chatModels.ShouldNotBeNull();
+        chatModels.ShouldNotBeEmpty();
+        chatModels.All(x => !String.IsNullOrEmpty(x.ApiModelName)).ShouldBeTrue();
+        chatModels.All(x => !String.IsNullOrEmpty(x.Description)).ShouldBeTrue();
+        chatModels.All(x => !String.IsNullOrEmpty(x.Name)).ShouldBeTrue();
     }
 }
