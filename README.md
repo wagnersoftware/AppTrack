@@ -42,6 +42,7 @@ The project is primarily intended as a playground for exploring new technologies
 ## MEthologies 
 
 - Clean Code and SOLID principles
+
 - CI Pipeline
 
 ## Installation
