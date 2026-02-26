@@ -2,13 +2,12 @@
 
 ![AppTrack](Documentation/Screenshots/AppTrack.png)
 
-AppTrack helps me manage my own job applications and generate application texts using AI (work in progress). It features Bearer-Token authentication, a WPF frontend, with a Blazor web frontend planned for the future. The backend is an ASP.NET Web API (all .NET 8) following Clean Architecture, CQRS, and the Mediator pattern. 
+AppTrack helps me manage my own job applications and generate application texts using AI. It features Bearer-Token authentication, a WPF frontend, with a Blazor web frontend planned for the future. The backend is an ASP.NET Web API (all .NET 8) following Clean Architecture, CQRS, and the Mediator pattern. 
 The project is primarily intended as a playground for exploring new technologies and architectures.
 
-## Features
-- Manage personal job applications
+## Technologies
 
-- Generate application texts using AI
+- ASP.NET Web API backend with Clean Architecture, CQRS, and the Mediator pattern
 
 - Token-based authentication
 
@@ -18,11 +17,7 @@ The project is primarily intended as a playground for exploring new technologies
 
 - XAML Styler for consistent code style
 
-- ASP.NET Web API backend with Clean Architecture, CQRS, and the Mediator pattern
-
 - Dependency Injection
-
-- Clean Code and SOLID principles
 
 - API client generation with NSwag
 
@@ -42,8 +37,12 @@ The project is primarily intended as a playground for exploring new technologies
 
 - MS SQL LocalDB
 
-- CI Pipeline with GitHub Actions
+- GitHub Actions
 
+## MEthologies 
+
+- Clean Code and SOLID principles
+- CI Pipeline
 
 ## Installation
 1. Clone the repository:
