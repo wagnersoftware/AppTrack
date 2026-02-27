@@ -34,7 +34,7 @@ public class GeneratePromptQueryHandler : IRequestHandler<GeneratePromptQuery, G
         }
 
         //get Ai settings
-        var aiSettings = await _aiSettingsRepository.GetByUserIdWithPromptParameterAsync(request.UserId);
+        var aiSettings = await _aiSettingsRepository.GetByUserIdIncludePromptParameterAsync(request.UserId);
         _applicationTextGenerator.SetApiKey(aiSettings!.ApiKey);
 
         //get job application

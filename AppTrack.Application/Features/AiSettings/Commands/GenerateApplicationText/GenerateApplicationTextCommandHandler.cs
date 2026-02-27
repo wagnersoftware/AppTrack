@@ -39,7 +39,7 @@ public class GenerateApplicationTextCommandHandler : IRequestHandler<GenerateApp
 
         //get Ai settings
         cancellationToken.ThrowIfCancellationRequested();
-        var aiSettings = await _aiSettingsRepository.GetByUserIdWithPromptParameterAsync(request.UserId);
+        var aiSettings = await _aiSettingsRepository.GetByUserIdIncludePromptParameterAsync(request.UserId);
         var chatModel= await _chatModelRepository.GetByIdAsync(aiSettings!.SelectedChatModelId);
         var chatModelName = chatModel!.ApiModelName;
 
