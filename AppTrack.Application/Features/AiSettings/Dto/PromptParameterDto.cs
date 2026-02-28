@@ -1,6 +1,8 @@
-﻿namespace AppTrack.Application.Features.AiSettings.Dto
+﻿using AppTrack.Shared.Validation.Interfaces;
+
+namespace AppTrack.Application.Features.AiSettings.Dto
 {
-    public class PromptParameterDto
+    public class PromptParameterDto : IPromptParameterValidatable
     {
         public string Key { get; set; } = string.Empty;
 

@@ -13,7 +13,7 @@ namespace AppTrack.WpfUi.ViewModel
             base.WindowTitle = "Generated Prompt";
         }
 
-        [RelayCommand(CanExecute = nameof(base.IsTextSet))]
+        [RelayCommand(CanExecute = nameof(IsTextSet))]
         public void GenerateApplicationText(Window window)
         {
             window.DialogResult = true;

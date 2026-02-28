@@ -1,9 +1,10 @@
 ﻿using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Shared;
+using AppTrack.Shared.Validation.Interfaces;
 
 namespace AppTrack.Application.Features.JobApplicationDefaults.Commands.UpdateApplicationDefaults;
 
-public class UpdateJobApplicationDefaultsCommand : IRequest<Unit>
+public class UpdateJobApplicationDefaultsCommand : IRequest<Unit>, IJobApplicationDefaultsValidatable
 {
     public int Id { get; set; }
 

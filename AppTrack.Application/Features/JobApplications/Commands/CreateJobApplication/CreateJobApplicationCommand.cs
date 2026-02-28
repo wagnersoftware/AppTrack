@@ -1,10 +1,11 @@
 ﻿using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Features.JobApplications.Dto;
 using AppTrack.Domain.Enums;
+using AppTrack.Shared.Validation.Interfaces;
 
 namespace AppTrack.Application.Features.JobApplications.Commands.CreateJobApplication;
 
-public class CreateJobApplicationCommand : IRequest<JobApplicationDto>
+public class CreateJobApplicationCommand : IRequest<JobApplicationDto>, IJobApplicationValidatable
 {
     public DateTime CreationDate { get; set; }
     public DateTime ModifiedDate { get; set; }

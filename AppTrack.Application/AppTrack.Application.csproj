@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AppTrack.Domain\AppTrack.Domain.csproj" />
+    <ProjectReference Include="..\AppTrack.Shared.Validation\AppTrack.Shared.Validation.csproj" />
   </ItemGroup>
 
 </Project>
