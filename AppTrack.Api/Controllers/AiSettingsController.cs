@@ -52,6 +52,7 @@ public class AiSettingsController : ControllerBase
 
     // GET /api/ai-settings/chat-models
     [HttpGet("chat-models")]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(List<ChatModelDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<List<ChatModelDto>>> GetChatModels()

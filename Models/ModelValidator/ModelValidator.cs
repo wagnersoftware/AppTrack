@@ -1,9 +1,9 @@
-﻿using AppTrack.Frontend.Models.Base;
-using System.ComponentModel.DataAnnotations;
+using AppTrack.Frontend.Models.Base;
+using FluentValidation;
 
 namespace AppTrack.Frontend.Models.ModelValidator;
 
-public class ModelValidator<T> : IModelValidator<T> where T : ModelBase
+public class ModelValidator<T>(IValidator<T> validator) : IModelValidator<T> where T : ModelBase
 {
     private readonly Dictionary<string, List<string>> _errors = new();
 
@@ -13,30 +13,23 @@ public class ModelValidator<T> : IModelValidator<T> where T : ModelBase
     {
         _errors.Clear();
 
-        var context = new ValidationContext(instance);
-        var results = new List<ValidationResult>();
-        Validator.TryValidateObject(instance, context, results, true);
+        var result = validator.Validate(instance);
 
-        foreach (var result in results)
+        foreach (var failure in result.Errors)
         {
-            foreach (var memberName in result.MemberNames)
-            {
-                if (!_errors.ContainsKey(memberName))
-                    _errors[memberName] = new List<string>();
+            if (!_errors.ContainsKey(failure.PropertyName))
+                _errors[failure.PropertyName] = new List<string>();
 
-                _errors[memberName].Add(result.ErrorMessage ?? "");
-            }
+            _errors[failure.PropertyName].Add(failure.ErrorMessage);
         }
 
-        return !_errors.Any();
+        return result.IsValid;
     }
 
     public void ResetErrors(string propertyName)
     {
         if (string.IsNullOrEmpty(propertyName))
-        {
             return;
-        }
 
         _errors.Remove(propertyName);
     }

@@ -1,65 +1,39 @@
-﻿using AppTrack.Application.Contracts.Persistance;
-using AppTrack.Application.Features.AiSettings.Dto;
+using AppTrack.Application.Contracts.Persistance;
+using AppTrack.Shared.Validation.Validators;
 using FluentValidation;
 
 namespace AppTrack.Application.Features.AiSettings.Commands.UpdateAiSettings;
 
-public class UpdateAiSettingsCommandValidator : AbstractValidator<UpdateAiSettingsCommand>
+public class UpdateAiSettingsCommandValidator : AiSettingsBaseValidator<UpdateAiSettingsCommand>
 {
     private readonly IAiSettingsRepository _aiSettingsRepository;
 
     public UpdateAiSettingsCommandValidator(IAiSettingsRepository aiSettingsRepository)
     {
-        this._aiSettingsRepository = aiSettingsRepository;
+        _aiSettingsRepository = aiSettingsRepository;
 
         RuleFor(x => x.Id)
-        .GreaterThan(0).WithMessage("{PropertyName} must be greater than 0.")
-        .NotEmpty().WithMessage("{PropertyName} is required");
+            .GreaterThan(0).WithMessage("{PropertyName} must be greater than 0.")
+            .NotEmpty().WithMessage("{PropertyName} is required");
 
         RuleFor(x => x.UserId)
-        .NotEmpty().WithMessage("UserId is required")
-        .Matches("^[a-zA-Z0-9\\-]+$").WithMessage("UserId contains invalid characters.");
-
-        RuleFor(x => x.ApiKey)
-        .MaximumLength(200).WithMessage("ApiKey must not exceed 200 characters.");
+            .NotEmpty().WithMessage("UserId is required")
+            .Matches("^[a-zA-Z0-9\\-]+$").WithMessage("UserId contains invalid characters.");
 
         RuleFor(x => x)
-        .CustomAsync(async (command, context, cancellationToken) =>
-        {
-            var aiSettings = await _aiSettingsRepository.GetByIdAsync(command.Id);
-            if (aiSettings is null)
+            .CustomAsync(async (command, context, cancellationToken) =>
             {
-                context.AddFailure("Id", "Ai settings not found.");
-                return;
-            }
+                var aiSettings = await _aiSettingsRepository.GetByIdAsync(command.Id);
+                if (aiSettings is null)
+                {
+                    context.AddFailure("Id", "Ai settings not found.");
+                    return;
+                }
 
-            if (aiSettings.UserId != command.UserId)
-            {
-                context.AddFailure("UserId", "Ai settings not assigned to this user.");
-            }
-        });
-
-        RuleForEach(x => x.PromptParameter)
-        .SetValidator(new PromptParameterDtoValidator());
-
-        RuleFor(x => x.PromptParameter)
-        .Must(HaveUniqueKeys)
-        .WithMessage("Each prompt parameter key must be unique.");
-
+                if (aiSettings.UserId != command.UserId)
+                {
+                    context.AddFailure("UserId", "Ai settings not assigned to this user.");
+                }
+            });
     }
-
-    private static bool HaveUniqueKeys(List<PromptParameterDto> parameters)
-    {
-        if (parameters == null || parameters.Count == 0)
-            return true;
-
-        var duplicateKeys = parameters
-            .GroupBy(p => p.Key)
-            .Where(g => g.Count() > 1)
-            .Select(g => g.Key)
-            .ToList();
-
-        return duplicateKeys.Count == 0;
-    }
-
 }

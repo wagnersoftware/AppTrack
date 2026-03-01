@@ -2,7 +2,9 @@
 using AppTrack.Frontend.ApiService.Contracts;
 using AppTrack.Frontend.Models;
 using AppTrack.Frontend.Models.ModelValidator;
+using AppTrack.Frontend.Models.Validators;
 using AppTrack.WpfUi.Cache;
+using FluentValidation;
 using AppTrack.WpfUi.Configuration;
 using AppTrack.WpfUi.Contracts;
 using AppTrack.WpfUi.CredentialManagement;
@@ -50,7 +52,13 @@ public partial class App : Application
         services.AddSingleton<IWindowService, WindowService>();
         services.AddSingleton<IMessageBoxService, MessageBoxService>();
 
-        //validator
+        //validators
+        services.AddTransient<IValidator<JobApplicationModel>, JobApplicationModelValidator>();
+        services.AddTransient<IValidator<JobApplicationDefaultsModel>, JobApplicationDefaultsModelValidator>();
+        services.AddTransient<IValidator<AiSettingsModel>, AiSettingsModelValidator>();
+        services.AddTransient<IValidator<PromptParameterModel>, PromptParameterModelValidator>();
+        services.AddTransient<IValidator<LoginModel>, LoginModelValidator>();
+        services.AddTransient<IValidator<RegistrationModel>, RegistrationModelValidator>();
         services.AddTransient(typeof(IModelValidator<>), typeof(ModelValidator<>));
 
         //helper, cache

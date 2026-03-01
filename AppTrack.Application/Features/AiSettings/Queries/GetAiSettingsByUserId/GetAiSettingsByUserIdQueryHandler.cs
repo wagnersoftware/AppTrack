@@ -44,7 +44,7 @@ public class GetAiSettingsByUserIdQueryHandler : IRequestHandler<GetAiSettingsBy
             throw new NotFoundException(nameof(user), request.UserId);
         }
 
-        var entity = await _aiSettingsRepository.GetByUserIdWithPromptParameterAsync(user.Id);
+        var entity = await _aiSettingsRepository.GetByUserIdIncludePromptParameterAsync(user.Id);
 
         if (entity == null)
         {

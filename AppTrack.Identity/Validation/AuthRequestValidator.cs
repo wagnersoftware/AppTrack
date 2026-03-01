@@ -1,27 +1,9 @@
-﻿using AppTrack.Application.Models.Identity;
-using FluentValidation;
+using AppTrack.Application.Models.Identity;
+using AppTrack.Shared.Validation.Validators;
 
 namespace AppTrack.Identity.Validation;
 
-public class AuthRequestValidator : AbstractValidator<AuthRequest>
+public class AuthRequestValidator : UserCredentialsBaseValidator<AuthRequest>
 {
-    public AuthRequestValidator()
-    {
-        RuleFor(x => x.UserName)
-            .Cascade(CascadeMode.Stop)
-            .NotEmpty().WithMessage("Username is required")
-            .MinimumLength(3).WithMessage("Username must be at least 3 characters long")
-            .MaximumLength(20).WithMessage("Username must not exceed 20 characters")
-            .Matches("^[a-zA-Z0-9-_]+$").WithMessage("Username can only contain letters, numbers, hyphens and underscores");
-
-        RuleFor(x => x.Password)
-            .Cascade(CascadeMode.Stop)
-            .NotEmpty().WithMessage("Password is required")
-            .MinimumLength(6).WithMessage("Password must be at least 6 characters long")
-            .MaximumLength(100).WithMessage("Passwordmust not exceed 100 characters")
-            .Matches(@"[A-Z]+").WithMessage("Password must contain at least one uppercase letter")
-            .Matches(@"[a-z]+").WithMessage("Password must contain at least one lowercase letter")
-            .Matches(@"\d+").WithMessage("Password must contain at least one number")
-            .Matches(@"[\!\?\*\.\@\$\#]+").WithMessage("Password must contain at least one special character");
-    }
+    public AuthRequestValidator() { }
 }

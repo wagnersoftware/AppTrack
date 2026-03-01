@@ -1,10 +1,11 @@
 ﻿using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Features.JobApplications.Dto;
 using AppTrack.Domain.Enums;
+using AppTrack.Shared.Validation.Interfaces;
 
 namespace AppTrack.Application.Features.JobApplications.Commands.UpdateJobApplication;
 
-public class UpdateJobApplicationCommand : IRequest<JobApplicationDto>
+public class UpdateJobApplicationCommand : IRequest<JobApplicationDto>, IJobApplicationValidatable
 {
     public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
