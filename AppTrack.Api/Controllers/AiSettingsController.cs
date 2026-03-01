@@ -2,11 +2,13 @@
 using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Features.AiSettings.Commands.GenerateApplicationText;
 using AppTrack.Application.Features.AiSettings.Commands.UpdateAiSettings;
+using AppTrack.Application.Features.AiSettings.Dto;
 using AppTrack.Application.Features.AiSettings.Queries.GetChatModelsQuery;
 using AppTrack.Application.Features.ApplicationText.Dto;
 using AppTrack.Application.Features.JobApplications.Dto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace AppTrack.Api.Controllers;
 
@@ -24,19 +26,20 @@ public class AiSettingsController : ControllerBase
 
     // PUT api/ai-settings/5
     [HttpPut("{id}")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(AiSettingsDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult> UpdateAiSettings([FromRoute] int id, [FromBody] UpdateAiSettingsCommand updateAiSettingsCommand)
+    public async Task<ActionResult<AiSettingsDto>> UpdateAiSettings([FromRoute] int id, [FromBody] UpdateAiSettingsCommand updateAiSettingsCommand)
     {
         if (id != updateAiSettingsCommand.Id)
         {
             return BadRequest("Route ID and body ID do not match.");
         }
 
-        await _mediator.Send(updateAiSettingsCommand);
-        return NoContent();
+        updateAiSettingsCommand.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        var result = await _mediator.Send(updateAiSettingsCommand);
+        return Ok(result);
     }
 
     // POST /api/ai-settings/generate-application-text
@@ -54,7 +57,6 @@ public class AiSettingsController : ControllerBase
     [HttpGet("chat-models")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(List<ChatModelDto>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<List<ChatModelDto>>> GetChatModels()
     {
         var result = await _mediator.Send(new GetChatModelsQuery());

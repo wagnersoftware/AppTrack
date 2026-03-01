@@ -1,11 +1,10 @@
 ﻿using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Features.AiSettings.Dto;
-using AppTrack.Application.Shared;
 using AppTrack.Shared.Validation.Interfaces;
 
 namespace AppTrack.Application.Features.AiSettings.Commands.UpdateAiSettings;
 
-public class UpdateAiSettingsCommand : IRequest<Unit>, IAiSettingsValidatable
+public class UpdateAiSettingsCommand : IRequest<AiSettingsDto>, IAiSettingsValidatable
 {
     public int SelectedChatModelId { get; set; }
     public int Id { get; set; }

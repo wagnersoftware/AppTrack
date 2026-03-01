@@ -19,9 +19,9 @@ public class JobApplicationDefaultsService : BaseHttpService, IJobApplicationDef
         });
 
     public Task<Response<JobApplicationDefaultsModel>> UpdateAsync(int id, JobApplicationDefaultsModel jobApplicationDefaultsModel) =>
-        TryExecuteAsync<JobApplicationDefaultsModel>(async () =>
+        TryExecuteAsync(async () =>
         {
-            var command = jobApplicationDefaultsModel.ToUpdateCommand();
-            await _client.JobApplicationDefaultsPUTAsync(id, command);
+            var dto = await _client.JobApplicationDefaultsPUTAsync(id, jobApplicationDefaultsModel.ToUpdateCommand());
+            return dto.ToModel();
         });
 }

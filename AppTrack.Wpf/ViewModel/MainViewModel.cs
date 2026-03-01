@@ -207,14 +207,7 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
-        var userId = await _userHelper.TryGetUserIdAsync();
-
-        if (userId == null)
-        {
-            return;
-        }
-
-        var apiResponse = await _jobApplicationService.DeleteJobApplicationAsync(id, userId);
+        var apiResponse = await _jobApplicationService.DeleteJobApplicationAsync(id);
 
         if (apiResponse.Success == false)
         {
