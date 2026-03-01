@@ -1,26 +1,23 @@
-﻿using AppTrack.Frontend.ApiService.Base;
+using AppTrack.Frontend.ApiService.Base;
 using AppTrack.Frontend.ApiService.Contracts;
+using AppTrack.Frontend.ApiService.Mappings;
 using AppTrack.Frontend.Models;
-using AutoMapper;
 
 namespace AppTrack.Frontend.ApiService.Services;
 
 public class JobApplicationService : BaseHttpService, IJobApplicationService
 {
-    private readonly IMapper _mapper;
-
-    public JobApplicationService(IClient client, IMapper mapper, ITokenStorage tokenStorage) : base(client, tokenStorage)
+    public JobApplicationService(IClient client, ITokenStorage tokenStorage) : base(client, tokenStorage)
     {
-        this._mapper = mapper;
     }
 
     public Task<Response<JobApplicationModel>> CreateJobApplicationForUserAsync(JobApplicationModel jobApplicationModel, string userId) =>
         TryExecuteAsync(async () =>
         {
-            var createJobApplicationCommand = _mapper.Map<CreateJobApplicationCommand>(jobApplicationModel);
+            var createJobApplicationCommand = jobApplicationModel.ToCreateCommand();
             createJobApplicationCommand.UserId = userId;
             var jobApplicationDto = await _client.JobApplicationsPOSTAsync(createJobApplicationCommand);
-            return _mapper.Map<JobApplicationModel>(jobApplicationDto);
+            return jobApplicationDto.ToModel();
         });
 
     public Task<Response<JobApplicationModel>> DeleteJobApplicationAsync(int id, string userId) =>
@@ -32,24 +29,23 @@ public class JobApplicationService : BaseHttpService, IJobApplicationService
     public Task<Response<JobApplicationModel>> GetJobApplicationByIdAsync(int id, string userId) =>
         TryExecuteAsync(async () =>
         {
-            var jobApplicationDtos = await _client.JobApplicationsGETAsync(id, userId);
-            return _mapper.Map<JobApplicationModel>(jobApplicationDtos);
+            var jobApplicationDto = await _client.JobApplicationsGETAsync(id, userId);
+            return jobApplicationDto.ToModel();
         });
 
     public Task<Response<List<JobApplicationModel>>> GetJobApplicationsForUserAsync(string userId) =>
         TryExecuteAsync(async () =>
         {
             var jobApplicationDtos = await _client.JobApplicationsAllAsync(userId);
-            return _mapper.Map<List<JobApplicationModel>>(jobApplicationDtos);
+            return jobApplicationDtos.Select(dto => dto.ToModel()).ToList();
         });
-
 
     public Task<Response<JobApplicationModel>> UpdateJobApplicationAsync(int id, string userId, JobApplicationModel jobApplicationModel) =>
         TryExecuteAsync(async () =>
         {
-            var jobApplicationCommand = _mapper.Map<UpdateJobApplicationCommand>(jobApplicationModel);
+            var jobApplicationCommand = jobApplicationModel.ToUpdateCommand();
             jobApplicationCommand.UserId = userId;
             var jobApplicationDto = await _client.JobApplicationsPUTAsync(id, jobApplicationCommand);
-            return _mapper.Map<JobApplicationModel>(jobApplicationDto);
+            return jobApplicationDto.ToModel();
         });
 }

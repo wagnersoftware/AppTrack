@@ -1,19 +1,17 @@
-﻿using AppTrack.Application.Contracts.Mediator;
+using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Exceptions;
 using AppTrack.Application.Features.JobApplicationDefaults.Dto;
-using AutoMapper;
+using AppTrack.Application.Mappings;
 
 namespace AppTrack.Application.Features.JobApplicationDefaults.Queries.GetJobApplicationDefaultsByUserId
 {
     public class GetJobApplicationDefaultsByUserIdQueryHandler : IRequestHandler<GetJobApplicationDefaultsByUserIdQuery, JobApplicationDefaultsDto>
     {
-        private readonly IMapper _mapper;
         private readonly IJobApplicationDefaultsRepository _jobApplicationDefaultsRepository;
 
-        public GetJobApplicationDefaultsByUserIdQueryHandler(IMapper mapper, IJobApplicationDefaultsRepository jobApplicationRepository)
+        public GetJobApplicationDefaultsByUserIdQueryHandler(IJobApplicationDefaultsRepository jobApplicationRepository)
         {
-            this._mapper = mapper;
             this._jobApplicationDefaultsRepository = jobApplicationRepository;
         }
 
@@ -41,9 +39,7 @@ namespace AppTrack.Application.Features.JobApplicationDefaults.Queries.GetJobApp
                 jobApplicationDefaults = await _jobApplicationDefaultsRepository.CreateForUserAsync(request.UserId);
             }
 
-            var jobApplicationDto = _mapper.Map<JobApplicationDefaultsDto>(jobApplicationDefaults);
-
-            return jobApplicationDto;
+            return jobApplicationDefaults!.ToDto();
         }
     }
 }

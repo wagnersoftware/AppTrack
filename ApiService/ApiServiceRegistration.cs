@@ -5,7 +5,6 @@ using AppTrack.Frontend.ApiService.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
 
 namespace AppTrack.Frontend.ApiService;
 
@@ -16,7 +15,6 @@ public static class ApiServiceRegistration
         var baseUrl = configuration["ApiSettings:BaseUrl"];
         if (string.IsNullOrWhiteSpace(baseUrl))
             throw new ArgumentNullException(nameof(configuration), message: "The base URL is not configured!");
-
 
         services.AddHttpClient<IClient, Client>(client => client.BaseAddress = new Uri(baseUrl));
 
@@ -29,11 +27,6 @@ public static class ApiServiceRegistration
         services.AddSingleton<ApiAuthenticationStateProvider>();
         services.AddSingleton<AuthenticationStateProvider>(sp => sp.GetRequiredService<ApiAuthenticationStateProvider>());
         services.AddScoped<IAuthenticationService, AuthenticationService>();
-
-        services.AddAutoMapper(cfg =>
-        {
-            cfg.AddMaps(Assembly.GetExecutingAssembly());
-        });
 
         return services;
     }

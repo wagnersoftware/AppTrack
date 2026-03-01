@@ -1,19 +1,17 @@
-﻿using AppTrack.Application.Contracts.Mediator;
+using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Exceptions;
 using AppTrack.Application.Features.JobApplications.Dto;
-using AutoMapper;
+using AppTrack.Application.Mappings;
 
 namespace AppTrack.Application.Features.JobApplications.Commands.CreateJobApplication;
 
 public class CreateJobApplicationCommandHandler : IRequestHandler<CreateJobApplicationCommand, JobApplicationDto>
 {
-    private readonly IMapper _mapper;
     private readonly IJobApplicationRepository _jobApplicationRepository;
 
-    public CreateJobApplicationCommandHandler(IMapper mapper, IJobApplicationRepository jobApplicationRepository)
+    public CreateJobApplicationCommandHandler(IJobApplicationRepository jobApplicationRepository)
     {
-        _mapper = mapper;
         _jobApplicationRepository = jobApplicationRepository;
     }
 
@@ -27,13 +25,10 @@ public class CreateJobApplicationCommandHandler : IRequestHandler<CreateJobAppli
             throw new BadRequestException($"Invalid Request", validationResult);
         }
 
-        var jobApplicationToCreate = _mapper.Map<Domain.JobApplication>(request);
+        var jobApplicationToCreate = request.ToDomain();
 
         await _jobApplicationRepository.CreateAsync(jobApplicationToCreate);
 
-        var jobApplicationDto = _mapper.Map<JobApplicationDto>(jobApplicationToCreate);
-
-        return jobApplicationDto;
+        return jobApplicationToCreate.ToDto();
     }
 }
-

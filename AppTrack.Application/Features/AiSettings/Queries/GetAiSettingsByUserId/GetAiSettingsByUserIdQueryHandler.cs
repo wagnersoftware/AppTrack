@@ -1,21 +1,19 @@
-﻿using AppTrack.Application.Contracts.Identity;
+using AppTrack.Application.Contracts.Identity;
 using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Exceptions;
 using AppTrack.Application.Features.AiSettings.Dto;
-using AutoMapper;
+using AppTrack.Application.Mappings;
 
 namespace AppTrack.Application.Features.AiSettings.Queries.GetAiSettingsByUserId;
 
 public class GetAiSettingsByUserIdQueryHandler : IRequestHandler<GetAiSettingsByUserIdQuery, AiSettingsDto>
 {
-    private readonly IMapper _mapper;
     private readonly IAiSettingsRepository _aiSettingsRepository;
     private readonly IUserService _userService;
 
-    public GetAiSettingsByUserIdQueryHandler(IMapper mapper, IAiSettingsRepository aiSettingsRepository, IUserService userService)
+    public GetAiSettingsByUserIdQueryHandler(IAiSettingsRepository aiSettingsRepository, IUserService userService)
     {
-        this._mapper = mapper;
         this._aiSettingsRepository = aiSettingsRepository;
         this._userService = userService;
     }
@@ -39,7 +37,7 @@ public class GetAiSettingsByUserIdQueryHandler : IRequestHandler<GetAiSettingsBy
 
         var user = await _userService.GetUser(request.UserId);
 
-        if(user is null)
+        if (user is null)
         {
             throw new NotFoundException(nameof(user), request.UserId);
         }
@@ -48,12 +46,10 @@ public class GetAiSettingsByUserIdQueryHandler : IRequestHandler<GetAiSettingsBy
 
         if (entity == null)
         {
-            entity = _mapper.Map<Domain.AiSettings>(request);
+            entity = request.ToDomain();
             await _aiSettingsRepository.CreateAsync(entity);
         }
 
-        var aiSettingsDto = _mapper.Map<AiSettingsDto>(entity);
-
-        return aiSettingsDto;
+        return entity.ToDto();
     }
 }

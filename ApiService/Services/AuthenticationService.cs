@@ -1,29 +1,27 @@
-﻿using AppTrack.Frontend.ApiService.ApiAuthenticationProvider;
+using AppTrack.Frontend.ApiService.ApiAuthenticationProvider;
 using AppTrack.Frontend.ApiService.Base;
 using AppTrack.Frontend.ApiService.Contracts;
+using AppTrack.Frontend.ApiService.Mappings;
 using AppTrack.Frontend.Models;
-using AutoMapper;
 using Microsoft.AspNetCore.Components.Authorization;
 
 namespace AppTrack.Frontend.ApiService.Services;
 
 public class AuthenticationService : BaseHttpService, IAuthenticationService
 {
-    private readonly IMapper _mapper;
     private readonly AuthenticationStateProvider _authenticationStateProvider;
+
     public AuthenticationService(IClient client,
                                  ITokenStorage localStorage,
-                                 IMapper mapper,
                                  AuthenticationStateProvider authenticationStateProvider) : base(client, localStorage)
     {
-        this._mapper = mapper;
         this._authenticationStateProvider = authenticationStateProvider;
     }
 
     public Task<Response<bool>> AuthenticateAsync(LoginModel loginModel) =>
            TryExecuteAsync(async () =>
            {
-               var authenticationRequest = _mapper.Map<AuthRequest>(loginModel);
+               var authenticationRequest = loginModel.ToAuthRequest();
                var authenticationResponse = await _client.LoginAsync(authenticationRequest);
                if (authenticationResponse.Token != string.Empty)
                {
@@ -42,7 +40,7 @@ public class AuthenticationService : BaseHttpService, IAuthenticationService
     public Task<Response<bool>> RegisterAsync(RegistrationModel registerModel) =>
        TryExecuteAsync(async () =>
        {
-           var registrationRequest = _mapper.Map<RegistrationRequest>(registerModel);
+           var registrationRequest = registerModel.ToRegistrationRequest();
            var response = await _client.RegisterAsync(registrationRequest);
 
            if (!string.IsNullOrEmpty(response.UserId))
