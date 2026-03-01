@@ -21,8 +21,6 @@ The project is primarily intended as a playground for exploring new technologies
 
 - API client generation with NSwag
 
-- AutoMapper
-
 - FluentValidation
 
 - ModernWpfUI controls

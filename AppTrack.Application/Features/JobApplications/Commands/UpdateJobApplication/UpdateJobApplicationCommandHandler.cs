@@ -1,19 +1,17 @@
-﻿using AppTrack.Application.Contracts.Mediator;
+using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Exceptions;
 using AppTrack.Application.Features.JobApplications.Dto;
-using AutoMapper;
+using AppTrack.Application.Mappings;
 
 namespace AppTrack.Application.Features.JobApplications.Commands.UpdateJobApplication;
 
 public class UpdateJobApplicationCommandHandler : IRequestHandler<UpdateJobApplicationCommand, JobApplicationDto>
 {
-    private readonly IMapper _mapper;
     private readonly IJobApplicationRepository _jobApplicationRepository;
 
-    public UpdateJobApplicationCommandHandler(IMapper mapper, IJobApplicationRepository jobApplicationRepository)
+    public UpdateJobApplicationCommandHandler(IJobApplicationRepository jobApplicationRepository)
     {
-        _mapper = mapper;
         _jobApplicationRepository = jobApplicationRepository;
     }
 
@@ -34,12 +32,10 @@ public class UpdateJobApplicationCommandHandler : IRequestHandler<UpdateJobAppli
             throw new NotFoundException("Job Application", request.Id);
         }
 
-        _mapper.Map(request, jobApplicationToUpdate);
+        request.ApplyTo(jobApplicationToUpdate);
 
         await _jobApplicationRepository.UpdateAsync(jobApplicationToUpdate);
 
-        var jobApplicationDto = _mapper.Map<JobApplicationDto>(jobApplicationToUpdate);
-
-        return jobApplicationDto;
+        return jobApplicationToUpdate.ToDto();
     }
 }

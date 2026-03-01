@@ -10,11 +10,6 @@ namespace AppTrack.Application
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
-            services.AddAutoMapper(cfg =>
-            {
-                cfg.AddMaps(Assembly.GetExecutingAssembly());
-            });
-
             //register mediator handlers
             services.Scan(scan => scan
                 .FromAssemblies(Assembly.GetExecutingAssembly())

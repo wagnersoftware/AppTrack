@@ -1,20 +1,18 @@
-﻿using AppTrack.Application.Contracts.Mediator;
+using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Exceptions;
 using AppTrack.Application.Features.JobApplications.Dto;
-using AutoMapper;
+using AppTrack.Application.Mappings;
 
 namespace AppTrack.Application.Features.JobApplications.Queries.GetJobApplicationById;
 
 public class GetJobApplicationByIdQueryHandler : IRequestHandler<GetJobApplicationByIdQuery, JobApplicationDto>
 {
-    private readonly IMapper _mapper;
     private readonly IJobApplicationRepository _jobApplicationRepository;
 
-    public GetJobApplicationByIdQueryHandler(IMapper mapper, IJobApplicationRepository jobApplicationRepository)
+    public GetJobApplicationByIdQueryHandler(IJobApplicationRepository jobApplicationRepository)
     {
-        this._mapper = mapper;
-        this._jobApplicationRepository = jobApplicationRepository;
+        _jobApplicationRepository = jobApplicationRepository;
     }
 
     public async Task<JobApplicationDto> Handle(GetJobApplicationByIdQuery request, CancellationToken cancellationToken)
@@ -34,8 +32,6 @@ public class GetJobApplicationByIdQueryHandler : IRequestHandler<GetJobApplicati
             throw new NotFoundException(nameof(jobApplication), request.Id);
         }
 
-        var jobApplicationDto = _mapper.Map<JobApplicationDto>(jobApplication);
-
-        return jobApplicationDto;
+        return jobApplication.ToDto();
     }
 }
