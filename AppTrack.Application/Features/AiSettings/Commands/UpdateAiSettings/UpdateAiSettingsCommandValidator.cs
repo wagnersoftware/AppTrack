@@ -20,12 +20,6 @@ public class UpdateAiSettingsCommandValidator : AiSettingsBaseValidator<UpdateAi
             .NotEmpty().WithMessage("UserId is required")
             .Matches("^[a-zA-Z0-9\\-]+$").WithMessage("UserId contains invalid characters.");
 
-        RuleForEach(x => x.PromptParameter)
-            .Must((command, dto) => !command.PromptParameter
-                .Where(other => !ReferenceEquals(other, dto))
-                .Any(other => string.Equals(other.Key, dto.Key, StringComparison.OrdinalIgnoreCase)))
-            .WithMessage("A prompt parameter with this key already exists.");
-
         RuleFor(x => x)
             .CustomAsync(async (command, context, cancellationToken) =>
             {

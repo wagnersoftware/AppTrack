@@ -22,7 +22,7 @@ public abstract class JobApplicationBaseValidator<T> : AbstractValidator<T>
             .NotNull().WithMessage("{PropertyName} is required")
             .NotEmpty().WithMessage("{PropertyName} is required")
             .MaximumLength(1000).WithMessage("{PropertyName} must not exceed 1000 characters.")
-            .Must(BeAValidUrl).WithMessage("{PropertyName} must be a valid http or https URL.");
+            .Must(BeAValidUrl).WithMessage("{PropertyName} must be a valid URL.");
 
         RuleFor(x => x.JobDescription)
             .NotNull().WithMessage("{PropertyName} is required")

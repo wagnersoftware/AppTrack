@@ -14,5 +14,5 @@ public class UpdateAiSettingsCommand : IRequest<Unit>, IAiSettingsValidatable
     public string UserId { get; set; } = string.Empty;
     public List<PromptParameterDto> PromptParameter { get; set; } = new List<PromptParameterDto>();
 
-    IEnumerable<IPromptParameterValidatable> IAiSettingsValidatable.PromptParameters => PromptParameter;
+    IEnumerable<IPromptParameterValidatable> IAiSettingsValidatable.PromptParameter => PromptParameter;
 }

@@ -11,10 +11,10 @@ public abstract class AiSettingsBaseValidator<T> : AbstractValidator<T>
         RuleFor(x => x.ApiKey)
             .MaximumLength(200).WithMessage("ApiKey must not exceed 200 characters.");
 
-        RuleForEach(x => x.PromptParameters)
+        RuleForEach(x => x.PromptParameter)
             .SetValidator(new PromptParameterItemValidator());
 
-        RuleFor(x => x.PromptParameters)
+        RuleFor(x => x.PromptParameter)
             .Must(HaveUniqueKeys)
             .WithMessage("Each prompt parameter key must be unique.");
     }
