@@ -1,5 +1,6 @@
 ﻿using AppTrack.Api.IntegrationTests.Auth;
 using AppTrack.Api.IntegrationTests.SeedData;
+using AppTrack.Api.IntegrationTests.Seeddata.User;
 using AppTrack.Identity.DBContext;
 using AppTrack.Persistance.DatabaseContext;
 using Microsoft.AspNetCore.Authentication;
@@ -74,6 +75,9 @@ public class FakeAuthWebApplicationFactory : WebApplicationFactory<Program>, IAs
 
         await mainDb.Database.MigrateAsync();
         await identityDb.Database.MigrateAsync();
+
+        // Seed the fixed test user so handlers that look up users in Identity DB work
+        await ApplicationUserSeedHelper.CreateTestUserAsync(Services, userId: TestAuthHandler.TestUserId);
     }
 
     async Task IAsyncLifetime.DisposeAsync()

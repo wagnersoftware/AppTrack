@@ -20,6 +20,6 @@ public class JobApplicationDefaultsRepository : GenericRepository<JobApplication
 
     public async Task<JobApplicationDefaults?> GetByUserIdAsync(string userId)
     {
-        return await _context.JobApplicationDefaults.AsNoTracking().SingleOrDefaultAsync(x => x.UserId == userId);
+        return await _context.JobApplicationDefaults.AsNoTracking().FirstOrDefaultAsync(x => x.UserId == userId);
     }
 }

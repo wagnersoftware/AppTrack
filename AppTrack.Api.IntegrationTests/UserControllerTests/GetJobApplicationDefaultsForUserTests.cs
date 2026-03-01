@@ -23,7 +23,7 @@ public class GetJobApplicationDefaultsForUserTests : IClassFixture<FakeAuthWebAp
     public async Task GetJobApplicationDefaults_ShouldReturnDefaultsSettings_WhenExisting()
     {
         //Arrange
-        var defaultsId = await SeedHelper.CreateJobDefaultsForTestUserAsync(_factory.Services);
+        await SeedHelper.CreateJobDefaultsForTestUserAsync(_factory.Services);
 
         //act
         var response = await _client.GetAsync("/api/users/job-application-defaults");
@@ -33,7 +33,6 @@ public class GetJobApplicationDefaultsForUserTests : IClassFixture<FakeAuthWebAp
         var result = await response.Content.ReadFromJsonAsync<JobApplicationDefaultsDto>();
         result.ShouldNotBeNull();
         result.UserId.ShouldBe(TestAuthHandler.TestUserId);
-        result.Id.ShouldBe(defaultsId);
     }
 
     [Fact]

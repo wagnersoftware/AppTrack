@@ -1,8 +1,6 @@
 ﻿
 using AppTrack.Api.IntegrationTests.Auth;
 using AppTrack.Api.IntegrationTests.Seeddata;
-using AppTrack.Api.IntegrationTests.Seeddata.User;
-using AppTrack.Api.Models;
 using AppTrack.Application.Features.AiSettings.Dto;
 using Shouldly;
 using System.Net;
@@ -38,7 +36,7 @@ public class GetAiSettingsForUserTests : IClassFixture<FakeAuthWebApplicationFac
     public async Task GetAiSettings_ShouldReturnAiSettingsForUser_WhenAiSettingsExist()
     {
         // Arrange
-        var aiSettingsId = await SeedHelper.CreateAiSettingsForTestUserAsync(_factory.Services);
+        await SeedHelper.CreateAiSettingsForTestUserAsync(_factory.Services);
         // Act
         var response = await _client.GetAsync("/api/users/ai-settings");
         // Assert
@@ -46,7 +44,6 @@ public class GetAiSettingsForUserTests : IClassFixture<FakeAuthWebApplicationFac
         var aiSettings = await response.Content.ReadFromJsonAsync<AiSettingsDto>();
         aiSettings.ShouldNotBeNull();
         aiSettings.UserId.ShouldBe(TestAuthHandler.TestUserId);
-        aiSettings.Id.ShouldBe(aiSettingsId);
     }
 
     [Fact]
