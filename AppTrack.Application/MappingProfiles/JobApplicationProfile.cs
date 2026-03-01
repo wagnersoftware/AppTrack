@@ -11,7 +11,8 @@ public class JobApplicationProfile : Profile
     public JobApplicationProfile()
     {
         CreateMap<JobApplicationDto, JobApplication>().ReverseMap();
-        CreateMap<CreateJobApplicationCommand, JobApplication>();
+        CreateMap<CreateJobApplicationCommand, JobApplication>()
+            .ForMember(dest => dest.CreationDate, opt => opt.Ignore());
         CreateMap<UpdateJobApplicationCommand, JobApplication>()
             .ForMember(dest => dest.CreationDate, opt => opt.Ignore())
             .ForMember(dest => dest.Id, opt => opt.Ignore());

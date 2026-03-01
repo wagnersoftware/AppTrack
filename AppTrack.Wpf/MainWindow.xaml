@@ -267,7 +267,7 @@
                     <!--  CreationDate  -->
                     <DataGridTextColumn
                         Width="1.6*"
-                        Binding="{Binding CreationDate}"
+                        Binding="{Binding CreationDate, StringFormat={}{0:d}}"
                         Header="Created">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
@@ -278,7 +278,7 @@
                     <!--  ModifiedDate  -->
                     <DataGridTextColumn
                         Width="1.6*"
-                        Binding="{Binding ModifiedDate}"
+                        Binding="{Binding ModifiedDate, StringFormat={}{0:d}}"
                         Header="Modified">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
