@@ -29,7 +29,7 @@ public class RegisterTests : IClassFixture<IdentityWebApplicationFactory>
         var response = await client.PostAsJsonAsync("/api/authentication/register", request);
 
         // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        response.StatusCode.ShouldBe(HttpStatusCode.Created);
         var result = await response.Content.ReadFromJsonAsync<RegistrationResponse>();
         result.ShouldNotBeNull();
         result.UserId.ShouldNotBeNullOrEmpty();
@@ -122,7 +122,7 @@ public class RegisterTests : IClassFixture<IdentityWebApplicationFactory>
         // Test 11: Username already exists
         var request11 = new { UserName = _userName, Password = _password };
         var response11a = await client.PostAsJsonAsync("/api/authentication/register", request11);
-        response11a.StatusCode.ShouldBe(HttpStatusCode.OK);
+        response11a.StatusCode.ShouldBe(HttpStatusCode.Created);
 
         var response11b = await client.PostAsJsonAsync("/api/authentication/register", request11);
         response11b.StatusCode.ShouldBe(HttpStatusCode.Conflict);

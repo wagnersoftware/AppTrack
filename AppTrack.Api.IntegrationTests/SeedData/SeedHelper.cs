@@ -1,4 +1,5 @@
-﻿using AppTrack.Api.IntegrationTests.Seeddata.JobApplicationDefaults;
+﻿using AppTrack.Api.IntegrationTests.Auth;
+using AppTrack.Api.IntegrationTests.Seeddata.JobApplicationDefaults;
 using AppTrack.Api.IntegrationTests.SeedData.AiSettings;
 using AppTrack.Api.IntegrationTests.SeedData.JobApplication;
 using Microsoft.Extensions.DependencyInjection;
@@ -62,6 +63,15 @@ internal static class SeedHelper
         var aiSettingsId = await AiSettingsSeedsHelper.CreateAiSettingsForUserAsync(services, userId);
         return (userId, aiSettingsId);
     }
+
+    internal static Task<int> CreateJobApplicationForTestUserAsync(IServiceProvider services) =>
+        JobApplicationSeedsHelper.CreateJobApplicationForUserAsync(services, TestAuthHandler.TestUserId);
+
+    internal static Task<int> CreateAiSettingsForTestUserAsync(IServiceProvider services) =>
+        AiSettingsSeedsHelper.CreateAiSettingsForUserAsync(services, TestAuthHandler.TestUserId);
+
+    internal static Task<int> CreateJobDefaultsForTestUserAsync(IServiceProvider services) =>
+        JobApplicationDefaultsSeedHelper.CreateDefaultsForUserAsync(services, TestAuthHandler.TestUserId);
 
     internal static async Task CreateChatModels(IServiceProvider services)
     {

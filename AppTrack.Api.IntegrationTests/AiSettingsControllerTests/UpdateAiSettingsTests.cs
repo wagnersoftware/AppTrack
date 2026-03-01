@@ -1,4 +1,5 @@
-﻿using AppTrack.Api.IntegrationTests.Seeddata;
+﻿using AppTrack.Api.IntegrationTests.Auth;
+using AppTrack.Api.IntegrationTests.Seeddata;
 using AppTrack.Api.IntegrationTests.Seeddata.User;
 using AppTrack.Api.Models;
 using AppTrack.Application.Features.AiSettings.Commands.UpdateAiSettings;
@@ -49,56 +50,6 @@ public class UpdateAiSettingsTests : IClassFixture<FakeAuthWebApplicationFactory
         problem.Title.ShouldBe("One or more validation errors occurred.");
         problem.Errors.ShouldContainKey("Id");
         problem.Errors["Id"].ShouldContain("Id must be greater than 0.");
-    }
-
-    [Fact]
-    public async Task UpdateAiSettings_ShouldReturn400_WhenUserIdIsEmpty()
-    {
-        var (_, aiSettingsId) = await SeedHelper.CreateUserWithAiSettingsAsync(_factory.Services);
-
-        // Arrange
-        var command = new UpdateAiSettingsCommand
-        {
-            Id = aiSettingsId,
-            UserId = "",
-            ApiKey = "sk-validkey1234567890"
-        };
-
-        // Act
-        var response = await _client.PutAsJsonAsync($"/api/ai-settings/{command.Id}", command);
-
-        // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
-
-        var problem = await response.Content.ReadFromJsonAsync<CustomProblemDetails>();
-        problem.ShouldNotBeNull();
-        problem.Errors.ShouldContainKey("UserId");
-        problem.Errors["UserId"].ShouldContain("UserId is required");
-    }
-
-    [Fact]
-    public async Task UpdateAiSettings_ShouldReturn400_WhenUserIdHasInvalidCharacters()
-    {
-        var (_, aiSettingsId) = await SeedHelper.CreateUserWithAiSettingsAsync(_factory.Services);
-
-        // Arrange
-        var command = new UpdateAiSettingsCommand
-        {
-            Id = aiSettingsId,
-            UserId = "user@#!",
-            ApiKey = "sk-validkey1234567890"
-        };
-
-        // Act
-        var response = await _client.PutAsJsonAsync($"/api/ai-settings/{command.Id}", command);
-
-        // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
-
-        var problem = await response.Content.ReadFromJsonAsync<CustomProblemDetails>();
-        problem.ShouldNotBeNull();
-        problem.Errors.ShouldContainKey("UserId");
-        problem.Errors["UserId"].ShouldContain("UserId contains invalid characters.");
     }
 
     [Fact]
@@ -157,13 +108,12 @@ public class UpdateAiSettingsTests : IClassFixture<FakeAuthWebApplicationFactory
     [Fact]
     public async Task UpdateAiSettings_ShouldReturn200_WhenRequestIsValid()
     {
-
         // Arrange
-        var (userId, aiSettingsId) = await SeedHelper.CreateUserWithAiSettingsAsync(_factory.Services);
+        var aiSettingsId = await SeedHelper.CreateAiSettingsForTestUserAsync(_factory.Services);
         var validRequest = new UpdateAiSettingsCommand
         {
             Id = aiSettingsId,
-            UserId = userId,
+            UserId = TestAuthHandler.TestUserId,
             ApiKey = "sk-ABCDEFGHIJKLMNOPQRST",
             PromptParameter = new List<PromptParameterDto>
                 {
@@ -176,7 +126,10 @@ public class UpdateAiSettingsTests : IClassFixture<FakeAuthWebApplicationFactory
         var response = await _client.PutAsJsonAsync($"/api/ai-settings/{validRequest.Id}", validRequest);
 
         // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var result = await response.Content.ReadFromJsonAsync<AiSettingsDto>();
+        result.ShouldNotBeNull();
+        result.ApiKey.ShouldBe(validRequest.ApiKey);
     }
 
     [Fact]

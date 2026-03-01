@@ -1,4 +1,5 @@
 ﻿
+using AppTrack.Api.IntegrationTests.Auth;
 using AppTrack.Api.IntegrationTests.Seeddata;
 using AppTrack.Api.IntegrationTests.Seeddata.User;
 using AppTrack.Api.Models;
@@ -22,55 +23,37 @@ public class GetAiSettingsForUserTests : IClassFixture<FakeAuthWebApplicationFac
 
 
     [Fact]
-    public async Task GetAiSettings_ShouldCreateAiSettings_WhenUserExists()
+    public async Task GetAiSettings_ShouldCreateAiSettings_WhenNotExisting()
     {
-        // Arrange
-        var validUserId = await ApplicationUserSeedHelper.CreateTestUserAsync(_factory.Services);
         // Act
-        var response = await _client.GetAsync($"/api/users/{validUserId}/ai-settings");
+        var response = await _client.GetAsync("/api/users/ai-settings");
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
         var aiSettings = await response.Content.ReadFromJsonAsync<AiSettingsDto>();
         aiSettings.ShouldNotBeNull();
-        aiSettings.UserId.ShouldBe(validUserId);
+        aiSettings.UserId.ShouldBe(TestAuthHandler.TestUserId);
     }
 
     [Fact]
     public async Task GetAiSettings_ShouldReturnAiSettingsForUser_WhenAiSettingsExist()
     {
         // Arrange
-        var (userId, aiSettingsId) = await SeedHelper.CreateUserWithAiSettingsAsync(_factory.Services);
+        var aiSettingsId = await SeedHelper.CreateAiSettingsForTestUserAsync(_factory.Services);
         // Act
-        var response = await _client.GetAsync($"/api/users/{userId}/ai-settings");
+        var response = await _client.GetAsync("/api/users/ai-settings");
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
         var aiSettings = await response.Content.ReadFromJsonAsync<AiSettingsDto>();
         aiSettings.ShouldNotBeNull();
-        aiSettings.UserId.ShouldBe(userId);
+        aiSettings.UserId.ShouldBe(TestAuthHandler.TestUserId);
         aiSettings.Id.ShouldBe(aiSettingsId);
-    }
-
-    [Fact]
-    public async Task GetAiSettings_ShouldReturn404_WhenUserNotFound()
-    {
-        // Arrange
-        var invalidUserId = "999";
-        // Act
-        var response = await _client.GetAsync($"/api/users/{invalidUserId}/ai-settings");
-        // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
-        var problem = await response.Content.ReadFromJsonAsync<CustomProblemDetails>();
-        problem?.Title.ShouldBe($"user {invalidUserId} not found");
     }
 
     [Fact]
     public async Task GetAiSettings_ShouldReturn404_WhenUserIdIsEmpty()
     {
-        // Arrange
-        var emptyUserId = string.Empty;
-
-        // Act
-        var response = await _client.GetAsync($"/api/users/{emptyUserId}/ai-settings");
+        // Arrange – empty segment in URL resolves to 404 (no matching route)
+        var response = await _client.GetAsync("/api/users//ai-settings");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);

@@ -1,7 +1,9 @@
-﻿using AppTrack.Api.IntegrationTests.Seeddata;
+﻿using AppTrack.Api.IntegrationTests.Auth;
+using AppTrack.Api.IntegrationTests.Seeddata;
 using AppTrack.Api.IntegrationTests.Seeddata.User;
 using AppTrack.Api.Models;
 using AppTrack.Application.Features.JobApplicationDefaults.Commands.UpdateApplicationDefaults;
+using AppTrack.Application.Features.JobApplicationDefaults.Dto;
 using Shouldly;
 using System.Net;
 using System.Net.Http.Json;
@@ -20,14 +22,14 @@ public class UpdateJobApplicationDefaultsTests : IClassFixture<FakeAuthWebApplic
     }
 
     [Fact]
-    public async Task UpdateJobApplicationDefaults_ShouldReturn204_WhenCommandIsValid()
+    public async Task UpdateJobApplicationDefaults_ShouldReturn200_WhenCommandIsValid()
     {
         // Arrange
-        var (userId, defaultsId) = await SeedHelper.CreateUserWithJobDefaultsAsync(_factory.Services);
+        var defaultsId = await SeedHelper.CreateJobDefaultsForTestUserAsync(_factory.Services);
         var command = new UpdateJobApplicationDefaultsCommand
         {
             Id = defaultsId,
-            UserId = userId,
+            UserId = TestAuthHandler.TestUserId,
             Name = "Updated Name",
             Position = "Updated Position",
             Location = "Updated Location"
@@ -37,7 +39,10 @@ public class UpdateJobApplicationDefaultsTests : IClassFixture<FakeAuthWebApplic
         var response = await _client.PutAsJsonAsync($"/api/job-application-defaults/{command.Id}", command);
 
         // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var result = await response.Content.ReadFromJsonAsync<JobApplicationDefaultsDto>();
+        result.ShouldNotBeNull();
+        result.Name.ShouldBe(command.Name);
     }
 
     [Fact]
@@ -66,32 +71,6 @@ public class UpdateJobApplicationDefaultsTests : IClassFixture<FakeAuthWebApplic
         problem.Errors["Id"].Any(msg => msg.Contains("must be greater than 0")).ShouldBeTrue();
         problem.Errors["Id"].Any(msg => msg.Contains("is required")).ShouldBeTrue();
         problem.Errors["Id"].Any(msg => msg.Contains("not found")).ShouldBeTrue();
-    }
-
-    [Fact]
-    public async Task UpdateJobApplicationDefaults_ShouldReturn400_WhenUserIdIsInvalid()
-    {
-        //Arrange
-        var (_, defaultsId) = await SeedHelper.CreateUserWithJobDefaultsAsync(_factory.Services);
-        var command = new UpdateJobApplicationDefaultsCommand
-        {
-            Id = defaultsId,
-            UserId = "invalid!user",
-            Name = "Valid",
-            Position = "Valid",
-            Location = "Valid"
-        };
-
-        // Act
-        var response = await _client.PutAsJsonAsync($"/api/job-application-defaults/{command.Id}", command);
-
-        // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
-        var problem = await response.Content.ReadFromJsonAsync<CustomProblemDetails>();
-        problem.ShouldNotBeNull();
-
-        problem.Errors.ShouldContainKey("UserId");
-        problem.Errors["UserId"].Any(msg => msg.Contains("invalid characters")).ShouldBeTrue();
     }
 
     [Theory]

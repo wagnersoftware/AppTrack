@@ -117,7 +117,7 @@ public class CreateJobApplicationTests : IClassFixture<FakeAuthWebApplicationFac
 
         var requiredFields = new[]
         {
-            "Name", "Position", "URL", "UserId", "JobDescription",
+            "Name", "Position", "URL", "JobDescription",
             "Location", "ContactPerson", "StartDate"
         };
 
