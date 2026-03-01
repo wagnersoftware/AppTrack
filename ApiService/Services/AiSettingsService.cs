@@ -11,10 +11,10 @@ public class AiSettingsService : BaseHttpService, IAiSettingsService
     {
     }
 
-    public Task<Response<AiSettingsModel>> GetForUserAsync(string userId) =>
+    public Task<Response<AiSettingsModel>> GetForUserAsync() =>
         TryExecuteAsync(async () =>
         {
-            var aiSettingsDto = await _client.AiSettingsGETAsync(userId);
+            var aiSettingsDto = await _client.AiSettingsGETAsync();
             return aiSettingsDto.ToModel();
         });
 

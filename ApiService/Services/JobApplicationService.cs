@@ -33,10 +33,10 @@ public class JobApplicationService : BaseHttpService, IJobApplicationService
             return jobApplicationDto.ToModel();
         });
 
-    public Task<Response<List<JobApplicationModel>>> GetJobApplicationsForUserAsync(string userId) =>
+    public Task<Response<List<JobApplicationModel>>> GetJobApplicationsForUserAsync() =>
         TryExecuteAsync(async () =>
         {
-            var jobApplicationDtos = await _client.JobApplicationsAllAsync(userId);
+            var jobApplicationDtos = await _client.JobApplicationsAllAsync();
             return jobApplicationDtos.Select(dto => dto.ToModel()).ToList();
         });
 
