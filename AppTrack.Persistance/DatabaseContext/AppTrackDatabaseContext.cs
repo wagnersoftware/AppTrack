@@ -1,7 +1,6 @@
 ﻿using AppTrack.Domain;
 using AppTrack.Domain.Common;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AppTrack.Persistance.DatabaseContext;
 
@@ -9,7 +8,6 @@ public class AppTrackDatabaseContext : DbContext
 {
     public AppTrackDatabaseContext(DbContextOptions<AppTrackDatabaseContext> options) : base(options)
     {
-
     }
 
     public DbSet<JobApplication> JobApplications { get; set; }
@@ -18,15 +16,11 @@ public class AppTrackDatabaseContext : DbContext
 
     public DbSet<AiSettings> AiSettings { get; set; }
 
+    public DbSet<ChatModel> ChatModels { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppTrackDatabaseContext).Assembly);
-
-        modelBuilder.Entity<AiSettings>()
-            .HasMany(s => s.PromptParameter)
-            .WithOne(p => p.AISettings)
-            .HasForeignKey(p => p.AISettingsId)
-            .OnDelete(DeleteBehavior.Cascade);
 
         base.OnModelCreating(modelBuilder);
 
@@ -34,15 +28,20 @@ public class AppTrackDatabaseContext : DbContext
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        foreach (var entry in base.ChangeTracker.Entries<BaseEntity>().Where((entry => entry.State == EntityState.Added || entry.State == EntityState.Modified)))
-        {
-            entry.Entity.ModifiedDate = DateTime.Now;
-
-            if (entry.State == EntityState.Added)
+        base.ChangeTracker
+            .Entries<BaseEntity>()
+            .Where(entry => entry.State is EntityState.Added or EntityState.Modified)
+            .ToList()
+            .ForEach(entry =>
             {
-                entry.Entity.CreationDate = DateTime.Now;
-            }
-        }
+                entry.Entity.ModifiedDate = DateTime.Now;
+
+                if (entry.Entity.CreationDate == null)
+                {
+                    entry.Entity.CreationDate = DateTime.Now;
+                }
+            });
+
         return base.SaveChangesAsync(cancellationToken);
     }
 }

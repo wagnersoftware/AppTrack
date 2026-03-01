@@ -178,6 +178,6 @@ public class LoginTests : IClassFixture<IdentityWebApplicationFactory>
         var response10 = await client.PostAsJsonAsync("/api/authentication/login", request10);
         response10.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
         var problem10 = await response10.Content.ReadFromJsonAsync<CustomProblemDetails>();
-        problem10!.Errors["Password"].ShouldContain("Password must contain at least one special character");
+        problem10!.Errors["Password"].ShouldContain("Password must contain at least one special character (!?*.@$#&%+-=_())");
     }
 }

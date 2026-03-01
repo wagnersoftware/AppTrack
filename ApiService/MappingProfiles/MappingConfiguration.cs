@@ -30,5 +30,8 @@ public class MappingConfiguration : Profile
 
         //PromptParameter
         CreateMap<PromptParameterDto, PromptParameterModel>().ReverseMap();
+
+        //ChatModel
+        CreateMap<ChatModelDto, ChatModel>();
     }
 }

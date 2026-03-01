@@ -24,6 +24,7 @@ public static class ApiServiceRegistration
         services.AddScoped<IJobApplicationDefaultsService, JobApplicationDefaultsService>();
         services.AddScoped<IAiSettingsService, AiSettingsService>();
         services.AddScoped<IApplicationTextService, ApplicationTextService>();
+        services.AddScoped<IChatModelsService, ChatModelsService>();
 
         services.AddSingleton<ApiAuthenticationStateProvider>();
         services.AddSingleton<AuthenticationStateProvider>(sp => sp.GetRequiredService<ApiAuthenticationStateProvider>());

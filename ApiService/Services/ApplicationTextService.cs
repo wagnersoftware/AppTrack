@@ -15,7 +15,7 @@ namespace AppTrack.Frontend.ApiService.Services
             TryExecuteAsync(async () =>
             {
                 var command = new GenerateApplicationTextCommand() { UserId = userId, Prompt = prompt, JobApplicationId = jobApplicationId };
-                var generatedTextDto = await _client.ApplicationTextsAsync(command, token);
+                var generatedTextDto = await _client.GenerateApplicationTextAsync(command, token);
                 return new ApplicationTextModel()
                 {
                     Text = generatedTextDto.ApplicationText,
@@ -27,7 +27,7 @@ namespace AppTrack.Frontend.ApiService.Services
             TryExecuteAsync(async () =>
             {
                 var query = new GeneratePromptQuery() { UserId = userId, JobApplicationId = jobApplicationId };
-                var generatedPromptDto = await _client.GenerateAsync(query);
+                var generatedPromptDto = await _client.GeneratePromptAsync(query);
                 return new GeneratedPromptModel()
                 {
                     Text = generatedPromptDto.Prompt,

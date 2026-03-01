@@ -1,47 +1,33 @@
-﻿using AppTrack.Frontend.Models.Base;
+using AppTrack.Frontend.Models.Base;
+using AppTrack.Shared.Validation.Interfaces;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace AppTrack.Frontend.Models;
 
-public partial class JobApplicationModel : ModelBase
+public partial class JobApplicationModel : ModelBase, IJobApplicationValidatable
 {
-    [Required]
-    [MaxLength(200, ErrorMessage = "{0} must not exceed 200 characters.")]
     public string Name { get; set; } = string.Empty;
 
-    [Required]
-    [MaxLength(200, ErrorMessage = "{0} must not exceed 200 characters.")]
     public string Position { get; set; } = string.Empty;
 
-    [Required]
-    [Url]
-    [MaxLength(1000, ErrorMessage = "{0} must not exceed 1000 characters.")]
     public string URL { get; set; } = string.Empty;
 
-    [Required]
     public string JobDescription { get; set; } = string.Empty;
 
-    [Required]
-    [MaxLength(200, ErrorMessage = "{0} must not exceed 200 characters.")]
     public string Location { get; set; } = string.Empty;
 
-    [Required]
-    [MaxLength(200, ErrorMessage = "{0} must not exceed 200 characters.")]
     public string ContactPerson { get; set; } = string.Empty;
 
     [Required]
     public JobApplicationStatus Status { get; set; } = JobApplicationStatus.New;
 
-    [Required]
     [DataType(DataType.Date)]
     public DateOnly StartDate { get; set; }
 
     [ObservableProperty]
     private string applicationText = string.Empty;
 
-    [RegularExpression(@"^\d+$", ErrorMessage = "{0} must be a number.")]
-    [MaxLength(10, ErrorMessage = "{0} must not exceed 10 characters.")]
     public string DurationInMonths { get; set; } = string.Empty;
 
     public static Array JobApplicationStatusValues => Enum.GetValues(typeof(JobApplicationStatus));

@@ -10,7 +10,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="AI Settings"
     Width="1000"
-    Height="1200"
+    Height="1250"
     mc:Ignorable="d">
     <Window.Resources>
         <converter:ErrorsDictionaryConverter x:Key="ErrorsDictConverter" />
@@ -21,8 +21,9 @@
                 <RowDefinition />
                 <RowDefinition />
                 <RowDefinition />
-                <RowDefinition Height="*" />
                 <RowDefinition />
+                <RowDefinition />
+                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
@@ -59,9 +60,37 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </StackPanel>
-            <!--  Prompt parameter  -->
+            <!--  ChatModels- Combobox  -->
             <Label
                 Grid.Row="1"
+                Grid.Column="0"
+                Margin="0,5,5,0"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top">
+                Chat Models:
+            </Label>
+            <StackPanel
+                Grid.Row="1"
+                Grid.Column="1"
+                Margin="5">
+                <ComboBox
+                    Width="150"
+                    ItemsSource="{Binding ChatModels}"
+                    SelectedItem="{Binding SelectedChatModel}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}" ToolTip="{Binding Description}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                    <ComboBox.ToolTip>
+                        <TextBlock Text="{Binding SelectedChatModel.Description}" />
+                    </ComboBox.ToolTip>
+                </ComboBox>
+
+            </StackPanel>
+            <!--  Prompt parameter  -->
+            <Label
+                Grid.Row="2"
                 Grid.Column="0"
                 Margin="0,5,5,0"
                 HorizontalAlignment="Right"
@@ -69,7 +98,7 @@
                 Prompt Parameter:
             </Label>
             <Border
-                Grid.Row="1"
+                Grid.Row="2"
                 Grid.Column="1"
                 Height="250"
                 Margin="5"
@@ -134,14 +163,14 @@
             </Border>
             <!--  Add Prompt Parameter Button  -->
             <Button
-                Grid.Row="2"
+                Grid.Row="3"
                 Grid.Column="1"
                 Margin="5"
                 Command="{Binding AddPromptParameterCommand}"
                 Content="Add" />
             <!--  Prompt  -->
             <Label
-                Grid.Row="3"
+                Grid.Row="4"
                 Grid.Column="0"
                 Margin="0,5,5,0"
                 HorizontalAlignment="Right"
@@ -149,7 +178,7 @@
                 Prompt:
             </Label>
             <StackPanel
-                Grid.Row="3"
+                Grid.Row="4"
                 Grid.Column="1"
                 Margin="5">
                 <TextBox
@@ -177,7 +206,7 @@
                 </ItemsControl>
             </StackPanel>
             <!--  Buttons  -->
-            <StackPanel Grid.Row="4" Grid.ColumnSpan="2">
+            <StackPanel Grid.Row="5" Grid.ColumnSpan="2">
                 <Button
                     Width="150"
                     Margin="5,20,5,5"

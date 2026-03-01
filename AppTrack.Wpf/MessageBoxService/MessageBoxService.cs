@@ -15,25 +15,44 @@ public class MessageBoxService : IMessageBoxService
     {
         var owner = GetActiveWindow();
         var message = string.IsNullOrEmpty(response.ValidationErrors) == false ? response.ValidationErrors : response.ErrorMessage;
-        return MessageBox.Show(owner, message, "error", MessageBoxButton.OK, MessageBoxImage.Error);
+
+        if (owner != null)
+        {
+            return MessageBox.Show(owner, message, "error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+        return MessageBox.Show(message, "error", MessageBoxButton.OK, MessageBoxImage.Error);
     }
+
 
     public MessageBoxResult ShowErrorMessageBox(string message)
     {
         var owner = GetActiveWindow();
-        return MessageBox.Show(owner, message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        if (owner != null)
+        {
+            return MessageBox.Show(owner, message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+
+        return MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
     }
 
     public MessageBoxResult ShowInformationMessageBox(string message, string caption)
     {
         var owner = GetActiveWindow();
-        return MessageBox.Show(owner, message, caption, MessageBoxButton.OK, MessageBoxImage.Information);
+        if (owner != null)
+        {
+            return MessageBox.Show(owner, message, caption, MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+        return MessageBox.Show(message, caption, MessageBoxButton.OK, MessageBoxImage.Information);
     }
 
     public MessageBoxResult ShowQuestionMessageBox(string message, string caption)
     {
         var owner = GetActiveWindow();
-        return MessageBox.Show(owner, message, caption, MessageBoxButton.OKCancel, MessageBoxImage.Question);
+        if (owner != null)
+        {
+            return MessageBox.Show(owner, message, caption, MessageBoxButton.OKCancel, MessageBoxImage.Question);
+        }
+        return MessageBox.Show(message, caption, MessageBoxButton.OKCancel, MessageBoxImage.Question);
     }
 
     private static Window GetActiveWindow() =>

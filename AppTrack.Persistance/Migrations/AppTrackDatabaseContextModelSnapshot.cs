@@ -45,6 +45,9 @@ namespace AppTrack.Persistance.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("SelectedChatModelId")
+                        .HasColumnType("int");
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -52,6 +55,71 @@ namespace AppTrack.Persistance.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("AiSettings");
+                });
+
+            modelBuilder.Entity("AppTrack.Domain.ChatModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ApiModelName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ChatModels");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            ApiModelName = "gpt-3.5-turbo",
+                            Description = "Fast model, suitable for short text snippets and suggestions",
+                            IsActive = true,
+                            Name = "ChatGPT 3.5"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            ApiModelName = "gpt-4",
+                            Description = "High-precision model, ideal for complex cover letters and refined writing",
+                            IsActive = true,
+                            Name = "ChatGPT 4"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            ApiModelName = "gpt-4o-mini",
+                            Description = "Lightweight model for quick suggestions or interactive text generation",
+                            IsActive = false,
+                            Name = "ChatGPT 4 Mini"
+                        });
                 });
 
             modelBuilder.Entity("AppTrack.Domain.JobApplication", b =>

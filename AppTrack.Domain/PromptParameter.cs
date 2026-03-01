@@ -11,7 +11,6 @@ public class PromptParameter : BaseEntity
 
     private PromptParameter()
     {
-
     }
 
     public static PromptParameter Create(string? key, string? value)
