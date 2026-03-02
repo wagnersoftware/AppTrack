@@ -16,14 +16,14 @@ internal static class ApplicationUserSeedHelper
     /// <param name="identityDb">The identity database context in which the test user will be created. Must not be null.</param>
     /// <param name="userName">The user name to assign to the test user. If null, a unique user name will be generated automatically.</param>
     /// <returns>A string containing the unique identifier of the newly created test user.</returns>
-    internal static async Task<string> CreateTestUserAsync(IServiceProvider services, string? userName = null)
+    internal static async Task<string> CreateTestUserAsync(IServiceProvider services, string? userName = null, string? userId = null)
     {
         using var scope = services.CreateScope();
         var identityDb = scope.ServiceProvider.GetRequiredService<AppTrackIdentityDbContext>();
 
         var user = new ApplicationUser
         {
-            Id = Guid.NewGuid().ToString(),
+            Id = userId ?? Guid.NewGuid().ToString(),
             UserName = userName ?? $"testuser_{Guid.NewGuid():N}",
             EmailConfirmed = true
         };

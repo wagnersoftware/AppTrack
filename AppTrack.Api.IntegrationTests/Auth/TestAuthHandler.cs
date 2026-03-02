@@ -9,6 +9,7 @@ namespace AppTrack.Api.IntegrationTests.Auth;
 public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
     public const string AuthenticationScheme = "Test";
+    public const string TestUserId = "test-user-id";
 
     public TestAuthHandler(
         IOptionsMonitor<AuthenticationSchemeOptions> options,

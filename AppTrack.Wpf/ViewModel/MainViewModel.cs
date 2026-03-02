@@ -92,14 +92,7 @@ public partial class MainViewModel : ObservableObject
 
     public async Task LoadJobApplicationsForUserAsync()
     {
-        var userId = await _userHelper.TryGetUserIdAsync();
-
-        if (userId == null)
-        {
-            return;
-        }
-
-        var apiResponse = await _jobApplicationService.GetJobApplicationsForUserAsync(userId);
+        var apiResponse = await _jobApplicationService.GetJobApplicationsForUserAsync();
 
         if (apiResponse.Success == false)
         {
@@ -167,7 +160,7 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
-        var response = await _jobApplicationDefaultsService.GetForUserAsync(userId);
+        var response = await _jobApplicationDefaultsService.GetForUserAsync();
 
         if (response.Success == false)
         {
@@ -207,14 +200,7 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
-        var userId = await _userHelper.TryGetUserIdAsync();
-
-        if (userId == null)
-        {
-            return;
-        }
-
-        var apiResponse = await _jobApplicationService.DeleteJobApplicationAsync(id, userId);
+        var apiResponse = await _jobApplicationService.DeleteJobApplicationAsync(id);
 
         if (apiResponse.Success == false)
         {
@@ -321,14 +307,7 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private async Task SetDefaults()
     {
-        var userId = await _userHelper.TryGetUserIdAsync();
-
-        if (userId == null)
-        {
-            return;
-        }
-
-        var apiResponse = await _jobApplicationDefaultsService.GetForUserAsync(userId);
+        var apiResponse = await _jobApplicationDefaultsService.GetForUserAsync();
 
         if (apiResponse.Success == false)
         {
@@ -355,14 +334,7 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private async Task OpenAiSettings()
     {
-        var userId = await _userHelper.TryGetUserIdAsync();
-
-        if (userId == null)
-        {
-            return;
-        }
-
-        var apiResponse = await _aiSettingsService.GetForUserAsync(userId);
+        var apiResponse = await _aiSettingsService.GetForUserAsync();
 
         if (apiResponse.Success == false)
         {

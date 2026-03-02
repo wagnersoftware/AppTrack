@@ -5,7 +5,7 @@ namespace AppTrack.Frontend.ApiService.Contracts;
 
 public interface IJobApplicationDefaultsService
 {
-    Task<Response<JobApplicationDefaultsModel>> GetForUserAsync(string userId);
+    Task<Response<JobApplicationDefaultsModel>> GetForUserAsync();
 
     Task<Response<JobApplicationDefaultsModel>> UpdateAsync(int id, JobApplicationDefaultsModel jobApplicationDefaultsModel);
 }

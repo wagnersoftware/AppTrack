@@ -20,23 +20,23 @@ public class JobApplicationService : BaseHttpService, IJobApplicationService
             return jobApplicationDto.ToModel();
         });
 
-    public Task<Response<JobApplicationModel>> DeleteJobApplicationAsync(int id, string userId) =>
+    public Task<Response<JobApplicationModel>> DeleteJobApplicationAsync(int id) =>
         TryExecuteAsync<JobApplicationModel>(async () =>
         {
-            await _client.JobApplicationsDELETEAsync(id, userId);
+            await _client.JobApplicationsDELETEAsync(id);
         });
 
-    public Task<Response<JobApplicationModel>> GetJobApplicationByIdAsync(int id, string userId) =>
+    public Task<Response<JobApplicationModel>> GetJobApplicationByIdAsync(int id) =>
         TryExecuteAsync(async () =>
         {
-            var jobApplicationDto = await _client.JobApplicationsGETAsync(id, userId);
+            var jobApplicationDto = await _client.JobApplicationsGETAsync(id);
             return jobApplicationDto.ToModel();
         });
 
-    public Task<Response<List<JobApplicationModel>>> GetJobApplicationsForUserAsync(string userId) =>
+    public Task<Response<List<JobApplicationModel>>> GetJobApplicationsForUserAsync() =>
         TryExecuteAsync(async () =>
         {
-            var jobApplicationDtos = await _client.JobApplicationsAllAsync(userId);
+            var jobApplicationDtos = await _client.JobApplicationsAllAsync();
             return jobApplicationDtos.Select(dto => dto.ToModel()).ToList();
         });
 

@@ -1,12 +1,12 @@
 using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Exceptions;
+using AppTrack.Application.Features.AiSettings.Dto;
 using AppTrack.Application.Mappings;
-using AppTrack.Application.Shared;
 
 namespace AppTrack.Application.Features.AiSettings.Commands.UpdateAiSettings;
 
-public class UpdateAiSettingsCommandHandler : IRequestHandler<UpdateAiSettingsCommand, Unit>
+public class UpdateAiSettingsCommandHandler : IRequestHandler<UpdateAiSettingsCommand, AiSettingsDto>
 {
     private readonly IAiSettingsRepository _aiSettingsRepository;
 
@@ -15,7 +15,7 @@ public class UpdateAiSettingsCommandHandler : IRequestHandler<UpdateAiSettingsCo
         _aiSettingsRepository = aiSettingsRepository;
     }
 
-    public async Task<Unit> Handle(UpdateAiSettingsCommand request, CancellationToken cancellationToken)
+    public async Task<AiSettingsDto> Handle(UpdateAiSettingsCommand request, CancellationToken cancellationToken)
     {
         var validator = new UpdateAiSettingsCommandValidator(_aiSettingsRepository);
         var validationResult = await validator.ValidateAsync(request);
@@ -30,6 +30,6 @@ public class UpdateAiSettingsCommandHandler : IRequestHandler<UpdateAiSettingsCo
 
         await _aiSettingsRepository.UpdateAsync(aiSettingsToUpdate!);
 
-        return Unit.Value;
+        return aiSettingsToUpdate!.ToDto();
     }
 }

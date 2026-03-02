@@ -11,17 +11,17 @@ public class JobApplicationDefaultsService : BaseHttpService, IJobApplicationDef
     {
     }
 
-    public Task<Response<JobApplicationDefaultsModel>> GetForUserAsync(string userId) =>
+    public Task<Response<JobApplicationDefaultsModel>> GetForUserAsync() =>
         TryExecuteAsync(async () =>
         {
-            var jobApplicationDefaults = await _client.JobApplicationDefaultsGETAsync(userId);
+            var jobApplicationDefaults = await _client.JobApplicationDefaultsGETAsync();
             return jobApplicationDefaults.ToModel();
         });
 
     public Task<Response<JobApplicationDefaultsModel>> UpdateAsync(int id, JobApplicationDefaultsModel jobApplicationDefaultsModel) =>
-        TryExecuteAsync<JobApplicationDefaultsModel>(async () =>
+        TryExecuteAsync(async () =>
         {
-            var command = jobApplicationDefaultsModel.ToUpdateCommand();
-            await _client.JobApplicationDefaultsPUTAsync(id, command);
+            var dto = await _client.JobApplicationDefaultsPUTAsync(id, jobApplicationDefaultsModel.ToUpdateCommand());
+            return dto.ToModel();
         });
 }

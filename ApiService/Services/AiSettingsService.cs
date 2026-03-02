@@ -11,17 +11,17 @@ public class AiSettingsService : BaseHttpService, IAiSettingsService
     {
     }
 
-    public Task<Response<AiSettingsModel>> GetForUserAsync(string userId) =>
+    public Task<Response<AiSettingsModel>> GetForUserAsync() =>
         TryExecuteAsync(async () =>
         {
-            var aiSettingsDto = await _client.AiSettingsGETAsync(userId);
+            var aiSettingsDto = await _client.AiSettingsGETAsync();
             return aiSettingsDto.ToModel();
         });
 
     public Task<Response<AiSettingsModel>> UpdateAsync(int id, AiSettingsModel aiSettingsModel) =>
-        TryExecuteAsync<AiSettingsModel>(async () =>
+        TryExecuteAsync(async () =>
         {
-            var updateAiSettingsCommand = aiSettingsModel.ToUpdateCommand();
-            await _client.AiSettingsPUTAsync(id, updateAiSettingsCommand);
+            var dto = await _client.AiSettingsPUTAsync(id, aiSettingsModel.ToUpdateCommand());
+            return dto.ToModel();
         });
 }

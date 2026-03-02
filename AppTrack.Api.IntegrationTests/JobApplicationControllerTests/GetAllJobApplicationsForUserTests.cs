@@ -1,6 +1,6 @@
-﻿
+
+using AppTrack.Api.IntegrationTests.Auth;
 using AppTrack.Api.IntegrationTests.Seeddata;
-using AppTrack.Api.Models;
 using AppTrack.Application.Features.JobApplications.Dto;
 using Shouldly;
 using System.Net;
@@ -20,41 +20,28 @@ public class GetAllJobApplicationsForUserTests : IClassFixture<FakeAuthWebApplic
     }
 
     [Fact]
-    public async Task GetJobApplicationsForUser_ShouldReturn200_WhenUserIdIsValid()
+    public async Task GetJobApplicationsForUser_ShouldReturn200_WhenJobApplicationsExist()
     {
         // Arrange
-        var(userId, jobApplicationId) = await SeedHelper.CreateUserWithJobApplicationAsync(_factory.Services);
+        var jobApplicationId = await SeedHelper.CreateJobApplicationForTestUserAsync(_factory.Services);
 
         // Act
-        var response = await _client.GetAsync($"api/users/{userId}/job-applications");
+        var response = await _client.GetAsync("api/users/job-applications");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
         var jobApplications = await response.Content.ReadFromJsonAsync<List<JobApplicationDto>>();
         jobApplications.ShouldNotBeNull();
         jobApplications.ShouldNotBeEmpty();
-        jobApplications.All(x => x.UserId == userId).ShouldBeTrue();
+        jobApplications.All(x => x.UserId == TestAuthHandler.TestUserId).ShouldBeTrue();
         jobApplications.Any(x => x.Id == jobApplicationId).ShouldBeTrue();
     }
 
     [Fact]
     public async Task GetJobApplicationsForUser_ShouldReturn404_WhenUserIdIsEmpty()
     {
-        // Arrange
-        var userId = string.Empty;
-
-        // Act
-        var response = await _client.GetAsync($"api/users/{userId}/job-applications");
-
-        // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
-    }
-
-    [Fact]
-    public async Task GetJobApplicationsForUser_ShouldReturn404_WhenUserIdIsMissing()
-    {
-        // Act – kein UserId im Body
-        var response = await _client.GetAsync($"api/users/job-applications");
+        // Act – empty segment in URL resolves to 404 (no matching route)
+        var response = await _client.GetAsync("api/users//job-applications");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);

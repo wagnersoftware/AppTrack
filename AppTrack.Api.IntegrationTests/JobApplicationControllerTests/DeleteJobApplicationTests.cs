@@ -1,4 +1,4 @@
-﻿using AppTrack.Api.IntegrationTests.Seeddata;
+using AppTrack.Api.IntegrationTests.Seeddata;
 using AppTrack.Api.Models;
 using Shouldly;
 using System.Net;
@@ -21,10 +21,10 @@ public class DeleteJobApplicationTests : IClassFixture<FakeAuthWebApplicationFac
     public async Task DeleteJobApplication_ShouldReturn204_WhenCommandIsValid()
     {
         // Arrange
-        var (userId, jobApplicationId) = await SeedHelper.CreateUserWithJobApplicationAsync(_factory.Services);
+        var jobApplicationId = await SeedHelper.CreateJobApplicationForTestUserAsync(_factory.Services);
 
         // Act
-        var response = await _client.DeleteAsync($"/api/job-applications/{jobApplicationId}?userId={userId}");
+        var response = await _client.DeleteAsync($"/api/job-applications/{jobApplicationId}");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
@@ -33,12 +33,8 @@ public class DeleteJobApplicationTests : IClassFixture<FakeAuthWebApplicationFac
     [Fact]
     public async Task DeleteJobApplication_ShouldReturnMethodNotAllowed_WhenIdIsMissing()
     {
-        // Arrange
-        var (userId, _) = await SeedHelper.CreateUserWithJobApplicationAsync(_factory.Services);
-        var jobApplicationId = "";
-
         // Act
-        var response = await _client.DeleteAsync($"/api/job-applications/{jobApplicationId}?userId={userId}");
+        var response = await _client.DeleteAsync("/api/job-applications/");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.MethodNotAllowed);
@@ -48,11 +44,10 @@ public class DeleteJobApplicationTests : IClassFixture<FakeAuthWebApplicationFac
     public async Task DeleteJobApplication_ShouldReturn400_WhenJobApplicationDoesNotExist()
     {
         // Arrange
-        var userId = Guid.NewGuid().ToString();
         var invalidJobApplicationId = 999;
 
         // Act
-        var response = await _client.DeleteAsync($"/api/job-applications/{invalidJobApplicationId}?userId={userId}");
+        var response = await _client.DeleteAsync($"/api/job-applications/{invalidJobApplicationId}");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
@@ -65,12 +60,11 @@ public class DeleteJobApplicationTests : IClassFixture<FakeAuthWebApplicationFac
     [Fact]
     public async Task DeleteJobApplication_ShouldReturn400_WhenJobApplicationBelongsToDifferentUser()
     {
-        // Arrange
-        var (userId1, _) = await SeedHelper.CreateUserWithJobApplicationAsync(_factory.Services);
-        var (_, jobApplicationId2) = await SeedHelper.CreateUserWithJobApplicationAsync(_factory.Services);
+        // Arrange – job application belongs to a random user, not the authenticated test user
+        var (_, jobApplicationId) = await SeedHelper.CreateUserWithJobApplicationAsync(_factory.Services);
 
         // Act
-        var response = await _client.DeleteAsync($"/api/job-applications/{jobApplicationId2}?userId={userId1}");
+        var response = await _client.DeleteAsync($"/api/job-applications/{jobApplicationId}");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);

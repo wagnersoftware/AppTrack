@@ -1,5 +1,5 @@
-﻿using AppTrack.Api.IntegrationTests.Seeddata;
-using AppTrack.Api.Models;
+using AppTrack.Api.IntegrationTests.Auth;
+using AppTrack.Api.IntegrationTests.Seeddata;
 using AppTrack.Application.Features.JobApplicationDefaults.Dto;
 using Shouldly;
 using System.Net;
@@ -23,60 +23,36 @@ public class GetJobApplicationDefaultsForUserTests : IClassFixture<FakeAuthWebAp
     public async Task GetJobApplicationDefaults_ShouldReturnDefaultsSettings_WhenExisting()
     {
         //Arrange
-        var (userId, defaultsId) = await SeedHelper.CreateUserWithJobDefaultsAsync(_factory.Services);
+        await SeedHelper.CreateJobDefaultsForTestUserAsync(_factory.Services);
 
         //act
-        var response = await _client.GetAsync($"/api/users/{userId}/job-application-defaults/");
+        var response = await _client.GetAsync("/api/users/job-application-defaults");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
         var result = await response.Content.ReadFromJsonAsync<JobApplicationDefaultsDto>();
         result.ShouldNotBeNull();
-        result.UserId.ShouldBe(userId);
-        result.Id.ShouldBe(defaultsId);
+        result.UserId.ShouldBe(TestAuthHandler.TestUserId);
     }
 
     [Fact]
     public async Task GetJobApplicationDefaults_ShouldCreateDefaultsSettings_WhenNotExisting()
     {
-        //Arrange
-        var userId = Guid.NewGuid().ToString(); // random user
-
         //act
-        var response = await _client.GetAsync($"/api/users/{userId}/job-application-defaults/");
+        var response = await _client.GetAsync("/api/users/job-application-defaults");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
         var result = await response.Content.ReadFromJsonAsync<JobApplicationDefaultsDto>();
         result.ShouldNotBeNull();
-        result.UserId.ShouldBe(userId);
-    }
-
-    [Fact]
-    public async Task GetJobApplicationDefaults_ShouldReturn400_WhenUserIdIsInvalid()
-    {
-        // Arrange
-        var userId = "invalidUserId!";
-
-        // Act
-        var response = await _client.GetAsync($"/api/users/{userId}/job-application-defaults/");
-
-        // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
-        var problem = await response.Content.ReadFromJsonAsync<CustomProblemDetails>();
-        problem.ShouldNotBeNull();
-        problem.Errors.ShouldContainKey("UserId");
-        problem.Errors["UserId"].Any(msg => msg.Contains("UserId contains invalid characters.")).ShouldBeTrue();
+        result.UserId.ShouldBe(TestAuthHandler.TestUserId);
     }
 
     [Fact]
     public async Task GetJobApplicationDefaults_ShouldReturn404_WhenUserIdIsEmpty()
     {
-        // Arrange
-        var userId = string.Empty;
-
-        // Act
-        var response = await _client.GetAsync($"/api/users/{userId}/job-application-defaults/");
+        // Act – empty segment in URL resolves to 404 (no matching route)
+        var response = await _client.GetAsync("/api/users//job-application-defaults/");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);

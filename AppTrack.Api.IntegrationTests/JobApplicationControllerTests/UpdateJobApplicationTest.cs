@@ -1,4 +1,5 @@
-﻿using AppTrack.Api.IntegrationTests.Seeddata;
+using AppTrack.Api.IntegrationTests.Auth;
+using AppTrack.Api.IntegrationTests.Seeddata;
 using AppTrack.Api.Models;
 using AppTrack.Application.Features.JobApplications.Commands.UpdateJobApplication;
 using AppTrack.Application.Features.JobApplications.Dto;
@@ -23,12 +24,12 @@ public class UpdateJobApplicationTests : IClassFixture<FakeAuthWebApplicationFac
     [Fact]
     public async Task UpdateJobApplication_ShouldReturn200_WhenCommandIsValid()
     {
-        var (userId, jobApplicationId) = await SeedHelper.CreateUserWithJobApplicationAsync(_factory.Services);
+        var jobApplicationId = await SeedHelper.CreateJobApplicationForTestUserAsync(_factory.Services);
 
         var command = new UpdateJobApplicationCommand
         {
             Id = jobApplicationId,
-            UserId = userId,
+            UserId = TestAuthHandler.TestUserId,
             Name = "Updated Job",
             Position = "Senior Developer",
             URL = "https://company.com/job",
@@ -55,13 +56,13 @@ public class UpdateJobApplicationTests : IClassFixture<FakeAuthWebApplicationFac
     [InlineData("ContactPerson")]
     public async Task UpdateJobApplication_ShouldReturn400_WhenTextFieldExceedsMaxLength(string propertyName)
     {
-        var (userId, jobApplicationId) = await SeedHelper.CreateUserWithJobApplicationAsync(_factory.Services);
+        var jobApplicationId = await SeedHelper.CreateJobApplicationForTestUserAsync(_factory.Services);
 
         var longValue = new string('x', 201);
         var command = new UpdateJobApplicationCommand
         {
             Id = jobApplicationId,
-            UserId = userId,
+            UserId = TestAuthHandler.TestUserId,
             Name = propertyName == "Name" ? longValue : "Valid",
             Position = propertyName == "Position" ? longValue : "Valid",
             URL = "https://company.com/job",
@@ -84,12 +85,12 @@ public class UpdateJobApplicationTests : IClassFixture<FakeAuthWebApplicationFac
     [Fact]
     public async Task UpdateJobApplication_ShouldReturn400_WhenUrlIsInvalid()
     {
-        var (userId, jobApplicationId) = await SeedHelper.CreateUserWithJobApplicationAsync(_factory.Services);
+        var jobApplicationId = await SeedHelper.CreateJobApplicationForTestUserAsync(_factory.Services);
 
         var command = new UpdateJobApplicationCommand
         {
             Id = jobApplicationId,
-            UserId = userId,
+            UserId = TestAuthHandler.TestUserId,
             Name = "Valid",
             Position = "Valid",
             URL = "invalid-url",
@@ -114,7 +115,7 @@ public class UpdateJobApplicationTests : IClassFixture<FakeAuthWebApplicationFac
     {
         var (_, jobApplicationId) = await SeedHelper.CreateUserWithJobApplicationAsync(_factory.Services);
 
-        var command = new UpdateJobApplicationCommand { Id = jobApplicationId};
+        var command = new UpdateJobApplicationCommand { Id = jobApplicationId };
 
         var response = await _client.PutAsJsonAsync($"/api/job-applications/{command.Id}", command);
 
@@ -123,7 +124,7 @@ public class UpdateJobApplicationTests : IClassFixture<FakeAuthWebApplicationFac
 
         var requiredFields = new[]
         {
-            "Name", "Position", "URL", "UserId", "JobDescription",
+            "Name", "Position", "URL", "JobDescription",
             "Location", "ContactPerson", "StartDate"
         };
 
@@ -138,12 +139,12 @@ public class UpdateJobApplicationTests : IClassFixture<FakeAuthWebApplicationFac
     [Fact]
     public async Task UpdateJobApplication_ShouldReturn400_WhenDurationInMonthsIsInvalid()
     {
-        var (userId, jobApplicationId) = await SeedHelper.CreateUserWithJobApplicationAsync(_factory.Services);
+        var jobApplicationId = await SeedHelper.CreateJobApplicationForTestUserAsync(_factory.Services);
 
         var command = new UpdateJobApplicationCommand
         {
             Id = jobApplicationId,
-            UserId = userId,
+            UserId = TestAuthHandler.TestUserId,
             Name = "Valid Job",
             Position = "Valid",
             URL = "https://company.com/job",
@@ -167,12 +168,10 @@ public class UpdateJobApplicationTests : IClassFixture<FakeAuthWebApplicationFac
     [Fact]
     public async Task UpdateJobApplication_ShouldReturn400_WhenJobApplicationDoesNotExist()
     {
-        var (userId, _) = await SeedHelper.CreateUserWithJobApplicationAsync(_factory.Services);
-
         var command = new UpdateJobApplicationCommand
         {
             Id = 9999,
-            UserId = userId,
+            UserId = TestAuthHandler.TestUserId,
             Name = "Valid Job",
             Position = "Valid",
             URL = "https://company.com/job",
@@ -196,13 +195,12 @@ public class UpdateJobApplicationTests : IClassFixture<FakeAuthWebApplicationFac
     [Fact]
     public async Task UpdateJobApplication_ShouldReturn400_WhenJobApplicationBelongsToAnotherUser()
     {
-        var (userId, _) = await SeedHelper.CreateUserWithJobApplicationAsync(_factory.Services);
-        var (_, jobApplicationId2) = await SeedHelper.CreateUserWithJobApplicationAsync(_factory.Services);
+        var (_, jobApplicationId) = await SeedHelper.CreateUserWithJobApplicationAsync(_factory.Services);
 
         var command = new UpdateJobApplicationCommand
         {
-            Id = jobApplicationId2, // belonging to different user
-            UserId = userId,
+            Id = jobApplicationId, // belonging to a different user
+            UserId = TestAuthHandler.TestUserId,
             Name = "Valid Job",
             Position = "Valid",
             URL = "https://company.com/job",
