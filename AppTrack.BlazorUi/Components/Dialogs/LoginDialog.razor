@@ -1,0 +1,46 @@
+<MudDialog Class="apptrack-dialog">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Login" Class="mr-2" />
+            Login
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField T="string"
+                      Label="Username"
+                      Value="_model.UserName"
+                      ValueChanged="@((string v) => OnUsernameChanged(v))"
+                      Error="@ModelValidator.Errors.ContainsKey(nameof(LoginModel.UserName))"
+                      ErrorText="@GetFirstError(nameof(LoginModel.UserName))"
+                      Class="mb-3" />
+        <MudTextField T="string"
+                      Label="Password"
+                      InputType="InputType.Password"
+                      Value="_model.Password"
+                      ValueChanged="@((string v) => OnPasswordChanged(v))"
+                      Error="@ModelValidator.Errors.ContainsKey(nameof(LoginModel.Password))"
+                      ErrorText="@GetFirstError(nameof(LoginModel.Password))"
+                      Class="mb-1" />
+        <MudCheckBox T="bool"
+                     Label="Remember me"
+                     @bind-Value="_rememberMe"
+                     Class="mb-2" />
+        @if (!string.IsNullOrEmpty(ErrorMessage))
+        {
+            <MudAlert Severity="Severity.Error" Dense="true" Class="mt-2">
+                @ErrorMessage
+            </MudAlert>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Outlined" OnClick="OpenRegisterDialogAsync">
+            Register
+        </MudButton>
+        <MudSpacer />
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   OnClick="Submit">
+            Login
+        </MudButton>
+    </DialogActions>
+</MudDialog>
