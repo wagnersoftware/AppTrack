@@ -12,20 +12,21 @@
                       ValueChanged="@((string v) => OnUsernameChanged(v))"
                       Error="@ModelValidator.Errors.ContainsKey(nameof(LoginModel.UserName))"
                       ErrorText="@GetFirstError(nameof(LoginModel.UserName))"
+                      Variant="Variant.Outlined"
                       Class="mb-3" />
         <MudTextField T="string"
                       Label="Password"
-                      InputType="InputType.Password"
+                      InputType="_passwordInputType"
                       Value="_model.Password"
                       ValueChanged="@((string v) => OnPasswordChanged(v))"
                       Error="@ModelValidator.Errors.ContainsKey(nameof(LoginModel.Password))"
                       ErrorText="@GetFirstError(nameof(LoginModel.Password))"
+                      Adornment="Adornment.End"
+                      AdornmentIcon="@_passwordInputIcon"
+                      OnAdornmentClick="TogglePasswordVisibility"
+                      Variant="Variant.Outlined"
                       Class="mb-1" />
-        <MudCheckBox T="bool"
-                     Label="Remember me"
-                     @bind-Value="_rememberMe"
-                     Class="mb-2" />
-        @if (!string.IsNullOrEmpty(ErrorMessage))
+@if (!string.IsNullOrEmpty(ErrorMessage))
         {
             <MudAlert Severity="Severity.Error" Dense="true" Class="mt-2">
                 @ErrorMessage
@@ -39,7 +40,7 @@
         <MudSpacer />
         <MudButton Variant="Variant.Filled"
                    Color="Color.Primary"
-                   OnClick="Submit">
+                   OnClick="SubmitAsync">
             Login
         </MudButton>
     </DialogActions>

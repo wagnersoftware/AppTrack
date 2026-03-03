@@ -12,22 +12,31 @@
                       ValueChanged="@((string v) => OnUsernameChanged(v))"
                       Error="@ModelValidator.Errors.ContainsKey(nameof(RegistrationModel.UserName))"
                       ErrorText="@GetFirstError(nameof(RegistrationModel.UserName))"
-                      Class="mb-3" />
+                      Variant="Variant.Outlined"
+                      Class="mb-1" />
         <MudTextField T="string"
                       Label="Password"
-                      InputType="InputType.Password"
+                      InputType="_passwordInputType"
                       Value="_model.Password"
                       ValueChanged="@((string v) => OnPasswordChanged(v))"
                       Error="@ModelValidator.Errors.ContainsKey(nameof(RegistrationModel.Password))"
                       ErrorText="@GetFirstError(nameof(RegistrationModel.Password))"
-                      Class="mb-3" />
+                      Adornment="Adornment.End"
+                      AdornmentIcon="@_passwordInputIcon"
+                      OnAdornmentClick="TogglePasswordVisibility"
+                      Variant="Variant.Outlined"
+                      Class="mb-1" />
         <MudTextField T="string"
                       Label="Confirm Password"
-                      InputType="InputType.Password"
+                      InputType="_confirmPasswordInputType"
                       Value="_model.ConfirmPassword"
                       ValueChanged="@((string v) => OnConfirmPasswordChanged(v))"
                       Error="@ModelValidator.Errors.ContainsKey(nameof(RegistrationModel.ConfirmPassword))"
                       ErrorText="@GetFirstError(nameof(RegistrationModel.ConfirmPassword))"
+                      Adornment="Adornment.End"
+                      AdornmentIcon="@_confirmPasswordInputIcon"
+                      OnAdornmentClick="ToggleConfirmPasswordVisibility"
+                      Variant="Variant.Outlined"
                       Class="mb-1" />
         @if (!string.IsNullOrEmpty(ErrorMessage))
         {
@@ -41,7 +50,7 @@
         <MudSpacer />
         <MudButton Variant="Variant.Filled"
                    Color="Color.Primary"
-                   OnClick="Submit">
+                   OnClick="SubmitAsync">
             Register
         </MudButton>
     </DialogActions>
