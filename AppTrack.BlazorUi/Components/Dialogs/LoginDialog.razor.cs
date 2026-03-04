@@ -1,3 +1,4 @@
+using AppTrack.BlazorUi.Services;
 using AppTrack.Frontend.ApiService.Contracts;
 using AppTrack.Frontend.Models;
 using AppTrack.Frontend.Models.ModelValidator;
@@ -11,11 +12,14 @@ public partial class LoginDialog
     [Inject] private IDialogService DialogService { get; set; } = null!;
     [Inject] private IAuthenticationService AuthenticationService { get; set; } = null!;
     [Inject] private IModelValidator<LoginModel> ModelValidator { get; set; } = null!;
+    [Inject] private IErrorHandlingService ErrorHandlingService { get; set; } = null!;
 
     [CascadingParameter] private IMudDialogInstance MudDialog { get; set; } = null!;
 
     private readonly LoginModel _model = new();
-    private string ErrorMessage { get; set; } = string.Empty;
+
+    internal static readonly Dictionary<string, object> UsernameAttributes = new() { { "autocomplete", "username" } };
+    internal static readonly Dictionary<string, object> PasswordAttributes = new() { { "autocomplete", "current-password" } };
 
     private InputType _passwordInputType = InputType.Password;
     private string _passwordInputIcon = Icons.Material.Filled.VisibilityOff;
@@ -37,14 +41,12 @@ public partial class LoginDialog
     private void OnUsernameChanged(string value)
     {
         _model.UserName = value;
-        ErrorMessage = string.Empty;
         ModelValidator.ResetErrors(nameof(LoginModel.UserName));
     }
 
     private void OnPasswordChanged(string value)
     {
         _model.Password = value;
-        ErrorMessage = string.Empty;
         ModelValidator.ResetErrors(nameof(LoginModel.Password));
     }
 
@@ -57,13 +59,7 @@ public partial class LoginDialog
 
         var response = await AuthenticationService.AuthenticateAsync(_model);
 
-        if (!response.Success)
-        {
-            ErrorMessage = !string.IsNullOrEmpty(response.ValidationErrors)
-                ? response.ValidationErrors
-                : response.ErrorMessage;
-            return;
-        }
+        if (!ErrorHandlingService.HandleResponse(response)) return;
 
         MudDialog.Close(DialogResult.Ok(true));
     }

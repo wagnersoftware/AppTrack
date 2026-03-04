@@ -12,8 +12,9 @@
                       ValueChanged="@((string v) => OnUsernameChanged(v))"
                       Error="@ModelValidator.Errors.ContainsKey(nameof(RegistrationModel.UserName))"
                       ErrorText="@GetFirstError(nameof(RegistrationModel.UserName))"
+                      UserAttributes="UsernameAttributes"
                       Variant="Variant.Outlined"
-                      Class="mb-1" />
+                      Class="mb-3" />
         <MudTextField T="string"
                       Label="Password"
                       InputType="_passwordInputType"
@@ -21,6 +22,7 @@
                       ValueChanged="@((string v) => OnPasswordChanged(v))"
                       Error="@ModelValidator.Errors.ContainsKey(nameof(RegistrationModel.Password))"
                       ErrorText="@GetFirstError(nameof(RegistrationModel.Password))"
+                      UserAttributes="PasswordAttributes"
                       Adornment="Adornment.End"
                       AdornmentIcon="@_passwordInputIcon"
                       OnAdornmentClick="TogglePasswordVisibility"
@@ -33,17 +35,12 @@
                       ValueChanged="@((string v) => OnConfirmPasswordChanged(v))"
                       Error="@ModelValidator.Errors.ContainsKey(nameof(RegistrationModel.ConfirmPassword))"
                       ErrorText="@GetFirstError(nameof(RegistrationModel.ConfirmPassword))"
+                      UserAttributes="PasswordAttributes"
                       Adornment="Adornment.End"
                       AdornmentIcon="@_confirmPasswordInputIcon"
                       OnAdornmentClick="ToggleConfirmPasswordVisibility"
                       Variant="Variant.Outlined"
                       Class="mb-1" />
-        @if (!string.IsNullOrEmpty(ErrorMessage))
-        {
-            <MudAlert Severity="Severity.Error" Dense="true" Class="mt-2">
-                @ErrorMessage
-            </MudAlert>
-        }
     </DialogContent>
     <DialogActions>
         <MudButton Variant="Variant.Text" OnClick="Cancel">Cancel</MudButton>

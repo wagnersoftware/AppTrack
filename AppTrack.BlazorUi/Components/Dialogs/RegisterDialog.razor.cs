@@ -1,3 +1,4 @@
+using AppTrack.BlazorUi.Services;
 using AppTrack.Frontend.ApiService.Contracts;
 using AppTrack.Frontend.Models;
 using AppTrack.Frontend.Models.ModelValidator;
@@ -9,13 +10,15 @@ namespace AppTrack.BlazorUi.Components.Dialogs;
 public partial class RegisterDialog
 {
     [Inject] private IAuthenticationService AuthenticationService { get; set; } = null!;
-    [Inject] private ISnackbar Snackbar { get; set; } = null!;
     [Inject] private IModelValidator<RegistrationModel> ModelValidator { get; set; } = null!;
+    [Inject] private IErrorHandlingService ErrorHandlingService { get; set; } = null!;
 
     [CascadingParameter] private IMudDialogInstance MudDialog { get; set; } = null!;
 
     private readonly RegistrationModel _model = new();
-    private string ErrorMessage { get; set; } = string.Empty;
+
+    internal static readonly Dictionary<string, object> UsernameAttributes = new() { { "autocomplete", "off" } };
+    internal static readonly Dictionary<string, object> PasswordAttributes = new() { { "autocomplete", "new-password" } };
 
     private InputType _passwordInputType = InputType.Password;
     private string _passwordInputIcon = Icons.Material.Filled.VisibilityOff;
@@ -54,21 +57,18 @@ public partial class RegisterDialog
     private void OnUsernameChanged(string value)
     {
         _model.UserName = value;
-        ErrorMessage = string.Empty;
         ModelValidator.ResetErrors(nameof(RegistrationModel.UserName));
     }
 
     private void OnPasswordChanged(string value)
     {
         _model.Password = value;
-        ErrorMessage = string.Empty;
         ModelValidator.ResetErrors(nameof(RegistrationModel.Password));
     }
 
     private void OnConfirmPasswordChanged(string value)
     {
         _model.ConfirmPassword = value;
-        ErrorMessage = string.Empty;
         ModelValidator.ResetErrors(nameof(RegistrationModel.ConfirmPassword));
     }
 
@@ -81,15 +81,9 @@ public partial class RegisterDialog
 
         var response = await AuthenticationService.RegisterAsync(_model);
 
-        if (!response.Success)
-        {
-            ErrorMessage = !string.IsNullOrEmpty(response.ValidationErrors)
-                ? response.ValidationErrors
-                : response.ErrorMessage;
-            return;
-        }
+        if (!ErrorHandlingService.HandleResponse(response)) return;
 
-        Snackbar.Add($"User {_model.UserName} registered successfully.", Severity.Success);
+        ErrorHandlingService.ShowSuccess($"User {_model.UserName} registered successfully.");
         MudDialog.Close(DialogResult.Ok(true));
     }
 

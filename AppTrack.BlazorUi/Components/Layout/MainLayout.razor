@@ -1,6 +1,6 @@
 @inherits LayoutComponentBase
 
-<MudThemeProvider />
+<MudThemeProvider Theme="AzureTheme" />
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
@@ -17,6 +17,19 @@
         </MudButton>
     </MudAppBar>
     <MudMainContent>
-        @Body
+        <ErrorBoundary>
+            <ChildContent>
+                @Body
+            </ChildContent>
+            <ErrorContent Context="ex">
+                <MudContainer MaxWidth="MaxWidth.Small" Class="mt-8">
+                    <MudAlert Severity="Severity.Error" Variant="Variant.Filled">
+                        <MudText Typo="Typo.h6">An unexpected error occurred</MudText>
+                        <MudText>@ex.Message</MudText>
+                    </MudAlert>
+                    <MudButton Href="/" Color="Color.Primary" Class="mt-4">Go to home page</MudButton>
+                </MudContainer>
+            </ErrorContent>
+        </ErrorBoundary>
     </MudMainContent>
 </MudLayout>

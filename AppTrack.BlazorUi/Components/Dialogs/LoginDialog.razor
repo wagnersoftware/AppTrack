@@ -12,6 +12,7 @@
                       ValueChanged="@((string v) => OnUsernameChanged(v))"
                       Error="@ModelValidator.Errors.ContainsKey(nameof(LoginModel.UserName))"
                       ErrorText="@GetFirstError(nameof(LoginModel.UserName))"
+                      UserAttributes="UsernameAttributes"
                       Variant="Variant.Outlined"
                       Class="mb-3" />
         <MudTextField T="string"
@@ -21,17 +22,12 @@
                       ValueChanged="@((string v) => OnPasswordChanged(v))"
                       Error="@ModelValidator.Errors.ContainsKey(nameof(LoginModel.Password))"
                       ErrorText="@GetFirstError(nameof(LoginModel.Password))"
+                      UserAttributes="PasswordAttributes"
                       Adornment="Adornment.End"
                       AdornmentIcon="@_passwordInputIcon"
                       OnAdornmentClick="TogglePasswordVisibility"
                       Variant="Variant.Outlined"
                       Class="mb-1" />
-@if (!string.IsNullOrEmpty(ErrorMessage))
-        {
-            <MudAlert Severity="Severity.Error" Dense="true" Class="mt-2">
-                @ErrorMessage
-            </MudAlert>
-        }
     </DialogContent>
     <DialogActions>
         <MudButton Variant="Variant.Outlined" OnClick="OpenRegisterDialogAsync">
