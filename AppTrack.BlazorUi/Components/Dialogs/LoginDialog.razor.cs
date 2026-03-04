@@ -9,7 +9,6 @@ namespace AppTrack.BlazorUi.Components.Dialogs;
 
 public partial class LoginDialog
 {
-    [Inject] private IDialogService DialogService { get; set; } = null!;
     [Inject] private IAuthenticationService AuthenticationService { get; set; } = null!;
     [Inject] private IModelValidator<LoginModel> ModelValidator { get; set; } = null!;
     [Inject] private IErrorHandlingService ErrorHandlingService { get; set; } = null!;
@@ -64,14 +63,5 @@ public partial class LoginDialog
         MudDialog.Close(DialogResult.Ok(true));
     }
 
-    private async Task OpenRegisterDialogAsync()
-    {
-        MudDialog.Close();
-        var options = new DialogOptions { BackdropClick = false };
-        var dialog = await DialogService.ShowAsync<RegisterDialog>("", options);
-        await dialog.Result;
-
-        var loginOptions = new DialogOptions { BackdropClick = false };
-        await DialogService.ShowAsync<LoginDialog>("", loginOptions);
-    }
+    private void Cancel() => MudDialog.Cancel();
 }

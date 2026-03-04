@@ -21,9 +21,11 @@ public partial class MainLayout
         }
     };
 
-    private async Task OpenLoginDialogAsync()
-    {
-        var options = new DialogOptions { BackdropClick = false };
-        await DialogService.ShowAsync<LoginDialog>("", options);
-    }
+    private static readonly DialogOptions _dialogOptions = new() { BackdropClick = true };
+
+    private async Task OpenLoginDialogAsync() =>
+        await DialogService.ShowAsync<LoginDialog>("", _dialogOptions);
+
+    private async Task OpenRegisterDialogAsync() =>
+        await DialogService.ShowAsync<RegisterDialog>("", _dialogOptions);
 }

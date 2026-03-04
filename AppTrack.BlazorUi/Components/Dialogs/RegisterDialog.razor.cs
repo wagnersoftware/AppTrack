@@ -10,6 +10,7 @@ namespace AppTrack.BlazorUi.Components.Dialogs;
 public partial class RegisterDialog
 {
     [Inject] private IAuthenticationService AuthenticationService { get; set; } = null!;
+    [Inject] private IDialogService DialogService { get; set; } = null!;
     [Inject] private IModelValidator<RegistrationModel> ModelValidator { get; set; } = null!;
     [Inject] private IErrorHandlingService ErrorHandlingService { get; set; } = null!;
 
@@ -85,6 +86,7 @@ public partial class RegisterDialog
 
         ErrorHandlingService.ShowSuccess($"User {_model.UserName} registered successfully.");
         MudDialog.Close(DialogResult.Ok(true));
+        await DialogService.ShowAsync<LoginDialog>("", new DialogOptions { BackdropClick = true });
     }
 
     private void Cancel() => MudDialog.Cancel();
