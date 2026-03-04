@@ -4,6 +4,7 @@ using AppTrack.Application.Features.JobApplicationDefaults.Commands.UpdateApplic
 using AppTrack.Application.Features.JobApplicationDefaults.Dto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace AppTrack.Api.Controllers;
@@ -33,7 +34,7 @@ public class JobApplicationsDefaultsController : ControllerBase
             return BadRequest("Route ID and body ID do not match.");
         }
 
-        updateJobApplicationDefaultsCommand.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        updateJobApplicationDefaultsCommand.UserId = User.FindFirstValue(JwtRegisteredClaimNames.Sub)!;
         var result = await _mediator.Send(updateJobApplicationDefaultsCommand);
         return Ok(result);
     }

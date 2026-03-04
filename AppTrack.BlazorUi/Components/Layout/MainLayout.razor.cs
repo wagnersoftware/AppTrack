@@ -1,5 +1,7 @@
 using AppTrack.BlazorUi.Components.Dialogs;
+using AppTrack.Frontend.ApiService.ApiAuthenticationProvider;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using MudBlazor;
 
 namespace AppTrack.BlazorUi.Components.Layout;
@@ -7,6 +9,7 @@ namespace AppTrack.BlazorUi.Components.Layout;
 public partial class MainLayout
 {
     [Inject] private IDialogService DialogService { get; set; } = null!;
+    [Inject] private AuthenticationStateProvider AuthenticationStateProvider { get; set; } = null!;
 
     internal static readonly MudTheme AzureTheme = new()
     {
@@ -28,4 +31,10 @@ public partial class MainLayout
 
     private async Task OpenRegisterDialogAsync() =>
         await DialogService.ShowAsync<RegisterDialog>("", _dialogOptions);
+
+    private async Task LogoutAsync()
+    {
+        var provider = (ApiAuthenticationStateProvider)AuthenticationStateProvider;
+        await provider.LoggedOut();
+    }
 }

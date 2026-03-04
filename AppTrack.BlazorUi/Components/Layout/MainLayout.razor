@@ -9,19 +9,31 @@
     <MudAppBar Elevation="1">
         <MudText Typo="Typo.h6">AppTrack</MudText>
         <MudSpacer />
-        <MudButton Color="Color.Inherit"
-                   Variant="Variant.Text"
-                   StartIcon="@Icons.Material.Filled.Login"
-                   OnClick="OpenLoginDialogAsync">
-            Login
-        </MudButton>
-        <MudButton Color="Color.Inherit"
-                   Class="ml-2"
-                   Variant="Variant.Text"
-                   StartIcon="@Icons.Material.Filled.PersonAdd"
-                   OnClick="OpenRegisterDialogAsync">
-            Register
-        </MudButton>
+        <AuthorizeView>
+            <Authorized>
+                <MudButton Color="Color.Inherit"
+                           Variant="Variant.Text"
+                           StartIcon="@Icons.Material.Filled.Logout"
+                           OnClick="LogoutAsync">
+                    Logout
+                </MudButton>
+            </Authorized>
+            <NotAuthorized>
+                <MudButton Color="Color.Inherit"
+                           Variant="Variant.Text"
+                           StartIcon="@Icons.Material.Filled.Login"
+                           OnClick="OpenLoginDialogAsync">
+                    Login
+                </MudButton>
+                <MudButton Color="Color.Inherit"
+                           Class="ml-2"
+                           Variant="Variant.Text"
+                           StartIcon="@Icons.Material.Filled.PersonAdd"
+                           OnClick="OpenRegisterDialogAsync">
+                    Register
+                </MudButton>
+            </NotAuthorized>
+        </AuthorizeView>
     </MudAppBar>
     <MudMainContent>
         <ErrorBoundary>

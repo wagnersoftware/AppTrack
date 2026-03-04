@@ -1,7 +1,58 @@
-﻿@page "/"
+@page "/"
 
-<PageTitle>Home</PageTitle>
+<PageTitle>AppTrack</PageTitle>
 
-<h1>Hello, world!</h1>
-
-Welcome to your new app.
+<MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="mt-4">
+    <AuthorizeView>
+        <Authorized>
+            @if (_isLoading)
+            {
+                <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="mb-2" />
+            }
+            <MudDataGrid T="JobApplicationModel"
+                         Items="_jobApplications"
+                         Filterable="true"
+                         FilterMode="DataGridFilterMode.ColumnFilterRow"
+                         SortMode="SortMode.Multiple"
+                         Dense="true"
+                         Bordered="true"
+                         Striped="true"
+                         Hover="true"
+                         FixedHeader="true"
+                         Height="calc(100vh - 120px)">
+                <Columns>
+                    <PropertyColumn Property="x => x.Name" Title="Name" />
+                    <TemplateColumn Title="Status" Sortable="true" SortBy="x => x.Status">
+                        <CellTemplate Context="cell">
+                            <MudChip T="string"
+                                     Color="@GetStatusColor(cell.Item.Status)"
+                                     Size="Size.Small"
+                                     Variant="Variant.Filled">
+                                @cell.Item.Status
+                            </MudChip>
+                        </CellTemplate>
+                    </TemplateColumn>
+                    <PropertyColumn Property="x => x.Position" Title="Position" />
+                    <PropertyColumn Property="x => x.URL" Title="URL" />
+                    <PropertyColumn Property="x => x.Location" Title="Location" />
+                    <PropertyColumn Property="x => x.StartDate" Title="Start Date" />
+                    <PropertyColumn Property="x => x.DurationInMonths" Title="Duration (months)" />
+                    <PropertyColumn Property="x => x.ContactPerson" Title="Contact Person" />
+                    <PropertyColumn Property="x => x.CreationDate" Title="Created" Format="dd.MM.yyyy" />
+                    <PropertyColumn Property="x => x.ModifiedDate" Title="Modified" Format="dd.MM.yyyy" />
+                </Columns>
+            </MudDataGrid>
+        </Authorized>
+        <NotAuthorized>
+            <MudContainer MaxWidth="MaxWidth.Small" Class="mt-16">
+                <MudStack AlignItems="AlignItems.Center" Spacing="3">
+                    <MudIcon Icon="@Icons.Material.Filled.WorkOutline" Size="Size.Large" Color="Color.Primary" Style="font-size: 4rem;" />
+                    <MudText Typo="Typo.h5">Welcome to AppTrack</MudText>
+                    <MudText Typo="Typo.body1" Color="Color.Secondary" Align="Align.Center">
+                        Please log in to view and manage your job applications.
+                    </MudText>
+                </MudStack>
+            </MudContainer>
+        </NotAuthorized>
+    </AuthorizeView>
+</MudContainer>
