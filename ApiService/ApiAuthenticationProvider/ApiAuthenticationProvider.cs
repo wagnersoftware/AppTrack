@@ -50,7 +50,7 @@ public class ApiAuthenticationStateProvider : AuthenticationStateProvider
     public async Task LoggedIn()
     {
         var claims = await GetClaimsAsync();
-        var user = new ClaimsPrincipal(new ClaimsIdentity(claims, "jwt"));
+        var user = new ClaimsPrincipal(new ClaimsIdentity(claims, "jwt", JwtRegisteredClaimNames.Name, "role"));
         var authstate = Task.FromResult(new AuthenticationState(user));
         NotifyAuthenticationStateChanged(authstate);
     }

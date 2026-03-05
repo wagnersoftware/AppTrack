@@ -21,6 +21,8 @@ public partial class MainLayout
             PrimaryContrastText = "#FFFFFF",
             AppbarBackground = "#0078D4",
             AppbarText = "#FFFFFF",
+            Background = "#F0F3F7",
+            BackgroundGray = "#E4E8EE",
         }
     };
 

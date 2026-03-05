@@ -10,7 +10,11 @@
         <MudText Typo="Typo.h6">AppTrack</MudText>
         <MudSpacer />
         <AuthorizeView>
-            <Authorized>
+            <Authorized Context="authContext">
+                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1" Class="mr-2">
+                    <MudIcon Icon="@Icons.Material.Filled.AccountCircle" Size="Size.Small" />
+                    <MudText Typo="Typo.body2">@authContext.User.Identity?.Name</MudText>
+                </MudStack>
                 <MudButton Color="Color.Inherit"
                            Variant="Variant.Text"
                            StartIcon="@Icons.Material.Filled.Logout"
