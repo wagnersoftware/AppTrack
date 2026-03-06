@@ -16,7 +16,7 @@ public partial class Home : IDisposable
     [Inject] private IDialogService DialogService { get; set; } = null!;
     [Inject] private IErrorHandlingService ErrorHandlingService { get; set; } = null!;
 
-    private static readonly DialogOptions _createDialogOptions = new()
+    private static readonly DialogOptions _dialogOptions = new()
     {
         BackdropClick = false,
         MaxWidth = MaxWidth.Medium,
@@ -87,7 +87,7 @@ public partial class Home : IDisposable
 
     private async Task CreateJobApplicationAsync()
     {
-        var dialog = await DialogService.ShowAsync<CreateJobApplicationDialog>("", _createDialogOptions);
+        var dialog = await DialogService.ShowAsync<CreateJobApplicationDialog>("", _dialogOptions);
         var result = await dialog.Result;
 
         if (result is { Canceled: true }) return;
@@ -97,10 +97,24 @@ public partial class Home : IDisposable
         await InvokeAsync(StateHasChanged);
     }
 
-    private Task EditJobApplicationAsync(JobApplicationModel model)
+    private async Task EditJobApplicationAsync(JobApplicationModel model)
     {
-        Snackbar.Add($"Edit '{model.Name}' – not yet implemented.", Severity.Info);
-        return Task.CompletedTask;
+        var parameters = new DialogParameters<EditJobApplicationDialog>
+        {
+            { x => x.JobApplication, model }
+        };
+
+        var dialog = await DialogService.ShowAsync<EditJobApplicationDialog>("", parameters, _dialogOptions);
+        var result = await dialog.Result;
+
+        if (result is { Canceled: true }) return;
+        if (result?.Data is not JobApplicationModel updatedModel) return;
+
+        var index = _jobApplications.IndexOf(model);
+        if (index >= 0)
+            _jobApplications[index] = updatedModel;
+
+        await InvokeAsync(StateHasChanged);
     }
 
     private Task GenerateTextAsync(JobApplicationModel model)
