@@ -1,0 +1,147 @@
+<MudDialog Class="apptrack-dialog">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.SmartToy" Class="mr-2" />
+            AI Settings
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        @if (_isLoading)
+        {
+            <MudStack AlignItems="AlignItems.Center" Class="py-8">
+                <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+                <MudText Typo="Typo.body2" Color="Color.Secondary">Loading settings…</MudText>
+            </MudStack>
+        }
+        else
+        {
+            <MudGrid Spacing="2">
+                <!-- API Key -->
+                <MudItem xs="12">
+                    <MudTextField T="string"
+                                  Label="API Key"
+                                  InputType="_apiKeyInputType"
+                                  Value="_model.ApiKey"
+                                  ValueChanged="@((string v) => OnApiKeyChanged(v))"
+                                  Error="@ModelValidator.Errors.ContainsKey(nameof(AiSettingsModel.ApiKey))"
+                                  ErrorText="@GetFirstError(nameof(AiSettingsModel.ApiKey))"
+                                  Variant="Variant.Outlined"
+                                  Adornment="Adornment.End"
+                                  AdornmentIcon="@_apiKeyInputIcon"
+                                  OnAdornmentClick="ToggleApiKeyVisibility"
+                                  UserAttributes="_apiKeyAttributes"
+                                  Class="mb-1" />
+                </MudItem>
+                <!-- Chat Model -->
+                <MudItem xs="12" sm="6">
+                    <MudSelect T="ChatModel"
+                               Label="Chat Model"
+                               Value="_selectedChatModel"
+                               ValueChanged="@OnChatModelChanged"
+                               ToStringFunc="@(m => m?.Name ?? string.Empty)"
+                               Variant="Variant.Outlined"
+                               AdornmentIcon="@Icons.Material.Outlined.Psychology"
+                               Class="mb-1">
+                        @foreach (var model in _chatModels)
+                        {
+                            <MudSelectItem T="ChatModel" Value="@model">
+                                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                                    <MudText>@model.Name</MudText>
+                                    @if (!string.IsNullOrWhiteSpace(model.Description))
+                                    {
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">— @model.Description</MudText>
+                                    }
+                                </MudStack>
+                            </MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+                <!-- Prompt Template -->
+                <MudItem xs="12">
+                    <MudTextField T="string"
+                                  Label="Prompt Template"
+                                  Value="_model.PromptTemplate"
+                                  ValueChanged="@((string v) => OnPromptTemplateChanged(v))"
+                                  Error="@ModelValidator.Errors.ContainsKey(nameof(AiSettingsModel.PromptTemplate))"
+                                  ErrorText="@GetFirstError(nameof(AiSettingsModel.PromptTemplate))"
+                                  Variant="Variant.Outlined"
+                                  Lines="8"
+                                  Class="mb-1" />
+                </MudItem>
+                <!-- Prompt Parameters -->
+                <MudItem xs="12">
+                    <MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">
+                        <MudText Typo="Typo.subtitle1">Prompt Parameters</MudText>
+                        <MudSpacer />
+                        <MudButton Variant="Variant.Outlined"
+                                   Color="Color.Primary"
+                                   StartIcon="@Icons.Material.Filled.Add"
+                                   Size="Size.Small"
+                                   OnClick="AddPromptParameterAsync">
+                            Add
+                        </MudButton>
+                    </MudStack>
+                    @if (_model.PromptParameter.Count == 0)
+                    {
+                        <MudText Typo="Typo.body2" Color="Color.Secondary" Class="ml-1">
+                            No prompt parameters defined.
+                        </MudText>
+                    }
+                    else
+                    {
+                        <MudPaper Outlined="true" Class="pa-0" Style="max-height: 260px; overflow-y: auto;">
+                            @foreach (var param in _model.PromptParameter)
+                            {
+                                var captured = param;
+                                <MudStack Row="true"
+                                          AlignItems="AlignItems.Center"
+                                          Class="pa-3"
+                                          Style="border-bottom: 1px solid var(--mud-palette-divider);">
+                                    <MudStack Spacing="0" Style="flex: 1; min-width: 0;">
+                                        <MudText Typo="Typo.subtitle2" Style="word-break: break-word;">@captured.Key</MudText>
+                                        <MudText Typo="Typo.body2"
+                                                 Color="Color.Secondary"
+                                                 Style="word-break: break-word; white-space: pre-wrap;">@captured.Value</MudText>
+                                    </MudStack>
+                                    <MudStack Row="true" Spacing="0">
+                                        <MudTooltip Text="Edit">
+                                            <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                                           Size="Size.Small"
+                                                           Color="Color.Primary"
+                                                           OnClick="@(() => EditPromptParameterAsync(captured))" />
+                                        </MudTooltip>
+                                        <MudTooltip Text="Delete">
+                                            <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                                           Size="Size.Small"
+                                                           Color="Color.Error"
+                                                           OnClick="@(() => DeletePromptParameter(captured))" />
+                                        </MudTooltip>
+                                    </MudStack>
+                                </MudStack>
+                            }
+                        </MudPaper>
+                    }
+                </MudItem>
+            </MudGrid>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Text" OnClick="Cancel" Disabled="_isBusy || _isLoading">Cancel</MudButton>
+        <MudSpacer />
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   StartIcon="@Icons.Material.Filled.Save"
+                   OnClick="SubmitAsync"
+                   Disabled="_isBusy || _isLoading">
+            @if (_isBusy)
+            {
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+                <span>Saving…</span>
+            }
+            else
+            {
+                <span>Save</span>
+            }
+        </MudButton>
+    </DialogActions>
+</MudDialog>

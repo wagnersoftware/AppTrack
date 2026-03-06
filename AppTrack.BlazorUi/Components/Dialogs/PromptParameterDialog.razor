@@ -1,0 +1,47 @@
+<MudDialog Class="apptrack-dialog">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Tag" Class="mr-2" />
+            @(_isEdit ? "Edit Parameter" : "Add Parameter")
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudGrid Spacing="2">
+            <!-- Key -->
+            <MudItem xs="12">
+                <MudTextField T="string"
+                              Label="Key"
+                              Value="_model.Key"
+                              ValueChanged="@((string v) => OnKeyChanged(v))"
+                              Error="@ModelValidator.Errors.ContainsKey(nameof(PromptParameterModel.Key))"
+                              ErrorText="@GetFirstError(nameof(PromptParameterModel.Key))"
+                              Variant="Variant.Outlined"
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Outlined.Label"
+                              Class="mb-1" />
+            </MudItem>
+            <!-- Value -->
+            <MudItem xs="12">
+                <MudTextField T="string"
+                              Label="Value"
+                              Value="_model.Value"
+                              ValueChanged="@((string v) => OnValueChanged(v))"
+                              Error="@ModelValidator.Errors.ContainsKey(nameof(PromptParameterModel.Value))"
+                              ErrorText="@GetFirstError(nameof(PromptParameterModel.Value))"
+                              Variant="Variant.Outlined"
+                              Lines="6"
+                              Class="mb-1" />
+            </MudItem>
+        </MudGrid>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Text" OnClick="Cancel">Cancel</MudButton>
+        <MudSpacer />
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   StartIcon="@Icons.Material.Filled.Check"
+                   OnClick="Submit">
+            OK
+        </MudButton>
+    </DialogActions>
+</MudDialog>

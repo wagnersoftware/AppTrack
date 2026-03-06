@@ -90,6 +90,21 @@ Both create and edit dialogs share the same `DialogOptions` instance
   `ErrorText="@GetFirstError(propName)"` on MudTextField
 - `GetFirstError`: `ModelValidator.Errors.GetValueOrDefault(key)?.FirstOrDefault() ?? string.Empty`
 
+## Blazor Validator Registration Pattern
+Validators are registered one-by-one in `AppTrack.BlazorUi/Program.cs` as transient
+`IValidator<T>` bindings. The open-generic `IModelValidator<>` → `ModelValidator<>` is
+registered after all concrete validators. Adding a new validator requires two lines:
+```csharp
+builder.Services.AddTransient<IValidator<AiSettingsModel>, AiSettingsModelValidator>();
+builder.Services.AddTransient<IValidator<PromptParameterModel>, PromptParameterModelValidator>();
+```
+
+## Sub-Dialog (Nested Dialog) Pattern
+When a dialog needs to open another dialog (e.g., AiSettingsDialog → PromptParameterDialog),
+inject `IDialogService` into the parent dialog's code-behind. Use a separate `_paramDialogOptions`
+constant with `BackdropClick = false, MaxWidth = Small` for the child. Call
+`DialogService.ShowAsync<ChildDialog>("")` and `await dialog.Result` just like from a page.
+
 ## Key File Paths
 - WPF MainViewModel: `AppTrack.Wpf/ViewModel/MainViewModel.cs`
 - WPF form base: `AppTrack.Wpf/ViewModel/Base/AppTrackFormViewModelBase.cs`
@@ -100,5 +115,8 @@ Both create and edit dialogs share the same `DialogOptions` instance
 - Blazor Home page: `AppTrack.BlazorUi/Components/Pages/Home.razor(.cs)`
 - Blazor dialogs: `AppTrack.BlazorUi/Components/Dialogs/`
 - Blazor Program.cs: `AppTrack.BlazorUi/Program.cs`
+- Blazor layout: `AppTrack.BlazorUi/Components/Layout/MainLayout.razor(.cs)`
 - JobApplicationModel: `Models/JobApplicationModel.cs`
+- AiSettingsModel: `Models/AiSettingsModel.cs`
+- PromptParameterModel: `Models/PromptParameterModel.cs`
 - ModelBase: `Models/Base/ModelBase.cs` (Id, CreationDate, ModifiedDate)

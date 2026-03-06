@@ -22,6 +22,7 @@ public partial class EditJobApplicationDialog
 
     private JobApplicationModel _model = null!;
     private DateTime? _startDate;
+    // True only during the update API call; keeps the form visible but disables action buttons and shows an inline spinner.
     private bool _isBusy;
 
     protected override void OnParametersSet()

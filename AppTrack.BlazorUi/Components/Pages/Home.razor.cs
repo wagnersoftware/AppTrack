@@ -29,6 +29,7 @@ public partial class Home : IDisposable
     private List<JobApplicationModel> _jobApplications = [];
     private JobApplicationModel.JobApplicationStatus? _selectedStatus;
     private string _searchText = string.Empty;
+    // True while the initial job-application list is being fetched; replaces the card grid with a toolbar spinner.
     private bool _isLoading;
 
     private IEnumerable<JobApplicationModel> _filteredJobApplications =>

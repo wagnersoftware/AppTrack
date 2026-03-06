@@ -28,11 +28,28 @@ public partial class MainLayout
 
     private static readonly DialogOptions _dialogOptions = new() { BackdropClick = true };
 
+    private static readonly DialogOptions _aiSettingsDialogOptions = new()
+    {
+        BackdropClick = false,
+        MaxWidth = MaxWidth.Medium,
+        FullWidth = true,
+    };
+
+    private bool _drawerOpen = false;
+
+    private void ToggleDrawer() => _drawerOpen = !_drawerOpen;
+
     private async Task OpenLoginDialogAsync() =>
         await DialogService.ShowAsync<LoginDialog>("", _dialogOptions);
 
     private async Task OpenRegisterDialogAsync() =>
         await DialogService.ShowAsync<RegisterDialog>("", _dialogOptions);
+
+    private async Task OpenAiSettingsDialogAsync()
+    {
+        _drawerOpen = false;
+        await DialogService.ShowAsync<AiSettingsDialog>("", _aiSettingsDialogOptions);
+    }
 
     private async Task LogoutAsync()
     {

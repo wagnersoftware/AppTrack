@@ -20,6 +20,7 @@ public partial class CreateJobApplicationDialog
 
     private readonly JobApplicationModel _model = new();
     private DateTime? _startDate;
+    // True only during the create API call; keeps the form visible but disables action buttons and shows an inline spinner.
     private bool _isBusy;
 
     private void OnNameChanged(string value)
