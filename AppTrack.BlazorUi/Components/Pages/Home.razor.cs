@@ -23,6 +23,13 @@ public partial class Home : IDisposable
         FullWidth = true,
     };
 
+    private static readonly DialogOptions _generateTextDialogOptions = new()
+    {
+        BackdropClick = false,
+        MaxWidth = MaxWidth.Large,
+        FullWidth = true,
+    };
+
     private MudMessageBox? _deleteConfirmBox;
     private string _deleteConfirmMessage = string.Empty;
 
@@ -118,10 +125,21 @@ public partial class Home : IDisposable
         await InvokeAsync(StateHasChanged);
     }
 
-    private Task GenerateTextAsync(JobApplicationModel model)
+    private async Task GenerateTextAsync(JobApplicationModel model)
     {
-        Snackbar.Add($"Generate text for '{model.Name}' – not yet implemented.", Severity.Info);
-        return Task.CompletedTask;
+        var parameters = new DialogParameters<GenerateTextDialog>
+        {
+            { x => x.JobApplication, model }
+        };
+
+        var dialog = await DialogService.ShowAsync<GenerateTextDialog>("", parameters, _generateTextDialogOptions);
+        var result = await dialog.Result;
+
+        if (result is { Canceled: true }) return;
+        if (result?.Data is not string generatedText) return;
+
+        model.ApplicationText = generatedText;
+        await InvokeAsync(StateHasChanged);
     }
 
     private async Task DeleteJobApplicationAsync(JobApplicationModel model)
