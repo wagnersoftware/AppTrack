@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.JsonWebTokens;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 
@@ -21,7 +22,7 @@ public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions
     {
         var claims = new[]
         {
-            new Claim(ClaimTypes.NameIdentifier, "test-user-id"),
+            new Claim(JwtRegisteredClaimNames.Sub, "test-user-id"),
             new Claim(ClaimTypes.Name, "Test User"),
             new Claim(ClaimTypes.Role, "Admin")
         };
