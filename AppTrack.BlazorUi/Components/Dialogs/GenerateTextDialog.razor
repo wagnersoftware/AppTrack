@@ -1,0 +1,91 @@
+<MudDialog Class="apptrack-dialog" ContentClass="generate-text-content">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.AutoFixHigh" Class="mr-2" />
+            Generate Application Text
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        @if (_phase == Phase.LoadingPrompt)
+        {
+            <MudStack AlignItems="AlignItems.Center" Class="py-8" Spacing="2">
+                <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+                <MudText Typo="Typo.body2" Color="Color.Secondary">Generating prompt…</MudText>
+            </MudStack>
+        }
+        else if (_phase == Phase.PromptReady)
+        {
+            @if (_unusedKeys.Count > 0)
+            {
+                <MudAlert Severity="Severity.Warning" Class="mb-3" Dense="true">
+                    Unused placeholders: <strong>@string.Join(", ", _unusedKeys)</strong>
+                </MudAlert>
+            }
+            <MudTextField T="string"
+                          Value="_prompt"
+                          ValueChanged="@((string v) => _prompt = v)"
+                          Label="Prompt"
+                          Variant="Variant.Outlined"
+                          Lines="14"
+                          FullWidth="true" />
+        }
+        else if (_phase == Phase.GeneratingText)
+        {
+            <MudStack AlignItems="AlignItems.Center" Class="py-8" Spacing="3">
+                <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+                <MudText Typo="Typo.body2" Color="Color.Secondary">Generating application text…</MudText>
+                <MudButton Variant="Variant.Text"
+                           Color="Color.Warning"
+                           StartIcon="@Icons.Material.Filled.Stop"
+                           OnClick="AbortGeneration">
+                    Abort
+                </MudButton>
+            </MudStack>
+        }
+        else if (_phase == Phase.TextReady)
+        {
+            <MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">
+                <MudText Typo="Typo.subtitle2" Color="Color.Secondary">Generated text</MudText>
+                <MudSpacer />
+                <MudTooltip Text="Copy to clipboard">
+                    <MudIconButton Icon="@Icons.Material.Outlined.ContentCopy"
+                                   Size="Size.Small"
+                                   Color="Color.Default"
+                                   OnClick="CopyTextAsync" />
+                </MudTooltip>
+            </MudStack>
+            <MudTextField T="string"
+                          Value="_generatedText"
+                          ReadOnly="true"
+                          Variant="Variant.Outlined"
+                          Lines="14"
+                          FullWidth="true" />
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Text"
+                   OnClick="Cancel"
+                   Disabled="_phase is Phase.LoadingPrompt or Phase.GeneratingText">
+            @(_phase == Phase.TextReady ? "Close" : "Cancel")
+        </MudButton>
+        <MudSpacer />
+        @if (_phase == Phase.PromptReady)
+        {
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Send"
+                       OnClick="SendPromptAsync">
+                Send Prompt
+            </MudButton>
+        }
+        else if (_phase == Phase.TextReady)
+        {
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Outlined.ContentCopy"
+                       OnClick="CopyAndCloseAsync">
+                Copy and Close
+            </MudButton>
+        }
+    </DialogActions>
+</MudDialog>

@@ -1,0 +1,164 @@
+<MudDialog Class="apptrack-dialog">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-2" />
+            Edit Application
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudGrid Spacing="2">
+            <!-- Name -->
+            <MudItem xs="12" sm="6">
+                <MudTextField T="string"
+                              Label="Company Name"
+                              Value="_model.Name"
+                              ValueChanged="@((string v) => OnNameChanged(v))"
+                              Error="@ModelValidator.Errors.ContainsKey(nameof(JobApplicationModel.Name))"
+                              ErrorText="@GetFirstError(nameof(JobApplicationModel.Name))"
+                              Variant="Variant.Outlined"
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Outlined.Business"
+                              Class="mb-1" />
+            </MudItem>
+            <!-- Position -->
+            <MudItem xs="12" sm="6">
+                <MudTextField T="string"
+                              Label="Position"
+                              Value="_model.Position"
+                              ValueChanged="@((string v) => OnPositionChanged(v))"
+                              Error="@ModelValidator.Errors.ContainsKey(nameof(JobApplicationModel.Position))"
+                              ErrorText="@GetFirstError(nameof(JobApplicationModel.Position))"
+                              Variant="Variant.Outlined"
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Outlined.Badge"
+                              Class="mb-1" />
+            </MudItem>
+            <!-- URL -->
+            <MudItem xs="12">
+                <MudTextField T="string"
+                              Label="Job URL"
+                              Value="_model.URL"
+                              ValueChanged="@((string v) => OnUrlChanged(v))"
+                              Error="@ModelValidator.Errors.ContainsKey(nameof(JobApplicationModel.URL))"
+                              ErrorText="@GetFirstError(nameof(JobApplicationModel.URL))"
+                              Variant="Variant.Outlined"
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Outlined.Link"
+                              Class="mb-1" />
+            </MudItem>
+            <!-- Location -->
+            <MudItem xs="12" sm="6">
+                <MudTextField T="string"
+                              Label="Location"
+                              Value="_model.Location"
+                              ValueChanged="@((string v) => OnLocationChanged(v))"
+                              Error="@ModelValidator.Errors.ContainsKey(nameof(JobApplicationModel.Location))"
+                              ErrorText="@GetFirstError(nameof(JobApplicationModel.Location))"
+                              Variant="Variant.Outlined"
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Outlined.LocationOn"
+                              Class="mb-1" />
+            </MudItem>
+            <!-- Contact Person -->
+            <MudItem xs="12" sm="6">
+                <MudTextField T="string"
+                              Label="Contact Person"
+                              Value="_model.ContactPerson"
+                              ValueChanged="@((string v) => OnContactPersonChanged(v))"
+                              Error="@ModelValidator.Errors.ContainsKey(nameof(JobApplicationModel.ContactPerson))"
+                              ErrorText="@GetFirstError(nameof(JobApplicationModel.ContactPerson))"
+                              Variant="Variant.Outlined"
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Outlined.Person"
+                              Class="mb-1" />
+            </MudItem>
+            <!-- Start Date -->
+            <MudItem xs="12" sm="6">
+                <MudDatePicker Label="Start Date"
+                               Date="_startDate"
+                               DateChanged="@OnStartDateChanged"
+                               Error="@ModelValidator.Errors.ContainsKey(nameof(JobApplicationModel.StartDate))"
+                               ErrorText="@GetFirstError(nameof(JobApplicationModel.StartDate))"
+                               Variant="Variant.Outlined"
+                               DateFormat="dd.MM.yyyy"
+                               Editable="true"
+                               Class="mb-1" />
+            </MudItem>
+            <!-- Duration -->
+            <MudItem xs="12" sm="6">
+                <MudTextField T="string"
+                              Label="Duration (months)"
+                              Value="_model.DurationInMonths"
+                              ValueChanged="@((string v) => OnDurationChanged(v))"
+                              Error="@ModelValidator.Errors.ContainsKey(nameof(JobApplicationModel.DurationInMonths))"
+                              ErrorText="@GetFirstError(nameof(JobApplicationModel.DurationInMonths))"
+                              Variant="Variant.Outlined"
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Outlined.Schedule"
+                              Class="mb-1" />
+            </MudItem>
+            <!-- Status -->
+            <MudItem xs="12" sm="6">
+                <MudSelect T="JobApplicationModel.JobApplicationStatus"
+                           Label="Status"
+                           Value="_model.Status"
+                           ValueChanged="@OnStatusChanged"
+                           Variant="Variant.Outlined"
+                           AdornmentIcon="@Icons.Material.Outlined.Flag"
+                           Class="mb-1">
+                    @foreach (var status in Enum.GetValues<JobApplicationModel.JobApplicationStatus>())
+                    {
+                        <MudSelectItem T="JobApplicationModel.JobApplicationStatus" Value="@status">
+                            @status
+                        </MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+            <!-- Job Description -->
+            <MudItem xs="12">
+                <MudTextField T="string"
+                              Label="Job Description"
+                              Value="_model.JobDescription"
+                              ValueChanged="@((string v) => OnJobDescriptionChanged(v))"
+                              Error="@ModelValidator.Errors.ContainsKey(nameof(JobApplicationModel.JobDescription))"
+                              ErrorText="@GetFirstError(nameof(JobApplicationModel.JobDescription))"
+                              Variant="Variant.Outlined"
+                              Lines="5"
+                              Class="mb-1" />
+            </MudItem>
+            <!-- Application Text -->
+            <MudItem xs="12">
+                <MudTextField T="string"
+                              Label="Application Text"
+                              Value="_model.ApplicationText"
+                              ValueChanged="@((string v) => OnApplicationTextChanged(v))"
+                              Variant="Variant.Outlined"
+                              Lines="5"
+                              Adornment="Adornment.End"
+                              AdornmentIcon="@Icons.Material.Outlined.ContentCopy"
+                              AdornmentAriaLabel="Copy application text"
+                              OnAdornmentClick="CopyApplicationTextAsync"
+                              Class="mb-1" />
+            </MudItem>
+        </MudGrid>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Text" OnClick="Cancel" Disabled="_isBusy">Cancel</MudButton>
+        <MudSpacer />
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   StartIcon="@Icons.Material.Filled.Save"
+                   OnClick="SubmitAsync"
+                   Disabled="_isBusy">
+            @if (_isBusy)
+            {
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+                <span>Saving…</span>
+            }
+            else
+            {
+                <span>Save</span>
+            }
+        </MudButton>
+    </DialogActions>
+</MudDialog>

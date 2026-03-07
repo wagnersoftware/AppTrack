@@ -1,0 +1,214 @@
+@page "/"
+
+<PageTitle>AppTrack</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.False" Class="mt-4 pb-6 px-4">
+    <AuthorizeView>
+        <Authorized>
+            <!-- ── Toolbar ─────────────────────────────────────────────── -->
+            <MudPaper Elevation="1" Class="pa-3 mb-4 d-flex flex-wrap align-center gap-3" Style="border-radius: 10px;">
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Add"
+                           Size="Size.Medium"
+                           OnClick="CreateJobApplicationAsync">
+                    New
+                </MudButton>
+
+                <MudDivider Vertical="true" FlexItem="true" />
+
+                <MudTextField T="string"
+                              Value="_searchText"
+                              ValueChanged="OnSearchChanged"
+                              Placeholder="Search applications…"
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Outlined.Search"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              Clearable="true"
+                              Style="min-width: 240px; max-width: 320px;" />
+
+                <MudSelect T="JobApplicationModel.JobApplicationStatus?"
+                           Value="_selectedStatus"
+                           ValueChanged="OnStatusFilterChanged"
+                           Variant="Variant.Outlined"
+                           Dense="true"
+                           Clearable="true"
+                           Placeholder="All statuses"
+                           Margin="Margin.Dense"
+                           AdornmentIcon="@Icons.Material.Outlined.FilterList"
+                           Style="min-width: 190px; max-width: 220px;">
+                    @foreach (var status in Enum.GetValues<JobApplicationModel.JobApplicationStatus>())
+                    {
+                        <MudSelectItem T="JobApplicationModel.JobApplicationStatus?" Value="@((JobApplicationModel.JobApplicationStatus?)status)">
+                            @status
+                        </MudSelectItem>
+                    }
+                </MudSelect>
+
+                <MudSpacer />
+
+                @if (_isLoading)
+                {
+                    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                        <MudProgressCircular Color="Color.Primary" Size="Size.Small" Indeterminate="true" />
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">Loading…</MudText>
+                    </MudStack>
+                }
+                else
+                {
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">
+                        @_filteredCount application@(_filteredCount == 1 ? "" : "s")
+                    </MudText>
+                }
+            </MudPaper>
+
+            <!-- ── Card Grid ───────────────────────────────────────────── -->
+            @{
+                var cardIndex = 0;
+                var cards = _filteredJobApplications.ToList();
+            }
+
+            @if (!_isLoading && cards.Count == 0)
+            {
+                <MudStack AlignItems="AlignItems.Center" Class="mt-16" Spacing="2">
+                    <MudIcon Icon="@Icons.Material.Outlined.SearchOff"
+                             Color="Color.Secondary"
+                             Style="font-size: 3.5rem;" />
+                    <MudText Typo="Typo.h6" Color="Color.Secondary">No applications found</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        Try adjusting your search or filter.
+                    </MudText>
+                </MudStack>
+            }
+            else
+            {
+                <MudGrid Spacing="3">
+                    @foreach (var app in cards)
+                    {
+                        var animStyle = $"animation-delay: {cardIndex * 55}ms; border-left: 4px solid {GetStatusHexColor(app.Status)};";
+                        cardIndex++;
+
+                        <MudItem xs="12" sm="6" md="4" lg="3">
+                            <MudCard Class="apptrack-card" Style="@(animStyle + " cursor: pointer;")" Elevation="2"
+                                     @onclick="@(() => EditJobApplicationAsync(app))">
+                                <MudCardHeader Style="padding-bottom: 4px;">
+                                    <CardHeaderContent>
+                                        <div class="apptrack-company-name">@app.Name</div>
+                                        <MudText Typo="Typo.body2" Color="Color.Secondary" Style="margin-top:2px;">
+                                            @app.Position
+                                        </MudText>
+                                    </CardHeaderContent>
+                                    <CardHeaderActions>
+                                        <MudChip T="string"
+                                                 Color="@GetStatusColor(app.Status)"
+                                                 Size="Size.Small"
+                                                 Variant="Variant.Filled"
+                                                 Style="font-size:0.7rem; height:22px;">
+                                            @GetStatusLabel(app.Status)
+                                        </MudChip>
+                                    </CardHeaderActions>
+                                </MudCardHeader>
+
+                                <MudCardContent Style="padding-top: 4px; flex: 1;">
+                                    <MudStack Spacing="1">
+                                        @if (!string.IsNullOrWhiteSpace(app.Location))
+                                        {
+                                            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                                                <MudIcon Icon="@Icons.Material.Outlined.LocationOn"
+                                                         Size="Size.Small" Color="Color.Secondary" />
+                                                <MudText Typo="Typo.body2">@app.Location</MudText>
+                                            </MudStack>
+                                        }
+                                        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                                            <MudIcon Icon="@Icons.Material.Outlined.CalendarToday"
+                                                     Size="Size.Small" Color="Color.Secondary" />
+                                            <MudText Typo="Typo.body2">@app.StartDate.ToString("dd.MM.yyyy")</MudText>
+                                            @if (!string.IsNullOrWhiteSpace(app.DurationInMonths))
+                                            {
+                                                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                                    · @app.DurationInMonths mo.
+                                                </MudText>
+                                            }
+                                        </MudStack>
+                                        @if (!string.IsNullOrWhiteSpace(app.ContactPerson))
+                                        {
+                                            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                                                <MudIcon Icon="@Icons.Material.Outlined.Person"
+                                                         Size="Size.Small" Color="Color.Secondary" />
+                                                <MudText Typo="Typo.body2">@app.ContactPerson</MudText>
+                                            </MudStack>
+                                        }
+                                        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                                            <MudIcon Icon="@Icons.Material.Outlined.Schedule"
+                                                     Size="Size.Small" Color="Color.Secondary" />
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                                Added @app.CreationDate.ToString("dd.MM.yyyy")
+                                            </MudText>
+                                        </MudStack>
+                                    </MudStack>
+                                </MudCardContent>
+
+                                <MudCardActions Style="padding-top: 4px;" @onclick:stopPropagation="true">
+                                    <MudTooltip Text="Edit">
+                                        <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                                       Color="Color.Primary"
+                                                       Size="Size.Small"
+                                                       OnClick="@(() => EditJobApplicationAsync(app))" />
+                                    </MudTooltip>
+                                    <MudTooltip Text="Generate Text">
+                                        <MudIconButton Icon="@Icons.Material.Filled.AutoFixHigh"
+                                                       Color="Color.Secondary"
+                                                       Size="Size.Small"
+                                                       OnClick="@(() => GenerateTextAsync(app))" />
+                                    </MudTooltip>
+                                    @if (!string.IsNullOrWhiteSpace(app.URL))
+                                    {
+                                        <MudTooltip Text="@app.URL">
+                                            <MudIconButton Icon="@Icons.Material.Outlined.OpenInNew"
+                                                           Size="Size.Small"
+                                                           Color="Color.Default"
+                                                           Href="@app.URL"
+                                                           Target="_blank" />
+                                        </MudTooltip>
+                                    }
+                                    <MudSpacer />
+                                    <MudTooltip Text="Delete">
+                                        <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                                       Color="Color.Error"
+                                                       Size="Size.Small"
+                                                       OnClick="@(() => DeleteJobApplicationAsync(app))" />
+                                    </MudTooltip>
+                                </MudCardActions>
+                            </MudCard>
+                        </MudItem>
+                    }
+                </MudGrid>
+            }
+
+            <MudMessageBox @ref="_deleteConfirmBox" Title="Confirm Delete" CancelText="Cancel">
+                <MessageContent>
+                    @_deleteConfirmMessage
+                </MessageContent>
+                <YesButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Error">Delete</MudButton>
+                </YesButton>
+            </MudMessageBox>
+        </Authorized>
+
+        <NotAuthorized>
+            <MudContainer MaxWidth="MaxWidth.Small" Class="mt-16">
+                <MudStack AlignItems="AlignItems.Center" Spacing="3">
+                    <MudIcon Icon="@Icons.Material.Filled.WorkOutline"
+                             Size="Size.Large"
+                             Color="Color.Primary"
+                             Style="font-size: 4rem;" />
+                    <MudText Typo="Typo.h5">Welcome to AppTrack</MudText>
+                    <MudText Typo="Typo.body1" Color="Color.Secondary" Align="Align.Center">
+                        Please log in to view and manage your job applications.
+                    </MudText>
+                </MudStack>
+            </MudContainer>
+        </NotAuthorized>
+    </AuthorizeView>
+</MudContainer>

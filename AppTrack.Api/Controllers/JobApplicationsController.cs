@@ -8,6 +8,7 @@ using AppTrack.Application.Features.JobApplications.Queries.GetJobApplicationByI
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace AppTrack.Api.Controllers;
 
@@ -31,7 +32,7 @@ public class JobApplicationsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<JobApplicationDto>> Get([FromRoute] int id)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        var userId = User.FindFirstValue(JwtRegisteredClaimNames.Sub)!;
         var jobApplicationDto = await _mediator.Send(new GetJobApplicationByIdQuery { Id = id, UserId = userId });
         return Ok(jobApplicationDto);
     }
@@ -43,7 +44,7 @@ public class JobApplicationsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<JobApplicationDto>> Post([FromBody] CreateJobApplicationCommand createJobApplicationCommand)
     {
-        createJobApplicationCommand.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        createJobApplicationCommand.UserId = User.FindFirstValue(JwtRegisteredClaimNames.Sub)!;
         var response = await _mediator.Send(createJobApplicationCommand);
         return CreatedAtAction(nameof(Get), new { id = response.Id }, response);
     }
@@ -61,7 +62,7 @@ public class JobApplicationsController : ControllerBase
             return BadRequest("Route ID and body ID do not match.");
         }
 
-        command.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        command.UserId = User.FindFirstValue(JwtRegisteredClaimNames.Sub)!;
         var result = await _mediator.Send(command);
         return Ok(result);
     }
@@ -73,7 +74,7 @@ public class JobApplicationsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult> DeleteAsync([FromRoute] int id)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        var userId = User.FindFirstValue(JwtRegisteredClaimNames.Sub)!;
         await _mediator.Send(new DeleteJobApplicationCommand { Id = id, UserId = userId });
         return NoContent();
     }

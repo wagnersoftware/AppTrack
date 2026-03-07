@@ -35,7 +35,7 @@ public class ApiAuthenticationStateProvider : AuthenticationStateProvider
         }
 
         var claims = await GetClaimsAsync();
-        user = new ClaimsPrincipal(new ClaimsIdentity(claims, "jwt"));
+        user = new ClaimsPrincipal(new ClaimsIdentity(claims, "jwt", JwtRegisteredClaimNames.Name, "role"));
         return new AuthenticationState(user);
     }
 
@@ -50,7 +50,7 @@ public class ApiAuthenticationStateProvider : AuthenticationStateProvider
     public async Task LoggedIn()
     {
         var claims = await GetClaimsAsync();
-        var user = new ClaimsPrincipal(new ClaimsIdentity(claims, "jwt"));
+        var user = new ClaimsPrincipal(new ClaimsIdentity(claims, "jwt", JwtRegisteredClaimNames.Name, "role"));
         var authstate = Task.FromResult(new AuthenticationState(user));
         NotifyAuthenticationStateChanged(authstate);
     }
@@ -59,8 +59,6 @@ public class ApiAuthenticationStateProvider : AuthenticationStateProvider
     {
         var savedToken = await _localStorageService.GetItemAsync<string>("token");
         var tokenContent = _jwtSecurityTokenHandler.ReadJwtToken(savedToken);
-        var claims = tokenContent.Claims.ToList();
-        claims.Add(new Claim(ClaimTypes.Name, tokenContent.Subject));
-        return claims;
+        return tokenContent.Claims.ToList();
     }
 }

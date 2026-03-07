@@ -8,6 +8,7 @@ using AppTrack.Application.Features.JobApplications.Dto;
 using AppTrack.Application.Features.JobApplications.Queries.GetAllJobApplicationsForUser;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace AppTrack.Api.Controllers;
@@ -32,7 +33,7 @@ public class UsersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<List<JobApplicationDto>>> GetJobApplications()
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        var userId = User.FindFirstValue(JwtRegisteredClaimNames.Sub)!;
         var jobApplicationDtos = await _mediator.Send(new GetJobApplicationsForUserQuery() { UserId = userId });
         return Ok(jobApplicationDtos);
     }
@@ -45,7 +46,7 @@ public class UsersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<AiSettingsDto>> GetAiSettings()
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        var userId = User.FindFirstValue(JwtRegisteredClaimNames.Sub)!;
         var aiSettingsDto = await _mediator.Send(new GetAiSettingsByUserIdQuery() { UserId = userId });
         return Ok(aiSettingsDto);
     }
@@ -58,7 +59,7 @@ public class UsersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<JobApplicationDefaultsDto>> GetJobApplicationDefaults()
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        var userId = User.FindFirstValue(JwtRegisteredClaimNames.Sub)!;
         var jobApplicationDetailsDto = await _mediator.Send(new GetJobApplicationDefaultsByUserIdQuery() { UserId = userId });
         return Ok(jobApplicationDetailsDto);
     }

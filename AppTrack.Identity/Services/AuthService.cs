@@ -106,13 +106,13 @@ public class AuthService : IAuthService
         var userClaims = await _userManager.GetClaimsAsync(user);
         var userRoles = await _userManager.GetRolesAsync(user);
 
-        var roleClaims = userRoles.Select(r => new Claim(ClaimTypes.Role, r)).ToList();
+        var roleClaims = userRoles.Select(r => new Claim("role", r)).ToList();
 
         var claims = new[]
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.UserName!),
+            new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+            new Claim(JwtRegisteredClaimNames.Name, user.UserName!),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(ClaimTypes.NameIdentifier, user.Id),
         }
         .Union(userClaims)
         .Union(roleClaims);
