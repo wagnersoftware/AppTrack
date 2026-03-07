@@ -19,6 +19,8 @@ public partial class MainLayout
             PrimaryDarken = "#005A9E",
             PrimaryLighten = "#50A0D8",
             PrimaryContrastText = "#FFFFFF",
+            Secondary = "#637381",
+            SecondaryContrastText = "#FFFFFF",
             AppbarBackground = "#0078D4",
             AppbarText = "#FFFFFF",
             Background = "#F0F3F7",

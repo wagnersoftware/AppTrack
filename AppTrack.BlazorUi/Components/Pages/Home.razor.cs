@@ -163,7 +163,7 @@ public partial class Home : IDisposable
     {
         JobApplicationModel.JobApplicationStatus.New => Color.Primary,
         JobApplicationModel.JobApplicationStatus.WaitingForFeedback => Color.Warning,
-        JobApplicationModel.JobApplicationStatus.Rejected => Color.Error,
+        JobApplicationModel.JobApplicationStatus.Rejected => Color.Default,
         _ => Color.Default
     };
 
@@ -171,7 +171,7 @@ public partial class Home : IDisposable
     {
         JobApplicationModel.JobApplicationStatus.New => "#0078D4",
         JobApplicationModel.JobApplicationStatus.WaitingForFeedback => "#EF6C00",
-        JobApplicationModel.JobApplicationStatus.Rejected => "#C62828",
+        JobApplicationModel.JobApplicationStatus.Rejected => "#546E7A",
         _ => "#9E9E9E"
     };
 
