@@ -5,8 +5,6 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
 using MudBlazor;
-using System.IdentityModel.Tokens.Jwt;
-
 namespace AppTrack.BlazorUi.Components.Dialogs;
 
 public partial class GenerateTextDialog : IDisposable
@@ -31,7 +29,7 @@ public partial class GenerateTextDialog : IDisposable
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var userId = authState.User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value ?? string.Empty;
+        var userId = authState.User.FindFirst("sub")?.Value ?? string.Empty;
 
         var response = await ApplicationTextService.GeneratePrompt(JobApplication.Id, userId);
 
@@ -52,7 +50,7 @@ public partial class GenerateTextDialog : IDisposable
         _cts = new CancellationTokenSource();
 
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var userId = authState.User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value ?? string.Empty;
+        var userId = authState.User.FindFirst("sub")?.Value ?? string.Empty;
 
         var response = await ApplicationTextService.GenerateApplicationText(_prompt, userId, JobApplication.Id, _cts.Token);
 

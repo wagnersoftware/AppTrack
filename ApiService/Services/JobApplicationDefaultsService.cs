@@ -7,7 +7,7 @@ namespace AppTrack.Frontend.ApiService.Services;
 
 public class JobApplicationDefaultsService : BaseHttpService, IJobApplicationDefaultsService
 {
-    public JobApplicationDefaultsService(IClient client, ITokenStorage tokenStorage) : base(client, tokenStorage)
+    public JobApplicationDefaultsService(IClient client) : base(client)
     {
     }
 

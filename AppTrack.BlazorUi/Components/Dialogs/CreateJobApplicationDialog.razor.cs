@@ -5,8 +5,6 @@ using AppTrack.Frontend.Models.ModelValidator;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using MudBlazor;
-using System.IdentityModel.Tokens.Jwt;
-
 namespace AppTrack.BlazorUi.Components.Dialogs;
 
 public partial class CreateJobApplicationDialog
@@ -80,7 +78,7 @@ public partial class CreateJobApplicationDialog
         if (!ModelValidator.Validate(_model)) return;
 
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var userId = authState.User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value ?? string.Empty;
+        var userId = authState.User.FindFirst("sub")?.Value ?? string.Empty;
 
         if (string.IsNullOrEmpty(userId))
         {

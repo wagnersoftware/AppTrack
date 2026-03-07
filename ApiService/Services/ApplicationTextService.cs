@@ -7,7 +7,7 @@ namespace AppTrack.Frontend.ApiService.Services
     public class ApplicationTextService : BaseHttpService, IApplicationTextService
     {
 
-        public ApplicationTextService(IClient client, ITokenStorage tokenStorage) : base(client, tokenStorage)
+        public ApplicationTextService(IClient client) : base(client)
         {
         }
 

@@ -6,8 +6,6 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
 using MudBlazor;
-using System.IdentityModel.Tokens.Jwt;
-
 namespace AppTrack.BlazorUi.Components.Dialogs;
 
 public partial class EditJobApplicationDialog
@@ -119,7 +117,7 @@ public partial class EditJobApplicationDialog
         if (!ModelValidator.Validate(_model)) return;
 
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var userId = authState.User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value ?? string.Empty;
+        var userId = authState.User.FindFirst("sub")?.Value ?? string.Empty;
 
         if (string.IsNullOrEmpty(userId))
         {

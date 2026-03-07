@@ -1,22 +1,37 @@
 using AppTrack.Api.Helper;
 using AppTrack.Api.Middleware;
 using AppTrack.Application;
-using AppTrack.Identity;
 using AppTrack.Infrastructure;
 using AppTrack.Infrastructure.ApplicationTextGeneration;
 using AppTrack.Persistance;
+using Azure.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Identity.Web;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+if (!builder.Environment.IsDevelopment())
+{
+    var keyVaultUri = builder.Configuration["KeyVaultUri"];
+    if (!string.IsNullOrEmpty(keyVaultUri))
+    {
+        builder.Configuration.AddAzureKeyVault(new Uri(keyVaultUri), new DefaultAzureCredential());
+    }
+}
+
+builder.Services.AddMicrosoftIdentityWebApiAuthentication(builder.Configuration);
+
+
 builder.Services.AddHealthChecks();
 
-// Add services to the container.
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddPersistanceServices(builder.Configuration);
-builder.Services.AddIdentityServices(builder.Configuration);
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
 
 builder.Services.AddControllers();
 
@@ -29,17 +44,14 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddOptions<OpenAiOptions>()
     .Bind(builder.Configuration.GetSection("OpenAiSettings"))
-    .ValidateDataAnnotations() 
-    .ValidateOnStart();      
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
 
-
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
 
-    // JWT Bearer Auth
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -74,13 +86,11 @@ builder.Services.AddAuthorization(options =>
         .Build();
 });
 
-// Kestrel configuration
 builder.WebHost.UseKestrel(options =>
 {
-    options.AddServerHeader = false; //don't expose the framework type in the response header
+    options.AddServerHeader = false;
 });
 
-// avoid captive dependency problem (eg. a scoped dependency injected into a singleton) for all environments
 builder.Host.UseDefaultServiceProvider(options =>
 {
     options.ValidateOnBuild = true;
@@ -91,7 +101,6 @@ app.UseMiddleware<ExceptionMiddleware>();
 
 await MigrationsHelper.TryApplyDatabaseMigrations(app);
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 {
     app.UseSwagger();
@@ -99,10 +108,8 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 }
 
 app.UseCors("All");
-
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 app.MapHealthChecks("/health").AllowAnonymous();
 
@@ -110,4 +117,3 @@ await app.RunAsync();
 
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Major Code Smell", "S1118:Utility classes should not have public constructors", Justification = "For integration testing")]
 public partial class Program { }
-

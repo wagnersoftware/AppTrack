@@ -1,4 +1,3 @@
-using AppTrack.Application.Contracts.Identity;
 using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Exceptions;
@@ -10,12 +9,10 @@ namespace AppTrack.Application.Features.AiSettings.Queries.GetAiSettingsByUserId
 public class GetAiSettingsByUserIdQueryHandler : IRequestHandler<GetAiSettingsByUserIdQuery, AiSettingsDto>
 {
     private readonly IAiSettingsRepository _aiSettingsRepository;
-    private readonly IUserService _userService;
 
-    public GetAiSettingsByUserIdQueryHandler(IAiSettingsRepository aiSettingsRepository, IUserService userService)
+    public GetAiSettingsByUserIdQueryHandler(IAiSettingsRepository aiSettingsRepository)
     {
         this._aiSettingsRepository = aiSettingsRepository;
-        this._userService = userService;
     }
 
     /// <summary>
@@ -35,14 +32,7 @@ public class GetAiSettingsByUserIdQueryHandler : IRequestHandler<GetAiSettingsBy
             throw new BadRequestException($"Invalid request", validationResult);
         }
 
-        var user = await _userService.GetUser(request.UserId);
-
-        if (user is null)
-        {
-            throw new NotFoundException(nameof(user), request.UserId);
-        }
-
-        var entity = await _aiSettingsRepository.GetByUserIdIncludePromptParameterAsync(user.Id);
+        var entity = await _aiSettingsRepository.GetByUserIdIncludePromptParameterAsync(request.UserId);
 
         if (entity == null)
         {
