@@ -90,7 +90,8 @@
                         cardIndex++;
 
                         <MudItem xs="12" sm="6" md="4" lg="3">
-                            <MudCard Class="apptrack-card" Style="@animStyle" Elevation="2">
+                            <MudCard Class="apptrack-card" Style="@(animStyle + " cursor: pointer;")" Elevation="2"
+                                     @onclick="@(() => EditJobApplicationAsync(app))">
                                 <MudCardHeader Style="padding-bottom: 4px;">
                                     <CardHeaderContent>
                                         <div class="apptrack-company-name">@app.Name</div>
@@ -148,7 +149,7 @@
                                     </MudStack>
                                 </MudCardContent>
 
-                                <MudCardActions Style="padding-top: 4px;">
+                                <MudCardActions Style="padding-top: 4px;" @onclick:stopPropagation="true">
                                     <MudTooltip Text="Edit">
                                         <MudIconButton Icon="@Icons.Material.Filled.Edit"
                                                        Color="Color.Primary"

@@ -134,6 +134,10 @@
                               ValueChanged="@((string v) => OnApplicationTextChanged(v))"
                               Variant="Variant.Outlined"
                               Lines="5"
+                              Adornment="Adornment.End"
+                              AdornmentIcon="@Icons.Material.Outlined.ContentCopy"
+                              AdornmentAriaLabel="Copy application text"
+                              OnAdornmentClick="CopyApplicationTextAsync"
                               Class="mb-1" />
             </MudItem>
         </MudGrid>
