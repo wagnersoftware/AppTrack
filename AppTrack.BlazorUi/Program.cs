@@ -6,6 +6,7 @@ using AppTrack.Frontend.Models.ModelValidator;
 using AppTrack.Frontend.Models.Validators;
 using FluentValidation;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor;
 using MudBlazor.Services;
@@ -28,6 +29,7 @@ builder.Services.AddMsalAuthentication(options =>
         options.ProviderOptions.DefaultAccessTokenScopes.Add(apiScope);
 });
 
+builder.Services.AddTransient<BaseAddressAuthorizationMessageHandler>();
 builder.Services.AddApiServiceServices(builder.Configuration);
 
 builder.Services.AddTransient<IValidator<JobApplicationModel>, JobApplicationModelValidator>();

@@ -21,9 +21,6 @@ if (!builder.Environment.IsDevelopment())
     }
 }
 
-builder.Services.AddMicrosoftIdentityWebApiAuthentication(builder.Configuration);
-
-
 builder.Services.AddHealthChecks();
 
 builder.Services.AddApplicationServices();
