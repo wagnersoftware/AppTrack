@@ -2,18 +2,14 @@ using AppTrack.BlazorUi.Services;
 using AppTrack.Frontend.ApiService.Contracts;
 using AppTrack.Frontend.Models;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
 using MudBlazor;
-using System.IdentityModel.Tokens.Jwt;
-
 namespace AppTrack.BlazorUi.Components.Dialogs;
 
 public partial class GenerateTextDialog : IDisposable
 {
     [Inject] private IApplicationTextService ApplicationTextService { get; set; } = null!;
     [Inject] private IErrorHandlingService ErrorHandlingService { get; set; } = null!;
-    [Inject] private AuthenticationStateProvider AuthenticationStateProvider { get; set; } = null!;
     [Inject] private IJSRuntime JS { get; set; } = null!;
 
     [CascadingParameter] private IMudDialogInstance MudDialog { get; set; } = null!;
@@ -30,10 +26,7 @@ public partial class GenerateTextDialog : IDisposable
 
     protected override async Task OnInitializedAsync()
     {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var userId = authState.User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value ?? string.Empty;
-
-        var response = await ApplicationTextService.GeneratePrompt(JobApplication.Id, userId);
+        var response = await ApplicationTextService.GeneratePrompt(JobApplication.Id);
 
         if (!ErrorHandlingService.HandleResponse(response) || response.Data is null)
         {
@@ -51,10 +44,7 @@ public partial class GenerateTextDialog : IDisposable
         _phase = Phase.GeneratingText;
         _cts = new CancellationTokenSource();
 
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var userId = authState.User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value ?? string.Empty;
-
-        var response = await ApplicationTextService.GenerateApplicationText(_prompt, userId, JobApplication.Id, _cts.Token);
+        var response = await ApplicationTextService.GenerateApplicationText(_prompt, JobApplication.Id, _cts.Token);
 
         if (_cts.IsCancellationRequested)
         {

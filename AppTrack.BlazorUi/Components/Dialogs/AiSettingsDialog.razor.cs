@@ -158,6 +158,7 @@ public partial class AiSettingsDialog
         _isBusy = true;
         var response = await AiSettingsService.UpdateAsync(_model.Id, _model);
         _isBusy = false;
+        await InvokeAsync(StateHasChanged);
 
         if (!ErrorHandlingService.HandleResponse(response)) return;
 

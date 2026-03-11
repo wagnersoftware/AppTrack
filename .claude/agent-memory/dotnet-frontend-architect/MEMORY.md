@@ -105,6 +105,17 @@ inject `IDialogService` into the parent dialog's code-behind. Use a separate `_p
 constant with `BackdropClick = false, MaxWidth = Small` for the child. Call
 `DialogService.ShowAsync<ChildDialog>("")` and `await dialog.Result` just like from a page.
 
+## Blazor Auth: MSAL / Entra External ID (migrated Mar 2026)
+- Auth: `Microsoft.Authentication.WebAssembly.Msal` (BlazorUi) + `Microsoft.AspNetCore.Components.WebAssembly.Authentication` (ApiService)
+- `AddMsalAuthentication` in `Program.cs` replaces `AddAuthorizationCore` + custom `ApiAuthenticationStateProvider`
+- `BaseAddressAuthorizationMessageHandler` attached to `IClient` HttpClient in `ApiServiceRegistration` — token injection is automatic, no manual bearer header code
+- `BaseHttpService` no longer holds `ITokenStorage`; all services take only `(IClient client)`
+- Login/logout: `NavigationManager.NavigateToLogin("authentication/login")` / `NavigateToLogout("authentication/logout")`
+- `Authentication.razor` page at `/authentication/{action}` hosts `<RemoteAuthenticatorView>`
+- Config in `wwwroot/appsettings.json` under `"AzureAd"` key (`Authority`, `ClientId`, `ValidateAuthority`)
+- MSAL's `DefaultAccessTokenScopes` holds the API scope (`api://<api-client-id>/access_as_user`)
+- Deleted files: `ApiAuthenticationProvider/ApiAuthenticationProvider.cs`, `Services/AuthenticationService.cs`, `Contracts/IAuthenticationService.cs`, `Contracts/ITokenStorage.cs`, `Mappings/AuthMappings.cs`, `TokenStorage/BlazorTokenStorage.cs`, login/register dialogs
+
 ## Key File Paths
 - WPF MainViewModel: `AppTrack.Wpf/ViewModel/MainViewModel.cs`
 - WPF form base: `AppTrack.Wpf/ViewModel/Base/AppTrackFormViewModelBase.cs`

@@ -30,7 +30,7 @@
                 <MudButton Color="Color.Inherit"
                            Variant="Variant.Text"
                            StartIcon="@Icons.Material.Filled.Logout"
-                           OnClick="LogoutAsync">
+                           OnClick="Logout">
                     Logout
                 </MudButton>
             </Authorized>
@@ -38,15 +38,8 @@
                 <MudButton Color="Color.Inherit"
                            Variant="Variant.Text"
                            StartIcon="@Icons.Material.Filled.Login"
-                           OnClick="OpenLoginDialogAsync">
-                    Login
-                </MudButton>
-                <MudButton Color="Color.Inherit"
-                           Class="ml-2"
-                           Variant="Variant.Text"
-                           StartIcon="@Icons.Material.Filled.PersonAdd"
-                           OnClick="OpenRegisterDialogAsync">
-                    Register
+                           OnClick="Login">
+                    Login / Register
                 </MudButton>
             </NotAuthorized>
         </AuthorizeView>

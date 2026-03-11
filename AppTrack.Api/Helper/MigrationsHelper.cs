@@ -17,10 +17,8 @@ public static class MigrationsHelper
 
         try
         {
-            var identityDb = services.GetRequiredService<AppTrack.Identity.DBContext.AppTrackIdentityDbContext>();
             var mainDb = services.GetRequiredService<AppTrack.Persistance.DatabaseContext.AppTrackDatabaseContext>();
 
-            await identityDb.Database.MigrateAsync();
             await mainDb.Database.MigrateAsync();
         }
         catch (Exception ex)

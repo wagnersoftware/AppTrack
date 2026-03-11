@@ -1,4 +1,4 @@
-﻿using AppTrack.Api.Models;
+using AppTrack.Api.Models;
 using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Features.ApplicationText.Dto;
 using AppTrack.Application.Features.ApplicationText.Query.GeneratePromptQuery;

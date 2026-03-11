@@ -3,7 +3,7 @@ using AppTrack.Application.Features.JobApplications.Dto;
 
 namespace AppTrack.Application.Features.JobApplications.Queries.GetJobApplicationById;
 
-public class GetJobApplicationByIdQuery : IRequest<JobApplicationDto>
+public class GetJobApplicationByIdQuery : IRequest<JobApplicationDto>, IUserScopedRequest
 {
     public int Id { get; set; }
 

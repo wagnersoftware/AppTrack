@@ -5,7 +5,7 @@ namespace AppTrack.Frontend.ApiService.Contracts;
 
 public interface IApplicationTextService
 {
-    Task<Response<ApplicationTextModel>> GenerateApplicationText(string prompt, string userId, int jobApplicationId, CancellationToken token);
+    Task<Response<ApplicationTextModel>> GenerateApplicationText(string prompt, int jobApplicationId, CancellationToken token);
 
-    Task<Response<GeneratedPromptModel>> GeneratePrompt(int jobApplicationId, string userId);
+    Task<Response<GeneratedPromptModel>> GeneratePrompt(int jobApplicationId);
 }

@@ -5,7 +5,7 @@ using AppTrack.Shared.Validation.Interfaces;
 
 namespace AppTrack.Application.Features.JobApplications.Commands.CreateJobApplication;
 
-public class CreateJobApplicationCommand : IRequest<JobApplicationDto>, IJobApplicationValidatable
+public class CreateJobApplicationCommand : IRequest<JobApplicationDto>, IJobApplicationValidatable, IUserScopedRequest
 {
     public DateTime CreationDate { get; set; }
     public DateTime ModifiedDate { get; set; }

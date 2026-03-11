@@ -1,4 +1,4 @@
-﻿using AppTrack.Api.Models;
+using AppTrack.Api.Models;
 using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Features.AiSettings.Commands.GenerateApplicationText;
 using AppTrack.Application.Features.AiSettings.Commands.UpdateAiSettings;
@@ -8,8 +8,6 @@ using AppTrack.Application.Features.ApplicationText.Dto;
 using AppTrack.Application.Features.JobApplications.Dto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 
 namespace AppTrack.Api.Controllers;
 
@@ -38,7 +36,6 @@ public class AiSettingsController : ControllerBase
             return BadRequest("Route ID and body ID do not match.");
         }
 
-        updateAiSettingsCommand.UserId = User.FindFirstValue(JwtRegisteredClaimNames.Sub)!;
         var result = await _mediator.Send(updateAiSettingsCommand);
         return Ok(result);
     }

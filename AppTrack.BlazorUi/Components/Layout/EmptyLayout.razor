@@ -1,0 +1,5 @@
+@* Minimal layout without any UI chrome. Used by Authentication.razor to isolate
+   MSAL auth pages (login/logout callbacks) from MainLayout, which contains
+   AuthorizeView components that would conflict during the auth state transition. *@
+@inherits LayoutComponentBase
+@Body

@@ -7,7 +7,7 @@ namespace AppTrack.Frontend.ApiService.Services;
 
 public class AiSettingsService : BaseHttpService, IAiSettingsService
 {
-    public AiSettingsService(IClient client, ITokenStorage tokenStorage) : base(client, tokenStorage)
+    public AiSettingsService(IClient client) : base(client)
     {
     }
 

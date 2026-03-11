@@ -1,7 +1,6 @@
 using AppTrack.BlazorUi.Components.Dialogs;
-using AppTrack.Frontend.ApiService.ApiAuthenticationProvider;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using MudBlazor;
 
 namespace AppTrack.BlazorUi.Components.Layout;
@@ -9,7 +8,7 @@ namespace AppTrack.BlazorUi.Components.Layout;
 public partial class MainLayout
 {
     [Inject] private IDialogService DialogService { get; set; } = null!;
-    [Inject] private AuthenticationStateProvider AuthenticationStateProvider { get; set; } = null!;
+    [Inject] private NavigationManager Navigation { get; set; } = null!;
 
     internal static readonly MudTheme AzureTheme = new()
     {
@@ -28,8 +27,6 @@ public partial class MainLayout
         }
     };
 
-    private static readonly DialogOptions _dialogOptions = new() { BackdropClick = true };
-
     private static readonly DialogOptions _aiSettingsDialogOptions = new()
     {
         BackdropClick = false,
@@ -41,11 +38,7 @@ public partial class MainLayout
 
     private void ToggleDrawer() => _drawerOpen = !_drawerOpen;
 
-    private async Task OpenLoginDialogAsync() =>
-        await DialogService.ShowAsync<LoginDialog>("", _dialogOptions);
-
-    private async Task OpenRegisterDialogAsync() =>
-        await DialogService.ShowAsync<RegisterDialog>("", _dialogOptions);
+    private void Login() => Navigation.NavigateToLogin("authentication/login");
 
     private async Task OpenAiSettingsDialogAsync()
     {
@@ -53,9 +46,5 @@ public partial class MainLayout
         await DialogService.ShowAsync<AiSettingsDialog>("", _aiSettingsDialogOptions);
     }
 
-    private async Task LogoutAsync()
-    {
-        var provider = (ApiAuthenticationStateProvider)AuthenticationStateProvider;
-        await provider.LoggedOut();
-    }
+    private void Logout() => Navigation.NavigateToLogout("authentication/logout");
 }

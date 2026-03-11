@@ -7,7 +7,7 @@ namespace AppTrack.Frontend.ApiService.Services;
 
 public class ChatModelsService : BaseHttpService, IChatModelsService
 {
-    public ChatModelsService(IClient client, ITokenStorage tokenStorage) : base(client, tokenStorage)
+    public ChatModelsService(IClient client) : base(client)
     {
     }
 

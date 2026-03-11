@@ -6,7 +6,6 @@ using AppTrack.Application.Features.AiSettings.Commands.UpdateAiSettings;
 using AppTrack.Application.Features.AiSettings.Dto;
 using AppTrack.Application.Features.ApplicationText.Dto;
 using AppTrack.Application.Features.JobApplications.Dto;
-using AppTrack.Application.Models.Identity;
 using AppTrack.Domain;
 using Shouldly;
 using System;

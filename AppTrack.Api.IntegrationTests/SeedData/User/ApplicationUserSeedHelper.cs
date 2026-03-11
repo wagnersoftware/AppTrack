@@ -1,39 +1,22 @@
-﻿using AppTrack.Identity.DBContext;
-using AppTrack.Identity.Models;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection;
-
 namespace AppTrack.Api.IntegrationTests.Seeddata.User;
 
 internal static class ApplicationUserSeedHelper
 {
     /// <summary>
-    /// Asynchronously creates a new test user in the specified identity database and returns the user's unique
-    /// identifier.
+    /// Creates a new test user identifier for use in integration tests.
     /// </summary>
-    /// <remarks>The created test user will have a confirmed email and a default password of "Test1234!". This
-    /// method is intended for testing scenarios and should not be used to create production users.</remarks>
-    /// <param name="identityDb">The identity database context in which the test user will be created. Must not be null.</param>
-    /// <param name="userName">The user name to assign to the test user. If null, a unique user name will be generated automatically.</param>
-    /// <returns>A string containing the unique identifier of the newly created test user.</returns>
-    internal static async Task<string> CreateTestUserAsync(IServiceProvider services, string? userName = null, string? userId = null)
+    /// <remarks>Returns a stable or randomly generated user identifier suitable for seeding
+    /// test data. No Identity database record is created; the ID is used purely as a
+    /// foreign-key value in the application database.</remarks>
+    /// <param name="services">Unused. Retained for call-site compatibility.</param>
+    /// <param name="userName">Unused. Retained for call-site compatibility.</param>
+    /// <param name="userId">An optional fixed user identifier. A new GUID is generated when null.</param>
+    /// <returns>A string containing the user identifier.</returns>
+    internal static Task<string> CreateTestUserAsync(
+        IServiceProvider services,
+        string? userName = null,
+        string? userId = null)
     {
-        using var scope = services.CreateScope();
-        var identityDb = scope.ServiceProvider.GetRequiredService<AppTrackIdentityDbContext>();
-
-        var user = new ApplicationUser
-        {
-            Id = userId ?? Guid.NewGuid().ToString(),
-            UserName = userName ?? $"testuser_{Guid.NewGuid():N}",
-            EmailConfirmed = true
-        };
-
-        var hasher = new PasswordHasher<IdentityUser>();
-        user.PasswordHash = hasher.HashPassword(user, "Test1234!");
-
-        await identityDb.Users.AddAsync(user);
-        await identityDb.SaveChangesAsync();
-
-        return user.Id;
+        return Task.FromResult(userId ?? Guid.NewGuid().ToString());
     }
 }
