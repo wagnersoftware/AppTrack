@@ -7,7 +7,6 @@ using AppTrack.Application.Features.JobApplications.Dto;
 using AppTrack.Application.Features.JobApplications.Queries.GetJobApplicationById;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Web;
 
 namespace AppTrack.Api.Controllers;
 
@@ -31,8 +30,7 @@ public class JobApplicationsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<JobApplicationDto>> Get([FromRoute] int id)
     {
-        var userId = User.GetObjectId()!;
-        var jobApplicationDto = await _mediator.Send(new GetJobApplicationByIdQuery { Id = id, UserId = userId });
+        var jobApplicationDto = await _mediator.Send(new GetJobApplicationByIdQuery { Id = id });
         return Ok(jobApplicationDto);
     }
 
@@ -43,7 +41,6 @@ public class JobApplicationsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<JobApplicationDto>> Post([FromBody] CreateJobApplicationCommand createJobApplicationCommand)
     {
-        createJobApplicationCommand.UserId = User.GetObjectId()!;
         var response = await _mediator.Send(createJobApplicationCommand);
         return CreatedAtAction(nameof(Get), new { id = response.Id }, response);
     }
@@ -61,7 +58,6 @@ public class JobApplicationsController : ControllerBase
             return BadRequest("Route ID and body ID do not match.");
         }
 
-        command.UserId = User.GetObjectId()!;
         var result = await _mediator.Send(command);
         return Ok(result);
     }
@@ -73,8 +69,7 @@ public class JobApplicationsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult> DeleteAsync([FromRoute] int id)
     {
-        var userId = User.GetObjectId()!;
-        await _mediator.Send(new DeleteJobApplicationCommand { Id = id, UserId = userId });
+        await _mediator.Send(new DeleteJobApplicationCommand { Id = id });
         return NoContent();
     }
 }

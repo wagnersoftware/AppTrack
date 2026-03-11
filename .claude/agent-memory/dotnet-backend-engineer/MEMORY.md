@@ -17,6 +17,15 @@
 - `ApplicationUserSeedHelper` rewritten as pure in-memory GUID generator (no DbContext dependency)
   - Signature preserved for call-site compatibility: `CreateTestUserAsync(IServiceProvider, string? userName, string? userId)`
   - Used by `UpdateAiSettingsTests`, `UpdateJobApplicationDefaultsTests`, `SeedHelper.cs` — all just need a GUID string as userId
+- `TestAuthHandler` uses `"sub"` claim (value `"test-user-id"`) — no `"oid"` claim in test context
+
+## User Scoping Pipeline (as of Mar 2026 - branch: RefactoringAuthForCloud)
+- `IUserScopedRequest` (in `AppTrack.Application/Contracts/Mediator/`) — marker with `string UserId { get; set; }`
+- `IUserContext` (in `AppTrack.Application/Contracts/`) — abstraction for resolving current user ID
+- `HttpContextUserContext` (in `AppTrack.Infrastructure/Identity/`) — reads `"oid"` claim first, falls back to `"sub"`
+- `Mediator.Send()` (in `AppTrack.Infrastructure/Mediator/Mediator.cs`) — injects UserId before dispatching handler
+- All 9 commands/queries implement `IUserScopedRequest`; controllers never set UserId
+- Validators no longer have `NotEmpty`/`Matches` rules for UserId; DB-ownership checks still use `command.UserId`
 
 ## Key File Paths
 - `AppTrack.Api/AppTrack.Api.csproj` — no AppTrack.Identity ref; has Azure.Identity, Azure.Extensions, Microsoft.Identity.Web
@@ -24,3 +33,12 @@
 - `AppTrack.Api/Helper/MigrationsHelper.cs` — migrates AppTrackDatabaseContext only
 - `AppTrack.Api.IntegrationTests/WebApplicationFactory/FakeAuthWebApplicationFactory.cs` — Identity-free
 - `AppTrack.Api.IntegrationTests/SeedData/User/ApplicationUserSeedHelper.cs` — GUID-only, no DbContext
+- `AppTrack.Application/Contracts/Mediator/IUserScopedRequest.cs` — marker interface for user-scoped requests
+- `AppTrack.Application/Contracts/IUserContext.cs` — abstraction for user ID resolution
+- `AppTrack.Infrastructure/Identity/HttpContextUserContext.cs` — reads oid/sub claims
+- `AppTrack.Infrastructure/Mediator/Mediator.cs` — custom mediator; injects UserId before dispatch
+
+## Infrastructure Project Note
+- `AppTrack.Infrastructure` uses `Microsoft.NET.Sdk` (not Web SDK)
+- Adding `<FrameworkReference Include="Microsoft.AspNetCore.App" />` grants access to all ASP.NET Core types
+- After adding FrameworkReference, individual `Microsoft.Extensions.*` PackageReferences become redundant (NU1510 = build error due to TreatWarningsAsErrors); remove them all — only keep non-framework packages (e.g. SendGrid)

@@ -1,10 +1,9 @@
-﻿using AppTrack.Api.Models;
+using AppTrack.Api.Models;
 using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Features.JobApplicationDefaults.Commands.UpdateApplicationDefaults;
 using AppTrack.Application.Features.JobApplicationDefaults.Dto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Web;
 
 namespace AppTrack.Api.Controllers;
 
@@ -33,7 +32,6 @@ public class JobApplicationsDefaultsController : ControllerBase
             return BadRequest("Route ID and body ID do not match.");
         }
 
-        updateJobApplicationDefaultsCommand.UserId = User.GetObjectId()!;
         var result = await _mediator.Send(updateJobApplicationDefaultsCommand);
         return Ok(result);
     }

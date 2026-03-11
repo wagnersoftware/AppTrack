@@ -16,10 +16,6 @@ public class UpdateJobApplicationDefaultsCommandValidator : JobApplicationDefaul
             .GreaterThan(0).WithMessage("{PropertyName} must be greater than 0.")
             .NotEmpty().WithMessage("{PropertyName} is required");
 
-        RuleFor(x => x.UserId)
-            .NotEmpty().WithMessage("UserId is required")
-            .Matches("^[a-zA-Z0-9\\-]+$").WithMessage("UserId contains invalid characters.");
-
         RuleFor(x => x)
             .CustomAsync(async (command, context, cancellationToken) =>
             {

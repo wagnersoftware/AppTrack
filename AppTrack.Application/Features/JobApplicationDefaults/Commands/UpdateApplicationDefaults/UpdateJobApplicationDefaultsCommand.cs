@@ -4,7 +4,7 @@ using AppTrack.Shared.Validation.Interfaces;
 
 namespace AppTrack.Application.Features.JobApplicationDefaults.Commands.UpdateApplicationDefaults;
 
-public class UpdateJobApplicationDefaultsCommand : IRequest<JobApplicationDefaultsDto>, IJobApplicationDefaultsValidatable
+public class UpdateJobApplicationDefaultsCommand : IRequest<JobApplicationDefaultsDto>, IJobApplicationDefaultsValidatable, IUserScopedRequest
 {
     public int Id { get; set; }
 

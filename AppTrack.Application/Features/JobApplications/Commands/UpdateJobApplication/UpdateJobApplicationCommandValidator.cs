@@ -12,10 +12,6 @@ public class UpdateJobApplicationCommandValidator : JobApplicationBaseValidator<
     {
         _jobApplicationRepository = jobApplicationRepository;
 
-        RuleFor(x => x.UserId)
-            .NotNull().WithMessage("{PropertyName} is required")
-            .NotEmpty().WithMessage("{PropertyName} is required");
-
         RuleFor(x => x.Status)
             .NotNull().WithMessage("{PropertyName} is required");
 

@@ -1,4 +1,4 @@
-﻿using AppTrack.Application.Contracts.Persistance;
+using AppTrack.Application.Contracts.Persistance;
 using FluentValidation;
 
 namespace AppTrack.Application.Features.AiSettings.Commands.GenerateApplicationText;
@@ -10,7 +10,7 @@ public class GenerateApplicationTextCommandValidator : AbstractValidator<Generat
     private readonly IChatModelRepository _chatModelRepository;
 
     public GenerateApplicationTextCommandValidator(
-        IJobApplicationRepository jobApplicationRepository, 
+        IJobApplicationRepository jobApplicationRepository,
         IAiSettingsRepository aiSettingsRepository,
         IChatModelRepository chatModelRepository)
     {
@@ -19,10 +19,6 @@ public class GenerateApplicationTextCommandValidator : AbstractValidator<Generat
         _chatModelRepository = chatModelRepository;
 
         RuleFor(x => x.Prompt)
-            .NotEmpty().WithMessage("{PropertyName} is required")
-            .NotNull().WithMessage("{PropertyName} is required");
-
-        RuleFor(x => x.UserId)
             .NotEmpty().WithMessage("{PropertyName} is required")
             .NotNull().WithMessage("{PropertyName} is required");
 

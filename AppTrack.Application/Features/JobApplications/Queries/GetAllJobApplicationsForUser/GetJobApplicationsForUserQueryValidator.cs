@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 
 namespace AppTrack.Application.Features.JobApplications.Queries.GetAllJobApplicationsForUser;
 
@@ -6,7 +6,5 @@ public class GetJobApplicationsForUserQueryValidator : AbstractValidator<GetJobA
 {
     public GetJobApplicationsForUserQueryValidator()
     {
-        RuleFor(x => x.UserId)
-            .NotEmpty().WithMessage("{PropertyName} is required");
     }
 }

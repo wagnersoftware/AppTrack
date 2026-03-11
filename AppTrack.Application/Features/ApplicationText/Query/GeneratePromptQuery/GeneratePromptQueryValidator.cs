@@ -1,4 +1,4 @@
-﻿using AppTrack.Application.Contracts.Persistance;
+using AppTrack.Application.Contracts.Persistance;
 using FluentValidation;
 
 namespace AppTrack.Application.Features.ApplicationText.Query.GeneratePromptQuery;
@@ -12,10 +12,6 @@ public class GeneratePromptQueryValidator : AbstractValidator<GeneratePromptQuer
     {
         _jobApplicationRepository = jobApplicationRepository;
         _aiSettingsRepository = aiSettingsRepository;
-
-        RuleFor(x => x.UserId)
-            .NotEmpty().WithMessage("{PropertyName} is required")
-            .NotNull().WithMessage("{PropertyName} is required");
 
         RuleFor(x => x.JobApplicationId)
             .NotEmpty().WithMessage("{PropertyName} is required")
@@ -50,6 +46,5 @@ public class GeneratePromptQueryValidator : AbstractValidator<GeneratePromptQuer
 
         if (string.IsNullOrWhiteSpace(aiSettings.PromptTemplate))
             context.AddFailure("Prompt in AI settings is missing.");
-
     }
 }

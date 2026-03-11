@@ -1,4 +1,4 @@
-﻿using AppTrack.Application.Contracts.Persistance;
+using AppTrack.Application.Contracts.Persistance;
 using FluentValidation;
 
 namespace AppTrack.Application.Features.JobApplications.Queries.GetJobApplicationById;
@@ -13,9 +13,6 @@ public class GetJobApplicationByIdQueryValidator : AbstractValidator<GetJobAppli
 
         RuleFor(x => x.Id)
             .NotEmpty().WithMessage("Id is required");
-
-        RuleFor(x => x.UserId)
-            .NotEmpty().WithMessage("UserId is required");
 
         RuleFor(x => x)
             .CustomAsync(async (command, context, cancellationToken) =>

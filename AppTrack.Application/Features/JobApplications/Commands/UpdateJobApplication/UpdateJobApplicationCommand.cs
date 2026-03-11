@@ -5,7 +5,7 @@ using AppTrack.Shared.Validation.Interfaces;
 
 namespace AppTrack.Application.Features.JobApplications.Commands.UpdateJobApplication;
 
-public class UpdateJobApplicationCommand : IRequest<JobApplicationDto>, IJobApplicationValidatable
+public class UpdateJobApplicationCommand : IRequest<JobApplicationDto>, IJobApplicationValidatable, IUserScopedRequest
 {
     public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
