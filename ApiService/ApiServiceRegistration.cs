@@ -15,8 +15,24 @@ public static class ApiServiceRegistration
         if (string.IsNullOrWhiteSpace(baseUrl))
             throw new ArgumentNullException(nameof(configuration), message: "The base URL is not configured!");
 
-        services.AddHttpClient<IClient, Client>(client => client.BaseAddress = new Uri(baseUrl))
-            .AddHttpMessageHandler<BaseAddressAuthorizationMessageHandler>();
+        var apiScope = configuration["AzureAd:ApiScope"]
+            ?? throw new InvalidOperationException("AzureAd:ApiScope is not configured.");
+
+        services.AddHttpClient("ApptrackAPI", client =>
+        {
+            client.BaseAddress = new Uri(baseUrl);
+        })
+        .AddHttpMessageHandler(sp =>
+            sp.GetRequiredService<AuthorizationMessageHandler>()
+              .ConfigureHandler(
+                  authorizedUrls: [baseUrl],
+                  scopes: [apiScope]));
+
+        services.AddScoped<IClient>(sp =>
+        {
+            var httpClient = sp.GetRequiredService<IHttpClientFactory>().CreateClient("ApptrackAPI");
+            return new Client(httpClient);
+        });
 
         services.AddScoped<IJobApplicationService, JobApplicationService>();
         services.AddScoped<IJobApplicationDefaultsService, JobApplicationDefaultsService>();

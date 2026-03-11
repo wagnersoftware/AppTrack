@@ -28,7 +28,23 @@ builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddPersistanceServices(builder.Configuration);
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
+    .AddMicrosoftIdentityWebApi(
+        jwtBearerOptions =>
+        {
+            // Prevent ASP.NET Core from remapping claim names (e.g. "sub" → ClaimTypes.NameIdentifier).
+            jwtBearerOptions.MapInboundClaims = false;
+
+            // Explicitly set the CIAM metadata endpoint — required because ciamlogin.com
+            // uses a different discovery path than standard AAD.
+            var instance = builder.Configuration["AzureAd:Instance"]?.TrimEnd('/');
+            var tenantId = builder.Configuration["AzureAd:TenantId"];
+            jwtBearerOptions.MetadataAddress =
+                $"{instance}/{tenantId}/v2.0/.well-known/openid-configuration";
+        },
+        microsoftIdentityOptions =>
+        {
+            builder.Configuration.GetSection("AzureAd").Bind(microsoftIdentityOptions);
+        });
 
 builder.Services.AddControllers();
 
@@ -98,7 +114,7 @@ app.UseMiddleware<ExceptionMiddleware>();
 
 await MigrationsHelper.TryApplyDatabaseMigrations(app);
 
-if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
+if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();

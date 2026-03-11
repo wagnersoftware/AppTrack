@@ -8,7 +8,7 @@ using MudBlazor;
 
 namespace AppTrack.BlazorUi.Components.Pages;
 
-public partial class Home : IDisposable
+public partial class Home
 {
     [Inject] private IJobApplicationService JobApplicationService { get; set; } = null!;
     [Inject] private AuthenticationStateProvider AuthenticationStateProvider { get; set; } = null!;
@@ -36,7 +36,6 @@ public partial class Home : IDisposable
     private List<JobApplicationModel> _jobApplications = [];
     private JobApplicationModel.JobApplicationStatus? _selectedStatus;
     private string _searchText = string.Empty;
-    // True while the initial job-application list is being fetched; replaces the card grid with a toolbar spinner.
     private bool _isLoading;
 
     private IEnumerable<JobApplicationModel> _filteredJobApplications =>
@@ -51,40 +50,24 @@ public partial class Home : IDisposable
 
     protected override async Task OnInitializedAsync()
     {
-        AuthenticationStateProvider.AuthenticationStateChanged += OnAuthStateChanged;
-
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         if (authState.User.Identity?.IsAuthenticated == true)
             await LoadJobApplicationsAsync();
     }
 
-    private async void OnAuthStateChanged(Task<AuthenticationState> authStateTask)
-    {
-        var authState = await authStateTask;
-
-        if (authState.User.Identity?.IsAuthenticated == true)
-        {
-            await LoadJobApplicationsAsync();
-        }
-        else
-        {
-            _jobApplications = [];
-            _selectedStatus = null;
-            _searchText = string.Empty;
-            await InvokeAsync(StateHasChanged);
-        }
-    }
-
     private async Task LoadJobApplicationsAsync()
     {
         _isLoading = true;
-        await InvokeAsync(StateHasChanged);
-
-        var response = await JobApplicationService.GetJobApplicationsForUserAsync();
-        _jobApplications = response.Success ? response.Data ?? [] : [];
-
-        _isLoading = false;
-        await InvokeAsync(StateHasChanged);
+        try
+        {
+            var response = await JobApplicationService.GetJobApplicationsForUserAsync();
+            _jobApplications = response.Success ? response.Data ?? [] : [];
+        }
+        finally
+        {
+            _isLoading = false;
+            await InvokeAsync(StateHasChanged);
+        }
     }
 
     private void OnStatusFilterChanged(JobApplicationModel.JobApplicationStatus? status) =>
@@ -182,16 +165,4 @@ public partial class Home : IDisposable
         JobApplicationModel.JobApplicationStatus.Rejected => "Rejected",
         _ => status.ToString()
     };
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (disposing)
-            AuthenticationStateProvider.AuthenticationStateChanged -= OnAuthStateChanged;
-    }
-
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
 }

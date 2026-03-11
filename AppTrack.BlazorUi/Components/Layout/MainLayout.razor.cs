@@ -38,7 +38,7 @@ public partial class MainLayout
 
     private void ToggleDrawer() => _drawerOpen = !_drawerOpen;
 
-    private void LoginAsync() => Navigation.NavigateToLogin("authentication/login");
+    private void Login() => Navigation.NavigateToLogin("authentication/login");
 
     private async Task OpenAiSettingsDialogAsync()
     {
@@ -46,5 +46,5 @@ public partial class MainLayout
         await DialogService.ShowAsync<AiSettingsDialog>("", _aiSettingsDialogOptions);
     }
 
-    private void LogoutAsync() => Navigation.NavigateToLogout("authentication/logout");
+    private void Logout() => Navigation.NavigateToLogout("authentication/logout");
 }

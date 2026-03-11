@@ -27,9 +27,10 @@ builder.Services.AddMsalAuthentication(options =>
     var apiScope = builder.Configuration["AzureAd:ApiScope"];
     if (!string.IsNullOrEmpty(apiScope))
         options.ProviderOptions.DefaultAccessTokenScopes.Add(apiScope);
+    options.AuthenticationPaths.LogOutSucceededPath = "/";
 });
 
-builder.Services.AddTransient<BaseAddressAuthorizationMessageHandler>();
+builder.Services.AddScoped<AuthorizationMessageHandler>();
 builder.Services.AddApiServiceServices(builder.Configuration);
 
 builder.Services.AddTransient<IValidator<JobApplicationModel>, JobApplicationModelValidator>();

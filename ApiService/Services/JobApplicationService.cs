@@ -11,11 +11,10 @@ public class JobApplicationService : BaseHttpService, IJobApplicationService
     {
     }
 
-    public Task<Response<JobApplicationModel>> CreateJobApplicationForUserAsync(JobApplicationModel jobApplicationModel, string userId) =>
+    public Task<Response<JobApplicationModel>> CreateJobApplicationForUserAsync(JobApplicationModel jobApplicationModel) =>
         TryExecuteAsync(async () =>
         {
             var createJobApplicationCommand = jobApplicationModel.ToCreateCommand();
-            createJobApplicationCommand.UserId = userId;
             var jobApplicationDto = await _client.JobApplicationsPOSTAsync(createJobApplicationCommand);
             return jobApplicationDto.ToModel();
         });
@@ -40,11 +39,10 @@ public class JobApplicationService : BaseHttpService, IJobApplicationService
             return jobApplicationDtos.Select(dto => dto.ToModel()).ToList();
         });
 
-    public Task<Response<JobApplicationModel>> UpdateJobApplicationAsync(int id, string userId, JobApplicationModel jobApplicationModel) =>
+    public Task<Response<JobApplicationModel>> UpdateJobApplicationAsync(int id, JobApplicationModel jobApplicationModel) =>
         TryExecuteAsync(async () =>
         {
             var jobApplicationCommand = jobApplicationModel.ToUpdateCommand();
-            jobApplicationCommand.UserId = userId;
             var jobApplicationDto = await _client.JobApplicationsPUTAsync(id, jobApplicationCommand);
             return jobApplicationDto.ToModel();
         });

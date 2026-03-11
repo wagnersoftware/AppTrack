@@ -4,6 +4,7 @@ using AppTrack.Application.Features.ApplicationText.Dto;
 using AppTrack.Application.Features.ApplicationText.Query.GeneratePromptQuery;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Identity.Web;
 
 namespace AppTrack.Api.Controllers;
 
@@ -26,6 +27,7 @@ public class AiController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<GeneratedPromptDto>> GeneratePrompt([FromBody] GeneratePromptQuery query)
     {
+        query.UserId = User.GetObjectId()!;
         var result = await _mediator.Send(query);
         return Ok(result);
     }

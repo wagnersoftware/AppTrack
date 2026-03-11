@@ -1,0 +1,13 @@
+@* Rendered by AuthorizeRouteView's <NotAuthorized> template in Routes.razor.
+   Redirects unauthenticated users to the MSAL login page.
+   The path guard prevents re-triggering during the MSAL callback, where
+   AuthorizeRouteView briefly sees an unauthenticated state mid-token-processing. *@
+@inject NavigationManager Navigation
+@code {
+    protected override void OnInitialized()
+    {
+        var uri = new Uri(Navigation.Uri);
+        if (!uri.AbsolutePath.StartsWith("/authentication", StringComparison.OrdinalIgnoreCase))
+            Navigation.NavigateToLogin("authentication/login");
+    }
+}

@@ -1,4 +1,5 @@
 using AppTrack.Frontend.ApiService.Helper;
+using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 
 namespace AppTrack.Frontend.ApiService.Base;
 
@@ -39,6 +40,11 @@ public class BaseHttpService
             var result = await action();
             return new Response<T> { Success = true, Data = result };
         }
+        catch (AccessTokenNotAvailableException ex)
+        {
+            ex.Redirect();
+            return new Response<T> { Success = false, ErrorMessage = "Session expired. Redirecting to login..." };
+        }
         catch (OperationCanceledException)
         {
             return new Response<T> { Success = false, ErrorMessage = "Operation canceled." };
@@ -46,6 +52,10 @@ public class BaseHttpService
         catch (ApiException e)
         {
             return ConvertApiException<T>(e);
+        }
+        catch (Exception)
+        {
+            return new Response<T> { Success = false, ErrorMessage = "Something went wrong, please try again" };
         }
     }
 
@@ -56,6 +66,11 @@ public class BaseHttpService
             await action();
             return new Response<T> { Success = true };
         }
+        catch (AccessTokenNotAvailableException ex)
+        {
+            ex.Redirect();
+            return new Response<T> { Success = false, ErrorMessage = "Session expired. Redirecting to login..." };
+        }
         catch (OperationCanceledException)
         {
             return new Response<T> { Success = false, ErrorMessage = "Operation canceled." };
@@ -63,6 +78,10 @@ public class BaseHttpService
         catch (ApiException e)
         {
             return ConvertApiException<T>(e);
+        }
+        catch (Exception)
+        {
+            return new Response<T> { Success = false, ErrorMessage = "Something went wrong, please try again" };
         }
     }
 }

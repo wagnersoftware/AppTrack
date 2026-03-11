@@ -3,7 +3,6 @@ using AppTrack.Frontend.ApiService.Contracts;
 using AppTrack.Frontend.Models;
 using AppTrack.Frontend.Models.ModelValidator;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
 using MudBlazor;
 namespace AppTrack.BlazorUi.Components.Dialogs;
 
@@ -12,7 +11,6 @@ public partial class CreateJobApplicationDialog
     [Inject] private IJobApplicationService JobApplicationService { get; set; } = null!;
     [Inject] private IModelValidator<JobApplicationModel> ModelValidator { get; set; } = null!;
     [Inject] private IErrorHandlingService ErrorHandlingService { get; set; } = null!;
-    [Inject] private AuthenticationStateProvider AuthenticationStateProvider { get; set; } = null!;
 
     [CascadingParameter] private IMudDialogInstance MudDialog { get; set; } = null!;
 
@@ -77,17 +75,8 @@ public partial class CreateJobApplicationDialog
     {
         if (!ModelValidator.Validate(_model)) return;
 
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var userId = authState.User.FindFirst("sub")?.Value ?? string.Empty;
-
-        if (string.IsNullOrEmpty(userId))
-        {
-            ErrorHandlingService.ShowError("User session expired. Please log in again.");
-            return;
-        }
-
         _isBusy = true;
-        var response = await JobApplicationService.CreateJobApplicationForUserAsync(_model, userId);
+        var response = await JobApplicationService.CreateJobApplicationForUserAsync(_model);
         _isBusy = false;
 
         if (!ErrorHandlingService.HandleResponse(response)) return;
