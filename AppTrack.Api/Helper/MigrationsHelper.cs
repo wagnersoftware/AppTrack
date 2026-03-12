@@ -14,17 +14,20 @@ public static class MigrationsHelper
     {
         using var scope = app.Services.CreateScope();
         var services = scope.ServiceProvider;
+        var logger = services.GetRequiredService<ILogger>();
 
         try
         {
             var mainDb = services.GetRequiredService<AppTrack.Persistance.DatabaseContext.AppTrackDatabaseContext>();
 
+            logger.LogInformation("Starting database-migrations");
             await mainDb.Database.MigrateAsync();
+            logger.LogInformation("Databse migration successful");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Database migration was not successful {ex.Message}");
-            throw;
+            // Log the exception as critical, but do not rethrow it to allow migration retries as configured in DB context options
+            logger.LogCritical(ex, "Critical database migration exception {Message}", ex.Message);
         }
     }
 }
