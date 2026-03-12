@@ -13,7 +13,15 @@ public static class PersistanceServiceRegistration
     {
         services.AddDbContext<AppTrackDatabaseContext>(options =>
         {
-            options.UseSqlServer(configuration.GetConnectionString("AppTrackConnectionString"));
+            options.UseSqlServer(
+                configuration.GetConnectionString("AppTrackConnectionString"),
+                sqlServerOptionsAction: sqlOptions =>
+                {
+                    sqlOptions.EnableRetryOnFailure(
+                        maxRetryCount: 5,
+                        maxRetryDelay: TimeSpan.FromSeconds(30),
+                        errorNumbersToAdd: null);
+                });
         });
 
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
