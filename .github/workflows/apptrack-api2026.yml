@@ -1,4 +1,4 @@
-name: Build and deploy .NET Core application to Web App apptrack-api2026
+name: AppTrack WebApi to Azure CD pipeline
 on:
   push:
     branches:
