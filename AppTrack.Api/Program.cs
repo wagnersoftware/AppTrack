@@ -7,6 +7,7 @@ using AppTrack.Persistance;
 using Azure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Identity.Web;
 using Microsoft.OpenApi.Models;
 
@@ -99,7 +100,8 @@ builder.Services.AddAuthorization(options =>
         .Build();
 });
 
-builder.WebHost.UseKestrel(options =>
+// Remove the "Server" header from responses for security hardening
+builder.Services.PostConfigure<KestrelServerOptions>(options =>
 {
     options.AddServerHeader = false;
 });
