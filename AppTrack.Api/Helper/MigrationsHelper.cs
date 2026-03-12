@@ -14,7 +14,8 @@ public static class MigrationsHelper
     {
         using var scope = app.Services.CreateScope();
         var services = scope.ServiceProvider;
-        var logger = services.GetRequiredService<ILogger>();
+        var logger = services.GetRequiredService<ILoggerFactory>().CreateLogger("MigrationsHelper");
+
 
         try
         {
