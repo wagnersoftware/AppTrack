@@ -16,22 +16,6 @@
         else
         {
             <MudGrid Spacing="2">
-                <!-- API Key -->
-                <MudItem xs="12">
-                    <MudTextField T="string"
-                                  Label="API Key"
-                                  InputType="_apiKeyInputType"
-                                  Value="_model.ApiKey"
-                                  ValueChanged="@((string v) => OnApiKeyChanged(v))"
-                                  Error="@ModelValidator.Errors.ContainsKey(nameof(AiSettingsModel.ApiKey))"
-                                  ErrorText="@GetFirstError(nameof(AiSettingsModel.ApiKey))"
-                                  Variant="Variant.Outlined"
-                                  Adornment="Adornment.End"
-                                  AdornmentIcon="@_apiKeyInputIcon"
-                                  OnAdornmentClick="ToggleApiKeyVisibility"
-                                  UserAttributes="_apiKeyAttributes"
-                                  Class="mb-1" />
-                </MudItem>
                 <!-- Chat Model -->
                 <MudItem xs="12" sm="6">
                     <MudSelect T="ChatModel"
