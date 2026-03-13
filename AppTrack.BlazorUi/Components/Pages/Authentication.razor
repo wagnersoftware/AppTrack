@@ -1,8 +1,16 @@
 @page "/authentication/{action}"
 @layout AppTrack.BlazorUi.Components.Layout.EmptyLayout
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@inject NavigationManager Navigation
 
-<RemoteAuthenticatorView Action="@Action" />
+<RemoteAuthenticatorView Action="@Action">
+    <LogInFailed>
+        @* Login was cancelled or aborted by the user (e.g. closed the MSAL popup or
+           navigated away during the flow). Redirect silently back to the home page
+           instead of leaving the user stranded on /authentication/login-failed. *@
+        @{ Navigation.NavigateTo("/"); }
+    </LogInFailed>
+</RemoteAuthenticatorView>
 
 @code {
     [Parameter] public string? Action { get; set; }
