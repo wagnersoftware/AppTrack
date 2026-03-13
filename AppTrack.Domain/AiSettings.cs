@@ -1,11 +1,10 @@
-﻿using AppTrack.Domain.Common;
+using AppTrack.Domain.Common;
 
 namespace AppTrack.Domain;
 
 public class AiSettings : BaseEntity
 {
     public int SelectedChatModelId { get; set; }
-    public string ApiKey { get; set; } = string.Empty;
 
     public string PromptTemplate { get; set; } = string.Empty;
 

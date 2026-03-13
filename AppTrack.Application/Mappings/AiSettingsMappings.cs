@@ -15,7 +15,6 @@ internal static class AiSettingsMappings
     internal static void ApplyTo(this UpdateAiSettingsCommand command, AiSettings entity)
     {
         entity.SelectedChatModelId = command.SelectedChatModelId;
-        entity.ApiKey = command.ApiKey;
         entity.PromptTemplate = command.PromptTemplate;
         entity.UserId = command.UserId;
         entity.PromptParameter.Clear();
@@ -29,7 +28,6 @@ internal static class AiSettingsMappings
     {
         Id = entity.Id,
         SelectedChatModelId = entity.SelectedChatModelId,
-        ApiKey = entity.ApiKey,
         PromptTemplate = entity.PromptTemplate,
         UserId = entity.UserId,
         PromptParameter = entity.PromptParameter.Select(p => p.ToDto()).ToList(),

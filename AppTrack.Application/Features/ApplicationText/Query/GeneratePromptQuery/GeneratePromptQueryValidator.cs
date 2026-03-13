@@ -41,9 +41,6 @@ public class GeneratePromptQueryValidator : AbstractValidator<GeneratePromptQuer
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(aiSettings.ApiKey))
-            context.AddFailure("ApiKey in AI settings is missing.");
-
         if (string.IsNullOrWhiteSpace(aiSettings.PromptTemplate))
             context.AddFailure("Prompt in AI settings is missing.");
     }

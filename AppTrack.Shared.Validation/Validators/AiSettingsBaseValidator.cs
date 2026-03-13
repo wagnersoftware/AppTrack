@@ -8,9 +8,6 @@ public abstract class AiSettingsBaseValidator<T> : AbstractValidator<T>
 {
     protected AiSettingsBaseValidator()
     {
-        RuleFor(x => x.ApiKey)
-            .MaximumLength(200).WithMessage("ApiKey must not exceed 200 characters.");
-
         RuleForEach(x => x.PromptParameter)
             .SetValidator(new PromptParameterItemValidator());
 

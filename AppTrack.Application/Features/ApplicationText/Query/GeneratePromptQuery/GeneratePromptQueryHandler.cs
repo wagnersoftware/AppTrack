@@ -1,5 +1,4 @@
-﻿using AppTrack.Application.Contracts.ApplicationTextGenerator;
-using AppTrack.Application.Contracts.Mediator;
+﻿using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Exceptions;
 using AppTrack.Application.Features.ApplicationText.Dto;
@@ -10,16 +9,14 @@ namespace AppTrack.Application.Features.ApplicationText.Query.GeneratePromptQuer
 
 public class GeneratePromptQueryHandler : IRequestHandler<GeneratePromptQuery, GeneratedPromptDto>
 {
-    private readonly IApplicationTextGenerator _applicationTextGenerator;
     private readonly IAiSettingsRepository _aiSettingsRepository;
     private readonly IJobApplicationRepository _jobApplicationRepository;
     private readonly IPromptBuilder _promptBuilder;
 
-    public GeneratePromptQueryHandler(IAiSettingsRepository aiSettingsRepository, IJobApplicationRepository jobApplicationRepository, IApplicationTextGenerator applicationTextGenerator, IPromptBuilder promptBuilder)
+    public GeneratePromptQueryHandler(IAiSettingsRepository aiSettingsRepository, IJobApplicationRepository jobApplicationRepository, IPromptBuilder promptBuilder)
     {
         this._aiSettingsRepository = aiSettingsRepository;
         this._jobApplicationRepository = jobApplicationRepository;
-        this._applicationTextGenerator = applicationTextGenerator;
         this._promptBuilder = promptBuilder;
     }
 
@@ -35,13 +32,12 @@ public class GeneratePromptQueryHandler : IRequestHandler<GeneratePromptQuery, G
 
         //get Ai settings
         var aiSettings = await _aiSettingsRepository.GetByUserIdIncludePromptParameterAsync(request.UserId);
-        _applicationTextGenerator.SetApiKey(aiSettings!.ApiKey);
 
         //get job application
         var jobApplication = await _jobApplicationRepository.GetByIdAsync(request.JobApplicationId);
 
         //build prompt
-        var applicantParameter = aiSettings.PromptParameter.ToList();
+        var applicantParameter = aiSettings!.PromptParameter.ToList();
         var jobApplicationParameter = jobApplication!.ToPromptParameters().ToList();
         var promptParameter = jobApplicationParameter.Union(applicantParameter).ToList();
         var (prompt, unusedKeys) = _promptBuilder.BuildPrompt(promptParameter, aiSettings.PromptTemplate);
