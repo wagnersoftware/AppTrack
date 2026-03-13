@@ -54,9 +54,6 @@ public class GenerateApplicationTextCommandValidator : AbstractValidator<Generat
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(aiSettings.ApiKey))
-            context.AddFailure("ApiKey in AI settings is missing.");
-
         var chatModel = await _chatModelRepository.GetByIdAsync(aiSettings.SelectedChatModelId);
 
         if (chatModel == null)

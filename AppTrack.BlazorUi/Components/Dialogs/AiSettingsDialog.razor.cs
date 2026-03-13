@@ -32,17 +32,6 @@ public partial class AiSettingsDialog
     // True only during the save API call; keeps the form visible but disables action buttons and shows an inline spinner.
     private bool _isBusy;
 
-    // Suppresses browser "Save password?" prompts while keeping the field masked.
-    // "new-password" signals to the browser that this is a credential creation field,
-    // not a login form, which prevents most browsers from offering to save it.
-    private static readonly Dictionary<string, object> _apiKeyAttributes = new()
-    {
-        { "autocomplete", "new-password" },
-    };
-
-    private InputType _apiKeyInputType = InputType.Password;
-    private string _apiKeyInputIcon = Icons.Material.Filled.VisibilityOff;
-
     protected override async Task OnInitializedAsync()
     {
         _isLoading = true;
@@ -71,26 +60,6 @@ public partial class AiSettingsDialog
         _selectedChatModel = _chatModels.FirstOrDefault(m => m.Id == _model.SelectedChatModelId);
 
         _isLoading = false;
-    }
-
-    private void ToggleApiKeyVisibility()
-    {
-        if (_apiKeyInputType == InputType.Password)
-        {
-            _apiKeyInputType = InputType.Text;
-            _apiKeyInputIcon = Icons.Material.Filled.Visibility;
-        }
-        else
-        {
-            _apiKeyInputType = InputType.Password;
-            _apiKeyInputIcon = Icons.Material.Filled.VisibilityOff;
-        }
-    }
-
-    private void OnApiKeyChanged(string value)
-    {
-        _model.ApiKey = value;
-        ModelValidator.ResetErrors(nameof(AiSettingsModel.ApiKey));
     }
 
     private void OnPromptTemplateChanged(string value)

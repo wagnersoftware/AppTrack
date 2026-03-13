@@ -21,7 +21,6 @@ internal static class AiSettingsSeedsHelper
         var aiSettings = new Domain.AiSettings
         {
             UserId = userId,
-            ApiKey = "1234abc",
             PromptTemplate = "Hello, my name is {name} and my rate is {rate}.",
             PromptParameter = new List<PromptParameter>()
             {

@@ -1,4 +1,4 @@
-﻿using AppTrack.Api.IntegrationTests.Auth;
+using AppTrack.Api.IntegrationTests.Auth;
 using AppTrack.Api.IntegrationTests.Seeddata;
 using AppTrack.Api.IntegrationTests.Seeddata.User;
 using AppTrack.Api.Models;
@@ -35,7 +35,6 @@ public class UpdateAiSettingsTests : IClassFixture<FakeAuthWebApplicationFactory
         {
             Id = 0,
             UserId = userId,
-            ApiKey = "sk-validkey1234567890"
         };
 
         // Act
@@ -61,7 +60,6 @@ public class UpdateAiSettingsTests : IClassFixture<FakeAuthWebApplicationFactory
         {
             Id = 9999, // non-existent
             UserId = userId,
-            ApiKey = "sk-validkey1234567890"
         };
 
         // Act
@@ -88,7 +86,6 @@ public class UpdateAiSettingsTests : IClassFixture<FakeAuthWebApplicationFactory
         {
             Id = aiSettingsId,
             UserId = randomUserId, // belongs to another user
-            ApiKey = "sk-validkey1234567890"
         };
 
         // Act
@@ -113,7 +110,6 @@ public class UpdateAiSettingsTests : IClassFixture<FakeAuthWebApplicationFactory
         {
             Id = aiSettingsId,
             UserId = TestAuthHandler.TestUserId,
-            ApiKey = "sk-ABCDEFGHIJKLMNOPQRST",
             PromptParameter = new List<PromptParameterDto>
                 {
                     new() { Key = "Temperature", Value = "0.8" },
@@ -128,7 +124,6 @@ public class UpdateAiSettingsTests : IClassFixture<FakeAuthWebApplicationFactory
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
         var result = await response.Content.ReadFromJsonAsync<AiSettingsDto>();
         result.ShouldNotBeNull();
-        result.ApiKey.ShouldBe(validRequest.ApiKey);
     }
 
     [Fact]
@@ -141,7 +136,6 @@ public class UpdateAiSettingsTests : IClassFixture<FakeAuthWebApplicationFactory
         {
             Id = aiSettingsId,
             UserId = userId,
-            ApiKey = "sk-ABCDEFGHIJKLMNOPQRST",
             PromptParameter = new List<PromptParameterDto>
                 {
                     new() { Key = "Temperature", Value = "0.8" },
@@ -172,7 +166,6 @@ public class UpdateAiSettingsTests : IClassFixture<FakeAuthWebApplicationFactory
         {
             Id = aiSettingsId,
             UserId = userId,
-            ApiKey = "sk-ABCDEFGHIJKLMNOPQRST",
             PromptParameter = new List<PromptParameterDto>
                 {
                     new() { Key = "Temperature", Value = "" }
@@ -201,7 +194,6 @@ public class UpdateAiSettingsTests : IClassFixture<FakeAuthWebApplicationFactory
         {
             Id = aiSettingsId,
             UserId = userId,
-            ApiKey = "sk-ABCDEFGHIJKLMNOPQRST",
             PromptParameter = new List<PromptParameterDto>
                 {
                     new() { Key = "", Value = "TestValue" }
@@ -218,41 +210,6 @@ public class UpdateAiSettingsTests : IClassFixture<FakeAuthWebApplicationFactory
         problem.ShouldNotBeNull();
         problem.Errors.ShouldContainKey("PromptParameter[0].Key");
         problem.Errors["PromptParameter[0].Key"].ShouldContain("Key is required.");
-    }
-
-    [Fact]
-    public async Task UpdateAiSettings_ShouldReturn400_WhenApiKeyExceedsMaxChars()
-    {
-        // Arrange
-        var (userId, aiSettingsId) = await SeedHelper.CreateUserWithAiSettingsAsync(_factory.Services);
-
-        string prefix = "sk-";
-        int totalLength = 201;
-        int remainingLength = totalLength - prefix.Length;
-        string rest = new string('a', remainingLength);
-        string invalidApiKey = prefix + rest;
-
-        var invalidRequest = new UpdateAiSettingsCommand
-        {
-            Id = aiSettingsId,
-            UserId = userId,
-            ApiKey = invalidApiKey,
-            PromptParameter = new List<PromptParameterDto>
-                {
-                    new() { Key = "", Value = "TestValue" }
-                }
-        };
-
-        // Act
-        var response = await _client.PutAsJsonAsync($"/api/ai-settings/{invalidRequest.Id}", invalidRequest);
-
-        // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
-
-        var problem = await response.Content.ReadFromJsonAsync<CustomProblemDetails>();
-        problem.ShouldNotBeNull();
-        problem.Errors.ShouldContainKey("ApiKey");
-        problem.Errors["ApiKey"].ShouldContain("ApiKey must not exceed 200 characters.");
     }
 
     [Fact]
