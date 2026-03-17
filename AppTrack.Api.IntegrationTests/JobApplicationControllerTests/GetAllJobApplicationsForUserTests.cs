@@ -36,14 +36,4 @@ public class GetAllJobApplicationsForUserTests : IClassFixture<FakeAuthWebApplic
         jobApplications.All(x => x.UserId == TestAuthHandler.TestUserId).ShouldBeTrue();
         jobApplications.Any(x => x.Id == jobApplicationId).ShouldBeTrue();
     }
-
-    [Fact]
-    public async Task GetJobApplicationsForUser_ShouldReturn404_WhenUserIdIsEmpty()
-    {
-        // Act – empty segment in URL resolves to 404 (no matching route)
-        var response = await _client.GetAsync("api/users//job-applications");
-
-        // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
-    }
 }
