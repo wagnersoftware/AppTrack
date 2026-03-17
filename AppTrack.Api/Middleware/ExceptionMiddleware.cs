@@ -75,6 +75,18 @@ public class ExceptionMiddleware
                 };
 
                 break;
+            case ExternalServiceException extEx:
+                statusCode = extEx.UpstreamStatusCode ?? HttpStatusCode.BadGateway;
+                _logger.LogError(extEx, "External service error: {Message}", extEx.Message);
+                problem = new CustomProblemDetails()
+                {
+                    Title = extEx.Message.Trim(),
+                    Status = (int)statusCode,
+                    Detail = extEx.InnerException?.Message,
+                    Type = nameof(ExternalServiceException),
+                };
+
+                break;
             default:
                 _logger.LogError(ex, "Unhandled exception occurred while processing request {Path}", httpContext.Request.Path);
                 problem = new CustomProblemDetails()

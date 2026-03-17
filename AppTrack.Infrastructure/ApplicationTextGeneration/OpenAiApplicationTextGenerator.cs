@@ -1,6 +1,8 @@
 using AppTrack.Application.Contracts.ApplicationTextGenerator;
+using AppTrack.Application.Exceptions;
 using AppTrack.Infrastructure.ApplicationTextGeneration.OpAiModels;
 using Microsoft.Extensions.Options;
+using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
@@ -36,11 +38,44 @@ public class OpenAiApplicationTextGenerator : IApplicationTextGenerator
             max_tokens = 400
         });
 
-        var response = await _httpClient.SendAsync(request, cancellationToken);
-        response.EnsureSuccessStatusCode();
+        HttpResponseMessage response;
+        try
+        {
+            response = await _httpClient.SendAsync(request, cancellationToken);
+        }
+        catch (TaskCanceledException ex)
+        {
+            if (!cancellationToken.IsCancellationRequested)
+            {
+                throw new ExternalServiceException("The request to OpenAI timed out.", HttpStatusCode.GatewayTimeout, ex);
+            }
+
+            throw;
+        }
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw response.StatusCode switch
+            {
+                HttpStatusCode.Unauthorized =>
+                    new ExternalServiceException("OpenAI API key is invalid or expired.", HttpStatusCode.Unauthorized),
+                HttpStatusCode.TooManyRequests =>
+                    new ExternalServiceException("OpenAI rate limit exceeded. Please try again later.", HttpStatusCode.TooManyRequests),
+                HttpStatusCode.ServiceUnavailable or HttpStatusCode.GatewayTimeout =>
+                    new ExternalServiceException("OpenAI service is currently unavailable.", response.StatusCode),
+                _ =>
+                    new ExternalServiceException($"OpenAI returned an unexpected error: {(int)response.StatusCode}", response.StatusCode)
+            };
+        }
 
         var result = await response.Content.ReadFromJsonAsync<ChatCompletionResponse>(cancellationToken: cancellationToken);
+        var content = result?.Choices?.FirstOrDefault()?.Message?.Content;
 
-        return result?.Choices?.FirstOrDefault()?.Message?.Content ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(content))
+        {
+            throw new ExternalServiceException("OpenAI returned an empty response.");
+        }
+
+        return content;
     }
 }
