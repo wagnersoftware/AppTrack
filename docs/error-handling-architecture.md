@@ -23,9 +23,9 @@ The following diagram shows the full journey of a failed `CreateJobApplication` 
 
 ```mermaid
 sequenceDiagram
-    participant UI as Blazor Component<br/>(CreateJobApplicationDialog)
-    participant SVC as JobApplicationService<br/>(BaseHttpService)
-    participant API as JobApplicationsController<br/>(AppTrack.Api)
+    participant UI as Blazor Component (CreateJobApplicationDialog)
+    participant SVC as JobApplicationService (BaseHttpService)
+    participant API as JobApplicationsController (AppTrack.Api)
     participant MED as IMediator
     participant HDL as CreateJobApplicationCommandHandler
     participant VAL as CreateJobApplicationCommandValidator
@@ -44,8 +44,8 @@ sequenceDiagram
     MDW-->>API: HTTP 400 + CustomProblemDetails JSON
     Note over MDW: { title, status: 400, errors: { "Name": ["..."] } }
     API-->>SVC: ApiException (StatusCode: 400)
-    SVC->>SVC: ConvertApiException()<br/>→ ApiErrorHelper.ExtractErrors()
-    SVC-->>UI: Response&lt;T&gt; { Success=false, ErrorMessage="...", ErrorDetails="..." }
+    SVC->>SVC: ConvertApiException() + ApiErrorHelper.ExtractErrors()
+    SVC-->>UI: Response[T] - Success=false
     Note right of SVC: ErrorMessage="Invalid data was submitted"<br/>ErrorDetails="Status: 400 / Message: Invalid Request / Name: ..."
     UI->>UI: ErrorHandlingService.HandleResponse(response)
     Note over UI: HandleResponse returns false
