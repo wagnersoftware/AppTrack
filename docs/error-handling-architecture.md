@@ -45,7 +45,8 @@ sequenceDiagram
     Note over MDW: { title, status: 400, errors: { "Name": ["..."] } }
     API-->>SVC: ApiException (StatusCode: 400)
     SVC->>SVC: ConvertApiException()<br/>→ ApiErrorHelper.ExtractErrors()
-    SVC-->>UI: Response&lt;T&gt; { Success=false,<br/>ErrorMessage="Invalid data was submitted",<br/>ErrorDetails="Status: 400\nMessage: ...\nName: ..." }
+    SVC-->>UI: Response&lt;T&gt; { Success=false, ErrorMessage="...", ErrorDetails="..." }
+    Note right of SVC: ErrorMessage="Invalid data was submitted"<br/>ErrorDetails="Status: 400 / Message: Invalid Request / Name: ..."
     UI->>UI: ErrorHandlingService.HandleResponse(response)
     Note over UI: HandleResponse returns false
     UI->>UI: Snackbar shows response.DisplayMessage
