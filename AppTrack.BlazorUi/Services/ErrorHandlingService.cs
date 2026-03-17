@@ -15,11 +15,7 @@ public class ErrorHandlingService(ISnackbar snackbar) : IErrorHandlingService
     {
         if (response.Success) return true;
 
-        var message = !string.IsNullOrEmpty(response.ValidationErrors)
-            ? response.ValidationErrors
-            : response.ErrorMessage;
-
-        snackbar.Add(message, Severity.Error);
+        snackbar.Add(response.DisplayMessage, Severity.Error);
         return false;
     }
 }
