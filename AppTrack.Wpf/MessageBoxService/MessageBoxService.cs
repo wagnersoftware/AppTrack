@@ -5,16 +5,10 @@ namespace AppTrack.WpfUi.MessageBoxService;
 
 public class MessageBoxService : IMessageBoxService
 {
-    /// <summary>
-    /// Sets the response' validation error message as message box text if set, otherwise the response message.
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="response"></param>
-    /// <returns></returns>
     public MessageBoxResult ShowErrorMessageBox<T>(Response<T> response)
     {
         var owner = GetActiveWindow();
-        var message = string.IsNullOrEmpty(response.ValidationErrors) == false ? response.ValidationErrors : response.ErrorMessage;
+        var message = response.DisplayMessage;
 
         if (owner != null)
         {

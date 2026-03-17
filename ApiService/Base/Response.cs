@@ -8,9 +8,15 @@ public class Response<T>
     public string ErrorMessage { get; set; } = string.Empty;
 
     /// <summary>
-    /// Contains specific validation errors.
+    /// Contains detailed error information from the backend (e.g. field-level validation messages).
     /// </summary>
-    public string ValidationErrors { get; set; } = string.Empty;
+    public string ErrorDetails { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Returns ErrorDetails if available, otherwise falls back to ErrorMessage.
+    /// Use this as the single source for displaying an error to the user.
+    /// </summary>
+    public string DisplayMessage => !string.IsNullOrEmpty(ErrorDetails) ? ErrorDetails : ErrorMessage;
 
     /// <summary>
     /// False in error case, otherwise true,
