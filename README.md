@@ -1,81 +1,188 @@
 # AppTrack
 
-![AppTrack](Documentation/Screenshots/AppTrack.png)
+> AI-powered job application management — built as a playground for Clean Architecture, CQRS, and modern .NET cloud patterns.
 
-AppTrack helps me manage my own job applications and generate application texts using AI. It features Bearer-Token authentication, a WPF frontend, with a Blazor web frontend planned for the future. The backend is an ASP.NET Web API (all .NET 8) following Clean Architecture, CQRS, and the Mediator pattern. 
-The project is primarily intended as a playground for exploring new technologies and architectures.
+![.NET](https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet)
+![Azure](https://img.shields.io/badge/Azure-App_Service_·_Static_Web_Apps-0078D4?logo=microsoftazure)
+![CI](https://github.com/wagnersoftware/AppTrack/actions/workflows/ci.yml/badge.svg)
+![License](https://img.shields.io/badge/license-MIT-green)
 
-## Technologies
+AppTrack lets you track job applications and generate tailored application texts with OpenAI. The backend follows **Clean Architecture** with CQRS and the Mediator pattern. The web frontend is a **Blazor WebAssembly** SPA protected by **Microsoft Entra External ID (CIAM)**. Both are deployed to Azure via GitHub Actions CD pipelines.
 
-- ASP.NET Web API backend with Clean Architecture, CQRS, and the Mediator pattern
+---
 
-- Token-based authentication
+## Architecture
 
-- WPF desktop frontend (Blazor web frontend planned)
+```mermaid
+graph TB
+    subgraph Clients["Clients"]
+        Blazor["Blazor WASM\n(MudBlazor)"]
+        WPF["WPF Desktop Client\n(dev only)"]
+    end
 
-- WPF implemented with MVVM and CommunityToolkit.Mvvm
+    subgraph Azure["Azure"]
+        SWA["Azure Static Web Apps\n(Blazor Frontend)"]
+        AppSvc["Azure App Service\n(ASP.NET Core API)"]
+        EntraID["Microsoft Entra\nExternal ID (CIAM)"]
+        AzureSQL[("Azure SQL Database\n(EF Core)")]
+    end
 
-- XAML Styler for consistent code style
+    subgraph ExternalServices["External Services"]
+        OpenAI["OpenAI API\n(Text Generation)"]
+        SendGrid["SendGrid\n(Email)"]
+    end
 
-- Dependency Injection
+    subgraph API["ASP.NET Core API"]
+        Controllers["Controllers\n(Mediator dispatch only)"]
+        Application["Application Layer\n(Commands · Queries · Validators)"]
+        Domain["Domain Layer\n(Entities · Enums · Value Objects)"]
+        Infra["Infrastructure\n(OpenAI · SendGrid)"]
+        Persistence["Persistence\n(EF Core DbContext · Migrations)"]
+        Identity["Identity\n(JWT · ASP.NET Identity)"]
+    end
 
-- API client generation with NSwag
+    subgraph CI_CD["GitHub Actions CI/CD"]
+        CI["ci.yml\n(Build · Unit Tests)"]
+        CDApi["apptrack-api2026.yml\n(Deploy API → App Service)"]
+        CDBlazor["azure-static-web-apps.yml\n(Deploy Blazor → SWA)"]
+    end
 
+    Blazor --> SWA
+    SWA -->|"HTTPS + JWT"| AppSvc
+    WPF -->|"HTTPS + JWT\n(local dev)"| AppSvc
+    Blazor <-->|"MSAL / OIDC"| EntraID
+    EntraID -.->|"Token validation"| Identity
+
+    AppSvc --> Controllers
+    Controllers --> Application
+    Application --> Domain
+    Application --> Infra
+    Application --> Persistence
+    Application --> Identity
+    Persistence --> AzureSQL
+    Infra --> OpenAI
+    Infra --> SendGrid
+
+    CI_CD --> AppSvc
+    CI_CD --> SWA
+```
+
+### Layers
+
+| Layer | Project | Responsibility |
+|-------|---------|----------------|
+| Domain | `AppTrack.Domain` | Entities, enums, value objects — no dependencies |
+| Application | `AppTrack.Application` | CQRS handlers, DTOs, validators, mapping |
+| Infrastructure | `AppTrack.Infrastructure` | OpenAI text generation, SendGrid email |
+| Persistence | `AppTrack.Persistance` | EF Core DbContext, migrations (auto-applied on startup) |
+| Identity | `AppTrack.Identity` | JWT generation/validation, ASP.NET Identity |
+| API | `AppTrack.Api` | ASP.NET controllers, middleware, DI wiring |
+| Shared | `AppTrack.Shared.Validation` | Shared FluentValidation interfaces & base validators |
+| Frontend | `AppTrack.Frontend.Models` / `ApiService` | Shared DTOs, NSwag-generated API client |
+
+---
+
+## Tech Stack
+
+**Backend**
+- .NET 10 / ASP.NET Core Web API
+- Custom Mediator implementation (CQRS pattern, no third-party library)
+- Entity Framework Core 10 + MS SQL Server
 - FluentValidation
+- JWT Bearer authentication
+- SonarAnalyzer.CSharp (static analysis, warnings-as-errors)
 
-- ModernWpfUI controls
+**Frontend**
+- Blazor WebAssembly (net10.0)
+- MudBlazor component library
+- MSAL.js via `Microsoft.Authentication.WebAssembly.Msal`
+- NSwag-generated typed API client
 
-- Unit tests with xUnit, Moq and Shouldly
+**Cloud & DevOps**
+- Azure App Service (API)
+- Azure Static Web Apps (Blazor SPA)
+- Microsoft Entra External ID — CIAM (authentication)
+- GitHub Actions — CI pipeline + two CD pipelines (OIDC / Federated Identity, no long-lived secrets)
 
-- Integration tests with Docker Testcontainers, Xunit and Shouldly
+**Testing**
+- xUnit · Moq · Shouldly (unit tests)
+- EF Core InMemory (persistence integration tests)
+- Testcontainers + real SQL Server in Docker (API integration tests)
 
-- Static code analysis with SonarAnalyzer.CSharp
+---
 
-- Entity Framework Core
+## Getting Started (Local Development)
 
-- MS SQL LocalDB
+### Prerequisites
+- .NET 10 SDK
+- Visual Studio 2022 17.12+ or VS Code
+- SQL Server LocalDB (ships with Visual Studio)
+- Docker Desktop (for API integration tests only)
 
-- GitHub Actions
+### Run locally
 
-## MEthologies 
+```bash
+# Clone
+git clone https://github.com/wagnersoftware/AppTrack.git
+cd AppTrack
 
-- Clean Code and SOLID principles
+# Restore & build
+dotnet restore AppTrack.sln
+dotnet build AppTrack.sln --configuration Release
 
-- CI Pipeline
+# Start the API (migrations apply automatically on first run)
+dotnet run --project AppTrack.Api
 
-## Installation
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/wagnersoftware/AppTrack.git
-2. Open the solution in Visual Studio 2022 or later.
+# Start the Blazor frontend (separate terminal)
+dotnet run --project AppTrack.BlazorUi
+```
 
-3. Right-click on the solution file -> Restore NuGet packages.
+### Run tests
 
-4. Right-click the project file AppTrack.Api and select Publish. Choose any directory on your local machine, apply the settings and run Publish.
+```bash
+# Unit tests
+dotnet test test/AppTrack.Application.UnitTests/AppTrack.Application.UnitTests.csproj
 
-![AppTrack](Documentation/Screenshots/PublishBackend.png)
+# Persistence integration tests (LocalDB)
+dotnet test test/AppTrack.Persistance.IntegrationTests/AppTrack.Persistance.IntegrationTests.csproj
 
-5. Right-click the project file AppTrack.WpfUi and select Publish. Choose any directory on your local machine, apply the settings and run Publish.
+# API integration tests (requires Docker)
+dotnet test test/AppTrack.Api.IntegrationTests/AppTrack.Api.IntegrationTests.csproj
+```
 
-![AppTrack](Documentation/Screenshots/PublishFrontend.png)
+### Configuration
 
-6. In the Frontend directory there is a batch file (StartAppTrack.bat) that will run the frontend and backend. you must set the APIPATH and UIPATH to your installation directory.
+Key settings in `AppTrack.Api/appsettings.json` — override via user secrets or environment variables:
 
-![AppTrack](Documentation/Screenshots/StartBatchConfig.png)
+| Key | Description |
+|-----|-------------|
+| `ConnectionStrings:DefaultConnection` | SQL Server connection string |
+| `JwtSettings:Key` | JWT signing key |
+| `OpenAiSettings:ApiUrl` | OpenAI API endpoint |
+| `EmailSettings:ApiKey` | SendGrid API key |
 
-7. Run the batch file
+> A WPF desktop client (`AppTrack.WpfUi`) is also included for local use, though the Blazor frontend is the primary UI.
 
-The application uses LocalDB that comes with Visual Studio. If you still need it, you can get it here (Express Version): https://www.microsoft.com/en-us/sql-server/sql-server-downloads
-The migration scripts run automatically on server start.
+---
+
+## CI/CD
+
+| Workflow | Trigger | Action |
+|----------|---------|--------|
+| `ci.yml` | Push / PR | Build + unit tests |
+| `apptrack-api2026.yml` | Push to `main` | Deploy API → Azure App Service (OIDC) |
+| `azure-static-web-apps-*.yml` | Push to `main` | Deploy Blazor → Azure Static Web Apps |
+
+---
 
 ## Contributing
 
 1. Fork the repository.
+2. Create a branch: `git checkout -b feature/your-feature`.
+3. Submit a Pull Request against `main`.
 
-2. Create a new branch for your feature or bugfix.
-
-3. Submit a Pull Request.
+---
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the [MIT License](LICENSE).
