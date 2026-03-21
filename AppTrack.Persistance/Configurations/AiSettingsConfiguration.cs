@@ -12,5 +12,10 @@ public class AiSettingsConfiguration : IEntityTypeConfiguration<AiSettings>
             .WithOne(p => p.AISettings)
             .HasForeignKey(p => p.AISettingsId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(s => s.Prompts)
+            .WithOne(p => p.AiSettings)
+            .HasForeignKey(p => p.AiSettingsId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
