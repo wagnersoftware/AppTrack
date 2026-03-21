@@ -6,9 +6,9 @@ using Shouldly;
 namespace AppTrack.Application.UnitTests.Validators;
 
 // Concrete test implementation
-file class TestPromptValidator : PromptBaseValidator<TestPrompt> { }
+internal sealed class TestPromptValidator : PromptBaseValidator<TestPrompt> { }
 
-file class TestPrompt : IPromptValidatable
+internal sealed class TestPrompt : IPromptValidatable
 {
     public string Name { get; init; } = string.Empty;
     public string PromptTemplate { get; init; } = string.Empty;

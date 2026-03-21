@@ -62,12 +62,6 @@ public partial class AiSettingsDialog
         _isLoading = false;
     }
 
-    private void OnPromptTemplateChanged(string value)
-    {
-        _model.PromptTemplate = value;
-        ModelValidator.ResetErrors(nameof(AiSettingsModel.PromptTemplate));
-    }
-
     private void OnChatModelChanged(ChatModel value)
     {
         _selectedChatModel = value;
@@ -114,9 +108,6 @@ public partial class AiSettingsDialog
     {
         _model.PromptParameter.Remove(param);
     }
-
-    private string GetFirstError(string propertyName)
-        => ModelValidator.Errors.GetValueOrDefault(propertyName)?.FirstOrDefault() ?? string.Empty;
 
     private async Task SubmitAsync()
     {

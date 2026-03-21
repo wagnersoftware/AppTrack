@@ -4,21 +4,21 @@ using Shouldly;
 
 namespace AppTrack.Application.UnitTests.Validators;
 
-file class TestAiSettingsValidator : AiSettingsBaseValidator<TestAiSettings> { }
+internal sealed class TestAiSettingsValidator : AiSettingsBaseValidator<TestAiSettings> { }
 
-file class TestAiSettings : IAiSettingsValidatable
+internal sealed class TestAiSettings : IAiSettingsValidatable
 {
     public IEnumerable<IPromptParameterValidatable> PromptParameter { get; init; } = [];
     public IEnumerable<IPromptValidatable> Prompts { get; init; } = [];
 }
 
-file class TestPromptItem : IPromptValidatable
+internal sealed class TestPromptItem : IPromptValidatable
 {
     public string Name { get; init; } = string.Empty;
     public string PromptTemplate { get; init; } = string.Empty;
 }
 
-file class TestPromptParameterItem : IPromptParameterValidatable
+internal sealed class TestPromptParameterItem : IPromptParameterValidatable
 {
     public string Key { get; init; } = string.Empty;
     public string Value { get; init; } = string.Empty;

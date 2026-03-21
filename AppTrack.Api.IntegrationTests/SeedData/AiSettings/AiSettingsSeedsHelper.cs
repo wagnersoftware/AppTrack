@@ -21,7 +21,10 @@ internal static class AiSettingsSeedsHelper
         var aiSettings = new Domain.AiSettings
         {
             UserId = userId,
-            PromptTemplate = "Hello, my name is {name} and my rate is {rate}.",
+            Prompts = new List<Prompt>()
+            {
+                Prompt.Create("Default", "Hello, my name is {name} and my rate is {rate}."),
+            },
             PromptParameter = new List<PromptParameter>()
             {
                 PromptParameter.Create("key1", "value1"),

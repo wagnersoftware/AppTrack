@@ -10,7 +10,6 @@ internal static class AiSettingsMappings
     {
         Id = dto.Id,
         SelectedChatModelId = dto.SelectedChatModelId,
-        PromptTemplate = dto.PromptTemplate ?? string.Empty,
         UserId = dto.UserId ?? string.Empty,
         PromptParameter = new ObservableCollection<PromptParameterModel>(
             (dto.PromptParameter ?? []).Select(p => p.ToModel())),
@@ -27,7 +26,6 @@ internal static class AiSettingsMappings
     {
         Id = model.Id,
         SelectedChatModelId = model.SelectedChatModelId,
-        PromptTemplate = model.PromptTemplate,
         UserId = model.UserId,
         PromptParameter = model.PromptParameter.Select(p => p.ToDto()).ToList(),
     };

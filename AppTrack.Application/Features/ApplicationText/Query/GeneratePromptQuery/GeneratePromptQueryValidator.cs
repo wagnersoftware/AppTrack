@@ -41,7 +41,7 @@ public class GeneratePromptQueryValidator : AbstractValidator<GeneratePromptQuer
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(aiSettings.PromptTemplate))
+        if (!aiSettings.Prompts.Any() || string.IsNullOrWhiteSpace(aiSettings.Prompts.First().PromptTemplate))
             context.AddFailure("Prompt in AI settings is missing.");
     }
 }

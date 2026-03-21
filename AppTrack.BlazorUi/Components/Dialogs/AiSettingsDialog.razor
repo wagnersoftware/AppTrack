@@ -40,18 +40,7 @@
                         }
                     </MudSelect>
                 </MudItem>
-                <!-- Prompt Template -->
-                <MudItem xs="12">
-                    <MudTextField T="string"
-                                  Label="Prompt Template"
-                                  Value="_model.PromptTemplate"
-                                  ValueChanged="@((string v) => OnPromptTemplateChanged(v))"
-                                  Error="@ModelValidator.Errors.ContainsKey(nameof(AiSettingsModel.PromptTemplate))"
-                                  ErrorText="@GetFirstError(nameof(AiSettingsModel.PromptTemplate))"
-                                  Variant="Variant.Outlined"
-                                  Lines="8"
-                                  Class="mb-1" />
-                </MudItem>
+                <!-- Prompt Template: replaced by per-prompt management (see PromptDialog) -->
                 <!-- Prompt Parameters -->
                 <MudItem xs="12">
                     <MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">
