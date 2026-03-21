@@ -4,7 +4,7 @@ public class AiSettingsDto
 {
     public int SelectedChatModelId { get; set; }
     public int Id { get; set; }
-    public string PromptTemplate { get; set; } = string.Empty;
     public string UserId { get; set; } = string.Empty;
     public List<PromptParameterDto> PromptParameter { get; set; } = new List<PromptParameterDto>();
+    public List<PromptDto> Prompts { get; set; } = new List<PromptDto>();
 }
