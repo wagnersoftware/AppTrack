@@ -40,7 +40,60 @@
                         }
                     </MudSelect>
                 </MudItem>
-                <!-- Prompt Template: replaced by per-prompt management (see PromptDialog) -->
+                <!-- Prompts -->
+                <MudItem xs="12">
+                    <MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">
+                        <MudText Typo="Typo.subtitle1">Prompts</MudText>
+                        <MudSpacer />
+                        <MudButton Variant="Variant.Outlined"
+                                   Color="Color.Primary"
+                                   StartIcon="@Icons.Material.Filled.Add"
+                                   Size="Size.Small"
+                                   OnClick="AddPromptAsync">
+                            Add
+                        </MudButton>
+                    </MudStack>
+                    @if (_model.Prompts.Count == 0)
+                    {
+                        <MudText Typo="Typo.body2" Color="Color.Secondary" Class="ml-1">
+                            No prompts defined.
+                        </MudText>
+                    }
+                    else
+                    {
+                        <MudPaper Outlined="true" Class="pa-0" Style="max-height: 260px; overflow-y: auto;">
+                            @foreach (var prompt in _model.Prompts)
+                            {
+                                var captured = prompt;
+                                <MudStack Row="true"
+                                          AlignItems="AlignItems.Center"
+                                          Class="pa-3"
+                                          Style="border-bottom: 1px solid var(--mud-palette-divider);">
+                                    <MudStack Spacing="0" Style="flex: 1; min-width: 0;">
+                                        <MudText Typo="Typo.subtitle2" Style="word-break: break-word;">@captured.Name</MudText>
+                                        <MudText Typo="Typo.body2"
+                                                 Color="Color.Secondary"
+                                                 Style="word-break: break-word; white-space: pre-wrap;">@captured.PromptTemplate</MudText>
+                                    </MudStack>
+                                    <MudStack Row="true" Spacing="0">
+                                        <MudTooltip Text="Edit">
+                                            <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                                           Size="Size.Small"
+                                                           Color="Color.Primary"
+                                                           OnClick="@(() => EditPromptAsync(captured))" />
+                                        </MudTooltip>
+                                        <MudTooltip Text="Delete">
+                                            <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                                           Size="Size.Small"
+                                                           Color="Color.Error"
+                                                           OnClick="@(() => DeletePrompt(captured))" />
+                                        </MudTooltip>
+                                    </MudStack>
+                                </MudStack>
+                            }
+                        </MudPaper>
+                    }
+                </MudItem>
                 <!-- Prompt Parameters -->
                 <MudItem xs="12">
                     <MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">
