@@ -70,4 +70,4 @@ pnpm-lock.yaml
 
 ### OS / Misc ###
 .DS_Store
-Thumbs.db
+Thumbs.db.worktrees/

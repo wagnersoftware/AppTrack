@@ -62,12 +62,6 @@ public partial class AiSettingsDialog
         _isLoading = false;
     }
 
-    private void OnPromptTemplateChanged(string value)
-    {
-        _model.PromptTemplate = value;
-        ModelValidator.ResetErrors(nameof(AiSettingsModel.PromptTemplate));
-    }
-
     private void OnChatModelChanged(ChatModel value)
     {
         _selectedChatModel = value;
@@ -115,8 +109,47 @@ public partial class AiSettingsDialog
         _model.PromptParameter.Remove(param);
     }
 
-    private string GetFirstError(string propertyName)
-        => ModelValidator.Errors.GetValueOrDefault(propertyName)?.FirstOrDefault() ?? string.Empty;
+    private async Task AddPromptAsync()
+    {
+        var parameters = new DialogParameters<PromptDialog>
+        {
+            { x => x.SiblingPrompts, _model.Prompts },
+        };
+
+        var dialog = await DialogService.ShowAsync<PromptDialog>("", parameters, _paramDialogOptions);
+        var result = await dialog.Result;
+
+        if (result is { Canceled: true }) return;
+        if (result?.Data is not PromptModel newPrompt) return;
+
+        _model.Prompts.Add(newPrompt);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task EditPromptAsync(PromptModel prompt)
+    {
+        var parameters = new DialogParameters<PromptDialog>
+        {
+            { x => x.ExistingPrompt, prompt },
+            { x => x.SiblingPrompts, _model.Prompts },
+        };
+
+        var dialog = await DialogService.ShowAsync<PromptDialog>("", parameters, _paramDialogOptions);
+        var result = await dialog.Result;
+
+        if (result is { Canceled: true }) return;
+        if (result?.Data is not PromptModel updatedPrompt) return;
+
+        prompt.Name = updatedPrompt.Name;
+        prompt.PromptTemplate = updatedPrompt.PromptTemplate;
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void DeletePrompt(PromptModel prompt)
+    {
+        _model.Prompts.Remove(prompt);
+    }
 
     private async Task SubmitAsync()
     {

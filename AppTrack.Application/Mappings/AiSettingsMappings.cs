@@ -15,12 +15,18 @@ internal static class AiSettingsMappings
     internal static void ApplyTo(this UpdateAiSettingsCommand command, AiSettings entity)
     {
         entity.SelectedChatModelId = command.SelectedChatModelId;
-        entity.PromptTemplate = command.PromptTemplate;
         entity.UserId = command.UserId;
+
         entity.PromptParameter.Clear();
         foreach (var dto in command.PromptParameter)
         {
             entity.PromptParameter.Add(PromptParameter.Create(dto.Key, dto.Value));
+        }
+
+        entity.Prompts.Clear();
+        foreach (var dto in command.Prompts)
+        {
+            entity.Prompts.Add(Prompt.Create(dto.Name, dto.PromptTemplate));
         }
     }
 
@@ -28,9 +34,9 @@ internal static class AiSettingsMappings
     {
         Id = entity.Id,
         SelectedChatModelId = entity.SelectedChatModelId,
-        PromptTemplate = entity.PromptTemplate,
         UserId = entity.UserId,
         PromptParameter = entity.PromptParameter.Select(p => p.ToDto()).ToList(),
+        Prompts = entity.Prompts.Select(p => p.ToDto()).ToList(),
     };
 
     internal static PromptParameterDto ToDto(this PromptParameter entity) => new()
@@ -38,5 +44,12 @@ internal static class AiSettingsMappings
         Id = entity.Id,
         Key = entity.Key,
         Value = entity.Value,
+    };
+
+    internal static PromptDto ToDto(this Prompt entity) => new()
+    {
+        Id = entity.Id,
+        Name = entity.Name,
+        PromptTemplate = entity.PromptTemplate,
     };
 }

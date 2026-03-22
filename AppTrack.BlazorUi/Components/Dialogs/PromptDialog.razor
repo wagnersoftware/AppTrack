@@ -1,0 +1,47 @@
+<MudDialog Class="apptrack-dialog">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Description" Class="mr-2" />
+            @(_isEdit ? "Edit Prompt" : "Add Prompt")
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudGrid Spacing="2">
+            <!-- Name -->
+            <MudItem xs="12">
+                <MudTextField T="string"
+                              Label="Name"
+                              Value="_model.Name"
+                              ValueChanged="@((string v) => OnNameChanged(v))"
+                              Error="@ModelValidator.Errors.ContainsKey(nameof(PromptModel.Name))"
+                              ErrorText="@GetFirstError(nameof(PromptModel.Name))"
+                              Variant="Variant.Outlined"
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Outlined.Label"
+                              Class="mb-1" />
+            </MudItem>
+            <!-- Prompt Template -->
+            <MudItem xs="12">
+                <MudTextField T="string"
+                              Label="Prompt Template"
+                              Value="_model.PromptTemplate"
+                              ValueChanged="@((string v) => OnPromptTemplateChanged(v))"
+                              Error="@ModelValidator.Errors.ContainsKey(nameof(PromptModel.PromptTemplate))"
+                              ErrorText="@GetFirstError(nameof(PromptModel.PromptTemplate))"
+                              Variant="Variant.Outlined"
+                              Lines="8"
+                              Class="mb-1" />
+            </MudItem>
+        </MudGrid>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Text" OnClick="Cancel">Cancel</MudButton>
+        <MudSpacer />
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   StartIcon="@Icons.Material.Filled.Check"
+                   OnClick="Submit">
+            OK
+        </MudButton>
+    </DialogActions>
+</MudDialog>

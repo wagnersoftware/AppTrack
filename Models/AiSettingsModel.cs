@@ -8,8 +8,9 @@ public partial class AiSettingsModel : ModelBase, IAiSettingsValidatable
 {
     public int SelectedChatModelId { get; set; }
     public string UserId { get; set; } = string.Empty;
-    public string PromptTemplate { get; set; } = string.Empty;
     public ObservableCollection<PromptParameterModel> PromptParameter { get; set; } = new ObservableCollection<PromptParameterModel>();
+    public ObservableCollection<PromptModel> Prompts { get; set; } = new ObservableCollection<PromptModel>();
 
     IEnumerable<IPromptParameterValidatable> IAiSettingsValidatable.PromptParameter => PromptParameter;
+    IEnumerable<IPromptValidatable> IAiSettingsValidatable.Prompts => Prompts;
 }

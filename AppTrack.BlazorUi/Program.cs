@@ -36,6 +36,7 @@ builder.Services.AddApiServiceServices(builder.Configuration);
 builder.Services.AddTransient<IValidator<JobApplicationModel>, JobApplicationModelValidator>();
 builder.Services.AddTransient<IValidator<AiSettingsModel>, AiSettingsModelValidator>();
 builder.Services.AddTransient<IValidator<PromptParameterModel>, PromptParameterModelValidator>();
+builder.Services.AddTransient<IValidator<PromptModel>, PromptModelValidator>();
 builder.Services.AddTransient(typeof(IModelValidator<>), typeof(ModelValidator<>));
 
 await builder.Build().RunAsync();

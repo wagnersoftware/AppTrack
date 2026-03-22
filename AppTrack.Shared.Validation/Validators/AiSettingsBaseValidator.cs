@@ -8,12 +8,21 @@ public abstract class AiSettingsBaseValidator<T> : AbstractValidator<T>
 {
     protected AiSettingsBaseValidator()
     {
+        // Existing PromptParameter rules — unchanged
         RuleForEach(x => x.PromptParameter)
             .SetValidator(new PromptParameterItemValidator());
 
         RuleFor(x => x.PromptParameter)
             .Must(HaveUniqueKeys)
             .WithMessage("Each prompt parameter key must be unique.");
+
+        // New Prompts rules
+        RuleForEach(x => x.Prompts)
+            .SetValidator(new PromptItemValidator());
+
+        RuleFor(x => x.Prompts)
+            .Must(HaveUniqueNames)
+            .WithMessage("Each prompt name must be unique.");
     }
 
     private static bool HaveUniqueKeys(IEnumerable<IPromptParameterValidatable> parameters)
@@ -27,8 +36,24 @@ public abstract class AiSettingsBaseValidator<T> : AbstractValidator<T>
                    .All(g => g.Count() == 1);
     }
 
+    private static bool HaveUniqueNames(IEnumerable<IPromptValidatable> prompts)
+    {
+        var list = prompts?.ToList();
+        if (list is null || list.Count == 0)
+            return true;
+
+        return list.Select(p => p.Name)
+                   .GroupBy(n => n, StringComparer.OrdinalIgnoreCase)
+                   .All(g => g.Count() == 1);
+    }
+
     private sealed class PromptParameterItemValidator : PromptParameterBaseValidator<IPromptParameterValidatable>
     {
         public PromptParameterItemValidator() : base() { }
+    }
+
+    private sealed class PromptItemValidator : PromptBaseValidator<IPromptValidatable>
+    {
+        public PromptItemValidator() : base() { }
     }
 }
