@@ -1,4 +1,5 @@
-﻿using AppTrack.Application.Contracts.Mediator;
+﻿using System.Text.Json.Serialization;
+using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Features.JobApplications.Dto;
 using AppTrack.Domain.Enums;
 using AppTrack.Shared.Validation.Interfaces;
@@ -13,6 +14,7 @@ public class UpdateJobApplicationCommand : IRequest<JobApplicationDto>, IJobAppl
     public string URL { get; set; } = string.Empty;
     public string ApplicationText { get; set; } = string.Empty;
     public JobApplicationStatus Status { get; set; } = JobApplicationStatus.New;
+    [JsonIgnore]
     public string UserId { get; set; } = string.Empty;
     public string JobDescription { get; set; } = string.Empty;
     public string Location { get; set; } = string.Empty;

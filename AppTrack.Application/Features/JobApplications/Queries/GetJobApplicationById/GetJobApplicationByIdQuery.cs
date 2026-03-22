@@ -1,4 +1,5 @@
-﻿using AppTrack.Application.Contracts.Mediator;
+﻿using System.Text.Json.Serialization;
+using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Features.JobApplications.Dto;
 
 namespace AppTrack.Application.Features.JobApplications.Queries.GetJobApplicationById;
@@ -7,5 +8,6 @@ public class GetJobApplicationByIdQuery : IRequest<JobApplicationDto>, IUserScop
 {
     public int Id { get; set; }
 
+    [JsonIgnore]
     public string UserId { get; set; } = string.Empty;
 }
