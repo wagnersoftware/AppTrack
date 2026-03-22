@@ -1626,9 +1626,6 @@ namespace AppTrack.Frontend.ApiService.Base
         [System.Text.Json.Serialization.JsonPropertyName("status")]
         public JobApplicationStatus Status { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("userId")]
-        public string UserId { get; set; }
-
         [System.Text.Json.Serialization.JsonPropertyName("jobDescription")]
         public string JobDescription { get; set; }
 
@@ -1689,9 +1686,6 @@ namespace AppTrack.Frontend.ApiService.Base
         [System.Text.Json.Serialization.JsonPropertyName("prompt")]
         public string Prompt { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("userId")]
-        public string UserId { get; set; }
-
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.6.3.0 (NJsonSchema v11.5.2.0 (Newtonsoft.Json v13.0.0.0))")]
@@ -1700,9 +1694,6 @@ namespace AppTrack.Frontend.ApiService.Base
 
         [System.Text.Json.Serialization.JsonPropertyName("jobApplicationId")]
         public int JobApplicationId { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("userId")]
-        public string UserId { get; set; }
 
     }
 
@@ -1878,9 +1869,6 @@ namespace AppTrack.Frontend.ApiService.Base
         [System.Text.Json.Serialization.JsonPropertyName("id")]
         public int Id { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("userId")]
-        public string UserId { get; set; }
-
         [System.Text.Json.Serialization.JsonPropertyName("promptParameter")]
         public System.Collections.Generic.ICollection<PromptParameterDto> PromptParameter { get; set; }
 
@@ -1911,9 +1899,6 @@ namespace AppTrack.Frontend.ApiService.Base
         [System.Text.Json.Serialization.JsonPropertyName("status")]
         public JobApplicationStatus Status { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("userId")]
-        public string UserId { get; set; }
-
         [System.Text.Json.Serialization.JsonPropertyName("jobDescription")]
         public string JobDescription { get; set; }
 
@@ -1937,9 +1922,6 @@ namespace AppTrack.Frontend.ApiService.Base
 
         [System.Text.Json.Serialization.JsonPropertyName("id")]
         public int Id { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("userId")]
-        public string UserId { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("name")]
         public string Name { get; set; }
