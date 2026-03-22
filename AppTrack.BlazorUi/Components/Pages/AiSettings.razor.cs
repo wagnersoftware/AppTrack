@@ -1,3 +1,4 @@
+using AppTrack.BlazorUi.Components.Dialogs;
 using AppTrack.BlazorUi.Services;
 using AppTrack.Frontend.ApiService.Contracts;
 using AppTrack.Frontend.Models;
@@ -5,17 +6,15 @@ using AppTrack.Frontend.Models.ModelValidator;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
-namespace AppTrack.BlazorUi.Components.Dialogs;
+namespace AppTrack.BlazorUi.Components.Pages;
 
-public partial class AiSettingsDialog
+public partial class AiSettings
 {
     [Inject] private IAiSettingsService AiSettingsService { get; set; } = null!;
     [Inject] private IChatModelsService ChatModelsService { get; set; } = null!;
     [Inject] private IModelValidator<AiSettingsModel> ModelValidator { get; set; } = null!;
     [Inject] private IErrorHandlingService ErrorHandlingService { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
-
-    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; } = null!;
 
     private static readonly DialogOptions _paramDialogOptions = new()
     {
@@ -27,9 +26,7 @@ public partial class AiSettingsDialog
     private AiSettingsModel _model = new();
     private List<ChatModel> _chatModels = [];
     private ChatModel? _selectedChatModel;
-    // True while AI settings and chat models are being fetched on open; hides the form and shows a centred spinner.
     private bool _isLoading;
-    // True only during the save API call; keeps the form visible but disables action buttons and shows an inline spinner.
     private bool _isBusy;
 
     protected override async Task OnInitializedAsync()
@@ -165,8 +162,5 @@ public partial class AiSettingsDialog
         if (!ErrorHandlingService.HandleResponse(response)) return;
 
         ErrorHandlingService.ShowSuccess("AI settings saved successfully.");
-        MudDialog.Close(DialogResult.Ok(true));
     }
-
-    private void Cancel() => MudDialog.Cancel();
 }

@@ -1,13 +1,12 @@
-using AppTrack.BlazorUi.Components.Dialogs;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using MudBlazor;
 
 namespace AppTrack.BlazorUi.Components.Layout;
 
-public partial class MainLayout
+public partial class MainLayout : IDisposable
 {
-    [Inject] private IDialogService DialogService { get; set; } = null!;
     [Inject] private NavigationManager Navigation { get; set; } = null!;
 
     internal static readonly MudTheme AzureTheme = new()
@@ -27,24 +26,34 @@ public partial class MainLayout
         }
     };
 
-    private static readonly DialogOptions _aiSettingsDialogOptions = new()
-    {
-        BackdropClick = false,
-        MaxWidth = MaxWidth.Medium,
-        FullWidth = true,
-    };
-
     private bool _drawerOpen = false;
+
+    protected override void OnInitialized()
+    {
+        Navigation.LocationChanged += OnLocationChanged;
+    }
 
     private void ToggleDrawer() => _drawerOpen = !_drawerOpen;
 
     private void Login() => Navigation.NavigateToLogin("authentication/login");
 
-    private async Task OpenAiSettingsDialogAsync()
+    private void Logout() => Navigation.NavigateToLogout("authentication/logout");
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
     {
         _drawerOpen = false;
-        await DialogService.ShowAsync<AiSettingsDialog>("", _aiSettingsDialogOptions);
+        InvokeAsync(StateHasChanged);
     }
 
-    private void Logout() => Navigation.NavigateToLogout("authentication/logout");
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing)
+            Navigation.LocationChanged -= OnLocationChanged;
+    }
 }
