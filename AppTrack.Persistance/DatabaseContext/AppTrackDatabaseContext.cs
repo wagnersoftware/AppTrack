@@ -18,6 +18,8 @@ public class AppTrackDatabaseContext : DbContext
 
     public DbSet<ChatModel> ChatModels { get; set; }
 
+    public DbSet<DefaultPrompt> DefaultPrompts { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppTrackDatabaseContext).Assembly);
