@@ -15,6 +15,18 @@
         }
         else if (_phase == Phase.PromptReady)
         {
+            <MudSelect T="string"
+                       Label="Prompt"
+                       Value="_selectedPromptName"
+                       ValueChanged="OnPromptNameChangedAsync"
+                       Variant="Variant.Outlined"
+                       Disabled="@_isReloadingPrompt"
+                       Class="mb-3">
+                @foreach (var name in PromptNames)
+                {
+                    <MudSelectItem Value="@name">@name</MudSelectItem>
+                }
+            </MudSelect>
             @if (_unusedKeys.Count > 0)
             {
                 <MudAlert Severity="Severity.Warning" Class="mb-3" Dense="true">
@@ -27,7 +39,8 @@
                           Label="Prompt"
                           Variant="Variant.Outlined"
                           Lines="14"
-                          FullWidth="true" />
+                          FullWidth="true"
+                          Disabled="@_isReloadingPrompt" />
         }
         else if (_phase == Phase.GeneratingText)
         {
@@ -74,6 +87,7 @@
             <MudButton Variant="Variant.Filled"
                        Color="Color.Primary"
                        StartIcon="@Icons.Material.Filled.Send"
+                       Disabled="@_isReloadingPrompt"
                        OnClick="SendPromptAsync">
                 Send Prompt
             </MudButton>

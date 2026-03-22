@@ -4,6 +4,7 @@ using AppTrack.Frontend.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MudBlazor;
+
 namespace AppTrack.BlazorUi.Components.Dialogs;
 
 public partial class GenerateTextDialog : IDisposable
@@ -15,6 +16,7 @@ public partial class GenerateTextDialog : IDisposable
     [CascadingParameter] private IMudDialogInstance MudDialog { get; set; } = null!;
 
     [Parameter] public JobApplicationModel JobApplication { get; set; } = null!;
+    [Parameter] public List<string> PromptNames { get; set; } = [];
 
     private enum Phase { LoadingPrompt, PromptReady, GeneratingText, TextReady }
 
@@ -23,10 +25,13 @@ public partial class GenerateTextDialog : IDisposable
     private string _generatedText = string.Empty;
     private List<string> _unusedKeys = [];
     private CancellationTokenSource _cts = new();
+    private string _selectedPromptName = string.Empty;
+    private bool _isReloadingPrompt;
 
     protected override async Task OnInitializedAsync()
     {
-        var response = await ApplicationTextService.GeneratePrompt(JobApplication.Id, "Default");
+        _selectedPromptName = PromptNames[0];
+        var response = await ApplicationTextService.GeneratePrompt(JobApplication.Id, _selectedPromptName);
 
         if (!ErrorHandlingService.HandleResponse(response) || response.Data is null)
         {
@@ -37,6 +42,22 @@ public partial class GenerateTextDialog : IDisposable
         _prompt = response.Data.Text;
         _unusedKeys = response.Data.UnusedKeys;
         _phase = Phase.PromptReady;
+    }
+
+    private async Task OnPromptNameChangedAsync(string newName)
+    {
+        _selectedPromptName = newName;
+        _isReloadingPrompt = true;
+        StateHasChanged();
+
+        var response = await ApplicationTextService.GeneratePrompt(JobApplication.Id, newName);
+        _isReloadingPrompt = false;
+
+        if (!ErrorHandlingService.HandleResponse(response) || response.Data is null)
+            return;
+
+        _prompt = response.Data.Text;
+        _unusedKeys = response.Data.UnusedKeys;
     }
 
     private async Task SendPromptAsync()
