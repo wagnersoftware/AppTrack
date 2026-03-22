@@ -9,28 +9,24 @@ namespace AppTrack.Application.Features.AiSettings.Queries.GetAiSettingsByUserId
 public class GetAiSettingsByUserIdQueryHandler : IRequestHandler<GetAiSettingsByUserIdQuery, AiSettingsDto>
 {
     private readonly IAiSettingsRepository _aiSettingsRepository;
+    private readonly IDefaultPromptRepository _defaultPromptRepository;
 
-    public GetAiSettingsByUserIdQueryHandler(IAiSettingsRepository aiSettingsRepository)
+    public GetAiSettingsByUserIdQueryHandler(IAiSettingsRepository aiSettingsRepository, IDefaultPromptRepository defaultPromptRepository)
     {
-        this._aiSettingsRepository = aiSettingsRepository;
+        _aiSettingsRepository = aiSettingsRepository;
+        _defaultPromptRepository = defaultPromptRepository;
     }
 
     /// <summary>
-    /// Gets the AI settings for the specified user. Creates and returns a new instance, if the entity doesn't exist.
+    /// Gets the AI settings for the specified user. Creates and returns a new instance if the entity doesn't exist.
     /// </summary>
-    /// <param name="request"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    /// <exception cref="BadRequestException"></exception>
     public async Task<AiSettingsDto> Handle(GetAiSettingsByUserIdQuery request, CancellationToken cancellationToken)
     {
         var validator = new GetAiSettingsByUserIdQueryValidator();
         var validationResult = await validator.ValidateAsync(request);
 
         if (validationResult.Errors.Any())
-        {
             throw new BadRequestException($"Invalid request", validationResult);
-        }
 
         var entity = await _aiSettingsRepository.GetByUserIdIncludePromptParameterAsync(request.UserId);
 
@@ -40,6 +36,9 @@ public class GetAiSettingsByUserIdQueryHandler : IRequestHandler<GetAiSettingsBy
             await _aiSettingsRepository.CreateAsync(entity);
         }
 
-        return entity.ToDto();
+        var dto = entity.ToDto();
+        var defaults = await _defaultPromptRepository.GetAsync();
+        dto.DefaultPrompts = defaults.Select(d => d.ToDto()).ToList();
+        return dto;
     }
 }

@@ -1,6 +1,7 @@
 using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Features.AiSettings.Dto;
 using AppTrack.Application.Features.AiSettings.Queries.GetAiSettingsByUserId;
+using AppTrack.Domain;
 using Moq;
 using Shouldly;
 using DomainAiSettings = AppTrack.Domain.AiSettings;
@@ -9,32 +10,31 @@ namespace AppTrack.Application.UnitTests.Features.AiSettings.Queries;
 
 public class GetAiSettingsByUserIdQueryHandlerTests
 {
-    private readonly Mock<IAiSettingsRepository> _mockRepo;
+    private readonly Mock<IAiSettingsRepository> _mockRepo = new();
+    private readonly Mock<IDefaultPromptRepository> _mockDefaultPromptRepo = new();
 
     public GetAiSettingsByUserIdQueryHandlerTests()
     {
-        _mockRepo = new Mock<IAiSettingsRepository>();
+        // Default: return empty list so existing tests are unaffected
+        _mockDefaultPromptRepo
+            .Setup(r => r.GetAsync())
+            .ReturnsAsync(new List<DefaultPrompt>());
     }
+
+    private GetAiSettingsByUserIdQueryHandler CreateHandler() =>
+        new(_mockRepo.Object, _mockDefaultPromptRepo.Object);
 
     [Fact]
     public async Task Handle_ShouldReturnExistingAiSettings_WhenAiSettingsExistForUser()
     {
         const string userId = "user-1";
-        var existingSettings = new DomainAiSettings
-        {
-            Id = 1,
-            UserId = userId,
-            SelectedChatModelId = 3,
-        };
+        var existingSettings = new DomainAiSettings { Id = 1, UserId = userId, SelectedChatModelId = 3 };
 
         _mockRepo
             .Setup(r => r.GetByUserIdIncludePromptParameterAsync(userId))
             .ReturnsAsync(existingSettings);
 
-        var query = new GetAiSettingsByUserIdQuery { UserId = userId };
-        var handler = new GetAiSettingsByUserIdQueryHandler(_mockRepo.Object);
-
-        var result = await handler.Handle(query, CancellationToken.None);
+        var result = await CreateHandler().Handle(new GetAiSettingsByUserIdQuery { UserId = userId }, CancellationToken.None);
 
         result.ShouldNotBeNull();
         result.ShouldBeOfType<AiSettingsDto>();
@@ -57,14 +57,35 @@ public class GetAiSettingsByUserIdQueryHandlerTests
             .Setup(r => r.CreateAsync(It.IsAny<DomainAiSettings>()))
             .Returns(Task.CompletedTask);
 
-        var query = new GetAiSettingsByUserIdQuery { UserId = userId };
-        var handler = new GetAiSettingsByUserIdQueryHandler(_mockRepo.Object);
-
-        var result = await handler.Handle(query, CancellationToken.None);
+        var result = await CreateHandler().Handle(new GetAiSettingsByUserIdQuery { UserId = userId }, CancellationToken.None);
 
         result.ShouldNotBeNull();
-        result.ShouldBeOfType<AiSettingsDto>();
         result.UserId.ShouldBe(userId);
         _mockRepo.Verify(r => r.CreateAsync(It.Is<DomainAiSettings>(s => s.UserId == userId)), Times.Once);
+    }
+
+    [Fact]
+    public async Task Handle_ShouldPopulateDefaultPrompts_InReturnedDto()
+    {
+        const string userId = "user-1";
+        _mockRepo
+            .Setup(r => r.GetByUserIdIncludePromptParameterAsync(userId))
+            .ReturnsAsync(new DomainAiSettings { Id = 1, UserId = userId });
+
+        var defaults = new List<DefaultPrompt>
+        {
+            DefaultPrompt.Create("Anschreiben", "Template A", "de"),
+            DefaultPrompt.Create("Vorstellung", "Template B", "de"),
+        };
+        _mockDefaultPromptRepo
+            .Setup(r => r.GetAsync())
+            .ReturnsAsync(defaults);
+
+        var result = await CreateHandler().Handle(new GetAiSettingsByUserIdQuery { UserId = userId }, CancellationToken.None);
+
+        result.DefaultPrompts.ShouldNotBeNull();
+        result.DefaultPrompts.Count.ShouldBe(2);
+        result.DefaultPrompts[0].Name.ShouldBe("Anschreiben");
+        result.DefaultPrompts[1].Name.ShouldBe("Vorstellung");
     }
 }
