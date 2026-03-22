@@ -17,6 +17,9 @@ public class GeneratePromptQueryValidator : AbstractValidator<GeneratePromptQuer
             .NotEmpty().WithMessage("{PropertyName} is required")
             .NotNull().WithMessage("{PropertyName} is required");
 
+        RuleFor(x => x.PromptName)
+            .NotEmpty().WithMessage("{PropertyName} is required");
+
         RuleFor(x => x)
             .MustAsync(JobApplicationExists)
             .WithMessage("Job application doesn't exist");
@@ -41,7 +44,15 @@ public class GeneratePromptQueryValidator : AbstractValidator<GeneratePromptQuer
             return;
         }
 
-        if (!aiSettings.Prompts.Any() || string.IsNullOrWhiteSpace(aiSettings.Prompts.First().PromptTemplate))
-            context.AddFailure("Prompt in AI settings is missing.");
+        var prompt = aiSettings.Prompts.FirstOrDefault(p => p.Name == query.PromptName);
+
+        if (prompt == null)
+        {
+            context.AddFailure("Prompt not found in AI settings.");
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(prompt.PromptTemplate))
+            context.AddFailure("Prompt template is empty.");
     }
 }
