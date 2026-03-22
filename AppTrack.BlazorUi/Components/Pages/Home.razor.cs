@@ -11,6 +11,7 @@ namespace AppTrack.BlazorUi.Components.Pages;
 public partial class Home
 {
     [Inject] private IJobApplicationService JobApplicationService { get; set; } = null!;
+    [Inject] private IApplicationTextService ApplicationTextService { get; set; } = null!;
     [Inject] private AuthenticationStateProvider AuthenticationStateProvider { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
@@ -110,9 +111,21 @@ public partial class Home
 
     private async Task GenerateTextAsync(JobApplicationModel model)
     {
+        var namesResponse = await ApplicationTextService.GetPromptNames();
+
+        if (!ErrorHandlingService.HandleResponse(namesResponse))
+            return;
+
+        if (namesResponse.Data is not { Count: > 0 })
+        {
+            ErrorHandlingService.ShowError("No prompt configured");
+            return;
+        }
+
         var parameters = new DialogParameters<GenerateTextDialog>
         {
-            { x => x.JobApplication, model }
+            { x => x.JobApplication, model },
+            { x => x.PromptNames, namesResponse.Data }
         };
 
         var dialog = await DialogService.ShowAsync<GenerateTextDialog>("", parameters, _generateTextDialogOptions);

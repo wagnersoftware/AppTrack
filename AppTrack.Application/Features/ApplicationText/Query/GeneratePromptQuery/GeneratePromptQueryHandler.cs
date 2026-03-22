@@ -1,4 +1,4 @@
-﻿using AppTrack.Application.Contracts.Mediator;
+using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Exceptions;
 using AppTrack.Application.Features.ApplicationText.Dto;
@@ -27,7 +27,7 @@ public class GeneratePromptQueryHandler : IRequestHandler<GeneratePromptQuery, G
 
         if (validationResult.Errors.Any())
         {
-            throw new BadRequestException($"Invalid Ai setting.", validationResult);
+            throw new BadRequestException("Invalid generate prompt request.", validationResult);
         }
 
         //get Ai settings
@@ -40,7 +40,7 @@ public class GeneratePromptQueryHandler : IRequestHandler<GeneratePromptQuery, G
         var applicantParameter = aiSettings!.PromptParameter.ToList();
         var jobApplicationParameter = jobApplication!.ToPromptParameters().ToList();
         var promptParameter = jobApplicationParameter.Union(applicantParameter).ToList();
-        var promptTemplate = aiSettings!.Prompts.FirstOrDefault()?.PromptTemplate ?? string.Empty;
+        var promptTemplate = aiSettings!.Prompts.First(p => p.Name == request.PromptName).PromptTemplate;
         var (prompt, unusedKeys) = _promptBuilder.BuildPrompt(promptParameter, promptTemplate);
 
         return new GeneratedPromptDto() { Prompt = prompt, UnusedKeys = unusedKeys };

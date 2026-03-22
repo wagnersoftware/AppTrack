@@ -116,6 +116,10 @@ constant with `BackdropClick = false, MaxWidth = Small` for the child. Call
 - MSAL's `DefaultAccessTokenScopes` holds the API scope (`api://<api-client-id>/access_as_user`)
 - Deleted files: `ApiAuthenticationProvider/ApiAuthenticationProvider.cs`, `Services/AuthenticationService.cs`, `Contracts/IAuthenticationService.cs`, `Contracts/ITokenStorage.cs`, `Mappings/AuthMappings.cs`, `TokenStorage/BlazorTokenStorage.cs`, login/register dialogs
 
+## SonarAnalyzer Rules (enforced as errors)
+- **S6608**: Use index (`list[0]`) instead of `Enumerable.First()` on indexable collections
+  (`List<T>`, arrays). Apply everywhere — LINQ `First()` on a `List` is a build error.
+
 ## Key File Paths
 - WPF MainViewModel: `AppTrack.Wpf/ViewModel/MainViewModel.cs`
 - WPF form base: `AppTrack.Wpf/ViewModel/Base/AppTrackFormViewModelBase.cs`

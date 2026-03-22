@@ -12,6 +12,7 @@ namespace AppTrack.Application.UnitTests.Features.ApplicationText.Queries;
 public class GeneratePromptQueryValidatorTests
 {
     private const string UserId = "user-1";
+    private const string PromptName = "Default";
     private const int ExistingJobApplicationId = 42;
 
     private readonly Mock<IJobApplicationRepository> _jobAppRepo;
@@ -32,7 +33,7 @@ public class GeneratePromptQueryValidatorTests
             .ReturnsAsync((DomainJobApplication?)null);
 
         var aiSettings = new DomainAiSettings { Id = 1, UserId = UserId };
-        aiSettings.Prompts.Add(DomainPrompt.Create("Default", "Write a cover letter for {position}"));
+        aiSettings.Prompts.Add(DomainPrompt.Create(PromptName, "Write a cover letter for {position}"));
 
         _aiSettingsRepo
             .Setup(r => r.GetByUserIdIncludePromptParameterAsync(UserId))
@@ -46,10 +47,12 @@ public class GeneratePromptQueryValidatorTests
 
     private static GeneratePromptQuery BuildValidQuery(
         string userId = UserId,
-        int jobApplicationId = ExistingJobApplicationId) => new()
+        int jobApplicationId = ExistingJobApplicationId,
+        string promptName = PromptName) => new()
     {
         UserId = userId,
-        JobApplicationId = jobApplicationId
+        JobApplicationId = jobApplicationId,
+        PromptName = promptName
     };
 
     [Fact]
@@ -62,69 +65,72 @@ public class GeneratePromptQueryValidatorTests
     [Fact]
     public async Task Validate_ShouldHaveError_WhenJobApplicationIdIsZero()
     {
-        var query = BuildValidQuery(jobApplicationId: 0);
-        var result = await _validator.TestValidateAsync(query);
+        var result = await _validator.TestValidateAsync(BuildValidQuery(jobApplicationId: 0));
         result.ShouldHaveValidationErrorFor(x => x.JobApplicationId);
     }
 
     [Fact]
     public async Task Validate_ShouldHaveError_WhenJobApplicationDoesNotExist()
     {
-        var query = BuildValidQuery(jobApplicationId: 9999);
-        var result = await _validator.TestValidateAsync(query);
+        var result = await _validator.TestValidateAsync(BuildValidQuery(jobApplicationId: 9999));
         result.IsValid.ShouldBeFalse();
         result.Errors.ShouldContain(e => e.ErrorMessage == "Job application doesn't exist");
     }
 
     [Fact]
+    public async Task Validate_ShouldHaveError_WhenJobApplicationBelongsToAnotherUser()
+    {
+        const string otherUserId = "user-other";
+        _jobAppRepo
+            .Setup(r => r.GetByIdAsync(ExistingJobApplicationId))
+            .ReturnsAsync(new DomainJobApplication { Id = ExistingJobApplicationId, UserId = otherUserId });
+
+        var result = await _validator.TestValidateAsync(BuildValidQuery());
+        result.IsValid.ShouldBeFalse();
+        result.Errors.ShouldContain(e => e.ErrorMessage == "Job application doesn't belong to this user.");
+    }
+
+    [Fact]
     public async Task Validate_ShouldHaveError_WhenAiSettingsNotFound()
     {
-        var query = BuildValidQuery(userId: "unknown-user");
-        var result = await _validator.TestValidateAsync(query);
+        var result = await _validator.TestValidateAsync(BuildValidQuery(userId: "unknown-user"));
         result.IsValid.ShouldBeFalse();
         result.Errors.ShouldContain(e => e.ErrorMessage == "AI settings not found for this user.");
     }
 
     [Fact]
-    public async Task Validate_ShouldHaveError_WhenAiSettingsHasNoPrompts()
+    public async Task Validate_ShouldHaveError_WhenPromptNameIsEmpty()
     {
-        const string userWithNoPrompts = "user-no-prompts";
-        var aiSettingsWithNoPrompts = new DomainAiSettings { Id = 2, UserId = userWithNoPrompts };
-
-        _aiSettingsRepo
-            .Setup(r => r.GetByUserIdIncludePromptParameterAsync(userWithNoPrompts))
-            .ReturnsAsync(aiSettingsWithNoPrompts);
-
-        var jobApp = new DomainJobApplication { Id = ExistingJobApplicationId, UserId = userWithNoPrompts };
-        _jobAppRepo
-            .Setup(r => r.GetByIdAsync(ExistingJobApplicationId))
-            .ReturnsAsync(jobApp);
-
-        var query = BuildValidQuery(userId: userWithNoPrompts);
-        var result = await _validator.TestValidateAsync(query);
+        var result = await _validator.TestValidateAsync(BuildValidQuery(promptName: ""));
         result.IsValid.ShouldBeFalse();
-        result.Errors.ShouldContain(e => e.ErrorMessage == "Prompt in AI settings is missing.");
+        result.ShouldHaveValidationErrorFor(x => x.PromptName);
     }
 
     [Fact]
-    public async Task Validate_ShouldHaveError_WhenFirstPromptTemplateIsEmpty()
+    public async Task Validate_ShouldHaveError_WhenNamedPromptNotFound()
     {
-        const string userWithEmptyTemplate = "user-empty-template";
-        var aiSettingsWithEmptyTemplate = new DomainAiSettings { Id = 3, UserId = userWithEmptyTemplate };
-        aiSettingsWithEmptyTemplate.Prompts.Add(DomainPrompt.Create("Empty", " "));
+        var result = await _validator.TestValidateAsync(BuildValidQuery(promptName: "NonExistentPrompt"));
+        result.IsValid.ShouldBeFalse();
+        result.Errors.ShouldContain(e => e.ErrorMessage == "Prompt not found in AI settings.");
+    }
+
+    [Fact]
+    public async Task Validate_ShouldHaveError_WhenNamedPromptTemplateIsEmpty()
+    {
+        const string emptyTemplateUser = "user-empty-template";
+        var aiSettingsWithEmptyTemplate = new DomainAiSettings { Id = 3, UserId = emptyTemplateUser };
+        aiSettingsWithEmptyTemplate.Prompts.Add(DomainPrompt.Create(PromptName, " "));
 
         _aiSettingsRepo
-            .Setup(r => r.GetByUserIdIncludePromptParameterAsync(userWithEmptyTemplate))
+            .Setup(r => r.GetByUserIdIncludePromptParameterAsync(emptyTemplateUser))
             .ReturnsAsync(aiSettingsWithEmptyTemplate);
 
-        var jobApp = new DomainJobApplication { Id = ExistingJobApplicationId, UserId = userWithEmptyTemplate };
         _jobAppRepo
             .Setup(r => r.GetByIdAsync(ExistingJobApplicationId))
-            .ReturnsAsync(jobApp);
+            .ReturnsAsync(new DomainJobApplication { Id = ExistingJobApplicationId, UserId = emptyTemplateUser });
 
-        var query = BuildValidQuery(userId: userWithEmptyTemplate);
-        var result = await _validator.TestValidateAsync(query);
+        var result = await _validator.TestValidateAsync(BuildValidQuery(userId: emptyTemplateUser));
         result.IsValid.ShouldBeFalse();
-        result.Errors.ShouldContain(e => e.ErrorMessage == "Prompt in AI settings is missing.");
+        result.Errors.ShouldContain(e => e.ErrorMessage == "Prompt template is empty.");
     }
 }

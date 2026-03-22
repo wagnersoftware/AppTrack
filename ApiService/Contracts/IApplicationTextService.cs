@@ -7,5 +7,7 @@ public interface IApplicationTextService
 {
     Task<Response<ApplicationTextModel>> GenerateApplicationText(string prompt, int jobApplicationId, CancellationToken token);
 
-    Task<Response<GeneratedPromptModel>> GeneratePrompt(int jobApplicationId);
+    Task<Response<GeneratedPromptModel>> GeneratePrompt(int jobApplicationId, string promptName);
+
+    Task<Response<List<string>>> GetPromptNames();
 }

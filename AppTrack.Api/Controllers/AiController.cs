@@ -2,6 +2,7 @@ using AppTrack.Api.Models;
 using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Features.ApplicationText.Dto;
 using AppTrack.Application.Features.ApplicationText.Query.GeneratePromptQuery;
+using AppTrack.Application.Features.ApplicationText.Query.GetPromptNamesQuery;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -27,6 +28,17 @@ public class AiController : ControllerBase
     public async Task<ActionResult<GeneratedPromptDto>> GeneratePrompt([FromBody] GeneratePromptQuery query)
     {
         var result = await _mediator.Send(query);
+        return Ok(result);
+    }
+
+    // GET /api/ai/prompt-names
+    [HttpGet("prompt-names")]
+    [ProducesResponseType(typeof(GetPromptNamesDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<GetPromptNamesDto>> GetPromptNames()
+    {
+        var result = await _mediator.Send(new GetPromptNamesQuery());
         return Ok(result);
     }
 }

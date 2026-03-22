@@ -15,6 +15,7 @@ public class GeneratePromptQueryHandlerTests
 {
     private const string UserId = "user-1";
     private const int JobApplicationId = 5;
+    private const string PromptName = "Default";
 
     private readonly Mock<IAiSettingsRepository> _mockAiSettingsRepo;
     private readonly Mock<IJobApplicationRepository> _mockJobApplicationRepo;
@@ -44,7 +45,7 @@ public class GeneratePromptQueryHandlerTests
         {
             Id = 1,
             UserId = UserId,
-            Prompts = new List<AppTrack.Domain.Prompt> { AppTrack.Domain.Prompt.Create("Default", "Hello {Name}") },
+            Prompts = new List<AppTrack.Domain.Prompt> { AppTrack.Domain.Prompt.Create(PromptName, "Hello {Name}") },
             PromptParameter = new List<PromptParameter>()
         };
 
@@ -65,27 +66,66 @@ public class GeneratePromptQueryHandlerTests
             .Returns(("Hello Test Company", new List<string>()));
     }
 
+    private GeneratePromptQueryHandler CreateHandler() =>
+        new(_mockAiSettingsRepo.Object, _mockJobApplicationRepo.Object, _mockPromptBuilder.Object);
+
     [Fact]
     public async Task Handle_ShouldReturnGeneratedPromptDto_WhenQueryIsValid()
     {
-        var query = new GeneratePromptQuery { JobApplicationId = JobApplicationId, UserId = UserId };
-        var handler = new GeneratePromptQueryHandler(_mockAiSettingsRepo.Object, _mockJobApplicationRepo.Object, _mockPromptBuilder.Object);
+        var query = new GeneratePromptQuery { JobApplicationId = JobApplicationId, UserId = UserId, PromptName = PromptName };
 
-        var result = await handler.Handle(query, CancellationToken.None);
+        var result = await CreateHandler().Handle(query, CancellationToken.None);
 
         result.ShouldNotBeNull();
         result.ShouldBeOfType<GeneratedPromptDto>();
         result.Prompt.ShouldBe("Hello Test Company");
-        _mockPromptBuilder.Verify(b => b.BuildPrompt(It.IsAny<IEnumerable<PromptParameter>>(), It.IsAny<string>()), Times.Once);
+        _mockPromptBuilder.Verify(b => b.BuildPrompt(It.IsAny<IEnumerable<PromptParameter>>(), "Hello {Name}"), Times.Once);
+    }
+
+    [Fact]
+    public async Task Handle_ShouldBuildPromptFromNamedTemplate()
+    {
+        const string secondPromptName = "LinkedIn";
+        const string secondTemplate = "LinkedIn template for {Name}";
+
+        _mockAiSettingsRepo
+            .Setup(r => r.GetByUserIdIncludePromptParameterAsync(UserId))
+            .ReturnsAsync(new DomainAiSettings
+            {
+                Id = 1,
+                UserId = UserId,
+                Prompts = new List<AppTrack.Domain.Prompt>
+                {
+                    AppTrack.Domain.Prompt.Create(PromptName, "Hello {Name}"),
+                    AppTrack.Domain.Prompt.Create(secondPromptName, secondTemplate)
+                },
+                PromptParameter = new List<PromptParameter>()
+            });
+
+        var query = new GeneratePromptQuery { JobApplicationId = JobApplicationId, UserId = UserId, PromptName = secondPromptName };
+
+        await CreateHandler().Handle(query, CancellationToken.None);
+
+        _mockPromptBuilder.Verify(b => b.BuildPrompt(It.IsAny<IEnumerable<PromptParameter>>(), secondTemplate), Times.Once);
     }
 
     [Fact]
     public async Task Handle_ShouldThrowBadRequestException_WhenJobApplicationDoesNotExist()
     {
-        var query = new GeneratePromptQuery { JobApplicationId = 9999, UserId = UserId };
-        var handler = new GeneratePromptQueryHandler(_mockAiSettingsRepo.Object, _mockJobApplicationRepo.Object, _mockPromptBuilder.Object);
+        var query = new GeneratePromptQuery { JobApplicationId = 9999, UserId = UserId, PromptName = PromptName };
+        await Should.ThrowAsync<BadRequestException>(() => CreateHandler().Handle(query, CancellationToken.None));
+    }
 
-        await Should.ThrowAsync<BadRequestException>(() => handler.Handle(query, CancellationToken.None));
+    [Fact]
+    public async Task Handle_ShouldThrowBadRequestException_WhenJobApplicationBelongsToAnotherUser()
+    {
+        const string otherUserId = "user-other";
+        _mockJobApplicationRepo
+            .Setup(r => r.GetByIdAsync(JobApplicationId))
+            .ReturnsAsync(new JobApplication { Id = JobApplicationId, UserId = otherUserId });
+
+        var query = new GeneratePromptQuery { JobApplicationId = JobApplicationId, UserId = UserId, PromptName = PromptName };
+        await Should.ThrowAsync<BadRequestException>(() => CreateHandler().Handle(query, CancellationToken.None));
     }
 
     [Fact]
@@ -101,34 +141,7 @@ public class GeneratePromptQueryHandlerTests
             .Setup(r => r.GetByIdAsync(JobApplicationId))
             .ReturnsAsync(new JobApplication { Id = JobApplicationId, UserId = noSettingsUser });
 
-        var query = new GeneratePromptQuery { JobApplicationId = JobApplicationId, UserId = noSettingsUser };
-        var handler = new GeneratePromptQueryHandler(_mockAiSettingsRepo.Object, _mockJobApplicationRepo.Object, _mockPromptBuilder.Object);
-
-        await Should.ThrowAsync<BadRequestException>(() => handler.Handle(query, CancellationToken.None));
-    }
-
-    [Fact]
-    public async Task Handle_ShouldThrowBadRequestException_WhenNoPromptsConfigured()
-    {
-        const string emptyTemplateUser = "user-empty-template";
-
-        _mockAiSettingsRepo
-            .Setup(r => r.GetByUserIdIncludePromptParameterAsync(emptyTemplateUser))
-            .ReturnsAsync(new DomainAiSettings
-            {
-                Id = 2,
-                UserId = emptyTemplateUser,
-                Prompts = new List<AppTrack.Domain.Prompt>(),
-                PromptParameter = new List<PromptParameter>()
-            });
-
-        _mockJobApplicationRepo
-            .Setup(r => r.GetByIdAsync(JobApplicationId))
-            .ReturnsAsync(new JobApplication { Id = JobApplicationId, UserId = emptyTemplateUser });
-
-        var query = new GeneratePromptQuery { JobApplicationId = JobApplicationId, UserId = emptyTemplateUser };
-        var handler = new GeneratePromptQueryHandler(_mockAiSettingsRepo.Object, _mockJobApplicationRepo.Object, _mockPromptBuilder.Object);
-
-        await Should.ThrowAsync<BadRequestException>(() => handler.Handle(query, CancellationToken.None));
+        var query = new GeneratePromptQuery { JobApplicationId = JobApplicationId, UserId = noSettingsUser, PromptName = PromptName };
+        await Should.ThrowAsync<BadRequestException>(() => CreateHandler().Handle(query, CancellationToken.None));
     }
 }

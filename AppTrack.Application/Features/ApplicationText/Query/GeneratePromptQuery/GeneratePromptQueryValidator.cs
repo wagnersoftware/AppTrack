@@ -17,18 +17,27 @@ public class GeneratePromptQueryValidator : AbstractValidator<GeneratePromptQuer
             .NotEmpty().WithMessage("{PropertyName} is required")
             .NotNull().WithMessage("{PropertyName} is required");
 
+        RuleFor(x => x.PromptName)
+            .NotEmpty().WithMessage("{PropertyName} is required");
+
         RuleFor(x => x)
-            .MustAsync(JobApplicationExists)
-            .WithMessage("Job application doesn't exist");
+            .CustomAsync(async (query, context, token) =>
+            {
+                var jobApplication = await _jobApplicationRepository.GetByIdAsync(query.JobApplicationId);
+                if (jobApplication == null)
+                {
+                    context.AddFailure("Job application doesn't exist");
+                    return;
+                }
+
+                if (jobApplication.UserId != query.UserId)
+                {
+                    context.AddFailure("Job application doesn't belong to this user.");
+                }
+            });
 
         RuleFor(x => x)
             .CustomAsync(ValidateAiSettings);
-    }
-
-    private async Task<bool> JobApplicationExists(GeneratePromptQuery query, CancellationToken token)
-    {
-        var jobApplication = await _jobApplicationRepository.GetByIdAsync(query.JobApplicationId);
-        return jobApplication != null;
     }
 
     private async Task ValidateAiSettings(GeneratePromptQuery query, ValidationContext<GeneratePromptQuery> context, CancellationToken token)
@@ -41,7 +50,15 @@ public class GeneratePromptQueryValidator : AbstractValidator<GeneratePromptQuer
             return;
         }
 
-        if (!aiSettings.Prompts.Any() || string.IsNullOrWhiteSpace(aiSettings.Prompts.First().PromptTemplate))
-            context.AddFailure("Prompt in AI settings is missing.");
+        var prompt = aiSettings.Prompts.FirstOrDefault(p => p.Name == query.PromptName);
+
+        if (prompt == null)
+        {
+            context.AddFailure("Prompt not found in AI settings.");
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(prompt.PromptTemplate))
+            context.AddFailure("Prompt template is empty.");
     }
 }
