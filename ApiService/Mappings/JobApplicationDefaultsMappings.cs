@@ -11,7 +11,6 @@ internal static class JobApplicationDefaultsMappings
         Name = dto.Name ?? string.Empty,
         Position = dto.Position ?? string.Empty,
         Location = dto.Location ?? string.Empty,
-        UserId = dto.UserId ?? string.Empty,
     };
 
     internal static UpdateJobApplicationDefaultsCommand ToUpdateCommand(this JobApplicationDefaultsModel model) => new()
@@ -20,6 +19,5 @@ internal static class JobApplicationDefaultsMappings
         Name = model.Name,
         Position = model.Position,
         Location = model.Location,
-        UserId = model.UserId,
     };
 }
