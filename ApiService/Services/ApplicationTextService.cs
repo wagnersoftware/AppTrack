@@ -23,10 +23,10 @@ namespace AppTrack.Frontend.ApiService.Services
                 };
             });
 
-        public Task<Response<GeneratedPromptModel>> GeneratePrompt(int jobApplicationId) =>
+        public Task<Response<GeneratedPromptModel>> GeneratePrompt(int jobApplicationId, string promptName) =>
             TryExecuteAsync(async () =>
             {
-                var query = new GeneratePromptQuery() { JobApplicationId = jobApplicationId };
+                var query = new GeneratePromptQuery() { JobApplicationId = jobApplicationId, PromptName = promptName };
                 var generatedPromptDto = await _client.GeneratePromptAsync(query);
                 return new GeneratedPromptModel()
                 {
@@ -34,6 +34,13 @@ namespace AppTrack.Frontend.ApiService.Services
                     WindowTitle = "Generated prompt",
                     UnusedKeys = generatedPromptDto.UnusedKeys.ToList()
                 };
+            });
+
+        public Task<Response<List<string>>> GetPromptNames() =>
+            TryExecuteAsync(async () =>
+            {
+                var dto = await _client.PromptNamesAsync();
+                return dto.Names.ToList();
             });
     }
 }

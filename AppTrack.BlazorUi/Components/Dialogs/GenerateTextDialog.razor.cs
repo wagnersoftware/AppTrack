@@ -26,7 +26,7 @@ public partial class GenerateTextDialog : IDisposable
 
     protected override async Task OnInitializedAsync()
     {
-        var response = await ApplicationTextService.GeneratePrompt(JobApplication.Id);
+        var response = await ApplicationTextService.GeneratePrompt(JobApplication.Id, "Default");
 
         if (!ErrorHandlingService.HandleResponse(response) || response.Data is null)
         {
