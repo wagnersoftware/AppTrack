@@ -54,8 +54,17 @@
                     <MudText Typo="Typo.h6">AppTrack</MudText>
                 </MudDrawerHeader>
                 <MudNavMenu>
-                    <MudNavLink Icon="@Icons.Material.Filled.SmartToy"
-                                OnClick="OpenAiSettingsDialogAsync">
+                    <MudNavLink Href="/" Icon="@Icons.Material.Filled.Work" Match="NavLinkMatch.All">
+                        Applications
+                    </MudNavLink>
+                    <MudNavLink Icon="@Icons.Material.Filled.Archive" Disabled="true">
+                        Archived
+                    </MudNavLink>
+                    <MudNavLink Icon="@Icons.Material.Filled.People" Disabled="true">
+                        Recruiters
+                    </MudNavLink>
+                    <MudDivider Class="my-2" />
+                    <MudNavLink Href="/ai-settings" Icon="@Icons.Material.Filled.SmartToy">
                         AI Settings
                     </MudNavLink>
                 </MudNavMenu>
