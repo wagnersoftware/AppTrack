@@ -78,6 +78,19 @@ public class GeneratePromptQueryValidatorTests
     }
 
     [Fact]
+    public async Task Validate_ShouldHaveError_WhenJobApplicationBelongsToAnotherUser()
+    {
+        const string otherUserId = "user-other";
+        _jobAppRepo
+            .Setup(r => r.GetByIdAsync(ExistingJobApplicationId))
+            .ReturnsAsync(new DomainJobApplication { Id = ExistingJobApplicationId, UserId = otherUserId });
+
+        var result = await _validator.TestValidateAsync(BuildValidQuery());
+        result.IsValid.ShouldBeFalse();
+        result.Errors.ShouldContain(e => e.ErrorMessage == "Job application doesn't belong to this user.");
+    }
+
+    [Fact]
     public async Task Validate_ShouldHaveError_WhenAiSettingsNotFound()
     {
         var result = await _validator.TestValidateAsync(BuildValidQuery(userId: "unknown-user"));

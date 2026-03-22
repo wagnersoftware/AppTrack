@@ -117,6 +117,18 @@ public class GeneratePromptQueryHandlerTests
     }
 
     [Fact]
+    public async Task Handle_ShouldThrowBadRequestException_WhenJobApplicationBelongsToAnotherUser()
+    {
+        const string otherUserId = "user-other";
+        _mockJobApplicationRepo
+            .Setup(r => r.GetByIdAsync(JobApplicationId))
+            .ReturnsAsync(new JobApplication { Id = JobApplicationId, UserId = otherUserId });
+
+        var query = new GeneratePromptQuery { JobApplicationId = JobApplicationId, UserId = UserId, PromptName = PromptName };
+        await Should.ThrowAsync<BadRequestException>(() => CreateHandler().Handle(query, CancellationToken.None));
+    }
+
+    [Fact]
     public async Task Handle_ShouldThrowBadRequestException_WhenAiSettingsDoNotExistForUser()
     {
         const string noSettingsUser = "user-no-settings";

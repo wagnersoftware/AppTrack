@@ -27,7 +27,7 @@ public class GeneratePromptQueryHandler : IRequestHandler<GeneratePromptQuery, G
 
         if (validationResult.Errors.Any())
         {
-            throw new BadRequestException($"Invalid Ai setting.", validationResult);
+            throw new BadRequestException("Invalid generate prompt request.", validationResult);
         }
 
         //get Ai settings
