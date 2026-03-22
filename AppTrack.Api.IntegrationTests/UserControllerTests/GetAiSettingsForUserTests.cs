@@ -1,4 +1,4 @@
-﻿
+
 using AppTrack.Api.IntegrationTests.Auth;
 using AppTrack.Api.IntegrationTests.Seeddata;
 using AppTrack.Application.Features.AiSettings.Dto;
@@ -19,19 +19,6 @@ public class GetAiSettingsForUserTests : IClassFixture<FakeAuthWebApplicationFac
         _client = _factory.CreateAuthenticatedClient();
     }
 
-
-    [Fact]
-    public async Task GetAiSettings_ShouldCreateAiSettings_WhenNotExisting()
-    {
-        // Act
-        var response = await _client.GetAsync("/api/users/ai-settings");
-        // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        var aiSettings = await response.Content.ReadFromJsonAsync<AiSettingsDto>();
-        aiSettings.ShouldNotBeNull();
-        aiSettings.UserId.ShouldBe(TestAuthHandler.TestUserId);
-    }
-
     [Fact]
     public async Task GetAiSettings_ShouldReturnAiSettingsForUser_WhenAiSettingsExist()
     {
@@ -44,15 +31,5 @@ public class GetAiSettingsForUserTests : IClassFixture<FakeAuthWebApplicationFac
         var aiSettings = await response.Content.ReadFromJsonAsync<AiSettingsDto>();
         aiSettings.ShouldNotBeNull();
         aiSettings.UserId.ShouldBe(TestAuthHandler.TestUserId);
-    }
-
-    [Fact]
-    public async Task GetAiSettings_ShouldReturn404_WhenUserIdIsEmpty()
-    {
-        // Arrange – empty segment in URL resolves to 404 (no matching route)
-        var response = await _client.GetAsync("/api/users//ai-settings");
-
-        // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }
 }

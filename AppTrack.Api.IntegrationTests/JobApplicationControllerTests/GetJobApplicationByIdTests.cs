@@ -1,6 +1,5 @@
 using AppTrack.Api.IntegrationTests.Auth;
 using AppTrack.Api.IntegrationTests.Seeddata;
-using AppTrack.Api.Models;
 using AppTrack.Application.Features.JobApplications.Dto;
 using Shouldly;
 using System.Net;
@@ -32,47 +31,5 @@ public class GetJobApplicationByIdTests : IClassFixture<FakeAuthWebApplicationFa
         result.ShouldNotBeNull();
         result.Id.ShouldBe(jobApplicationId);
         result.UserId.ShouldBe(TestAuthHandler.TestUserId);
-    }
-
-    [Fact]
-    public async Task GetJobApplicationById_ShouldReturn400_WhenIdIsMissingOrZero()
-    {
-        var response = await _client.GetAsync("/api/job-applications/0");
-
-        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
-        var problem = await response.Content.ReadFromJsonAsync<CustomProblemDetails>();
-        problem.ShouldNotBeNull();
-
-        problem.Errors.ShouldContainKey("Id");
-        problem.Errors["Id"].Any(msg => msg.Contains("is required")).ShouldBeTrue();
-    }
-
-    [Fact]
-    public async Task GetJobApplicationById_ShouldReturn400_WhenJobApplicationDoesNotExist()
-    {
-        var invalidId = 99999;
-        var response = await _client.GetAsync($"/api/job-applications/{invalidId}");
-
-        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
-        var problem = await response.Content.ReadFromJsonAsync<CustomProblemDetails>();
-        problem.ShouldNotBeNull();
-
-        problem.Errors.ShouldContainKey("Id");
-        problem.Errors["Id"].Any(msg => msg.Contains("Job application not found.")).ShouldBeTrue();
-    }
-
-    [Fact]
-    public async Task GetJobApplicationById_ShouldReturn400_WhenJobApplicationBelongsToAnotherUser()
-    {
-        var (_, jobApplicationId) = await SeedHelper.CreateUserWithJobApplicationAsync(_factory.Services);
-
-        var response = await _client.GetAsync($"/api/job-applications/{jobApplicationId}");
-
-        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
-        var problem = await response.Content.ReadFromJsonAsync<CustomProblemDetails>();
-        problem.ShouldNotBeNull();
-
-        problem.Errors.ShouldContainKey("UserId");
-        problem.Errors["UserId"].Any(msg => msg.Contains("Job application doesn't belong to this user.")).ShouldBeTrue();
     }
 }

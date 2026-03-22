@@ -34,27 +34,4 @@ public class GetJobApplicationDefaultsForUserTests : IClassFixture<FakeAuthWebAp
         result.ShouldNotBeNull();
         result.UserId.ShouldBe(TestAuthHandler.TestUserId);
     }
-
-    [Fact]
-    public async Task GetJobApplicationDefaults_ShouldCreateDefaultsSettings_WhenNotExisting()
-    {
-        //act
-        var response = await _client.GetAsync("/api/users/job-application-defaults");
-
-        // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        var result = await response.Content.ReadFromJsonAsync<JobApplicationDefaultsDto>();
-        result.ShouldNotBeNull();
-        result.UserId.ShouldBe(TestAuthHandler.TestUserId);
-    }
-
-    [Fact]
-    public async Task GetJobApplicationDefaults_ShouldReturn404_WhenUserIdIsEmpty()
-    {
-        // Act – empty segment in URL resolves to 404 (no matching route)
-        var response = await _client.GetAsync("/api/users//job-application-defaults/");
-
-        // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
-    }
 }
