@@ -1688,6 +1688,9 @@ namespace AppTrack.Frontend.ApiService.Base
         [System.Text.Json.Serialization.JsonPropertyName("prompts")]
         public System.Collections.Generic.ICollection<PromptDto> Prompts { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("defaultPrompts")]
+        public System.Collections.Generic.ICollection<PromptDto> DefaultPrompts { get; set; }
+
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.6.3.0 (NJsonSchema v11.5.2.0 (Newtonsoft.Json v13.0.0.0))")]

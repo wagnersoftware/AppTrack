@@ -52,4 +52,11 @@ internal static class AiSettingsMappings
         Name = entity.Name,
         PromptTemplate = entity.PromptTemplate,
     };
+
+    internal static PromptDto ToDto(this DefaultPrompt entity) => new()
+    {
+        Id = entity.Id,
+        Name = entity.Name,
+        PromptTemplate = entity.PromptTemplate,
+    };
 }
