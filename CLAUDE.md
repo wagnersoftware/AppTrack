@@ -79,6 +79,8 @@ MS SQL Server via EF Core. LocalDB (`Server=(localdb)\MSSQLLocalDB;Database=AppT
 - **Persistence integration tests** (`AppTrack.Persistance.IntegrationTests`): EF Core InMemory provider.
 - **API integration tests** (`AppTrack.Api.IntegrationTests`): `WebApplicationFactory` + Testcontainers (real SQL Server in Docker container).
 
+**Coverage requirement:** Every handler and validator in `AppTrack.Application` must have a corresponding unit test file in `AppTrack.Application.UnitTests`. When adding a new handler or validator, add its tests in the same PR.
+
 ## Code Style
 
 Enforced via `.editorconfig` and SonarAnalyzer.CSharp:
