@@ -67,6 +67,8 @@ Each feature follows this structure under `AppTrack.Application`:
 
 Global authorization policy requires JWT Bearer authentication for all endpoints. Exceptions are marked `[AllowAnonymous]`. The `/health` endpoint is publicly accessible.
 
+`UserId` must never appear in frontend validators or frontend-to-command mappings. It is always set by the backend mediator from JWT claims (`IUserScopedRequest` + `Mediator.cs`). In the API contract, `UserId` is decorated with `[JsonIgnore]` on all `IUserScopedRequest` implementations to prevent client spoofing.
+
 ### Database
 
 MS SQL Server via EF Core. LocalDB (`Server=(localdb)\MSSQLLocalDB;Database=AppTrack_Local`) for development. Migrations run automatically on startup via `MigrationsHelper.TryApplyDatabaseMigrations` — no manual `dotnet ef database update` needed during development.
