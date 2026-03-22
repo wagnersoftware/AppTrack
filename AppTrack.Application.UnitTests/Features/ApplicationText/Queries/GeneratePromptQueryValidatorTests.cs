@@ -1,5 +1,7 @@
+// test/AppTrack.Application.UnitTests/Features/ApplicationText/Queries/GeneratePromptQueryValidatorTests.cs
 using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Features.ApplicationText.Query.GeneratePromptQuery;
+using AppTrack.Domain;
 using FluentValidation.TestHelper;
 using Moq;
 using Shouldly;
@@ -17,12 +19,14 @@ public class GeneratePromptQueryValidatorTests
 
     private readonly Mock<IJobApplicationRepository> _jobAppRepo;
     private readonly Mock<IAiSettingsRepository> _aiSettingsRepo;
+    private readonly Mock<IDefaultPromptRepository> _defaultPromptRepo;
     private readonly GeneratePromptQueryValidator _validator;
 
     public GeneratePromptQueryValidatorTests()
     {
         _jobAppRepo = new Mock<IJobApplicationRepository>();
         _aiSettingsRepo = new Mock<IAiSettingsRepository>();
+        _defaultPromptRepo = new Mock<IDefaultPromptRepository>();
 
         var jobApplication = new DomainJobApplication { Id = ExistingJobApplicationId, UserId = UserId };
         _jobAppRepo
@@ -42,7 +46,12 @@ public class GeneratePromptQueryValidatorTests
             .Setup(r => r.GetByUserIdIncludePromptParameterAsync(It.Is<string>(id => id != UserId)))
             .ReturnsAsync((DomainAiSettings?)null);
 
-        _validator = new GeneratePromptQueryValidator(_jobAppRepo.Object, _aiSettingsRepo.Object);
+        // Default: no default prompts
+        _defaultPromptRepo
+            .Setup(r => r.GetAsync())
+            .ReturnsAsync(new List<DefaultPrompt>());
+
+        _validator = new GeneratePromptQueryValidator(_jobAppRepo.Object, _aiSettingsRepo.Object, _defaultPromptRepo.Object);
     }
 
     private static GeneratePromptQuery BuildValidQuery(
@@ -107,7 +116,7 @@ public class GeneratePromptQueryValidatorTests
     }
 
     [Fact]
-    public async Task Validate_ShouldHaveError_WhenNamedPromptNotFound()
+    public async Task Validate_ShouldHaveError_WhenNamedPromptNotFoundInUserOrDefaults()
     {
         var result = await _validator.TestValidateAsync(BuildValidQuery(promptName: "NonExistentPrompt"));
         result.IsValid.ShouldBeFalse();
@@ -130,6 +139,58 @@ public class GeneratePromptQueryValidatorTests
             .ReturnsAsync(new DomainJobApplication { Id = ExistingJobApplicationId, UserId = emptyTemplateUser });
 
         var result = await _validator.TestValidateAsync(BuildValidQuery(userId: emptyTemplateUser));
+        result.IsValid.ShouldBeFalse();
+        result.Errors.ShouldContain(e => e.ErrorMessage == "Prompt template is empty.");
+    }
+
+    [Fact]
+    public async Task Validate_ShouldPass_WhenPromptNameExistsInDefaultPromptsOnly()
+    {
+        const string defaultOnlyPromptName = "Anschreiben";
+        // User has no prompt with this name
+        _aiSettingsRepo
+            .Setup(r => r.GetByUserIdIncludePromptParameterAsync(UserId))
+            .ReturnsAsync(new DomainAiSettings { Id = 1, UserId = UserId }); // no prompts
+
+        _defaultPromptRepo
+            .Setup(r => r.GetAsync())
+            .ReturnsAsync(new List<DefaultPrompt>
+            {
+                DefaultPrompt.Create(defaultOnlyPromptName, "Schreibe ein Anschreiben für {Position}.", "de"),
+            });
+
+        _jobAppRepo
+            .Setup(r => r.GetByIdAsync(ExistingJobApplicationId))
+            .ReturnsAsync(new DomainJobApplication { Id = ExistingJobApplicationId, UserId = UserId });
+
+        var localValidator = new GeneratePromptQueryValidator(_jobAppRepo.Object, _aiSettingsRepo.Object, _defaultPromptRepo.Object);
+        var result = await localValidator.TestValidateAsync(BuildValidQuery(promptName: defaultOnlyPromptName));
+        result.IsValid.ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task Validate_ShouldHaveError_WhenDefaultPromptTemplateIsEmpty()
+    {
+        const string defaultOnlyPromptName = "EmptyDefault";
+        _aiSettingsRepo
+            .Setup(r => r.GetByUserIdIncludePromptParameterAsync(UserId))
+            .ReturnsAsync(new DomainAiSettings { Id = 1, UserId = UserId }); // no user prompts
+
+        _defaultPromptRepo
+            .Setup(r => r.GetAsync())
+            .ReturnsAsync(new List<DefaultPrompt>
+            {
+                DefaultPrompt.Create(defaultOnlyPromptName, " ", "de"), // empty template
+            });
+
+        _jobAppRepo
+            .Setup(r => r.GetByIdAsync(ExistingJobApplicationId))
+            .ReturnsAsync(new DomainJobApplication { Id = ExistingJobApplicationId, UserId = UserId });
+
+        var localValidator = new GeneratePromptQueryValidator(
+            _jobAppRepo.Object, _aiSettingsRepo.Object, _defaultPromptRepo.Object);
+        var result = await localValidator.TestValidateAsync(BuildValidQuery(promptName: defaultOnlyPromptName));
+
         result.IsValid.ShouldBeFalse();
         result.Errors.ShouldContain(e => e.ErrorMessage == "Prompt template is empty.");
     }

@@ -12,37 +12,52 @@ public class GeneratePromptQueryHandler : IRequestHandler<GeneratePromptQuery, G
     private readonly IAiSettingsRepository _aiSettingsRepository;
     private readonly IJobApplicationRepository _jobApplicationRepository;
     private readonly IPromptBuilder _promptBuilder;
+    private readonly IDefaultPromptRepository _defaultPromptRepository;
 
-    public GeneratePromptQueryHandler(IAiSettingsRepository aiSettingsRepository, IJobApplicationRepository jobApplicationRepository, IPromptBuilder promptBuilder)
+    public GeneratePromptQueryHandler(
+        IAiSettingsRepository aiSettingsRepository,
+        IJobApplicationRepository jobApplicationRepository,
+        IPromptBuilder promptBuilder,
+        IDefaultPromptRepository defaultPromptRepository)
     {
-        this._aiSettingsRepository = aiSettingsRepository;
-        this._jobApplicationRepository = jobApplicationRepository;
-        this._promptBuilder = promptBuilder;
+        _aiSettingsRepository = aiSettingsRepository;
+        _jobApplicationRepository = jobApplicationRepository;
+        _promptBuilder = promptBuilder;
+        _defaultPromptRepository = defaultPromptRepository;
     }
 
     public async Task<GeneratedPromptDto> Handle(GeneratePromptQuery request, CancellationToken cancellationToken)
     {
-        var validator = new GeneratePromptQueryValidator(_jobApplicationRepository, _aiSettingsRepository);
+        var validator = new GeneratePromptQueryValidator(_jobApplicationRepository, _aiSettingsRepository, _defaultPromptRepository);
         var validationResult = await validator.ValidateAsync(request);
 
         if (validationResult.Errors.Any())
-        {
             throw new BadRequestException("Invalid generate prompt request.", validationResult);
-        }
 
-        //get Ai settings
         var aiSettings = await _aiSettingsRepository.GetByUserIdIncludePromptParameterAsync(request.UserId);
-
-        //get job application
         var jobApplication = await _jobApplicationRepository.GetByIdAsync(request.JobApplicationId);
 
-        //build prompt
         var applicantParameter = aiSettings!.PromptParameter.ToList();
         var jobApplicationParameter = jobApplication!.ToPromptParameters().ToList();
         var promptParameter = jobApplicationParameter.Union(applicantParameter).ToList();
-        var promptTemplate = aiSettings!.Prompts.First(p => p.Name == request.PromptName).PromptTemplate;
-        var (prompt, unusedKeys) = _promptBuilder.BuildPrompt(promptParameter, promptTemplate);
 
+        var userPrompt = aiSettings.Prompts.FirstOrDefault(
+            p => string.Equals(p.Name, request.PromptName, StringComparison.OrdinalIgnoreCase));
+
+        string promptTemplate;
+        if (userPrompt != null)
+        {
+            promptTemplate = userPrompt.PromptTemplate;
+        }
+        else
+        {
+            var defaults = await _defaultPromptRepository.GetAsync();
+            promptTemplate = defaults
+                .First(p => string.Equals(p.Name, request.PromptName, StringComparison.OrdinalIgnoreCase))
+                .PromptTemplate;
+        }
+
+        var (prompt, unusedKeys) = _promptBuilder.BuildPrompt(promptParameter, promptTemplate);
         return new GeneratedPromptDto() { Prompt = prompt, UnusedKeys = unusedKeys };
     }
 }
