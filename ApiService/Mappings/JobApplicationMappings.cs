@@ -29,7 +29,6 @@ internal static class JobApplicationMappings
         Url = model.URL,
         ApplicationText = model.ApplicationText,
         Status = (JobApplicationStatus)(int)model.Status,
-        UserId = string.Empty, // set by caller
         JobDescription = model.JobDescription,
         Location = model.Location,
         ContactPerson = model.ContactPerson,
@@ -45,7 +44,6 @@ internal static class JobApplicationMappings
         Url = model.URL,
         ApplicationText = model.ApplicationText,
         Status = (JobApplicationStatus)(int)model.Status,
-        UserId = string.Empty, // set by caller
         JobDescription = model.JobDescription,
         Location = model.Location,
         ContactPerson = model.ContactPerson,

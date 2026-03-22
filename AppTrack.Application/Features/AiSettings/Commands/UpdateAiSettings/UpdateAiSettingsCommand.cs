@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Features.AiSettings.Dto;
 using AppTrack.Shared.Validation.Interfaces;
@@ -8,6 +9,7 @@ public class UpdateAiSettingsCommand : IRequest<AiSettingsDto>, IAiSettingsValid
 {
     public int SelectedChatModelId { get; set; }
     public int Id { get; set; }
+    [JsonIgnore]
     public string UserId { get; set; } = string.Empty;
     public List<PromptParameterDto> PromptParameter { get; set; } = new List<PromptParameterDto>();
     public List<PromptDto> Prompts { get; set; } = new List<PromptDto>();

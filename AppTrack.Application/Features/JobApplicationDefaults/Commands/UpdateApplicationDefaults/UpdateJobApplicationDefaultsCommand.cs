@@ -1,4 +1,5 @@
-﻿using AppTrack.Application.Contracts.Mediator;
+﻿using System.Text.Json.Serialization;
+using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Features.JobApplicationDefaults.Dto;
 using AppTrack.Shared.Validation.Interfaces;
 
@@ -8,6 +9,7 @@ public class UpdateJobApplicationDefaultsCommand : IRequest<JobApplicationDefaul
 {
     public int Id { get; set; }
 
+    [JsonIgnore]
     public string UserId { get; set; } = string.Empty;
 
     public string Name { get; set; } = string.Empty;

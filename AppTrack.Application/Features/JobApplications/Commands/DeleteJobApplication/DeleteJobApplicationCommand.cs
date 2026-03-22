@@ -1,5 +1,5 @@
 ﻿
-
+using System.Text.Json.Serialization;
 using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Shared;
 
@@ -9,5 +9,6 @@ public class DeleteJobApplicationCommand : IRequest<Unit>, IUserScopedRequest
 {
     public int Id { get; set; }
 
+    [JsonIgnore]
     public string UserId { get; set; } = string.Empty;
 }

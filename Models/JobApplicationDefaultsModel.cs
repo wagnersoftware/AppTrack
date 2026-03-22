@@ -10,6 +10,4 @@ public class JobApplicationDefaultsModel : ModelBase, IJobApplicationDefaultsVal
     public string Position { get; set; } = string.Empty;
 
     public string Location { get; set; } = string.Empty;
-
-    public string UserId { get; set; } = string.Empty;
 }
