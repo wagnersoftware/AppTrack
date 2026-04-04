@@ -23,22 +23,31 @@ No spaces are allowed in any prompt name. Underscores are used as word separator
 
 ### 1. `DefaultPrompt.Create()` — Domain (`AppTrack.Domain`)
 
-Add two guards after the existing `ArgumentNullException.ThrowIfNull` calls:
+Add two guards immediately after the existing `ArgumentNullException.ThrowIfNull` calls:
 
-- `ArgumentException` if name does not start with `"Default_"`
-- `ArgumentException` if name contains a space
+```csharp
+// Seeder code runs outside the FluentValidation pipeline, so guards are the
+// only domain-level enforcement for these invariants.
+if (!name.StartsWith("Default_", StringComparison.Ordinal))
+    throw new ArgumentException("Default prompt names must start with 'Default_'.", nameof(name));
 
-Add a short comment: seeder code runs outside the FluentValidation pipeline, so guards are the only domain-level enforcement here.
+if (name.Contains(' '))
+    throw new ArgumentException("Default prompt names must not contain spaces.", nameof(name));
+```
+
+> **Important:** Changes 1 and 3 must be committed atomically. Applying the guards before renaming the seed entries will cause an immediate build/runtime failure because the existing names (`"Anschreiben"` etc.) violate the new guards.
 
 ### 2. `PromptBaseValidator` — Shared (`AppTrack.Shared.Validation`)
 
 Add two new rules to the existing `Name` rule chain:
 
-- Name must not start with `"Default_"` (case-insensitive) → `"A prompt name must not start with 'Default_'."`
-- Name must not contain spaces → `"A prompt name must not contain spaces."`
+- Name must not start with `"Default_"` (case-insensitive) → error message: `"A prompt name must not start with 'Default_'."`
+- Name must not contain spaces → error message: `"A prompt name must not contain spaces."`
 
-These rules apply to all validators that inherit from `PromptBaseValidator`:
-`PromptDtoValidator` (backend) and `PromptModelValidator` (frontend).
+These rules propagate automatically to all inheriting validators:
+- Backend: `PromptDtoValidator` (via `PromptBaseValidator<PromptDto>`)
+- Backend: `AiSettingsBaseValidator` (via its private `PromptItemValidator`)
+- Frontend: `PromptModelValidator` (via `PromptBaseValidator<PromptModel>`)
 
 ### 3. Seed Data + EF Core Migration — Persistence (`AppTrack.Persistance`)
 
@@ -51,7 +60,9 @@ Rename the four seeded default prompts to English names with the `Default_` pref
 | `Vorstellung` | `Default_Introduction` |
 | `Nachfassen` | `Default_Follow_Up` |
 
-Create a new EF Core migration that updates the four existing rows.
+Create a new EF Core migration that updates the four existing rows via `UpdateData`.
+
+> **Must be applied atomically with Change 1** — see note in Change 1.
 
 ### 4. Init Test — Persistence Integration Tests (`AppTrack.Persistance.IntegrationTests`)
 
@@ -65,8 +76,25 @@ These tests act as a safety net for future additions to the seed data.
 
 ### 5. Update Existing Tests
 
-- `DefaultPromptFactoryTests`: update all test names to use the `Default_` prefix (e.g., `"Default_Cover_Letter"`)
-- `PromptDtoValidatorTests`: add test cases for the two new rules (no `Default_` prefix, no spaces)
+All existing test fixtures that use prompt names with spaces must be renamed to use underscores. The following files are affected:
+
+**`PromptBaseValidatorTests.cs`**
+- Rename fixture `"My Prompt"` → `"My_Prompt"` (used in `ValidPrompt_ShouldPass` and `EmptyPromptTemplate_ShouldFail`)
+- Add: `NameWithSpace_ShouldFail` — verifies the no-spaces rule
+- Add: `NameStartingWithDefaultPrefix_ShouldFail` — verifies the no-`Default_`-prefix rule
+
+**`AiSettingsBaseValidatorTests.cs`**
+- Rename `"Prompt A"` → `"Prompt_A"` and `"Prompt B"` → `"Prompt_B"` in `ValidPrompts_ShouldPass`
+
+**`PromptDtoValidatorTests.cs`**
+- Rename `BuildValidDto()` fixture name `"Cover Letter"` → `"Cover_Letter"`
+- Add: `Validate_ShouldHaveError_WhenNameContainsSpace`
+- Add: `Validate_ShouldHaveError_WhenNameStartsWithDefaultPrefix`
+
+**`DefaultPromptFactoryTests.cs`**
+- Update valid-prompt test: both the `Create(...)` argument and the `result.Name.ShouldBe(...)` assertion from `"Anschreiben"` → `"Default_Cover_Letter"`
+- Add: `Create_ShouldThrowArgumentException_WhenNameDoesNotStartWithDefaultPrefix`
+- Add: `Create_ShouldThrowArgumentException_WhenNameContainsSpace`
 
 ## What Does Not Change
 
@@ -74,10 +102,17 @@ These tests act as a safety net for future additions to the seed data.
 - `AiSettingsBaseValidator`: `HaveUniqueNames` remains as-is; the prefix makes cross-namespace conflicts structurally impossible
 - `UpdateAiSettingsCommandValidator`: no async default-prompt lookup needed
 
+## Out of Scope
+
+Existing user prompts in the database that happen to contain spaces are not migrated or renamed. The new validation rules will only prevent saving such prompts going forward via the normal command pipeline. This is a conscious decision — retroactive data cleanup is not part of this change.
+
 ## Testing Strategy
 
-| Layer | Test type | What is tested |
-|---|---|---|
-| Domain | Unit (`DefaultPromptFactoryTests`) | `Create()` throws on missing prefix and on spaces |
-| Shared validation | Unit (`PromptDtoValidatorTests`) | New rules block `Default_` prefix and spaces in user prompts |
-| Persistence | Integration (`DefaultPromptSeedTests`) | All seed entries follow the naming convention |
+| Layer | Test type | File | What is tested |
+|---|---|---|---|
+| Domain | Unit | `DefaultPromptFactoryTests` | `Create()` throws on missing prefix and on spaces (2 new negative tests) |
+| Shared validation | Unit | `PromptBaseValidatorTests` | New rules block spaces and `Default_` prefix in user prompts (2 new tests) |
+| Shared validation | Unit | `AiSettingsBaseValidatorTests` | Existing valid-prompt fixture renamed to avoid spaces |
+| Backend | Unit | `PromptDtoValidatorTests` | Fixture renamed + 2 new test cases for the new rules |
+| Persistence | Integration | `DefaultPromptSeedTests` | All seed entries follow the naming convention (safety net for future additions) |
+| Frontend | — | — | No unit tests exist for `PromptModelValidator`; rules propagate automatically via `PromptBaseValidator` |
