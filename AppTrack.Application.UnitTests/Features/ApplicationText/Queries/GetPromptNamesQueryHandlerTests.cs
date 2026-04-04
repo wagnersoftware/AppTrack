@@ -29,15 +29,15 @@ public class GetPromptNamesQueryHandlerTests
     public async Task Handle_ShouldReturnNamesInInsertionOrder_WhenAiSettingsHaveMultiplePrompts()
     {
         var aiSettings = new DomainAiSettings { Id = 1, UserId = UserId };
-        aiSettings.Prompts.Add(Prompt.Create("Cover Letter", "template A"));
-        aiSettings.Prompts.Add(Prompt.Create("LinkedIn Message", "template B"));
+        aiSettings.Prompts.Add(Prompt.Create("Cover_Letter", "template A"));
+        aiSettings.Prompts.Add(Prompt.Create("LinkedIn_Message", "template B"));
         _mockAiSettingsRepo
             .Setup(r => r.GetByUserIdIncludePromptParameterAsync(UserId))
             .ReturnsAsync(aiSettings);
 
         var result = await CreateHandler().Handle(new GetPromptNamesQuery { UserId = UserId }, CancellationToken.None);
 
-        result.Names.ShouldBe(["Cover Letter", "LinkedIn Message"]);
+        result.Names.ShouldBe(["Cover_Letter", "LinkedIn_Message"]);
     }
 
     [Fact]
@@ -86,7 +86,7 @@ public class GetPromptNamesQueryHandlerTests
     public async Task Handle_ShouldReturnUserNamesThenDefaultNames_WithUserNamesFirst()
     {
         var aiSettings = new DomainAiSettings { Id = 1, UserId = UserId };
-        aiSettings.Prompts.Add(Prompt.Create("My Custom Prompt", "template"));
+        aiSettings.Prompts.Add(Prompt.Create("My_Custom_Prompt", "template"));
         _mockAiSettingsRepo
             .Setup(r => r.GetByUserIdIncludePromptParameterAsync(UserId))
             .ReturnsAsync(aiSettings);
@@ -99,7 +99,7 @@ public class GetPromptNamesQueryHandlerTests
 
         var result = await CreateHandler().Handle(new GetPromptNamesQuery { UserId = UserId }, CancellationToken.None);
 
-        result.Names[0].ShouldBe("My Custom Prompt");
+        result.Names[0].ShouldBe("My_Custom_Prompt");
         result.Names[^1].ShouldBe("Default_Anschreiben");
     }
 
