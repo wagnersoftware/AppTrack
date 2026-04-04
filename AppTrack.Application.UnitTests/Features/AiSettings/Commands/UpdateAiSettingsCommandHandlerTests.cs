@@ -29,7 +29,7 @@ public class UpdateAiSettingsCommandHandlerTests
         Id = id,
         UserId = userId,
         SelectedChatModelId = 2,
-        Prompts = [new PromptDto { Name = "My Prompt", PromptTemplate = "Hello {name}" }],
+        Prompts = [new PromptDto { Name = "My_Prompt", PromptTemplate = "Hello {name}" }],
         PromptParameter = [new PromptParameterDto { Key = "Temperature", Value = "0.7" }]
     };
 
@@ -42,7 +42,7 @@ public class UpdateAiSettingsCommandHandlerTests
 
         result.ShouldBeOfType<AiSettingsDto>();
         result.Prompts.Count.ShouldBe(1);
-        result.Prompts[0].Name.ShouldBe("My Prompt");
+        result.Prompts[0].Name.ShouldBe("My_Prompt");
     }
 
     [Fact]

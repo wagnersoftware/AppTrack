@@ -21,7 +21,7 @@ public class PromptBaseValidatorTests
     [Fact]
     public async Task ValidPrompt_ShouldPass()
     {
-        var result = await _validator.ValidateAsync(new TestPrompt { Name = "My Prompt", PromptTemplate = "Hello {name}" });
+        var result = await _validator.ValidateAsync(new TestPrompt { Name = "My_Prompt", PromptTemplate = "Hello {name}" });
         result.IsValid.ShouldBeTrue();
     }
 
@@ -44,8 +44,24 @@ public class PromptBaseValidatorTests
     [Fact]
     public async Task EmptyPromptTemplate_ShouldFail()
     {
-        var result = await _validator.ValidateAsync(new TestPrompt { Name = "My Prompt", PromptTemplate = "" });
+        var result = await _validator.ValidateAsync(new TestPrompt { Name = "My_Prompt", PromptTemplate = "" });
         result.IsValid.ShouldBeFalse();
         result.Errors.ShouldContain(e => e.PropertyName == "PromptTemplate");
+    }
+
+    [Fact]
+    public async Task NameWithSpace_ShouldFail()
+    {
+        var result = await _validator.ValidateAsync(new TestPrompt { Name = "My Prompt", PromptTemplate = "Hello" });
+        result.IsValid.ShouldBeFalse();
+        result.Errors.ShouldContain(e => e.PropertyName == "Name" && e.ErrorMessage == "A prompt name must not contain spaces.");
+    }
+
+    [Fact]
+    public async Task NameStartingWithDefaultPrefix_ShouldFail()
+    {
+        var result = await _validator.ValidateAsync(new TestPrompt { Name = "Default_Something", PromptTemplate = "Hello" });
+        result.IsValid.ShouldBeFalse();
+        result.Errors.ShouldContain(e => e.PropertyName == "Name" && e.ErrorMessage == "A prompt name must not start with 'Default_'.");
     }
 }
