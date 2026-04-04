@@ -11,7 +11,7 @@ public class ChatModelsService : BaseHttpService, IChatModelsService
     {
     }
 
-    public Task<Response<List<ChatModel>>> GetChatModels() =>
+    public Task<Response<List<ChatModel>>> GetChatModelsAsync() =>
         TryExecuteAsync(async () =>
         {
             var chatModelDtos = await _client.ChatModelsAsync();
