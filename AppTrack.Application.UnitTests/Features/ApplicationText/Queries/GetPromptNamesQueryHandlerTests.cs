@@ -72,14 +72,14 @@ public class GetPromptNamesQueryHandlerTests
 
         var defaults = new List<DefaultPrompt>
         {
-            DefaultPrompt.Create("Anschreiben", "template", "de"),
-            DefaultPrompt.Create("Vorstellung", "template", "de"),
+            DefaultPrompt.Create("Default_Anschreiben", "template", "de"),
+            DefaultPrompt.Create("Default_Vorstellung", "template", "de"),
         };
         _mockDefaultPromptRepo.Setup(r => r.GetAsync()).ReturnsAsync(defaults);
 
         var result = await CreateHandler().Handle(new GetPromptNamesQuery { UserId = UserId }, CancellationToken.None);
 
-        result.Names.ShouldBe(["Anschreiben", "Vorstellung"]);
+        result.Names.ShouldBe(["Default_Anschreiben", "Default_Vorstellung"]);
     }
 
     [Fact]
@@ -93,37 +93,38 @@ public class GetPromptNamesQueryHandlerTests
 
         var defaults = new List<DefaultPrompt>
         {
-            DefaultPrompt.Create("Anschreiben", "template", "de"),
+            DefaultPrompt.Create("Default_Anschreiben", "template", "de"),
         };
         _mockDefaultPromptRepo.Setup(r => r.GetAsync()).ReturnsAsync(defaults);
 
         var result = await CreateHandler().Handle(new GetPromptNamesQuery { UserId = UserId }, CancellationToken.None);
 
         result.Names[0].ShouldBe("My Custom Prompt");
-        result.Names[^1].ShouldBe("Anschreiben");
+        result.Names[^1].ShouldBe("Default_Anschreiben");
     }
 
     [Fact]
     public async Task Handle_ShouldDeduplicatePromptNames_CaseInsensitively()
     {
         var aiSettings = new DomainAiSettings { Id = 1, UserId = UserId };
-        aiSettings.Prompts.Add(Prompt.Create("anschreiben", "user template"));
+        // User has a prompt whose name matches a default name case-insensitively
+        aiSettings.Prompts.Add(Prompt.Create("default_cover_letter", "user template"));
         _mockAiSettingsRepo
             .Setup(r => r.GetByUserIdIncludePromptParameterAsync(UserId))
             .ReturnsAsync(aiSettings);
 
         var defaults = new List<DefaultPrompt>
         {
-            DefaultPrompt.Create("Anschreiben", "default template", "de"),
-            DefaultPrompt.Create("Vorstellung", "template", "de"),
+            DefaultPrompt.Create("Default_Cover_Letter", "default template", "de"),
+            DefaultPrompt.Create("Default_Vorstellung", "template", "de"),
         };
         _mockDefaultPromptRepo.Setup(r => r.GetAsync()).ReturnsAsync(defaults);
 
         var result = await CreateHandler().Handle(new GetPromptNamesQuery { UserId = UserId }, CancellationToken.None);
 
-        // "Anschreiben" from defaults is suppressed; "anschreiben" from user + "Vorstellung" remain
+        // "Default_Cover_Letter" from defaults is suppressed; "default_cover_letter" from user + "Default_Vorstellung" remain
         result.Names.Count.ShouldBe(2);
-        result.Names.ShouldContain("anschreiben");
-        result.Names.ShouldContain("Vorstellung");
+        result.Names.ShouldContain("default_cover_letter");
+        result.Names.ShouldContain("Default_Vorstellung");
     }
 }

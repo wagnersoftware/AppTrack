@@ -154,8 +154,8 @@ public class GeneratePromptQueryHandlerTests
     [Fact]
     public async Task Handle_ShouldBuildPromptFromDefaultTemplate_WhenPromptNameNotInUserSettings()
     {
-        const string defaultPromptName = "Anschreiben";
-        const string defaultTemplate = "Schreibe ein Anschreiben für {Position}.";
+        const string defaultPromptName = "Default_Cover_Letter";
+        const string defaultTemplate = "Write a cover letter for {Position}.";
 
         // User has no prompt with this name
         _mockAiSettingsRepo

@@ -74,8 +74,8 @@ public class GetAiSettingsByUserIdQueryHandlerTests
 
         var defaults = new List<DefaultPrompt>
         {
-            DefaultPrompt.Create("Anschreiben", "Template A", "de"),
-            DefaultPrompt.Create("Vorstellung", "Template B", "de"),
+            DefaultPrompt.Create("Default_Anschreiben", "Template A", "de"),
+            DefaultPrompt.Create("Default_Vorstellung", "Template B", "de"),
         };
         _mockDefaultPromptRepo
             .Setup(r => r.GetAsync())
@@ -85,7 +85,7 @@ public class GetAiSettingsByUserIdQueryHandlerTests
 
         result.DefaultPrompts.ShouldNotBeNull();
         result.DefaultPrompts.Count.ShouldBe(2);
-        result.DefaultPrompts[0].Name.ShouldBe("Anschreiben");
-        result.DefaultPrompts[1].Name.ShouldBe("Vorstellung");
+        result.DefaultPrompts[0].Name.ShouldBe("Default_Anschreiben");
+        result.DefaultPrompts[1].Name.ShouldBe("Default_Vorstellung");
     }
 }

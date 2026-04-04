@@ -146,7 +146,7 @@ public class GeneratePromptQueryValidatorTests
     [Fact]
     public async Task Validate_ShouldPass_WhenPromptNameExistsInDefaultPromptsOnly()
     {
-        const string defaultOnlyPromptName = "Anschreiben";
+        const string defaultOnlyPromptName = "Default_Cover_Letter";
         // User has no prompt with this name
         _aiSettingsRepo
             .Setup(r => r.GetByUserIdIncludePromptParameterAsync(UserId))
@@ -156,7 +156,7 @@ public class GeneratePromptQueryValidatorTests
             .Setup(r => r.GetAsync())
             .ReturnsAsync(new List<DefaultPrompt>
             {
-                DefaultPrompt.Create(defaultOnlyPromptName, "Schreibe ein Anschreiben für {Position}.", "de"),
+                DefaultPrompt.Create(defaultOnlyPromptName, "Write a cover letter for {Position}.", "de"),
             });
 
         _jobAppRepo
@@ -171,7 +171,7 @@ public class GeneratePromptQueryValidatorTests
     [Fact]
     public async Task Validate_ShouldHaveError_WhenDefaultPromptTemplateIsEmpty()
     {
-        const string defaultOnlyPromptName = "EmptyDefault";
+        const string defaultOnlyPromptName = "Default_Empty";
         _aiSettingsRepo
             .Setup(r => r.GetByUserIdIncludePromptParameterAsync(UserId))
             .ReturnsAsync(new DomainAiSettings { Id = 1, UserId = UserId }); // no user prompts

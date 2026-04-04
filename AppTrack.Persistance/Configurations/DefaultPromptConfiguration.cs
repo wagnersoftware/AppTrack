@@ -23,14 +23,14 @@ public class DefaultPromptConfiguration : IEntityTypeConfiguration<DefaultPrompt
             .IsUnique();
 
         builder.HasData(
-            Seed(1, "Anschreiben",
-                "Schreibe ein professionelles Anschreiben für die Stelle {Position} bei {Company}. Stellenbeschreibung: {JobDescription}"),
-            Seed(2, "LinkedIn Nachricht",
-                "Schreibe eine kurze LinkedIn-Nachricht an {ContactPerson} bezüglich der Stelle {Position} bei {Company}."),
-            Seed(3, "Vorstellung",
-                "Stelle mich in ein paar Sätzen als Bewerber für die Stelle {Position} bei {Company} vor."),
-            Seed(4, "Nachfassen",
-                "Schreibe eine kurze Follow-up-E-Mail an {ContactPerson} bezüglich meiner Bewerbung für die Stelle {Position} bei {Company}.")
+            Seed(1, "Default_Cover_Letter",
+                "Write a professional cover letter for the {Position} position at {Company}. Job description: {JobDescription}"),
+            Seed(2, "Default_LinkedIn_Message",
+                "Write a short LinkedIn message to {ContactPerson} regarding the {Position} position at {Company}."),
+            Seed(3, "Default_Introduction",
+                "Introduce me in a few sentences as an applicant for the {Position} position at {Company}."),
+            Seed(4, "Default_Follow_Up",
+                "Write a short follow-up email to {ContactPerson} regarding my application for the {Position} position at {Company}.")
         );
     }
 

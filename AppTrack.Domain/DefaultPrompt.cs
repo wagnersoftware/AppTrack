@@ -16,6 +16,14 @@ public class DefaultPrompt : BaseEntity
         ArgumentNullException.ThrowIfNull(promptTemplate);
         ArgumentNullException.ThrowIfNull(language);
 
+        // Seeder code runs outside the FluentValidation pipeline, so guards are the
+        // only domain-level enforcement for these invariants.
+        if (!name.StartsWith("Default_", StringComparison.Ordinal))
+            throw new ArgumentException("Default prompt names must start with 'Default_'.", nameof(name));
+
+        if (name.Contains(' '))
+            throw new ArgumentException("Default prompt names must not contain spaces.", nameof(name));
+
         return new DefaultPrompt
         {
             Name = name,
