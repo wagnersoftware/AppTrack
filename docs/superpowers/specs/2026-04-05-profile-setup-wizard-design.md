@@ -21,7 +21,7 @@ Both surfaces embed the same `FreelancerProfileForm` component to avoid duplicat
 ```
 Models/                                         ← AppTrack.Frontend.Models project
   FreelancerProfileModel.cs
-  Enums/RemotePreference.cs
+  RemotePreference.cs
 
 AppTrack.BlazorUi/
   Components/
@@ -49,7 +49,7 @@ Lives in `AppTrack.Frontend.Models`, following the established pattern for all f
 | `DailyRate` | `decimal?` | no |
 | `HourlyRate` | `decimal?` | no |
 | `AvailableFrom` | `DateOnly?` | no |
-| `RemotePreference` | `RemotePreference?` (enum) | no |
+| `WorkMode` | `RemotePreference?` (enum) | no |
 | `Skills` | `string?` | no |
 
 `RemotePreference` enum (defined alongside the model in `AppTrack.Frontend.Models`):
