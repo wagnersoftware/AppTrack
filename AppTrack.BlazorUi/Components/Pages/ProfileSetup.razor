@@ -1,0 +1,21 @@
+@page "/profile/setup"
+
+<PageTitle>Profil einrichten - AppTrack</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="mt-6">
+    <MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-4">
+        <MudIcon Icon="@Icons.Material.Filled.AccountCircle" Class="mr-2" Color="Color.Primary" />
+        <MudText Typo="Typo.h5">Profil einrichten</MudText>
+    </MudStack>
+
+    <FreelancerProfileForm />
+
+    <MudStack Row="true" Justify="Justify.FlexEnd" Class="mt-4">
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   StartIcon="@Icons.Material.Filled.Save"
+                   OnClick="Save">
+            Speichern
+        </MudButton>
+    </MudStack>
+</MudContainer>
