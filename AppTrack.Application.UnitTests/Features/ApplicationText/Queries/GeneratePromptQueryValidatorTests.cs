@@ -116,9 +116,18 @@ public class GeneratePromptQueryValidatorTests
     }
 
     [Fact]
-    public async Task Validate_ShouldHaveError_WhenNamedPromptNotFoundInUserOrDefaults()
+    public async Task Validate_ShouldHaveError_WhenCustomPromptNameNotFoundInUserSettings()
     {
         var result = await _validator.TestValidateAsync(BuildValidQuery(promptName: "NonExistentPrompt"));
+        result.IsValid.ShouldBeFalse();
+        result.Errors.ShouldContain(e => e.ErrorMessage == "Prompt not found in AI settings.");
+    }
+
+    [Fact]
+    public async Task Validate_ShouldHaveError_WhenDefaultPrefixedPromptNotFoundInDefaultRepository()
+    {
+        // Default_ name not present in default repo — user prompts must not be checked as fallback
+        var result = await _validator.TestValidateAsync(BuildValidQuery(promptName: "Default_NonExistent"));
         result.IsValid.ShouldBeFalse();
         result.Errors.ShouldContain(e => e.ErrorMessage == "Prompt not found in AI settings.");
     }
@@ -144,27 +153,18 @@ public class GeneratePromptQueryValidatorTests
     }
 
     [Fact]
-    public async Task Validate_ShouldPass_WhenPromptNameExistsInDefaultPromptsOnly()
+    public async Task Validate_ShouldPass_WhenDefaultPrefixedPromptExistsInDefaultRepository()
     {
-        const string defaultOnlyPromptName = "Default_Cover_Letter";
-        // User has no prompt with this name
-        _aiSettingsRepo
-            .Setup(r => r.GetByUserIdIncludePromptParameterAsync(UserId))
-            .ReturnsAsync(new DomainAiSettings { Id = 1, UserId = UserId }); // no prompts
+        const string defaultPromptName = "Default_Cover_Letter";
 
         _defaultPromptRepo
             .Setup(r => r.GetAsync())
             .ReturnsAsync(new List<DefaultPrompt>
             {
-                DefaultPrompt.Create(defaultOnlyPromptName, "Write a cover letter for {Position}.", "de"),
+                DefaultPrompt.Create(defaultPromptName, "Write a cover letter for {Position}.", "de"),
             });
 
-        _jobAppRepo
-            .Setup(r => r.GetByIdAsync(ExistingJobApplicationId))
-            .ReturnsAsync(new DomainJobApplication { Id = ExistingJobApplicationId, UserId = UserId });
-
-        var localValidator = new GeneratePromptQueryValidator(_jobAppRepo.Object, _aiSettingsRepo.Object, _defaultPromptRepo.Object);
-        var result = await localValidator.TestValidateAsync(BuildValidQuery(promptName: defaultOnlyPromptName));
+        var result = await _validator.TestValidateAsync(BuildValidQuery(promptName: defaultPromptName));
         result.IsValid.ShouldBeTrue();
     }
 

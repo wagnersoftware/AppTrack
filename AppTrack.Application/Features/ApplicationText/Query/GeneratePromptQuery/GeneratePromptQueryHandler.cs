@@ -41,18 +41,17 @@ public class GeneratePromptQueryHandler : IRequestHandler<GeneratePromptQuery, G
         var jobApplicationParameter = jobApplication!.ToPromptParameters().ToList();
         var promptParameter = jobApplicationParameter.Union(applicantParameter).ToList();
 
-        var userPrompt = aiSettings.Prompts.FirstOrDefault(
-            p => string.Equals(p.Name, request.PromptName, StringComparison.OrdinalIgnoreCase));
-
         string promptTemplate;
-        if (userPrompt != null)
-        {
-            promptTemplate = userPrompt.PromptTemplate;
-        }
-        else
+        if (request.PromptName.StartsWith("Default_", StringComparison.Ordinal))
         {
             var defaults = await _defaultPromptRepository.GetAsync();
             promptTemplate = defaults
+                .First(p => string.Equals(p.Name, request.PromptName, StringComparison.OrdinalIgnoreCase))
+                .PromptTemplate;
+        }
+        else
+        {
+            promptTemplate = aiSettings!.Prompts
                 .First(p => string.Equals(p.Name, request.PromptName, StringComparison.OrdinalIgnoreCase))
                 .PromptTemplate;
         }

@@ -53,27 +53,34 @@ public class GeneratePromptQueryValidator : AbstractValidator<GeneratePromptQuer
             return;
         }
 
-        var userPrompt = aiSettings.Prompts.FirstOrDefault(
-            p => string.Equals(p.Name, query.PromptName, StringComparison.OrdinalIgnoreCase));
-
-        if (userPrompt != null)
+        if (query.PromptName.StartsWith("Default_", StringComparison.Ordinal))
         {
+            var defaults = await _defaultPromptRepository.GetAsync();
+            var defaultPrompt = defaults.FirstOrDefault(
+                p => string.Equals(p.Name, query.PromptName, StringComparison.OrdinalIgnoreCase));
+
+            if (defaultPrompt == null)
+            {
+                context.AddFailure("Prompt not found in AI settings.");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(defaultPrompt.PromptTemplate))
+                context.AddFailure("Prompt template is empty.");
+        }
+        else
+        {
+            var userPrompt = aiSettings.Prompts.FirstOrDefault(
+                p => string.Equals(p.Name, query.PromptName, StringComparison.OrdinalIgnoreCase));
+
+            if (userPrompt == null)
+            {
+                context.AddFailure("Prompt not found in AI settings.");
+                return;
+            }
+
             if (string.IsNullOrWhiteSpace(userPrompt.PromptTemplate))
                 context.AddFailure("Prompt template is empty.");
-            return;
         }
-
-        var defaults = await _defaultPromptRepository.GetAsync();
-        var defaultPrompt = defaults.FirstOrDefault(
-            p => string.Equals(p.Name, query.PromptName, StringComparison.OrdinalIgnoreCase));
-
-        if (defaultPrompt == null)
-        {
-            context.AddFailure("Prompt not found in AI settings.");
-            return;
-        }
-
-        if (string.IsNullOrWhiteSpace(defaultPrompt.PromptTemplate))
-            context.AddFailure("Prompt template is empty.");
     }
 }

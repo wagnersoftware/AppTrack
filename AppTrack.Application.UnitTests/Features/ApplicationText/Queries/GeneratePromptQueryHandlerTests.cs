@@ -152,19 +152,39 @@ public class GeneratePromptQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_ShouldBuildPromptFromDefaultTemplate_WhenPromptNameNotInUserSettings()
+    public async Task Handle_ShouldBuildPromptFromDefaultRepository_WhenPromptNameHasDefaultPrefix()
     {
         const string defaultPromptName = "Default_Cover_Letter";
         const string defaultTemplate = "Write a cover letter for {Position}.";
 
-        // User has no prompt with this name
+        _mockDefaultPromptRepo
+            .Setup(r => r.GetAsync())
+            .ReturnsAsync(new List<DefaultPrompt>
+            {
+                DefaultPrompt.Create(defaultPromptName, defaultTemplate, "de"),
+            });
+
+        var query = new GeneratePromptQuery { JobApplicationId = JobApplicationId, UserId = UserId, PromptName = defaultPromptName };
+        await CreateHandler().Handle(query, CancellationToken.None);
+
+        _mockPromptBuilder.Verify(b => b.BuildPrompt(It.IsAny<IEnumerable<PromptParameter>>(), defaultTemplate), Times.Once);
+    }
+
+    [Fact]
+    public async Task Handle_ShouldUseDefaultTemplate_NotUserTemplate_WhenPromptNameHasDefaultPrefix()
+    {
+        const string defaultPromptName = "Default_Cover_Letter";
+        const string userTemplate = "User's own template";
+        const string defaultTemplate = "Write a cover letter for {Position}.";
+
+        // User also has a prompt with the same name — must be ignored
         _mockAiSettingsRepo
             .Setup(r => r.GetByUserIdIncludePromptParameterAsync(UserId))
             .ReturnsAsync(new DomainAiSettings
             {
                 Id = 1,
                 UserId = UserId,
-                Prompts = new List<Prompt>(),
+                Prompts = new List<Prompt> { Prompt.Create("Default_Cover_Letter", userTemplate) },
                 PromptParameter = new List<PromptParameter>()
             });
 
@@ -175,25 +195,10 @@ public class GeneratePromptQueryHandlerTests
                 DefaultPrompt.Create(defaultPromptName, defaultTemplate, "de"),
             });
 
-        _mockJobApplicationRepo
-            .Setup(r => r.GetByIdAsync(JobApplicationId))
-            .ReturnsAsync(new JobApplication
-            {
-                Id = JobApplicationId,
-                UserId = UserId,
-                Name = "Acme",
-                Position = "Engineer",
-                URL = "https://acme.com",
-                JobDescription = "desc",
-                Location = "Remote",
-                ContactPerson = "Bob",
-                Status = JobApplicationStatus.New,
-                StartDate = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc)
-            });
-
         var query = new GeneratePromptQuery { JobApplicationId = JobApplicationId, UserId = UserId, PromptName = defaultPromptName };
         await CreateHandler().Handle(query, CancellationToken.None);
 
         _mockPromptBuilder.Verify(b => b.BuildPrompt(It.IsAny<IEnumerable<PromptParameter>>(), defaultTemplate), Times.Once);
+        _mockPromptBuilder.Verify(b => b.BuildPrompt(It.IsAny<IEnumerable<PromptParameter>>(), userTemplate), Times.Never);
     }
 }
