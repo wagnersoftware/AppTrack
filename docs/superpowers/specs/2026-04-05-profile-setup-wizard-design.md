@@ -21,6 +21,7 @@ Both surfaces embed the same `FreelancerProfileForm` component to avoid duplicat
 ```
 Models/                                         ← AppTrack.Frontend.Models project
   FreelancerProfileModel.cs
+  Enums/RemotePreference.cs
 
 AppTrack.BlazorUi/
   Components/
@@ -48,6 +49,13 @@ Lives in `AppTrack.Frontend.Models`, following the established pattern for all f
 | `DailyRate` | `decimal?` | no |
 | `HourlyRate` | `decimal?` | no |
 | `AvailableFrom` | `DateOnly?` | no |
+| `RemotePreference` | `RemotePreference?` (enum) | no |
+| `Skills` | `string?` | no |
+
+`RemotePreference` enum (defined alongside the model in `AppTrack.Frontend.Models`):
+- `Remote`
+- `Hybrid`
+- `OnSite`
 
 **No validator** is created in this iteration. The "Speichern" button performs no API call and saves no data, so there is nothing to validate. A validator will be added alongside the backend integration.
 
@@ -79,6 +87,8 @@ Always visible (only profile type available is Freelancer).
 | Day rate | `MudNumericField<decimal?>` | Left of two-column row, optional |
 | Hourly rate | `MudNumericField<decimal?>` | Right of two-column row, optional |
 | Available from | `MudDatePicker` | Full width, optional |
+| Remote preference | `MudSelect<RemotePreference?>` | Full width, optional; options: Remote / Hybrid / Vor Ort |
+| Skills | `MudTextField` (multiline) | Full width, optional, free text, e.g. "C#, .NET, Azure, SQL" |
 | CV upload | `MudFileUpload` | Decorative — no `FilesChanged` handler wired, no file stored |
 
 ---
