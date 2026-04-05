@@ -1,0 +1,16 @@
+<MudDialog Class="apptrack-dialog">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.AccountCircle" Class="mr-2" />
+            Profil einrichten
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <FreelancerProfileForm />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Text" OnClick="Skip">Überspringen</MudButton>
+        <MudSpacer />
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Save">Speichern</MudButton>
+    </DialogActions>
+</MudDialog>
