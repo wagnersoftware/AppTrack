@@ -27,10 +27,8 @@ public class GetPromptNamesQueryHandler : IRequestHandler<GetPromptNamesQuery, G
         var aiSettings = await _aiSettingsRepository.GetByUserIdIncludePromptParameterAsync(request.UserId);
         var defaults = await _defaultPromptRepository.GetAsync();
 
-        var userNames = aiSettings!.Prompts.Select(p => p.Name).ToList();
-        var defaultNames = defaults
-            .Select(d => d.Name)
-            .Where(dn => !userNames.Any(un => string.Equals(un, dn, StringComparison.OrdinalIgnoreCase)));
+        var userNames = aiSettings!.Prompts.Select(p => p.Name);
+        var defaultNames = defaults.Select(d => d.Name);
 
         var names = userNames.Concat(defaultNames).ToList();
         return new GetPromptNamesDto { Names = names };

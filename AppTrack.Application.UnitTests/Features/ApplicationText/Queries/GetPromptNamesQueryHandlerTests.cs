@@ -103,28 +103,4 @@ public class GetPromptNamesQueryHandlerTests
         result.Names[^1].ShouldBe("Default_Anschreiben");
     }
 
-    [Fact]
-    public async Task Handle_ShouldDeduplicatePromptNames_CaseInsensitively()
-    {
-        var aiSettings = new DomainAiSettings { Id = 1, UserId = UserId };
-        // User has a prompt whose name matches a default name case-insensitively
-        aiSettings.Prompts.Add(Prompt.Create("default_cover_letter", "user template"));
-        _mockAiSettingsRepo
-            .Setup(r => r.GetByUserIdIncludePromptParameterAsync(UserId))
-            .ReturnsAsync(aiSettings);
-
-        var defaults = new List<DefaultPrompt>
-        {
-            DefaultPrompt.Create("Default_Cover_Letter", "default template", "de"),
-            DefaultPrompt.Create("Default_Vorstellung", "template", "de"),
-        };
-        _mockDefaultPromptRepo.Setup(r => r.GetAsync()).ReturnsAsync(defaults);
-
-        var result = await CreateHandler().Handle(new GetPromptNamesQuery { UserId = UserId }, CancellationToken.None);
-
-        // "Default_Cover_Letter" from defaults is suppressed; "default_cover_letter" from user + "Default_Vorstellung" remain
-        result.Names.Count.ShouldBe(2);
-        result.Names.ShouldContain("default_cover_letter");
-        result.Names.ShouldContain("Default_Vorstellung");
-    }
 }
