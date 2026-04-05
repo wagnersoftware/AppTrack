@@ -1,3 +1,4 @@
+// test/AppTrack.Application.UnitTests/Features/ApplicationText/Queries/GeneratePromptQueryHandlerTests.cs
 using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Exceptions;
 using AppTrack.Application.Features.ApplicationText.Dto;
@@ -20,12 +21,14 @@ public class GeneratePromptQueryHandlerTests
     private readonly Mock<IAiSettingsRepository> _mockAiSettingsRepo;
     private readonly Mock<IJobApplicationRepository> _mockJobApplicationRepo;
     private readonly Mock<IPromptBuilder> _mockPromptBuilder;
+    private readonly Mock<IDefaultPromptRepository> _mockDefaultPromptRepo;
 
     public GeneratePromptQueryHandlerTests()
     {
         _mockAiSettingsRepo = new Mock<IAiSettingsRepository>();
         _mockJobApplicationRepo = new Mock<IJobApplicationRepository>();
         _mockPromptBuilder = new Mock<IPromptBuilder>();
+        _mockDefaultPromptRepo = new Mock<IDefaultPromptRepository>();
 
         var existingJobApplication = new JobApplication
         {
@@ -45,14 +48,13 @@ public class GeneratePromptQueryHandlerTests
         {
             Id = 1,
             UserId = UserId,
-            Prompts = new List<AppTrack.Domain.Prompt> { AppTrack.Domain.Prompt.Create(PromptName, "Hello {Name}") },
+            Prompts = new List<Prompt> { Prompt.Create(PromptName, "Hello {Name}") },
             PromptParameter = new List<PromptParameter>()
         };
 
         _mockJobApplicationRepo
             .Setup(r => r.GetByIdAsync(JobApplicationId))
             .ReturnsAsync(existingJobApplication);
-
         _mockJobApplicationRepo
             .Setup(r => r.GetByIdAsync(It.Is<int>(id => id != JobApplicationId)))
             .ReturnsAsync((JobApplication?)null);
@@ -61,13 +63,18 @@ public class GeneratePromptQueryHandlerTests
             .Setup(r => r.GetByUserIdIncludePromptParameterAsync(UserId))
             .ReturnsAsync(existingAiSettings);
 
+        // Default: no default prompts
+        _mockDefaultPromptRepo
+            .Setup(r => r.GetAsync())
+            .ReturnsAsync(new List<DefaultPrompt>());
+
         _mockPromptBuilder
             .Setup(b => b.BuildPrompt(It.IsAny<IEnumerable<PromptParameter>>(), It.IsAny<string>()))
             .Returns(("Hello Test Company", new List<string>()));
     }
 
     private GeneratePromptQueryHandler CreateHandler() =>
-        new(_mockAiSettingsRepo.Object, _mockJobApplicationRepo.Object, _mockPromptBuilder.Object);
+        new(_mockAiSettingsRepo.Object, _mockJobApplicationRepo.Object, _mockPromptBuilder.Object, _mockDefaultPromptRepo.Object);
 
     [Fact]
     public async Task Handle_ShouldReturnGeneratedPromptDto_WhenQueryIsValid()
@@ -94,16 +101,15 @@ public class GeneratePromptQueryHandlerTests
             {
                 Id = 1,
                 UserId = UserId,
-                Prompts = new List<AppTrack.Domain.Prompt>
+                Prompts = new List<Prompt>
                 {
-                    AppTrack.Domain.Prompt.Create(PromptName, "Hello {Name}"),
-                    AppTrack.Domain.Prompt.Create(secondPromptName, secondTemplate)
+                    Prompt.Create(PromptName, "Hello {Name}"),
+                    Prompt.Create(secondPromptName, secondTemplate)
                 },
                 PromptParameter = new List<PromptParameter>()
             });
 
         var query = new GeneratePromptQuery { JobApplicationId = JobApplicationId, UserId = UserId, PromptName = secondPromptName };
-
         await CreateHandler().Handle(query, CancellationToken.None);
 
         _mockPromptBuilder.Verify(b => b.BuildPrompt(It.IsAny<IEnumerable<PromptParameter>>(), secondTemplate), Times.Once);
@@ -143,5 +149,56 @@ public class GeneratePromptQueryHandlerTests
 
         var query = new GeneratePromptQuery { JobApplicationId = JobApplicationId, UserId = noSettingsUser, PromptName = PromptName };
         await Should.ThrowAsync<BadRequestException>(() => CreateHandler().Handle(query, CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task Handle_ShouldBuildPromptFromDefaultRepository_WhenPromptNameHasDefaultPrefix()
+    {
+        const string defaultPromptName = "Default_Cover_Letter";
+        const string defaultTemplate = "Write a cover letter for {Position}.";
+
+        _mockDefaultPromptRepo
+            .Setup(r => r.GetAsync())
+            .ReturnsAsync(new List<DefaultPrompt>
+            {
+                DefaultPrompt.Create(defaultPromptName, defaultTemplate, "de"),
+            });
+
+        var query = new GeneratePromptQuery { JobApplicationId = JobApplicationId, UserId = UserId, PromptName = defaultPromptName };
+        await CreateHandler().Handle(query, CancellationToken.None);
+
+        _mockPromptBuilder.Verify(b => b.BuildPrompt(It.IsAny<IEnumerable<PromptParameter>>(), defaultTemplate), Times.Once);
+    }
+
+    [Fact]
+    public async Task Handle_ShouldUseDefaultTemplate_NotUserTemplate_WhenPromptNameHasDefaultPrefix()
+    {
+        const string defaultPromptName = "Default_Cover_Letter";
+        const string userTemplate = "User's own template";
+        const string defaultTemplate = "Write a cover letter for {Position}.";
+
+        // User also has a prompt with the same name — must be ignored
+        _mockAiSettingsRepo
+            .Setup(r => r.GetByUserIdIncludePromptParameterAsync(UserId))
+            .ReturnsAsync(new DomainAiSettings
+            {
+                Id = 1,
+                UserId = UserId,
+                Prompts = new List<Prompt> { Prompt.Create("Default_Cover_Letter", userTemplate) },
+                PromptParameter = new List<PromptParameter>()
+            });
+
+        _mockDefaultPromptRepo
+            .Setup(r => r.GetAsync())
+            .ReturnsAsync(new List<DefaultPrompt>
+            {
+                DefaultPrompt.Create(defaultPromptName, defaultTemplate, "de"),
+            });
+
+        var query = new GeneratePromptQuery { JobApplicationId = JobApplicationId, UserId = UserId, PromptName = defaultPromptName };
+        await CreateHandler().Handle(query, CancellationToken.None);
+
+        _mockPromptBuilder.Verify(b => b.BuildPrompt(It.IsAny<IEnumerable<PromptParameter>>(), defaultTemplate), Times.Once);
+        _mockPromptBuilder.Verify(b => b.BuildPrompt(It.IsAny<IEnumerable<PromptParameter>>(), userTemplate), Times.Never);
     }
 }

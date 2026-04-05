@@ -5,5 +5,5 @@ namespace AppTrack.Frontend.ApiService.Contracts;
 
 public interface IChatModelsService
 {
-    Task<Response<List<ChatModel>>> GetChatModels();
+    Task<Response<List<ChatModel>>> GetChatModelsAsync();
 }

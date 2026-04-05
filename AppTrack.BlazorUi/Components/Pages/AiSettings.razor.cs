@@ -34,7 +34,7 @@ public partial class AiSettings
         _isLoading = true;
 
         var settingsTask = AiSettingsService.GetForUserAsync();
-        var chatModelsTask = ChatModelsService.GetChatModels();
+        var chatModelsTask = ChatModelsService.GetChatModelsAsync();
 
         await Task.WhenAll(settingsTask, chatModelsTask);
 

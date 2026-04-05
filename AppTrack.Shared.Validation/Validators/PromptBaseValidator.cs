@@ -10,7 +10,10 @@ public abstract class PromptBaseValidator<T> : AbstractValidator<T>
     {
         RuleFor(x => x.Name)
             .NotEmpty().WithMessage("Name is required.")
-            .MaximumLength(100).WithMessage("Name must not exceed 100 characters.");
+            .MaximumLength(100).WithMessage("Name must not exceed 100 characters.")
+            .Must(n => !n.Contains(' ')).WithMessage("A prompt name must not contain spaces.")
+            .Must(n => !n.StartsWith("Default_", StringComparison.OrdinalIgnoreCase))
+                .WithMessage("A prompt name must not start with 'Default_'.");
 
         RuleFor(x => x.PromptTemplate)
             .NotEmpty().WithMessage("Prompt template is required.");

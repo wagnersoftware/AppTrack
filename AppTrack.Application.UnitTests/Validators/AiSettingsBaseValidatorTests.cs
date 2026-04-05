@@ -42,8 +42,8 @@ public class AiSettingsBaseValidatorTests
         {
             Prompts =
             [
-                new TestPromptItem { Name = "Prompt A", PromptTemplate = "Hello" },
-                new TestPromptItem { Name = "Prompt B", PromptTemplate = "World" },
+                new TestPromptItem { Name = "Prompt_A", PromptTemplate = "Hello" },
+                new TestPromptItem { Name = "Prompt_B", PromptTemplate = "World" },
             ]
         };
         var result = await _validator.ValidateAsync(settings);

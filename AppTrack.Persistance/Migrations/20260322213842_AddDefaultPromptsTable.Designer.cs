@@ -4,6 +4,7 @@ using AppTrack.Persistance.DatabaseContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AppTrack.Persistance.Migrations
 {
     [DbContext(typeof(AppTrackDatabaseContext))]
-    partial class AppTrackDatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20260322213842_AddDefaultPromptsTable")]
+    partial class AddDefaultPromptsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -153,29 +156,29 @@ namespace AppTrack.Persistance.Migrations
                         {
                             Id = 1,
                             Language = "de",
-                            Name = "Default_Cover_Letter",
-                            PromptTemplate = "Write a professional cover letter for the {Position} position at {Company}. Job description: {JobDescription}"
+                            Name = "Anschreiben",
+                            PromptTemplate = "Schreibe ein professionelles Anschreiben für die Stelle {Position} bei {Company}. Stellenbeschreibung: {JobDescription}"
                         },
                         new
                         {
                             Id = 2,
                             Language = "de",
-                            Name = "Default_LinkedIn_Message",
-                            PromptTemplate = "Write a short LinkedIn message to {ContactPerson} regarding the {Position} position at {Company}."
+                            Name = "LinkedIn Nachricht",
+                            PromptTemplate = "Schreibe eine kurze LinkedIn-Nachricht an {ContactPerson} bezüglich der Stelle {Position} bei {Company}."
                         },
                         new
                         {
                             Id = 3,
                             Language = "de",
-                            Name = "Default_Introduction",
-                            PromptTemplate = "Introduce me in a few sentences as an applicant for the {Position} position at {Company}."
+                            Name = "Vorstellung",
+                            PromptTemplate = "Stelle mich in ein paar Sätzen als Bewerber für die Stelle {Position} bei {Company} vor."
                         },
                         new
                         {
                             Id = 4,
                             Language = "de",
-                            Name = "Default_Follow_Up",
-                            PromptTemplate = "Write a short follow-up email to {ContactPerson} regarding my application for the {Position} position at {Company}."
+                            Name = "Nachfassen",
+                            PromptTemplate = "Schreibe eine kurze Follow-up-E-Mail an {ContactPerson} bezüglich meiner Bewerbung für die Stelle {Position} bei {Company}."
                         });
                 });
 

@@ -41,10 +41,42 @@
                     }
                 </MudSelect>
             </MudItem>
-            <!-- Prompts -->
+            <!-- Default Prompts (read-only) -->
             <MudItem xs="12">
                 <MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">
-                    <MudText Typo="Typo.subtitle1">Prompts</MudText>
+                    <MudIcon Icon="@Icons.Material.Filled.Lock" Size="Size.Small" Color="Color.Secondary" Class="mr-1" />
+                    <MudText Typo="Typo.subtitle1">Default Prompts</MudText>
+                </MudStack>
+                @if (_model.DefaultPrompts.Count == 0)
+                {
+                    <MudText Typo="Typo.body2" Color="Color.Secondary" Class="ml-1">
+                        No default prompts available.
+                    </MudText>
+                }
+                else
+                {
+                    <MudPaper Outlined="true" Class="pa-0" Style="max-height: 260px; overflow-y: auto;">
+                        @foreach (var prompt in _model.DefaultPrompts)
+                        {
+                            <MudStack Row="true"
+                                      AlignItems="AlignItems.Center"
+                                      Class="pa-3"
+                                      Style="border-bottom: 1px solid var(--mud-palette-divider);">
+                                <MudStack Spacing="0" Style="flex: 1; min-width: 0;">
+                                    <MudText Typo="Typo.subtitle2" Style="word-break: break-word;">@prompt.Name</MudText>
+                                    <MudText Typo="Typo.body2"
+                                             Color="Color.Secondary"
+                                             Style="word-break: break-word; white-space: pre-wrap;">@prompt.PromptTemplate</MudText>
+                                </MudStack>
+                            </MudStack>
+                        }
+                    </MudPaper>
+                }
+            </MudItem>
+            <!-- My Prompts -->
+            <MudItem xs="12">
+                <MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">
+                    <MudText Typo="Typo.subtitle1">My Prompts</MudText>
                     <MudSpacer />
                     <MudButton Variant="Variant.Outlined"
                                Color="Color.Primary"

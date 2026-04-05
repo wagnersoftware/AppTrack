@@ -11,7 +11,7 @@ public class PromptDtoValidatorTests
 
     private static PromptDto BuildValidDto() => new()
     {
-        Name = "Cover Letter",
+        Name = "Cover_Letter",
         PromptTemplate = "Write a cover letter for {position} at {company}."
     };
 
@@ -64,5 +64,23 @@ public class PromptDtoValidatorTests
         dto.PromptTemplate = "   ";
         _validator.TestValidate(dto).ShouldHaveValidationErrorFor(x => x.PromptTemplate)
             .WithErrorMessage("Prompt template is required.");
+    }
+
+    [Fact]
+    public void Validate_ShouldHaveError_WhenNameContainsSpace()
+    {
+        var dto = BuildValidDto();
+        dto.Name = "Cover Letter";
+        _validator.TestValidate(dto).ShouldHaveValidationErrorFor(x => x.Name)
+            .WithErrorMessage("A prompt name must not contain spaces.");
+    }
+
+    [Fact]
+    public void Validate_ShouldHaveError_WhenNameStartsWithDefaultPrefix()
+    {
+        var dto = BuildValidDto();
+        dto.Name = "Default_Cover_Letter";
+        _validator.TestValidate(dto).ShouldHaveValidationErrorFor(x => x.Name)
+            .WithErrorMessage("A prompt name must not start with 'Default_'.");
     }
 }
