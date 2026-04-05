@@ -1,0 +1,131 @@
+<MudStack Spacing="4">
+
+    <!-- ── Section 1: Profile Type ─────────────────────────────── -->
+    <div>
+        <MudText Typo="Typo.subtitle1" Class="mb-2">Profiltyp</MudText>
+        <MudGrid Spacing="2">
+            <MudItem xs="12" sm="6">
+                <MudCard @onclick="SelectFreelancer"
+                         Style="@GetCardStyle("Freelancer")"
+                         Elevation="2">
+                    <MudCardContent>
+                        <MudStack AlignItems="AlignItems.Center" Spacing="1">
+                            <MudIcon Icon="@Icons.Material.Filled.WorkspacePremium"
+                                     Size="Size.Large"
+                                     Color="Color.Primary" />
+                            <MudText Typo="Typo.h6">Freelancer</MudText>
+                        </MudStack>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudTooltip Text="Kommt bald">
+                    <MudCard Style="pointer-events: none; opacity: 0.5;" Elevation="1">
+                        <MudCardContent>
+                            <MudStack AlignItems="AlignItems.Center" Spacing="1">
+                                <MudIcon Icon="@Icons.Material.Filled.BusinessCenter"
+                                         Size="Size.Large"
+                                         Color="Color.Secondary" />
+                                <MudText Typo="Typo.h6">Festangestellter</MudText>
+                            </MudStack>
+                        </MudCardContent>
+                    </MudCard>
+                </MudTooltip>
+            </MudItem>
+        </MudGrid>
+    </div>
+
+    <!-- ── Section 2: Freelancer Details ───────────────────────── -->
+    <div>
+        <MudText Typo="Typo.subtitle1" Class="mb-2">Persönliche Daten</MudText>
+        <MudGrid Spacing="2">
+
+            <!-- First / Last Name -->
+            <MudItem xs="12" sm="6">
+                <MudTextField T="string"
+                              Label="Vorname"
+                              @bind-Value="_model.FirstName"
+                              Variant="Variant.Outlined"
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Outlined.Person" />
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudTextField T="string"
+                              Label="Nachname"
+                              @bind-Value="_model.LastName"
+                              Variant="Variant.Outlined"
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Outlined.Person" />
+            </MudItem>
+
+            <!-- Day Rate / Hourly Rate -->
+            <MudItem xs="12" sm="6">
+                <MudNumericField T="decimal?"
+                                 Label="Tagessatz (€)"
+                                 @bind-Value="_model.DailyRate"
+                                 Variant="Variant.Outlined"
+                                 Adornment="Adornment.Start"
+                                 AdornmentIcon="@Icons.Material.Outlined.Euro" />
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudNumericField T="decimal?"
+                                 Label="Stundensatz (€)"
+                                 @bind-Value="_model.HourlyRate"
+                                 Variant="Variant.Outlined"
+                                 Adornment="Adornment.Start"
+                                 AdornmentIcon="@Icons.Material.Outlined.Euro" />
+            </MudItem>
+
+            <!-- Available From -->
+            <MudItem xs="12">
+                <MudDatePicker Label="Verfügbar ab"
+                               Date="_availableFrom"
+                               DateChanged="OnAvailableFromChanged"
+                               Variant="Variant.Outlined"
+                               DateFormat="dd.MM.yyyy"
+                               Editable="true" />
+            </MudItem>
+
+            <!-- Remote Preference -->
+            <MudItem xs="12">
+                <MudSelect T="RemotePreference?"
+                           Label="Remote-Präferenz"
+                           Value="_model.WorkMode"
+                           ValueChanged="@((RemotePreference? v) => _model.WorkMode = v)"
+                           Variant="Variant.Outlined"
+                           Clearable="true"
+                           AdornmentIcon="@Icons.Material.Outlined.LocationOn">
+                    <MudSelectItem T="RemotePreference?" Value="@((RemotePreference?)RemotePreference.Remote)">Remote</MudSelectItem>
+                    <MudSelectItem T="RemotePreference?" Value="@((RemotePreference?)RemotePreference.Hybrid)">Hybrid</MudSelectItem>
+                    <MudSelectItem T="RemotePreference?" Value="@((RemotePreference?)RemotePreference.OnSite)">Vor Ort</MudSelectItem>
+                </MudSelect>
+            </MudItem>
+
+            <!-- Skills -->
+            <MudItem xs="12">
+                <MudTextField T="string"
+                              Label="Skills"
+                              @bind-Value="_model.Skills"
+                              Variant="Variant.Outlined"
+                              Lines="3"
+                              Placeholder="z. B. C#, .NET, Azure, SQL" />
+            </MudItem>
+
+            <!-- CV Upload (decorative — no FilesChanged handler wired) -->
+            <MudItem xs="12">
+                <MudFileUpload T="IBrowserFile" Accept=".pdf,.doc,.docx">
+                    <CustomContent>
+                        <MudButton Variant="Variant.Outlined"
+                                   StartIcon="@Icons.Material.Filled.AttachFile"
+                                   Color="Color.Default"
+                                   OnClick="@context.OpenFilePickerAsync">
+                            Lebenslauf hochladen (PDF)
+                        </MudButton>
+                    </CustomContent>
+                </MudFileUpload>
+            </MudItem>
+
+        </MudGrid>
+    </div>
+
+</MudStack>
