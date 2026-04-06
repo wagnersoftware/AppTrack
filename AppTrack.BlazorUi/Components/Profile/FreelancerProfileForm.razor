@@ -72,7 +72,7 @@
             <!-- Active Rate Field (hidden when no rate type selected) -->
             @if (_model.SelectedRateType != null)
             {
-                <MudItem xs="12" sm="6">
+                <MudItem @key="_model.SelectedRateType" xs="12" sm="6">
                     <MudNumericField T="decimal?"
                                      Label="@(_model.SelectedRateType == RateKind.Hourly ? "Hourly Rate (€)" : "Daily Rate (€)")"
                                      Value="@(_model.SelectedRateType == RateKind.Hourly ? _model.HourlyRate : _model.DailyRate)"

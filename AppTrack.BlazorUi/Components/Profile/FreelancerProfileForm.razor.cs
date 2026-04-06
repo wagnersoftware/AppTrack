@@ -30,6 +30,7 @@ public partial class FreelancerProfileForm
         else { _model.HourlyRate = null; _model.DailyRate = null; }
     }
 
+    // Only called while SelectedRateType != null (enforced by the @if guard in the markup).
     private void OnRateValueChanged(decimal? value)
     {
         if (_model.SelectedRateType == RateKind.Hourly) _model.HourlyRate = value;
