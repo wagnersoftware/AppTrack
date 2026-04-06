@@ -2,7 +2,7 @@
 
     <!-- ── Section 1: Profile Type ─────────────────────────────── -->
     <div>
-        <MudText Typo="Typo.subtitle1" Class="mb-2">Profiltyp</MudText>
+        <MudText Typo="Typo.subtitle1" Class="mb-2">Profile Type</MudText>
         <MudGrid Spacing="2">
             <MudItem xs="12" sm="6">
                 <MudCard @onclick="SelectFreelancer"
@@ -19,14 +19,14 @@
                 </MudCard>
             </MudItem>
             <MudItem xs="12" sm="6">
-                <MudTooltip Text="Kommt bald">
+                <MudTooltip Text="Coming soon">
                     <MudCard Style="pointer-events: none; opacity: 0.5;" Elevation="1">
                         <MudCardContent>
                             <MudStack AlignItems="AlignItems.Center" Spacing="1">
                                 <MudIcon Icon="@Icons.Material.Filled.BusinessCenter"
                                          Size="Size.Large"
                                          Color="Color.Secondary" />
-                                <MudText Typo="Typo.h6">Festangestellter</MudText>
+                                <MudText Typo="Typo.h6">Employee</MudText>
                             </MudStack>
                         </MudCardContent>
                     </MudCard>
@@ -35,15 +35,15 @@
         </MudGrid>
     </div>
 
-    <!-- ── Section 2: Freelancer Details ───────────────────────── -->
+    <!-- ── Section 2: Personal Details ─────────────────────────── -->
     <div>
-        <MudText Typo="Typo.subtitle1" Class="mb-2">Persönliche Daten</MudText>
+        <MudText Typo="Typo.subtitle1" Class="mb-2">Personal Details</MudText>
         <MudGrid Spacing="2">
 
             <!-- First / Last Name -->
             <MudItem xs="12" sm="6">
                 <MudTextField T="string"
-                              Label="Vorname"
+                              Label="First Name"
                               @bind-Value="_model.FirstName"
                               Variant="Variant.Outlined"
                               Adornment="Adornment.Start"
@@ -51,34 +51,41 @@
             </MudItem>
             <MudItem xs="12" sm="6">
                 <MudTextField T="string"
-                              Label="Nachname"
+                              Label="Last Name"
                               @bind-Value="_model.LastName"
                               Variant="Variant.Outlined"
                               Adornment="Adornment.Start"
                               AdornmentIcon="@Icons.Material.Outlined.Person" />
             </MudItem>
 
-            <!-- Day Rate / Hourly Rate -->
-            <MudItem xs="12" sm="6">
-                <MudNumericField T="decimal?"
-                                 Label="Tagessatz (€)"
-                                 @bind-Value="_model.DailyRate"
-                                 Variant="Variant.Outlined"
-                                 Adornment="Adornment.Start"
-                                 AdornmentIcon="@Icons.Material.Outlined.Euro" />
+            <!-- Rate Type Toggle -->
+            <MudItem xs="12">
+                <MudToggleGroup T="RateKind?" Value="_model.SelectedRateType"
+                                ValueChanged="OnRateKindChanged"
+                                SelectionMode="SelectionMode.ToggleSelection"
+                                Color="Color.Primary" Outlined="true">
+                    <MudToggleItem Value="@((RateKind?)RateKind.Hourly)">Hourly Rate</MudToggleItem>
+                    <MudToggleItem Value="@((RateKind?)RateKind.Daily)">Daily Rate</MudToggleItem>
+                </MudToggleGroup>
             </MudItem>
-            <MudItem xs="12" sm="6">
-                <MudNumericField T="decimal?"
-                                 Label="Stundensatz (€)"
-                                 @bind-Value="_model.HourlyRate"
-                                 Variant="Variant.Outlined"
-                                 Adornment="Adornment.Start"
-                                 AdornmentIcon="@Icons.Material.Outlined.Euro" />
-            </MudItem>
+
+            <!-- Active Rate Field (hidden when no rate type selected) -->
+            @if (_model.SelectedRateType != null)
+            {
+                <MudItem xs="12" sm="6">
+                    <MudNumericField T="decimal?"
+                                     Label="@(_model.SelectedRateType == RateKind.Hourly ? "Hourly Rate (€)" : "Daily Rate (€)")"
+                                     Value="@(_model.SelectedRateType == RateKind.Hourly ? _model.HourlyRate : _model.DailyRate)"
+                                     ValueChanged="OnRateValueChanged"
+                                     Variant="Variant.Outlined"
+                                     Adornment="Adornment.Start"
+                                     AdornmentIcon="@Icons.Material.Outlined.Euro" />
+                </MudItem>
+            }
 
             <!-- Available From -->
             <MudItem xs="12">
-                <MudDatePicker Label="Verfügbar ab"
+                <MudDatePicker Label="Available From"
                                Date="_availableFrom"
                                DateChanged="OnAvailableFromChanged"
                                Variant="Variant.Outlined"
@@ -89,7 +96,7 @@
             <!-- Remote Preference -->
             <MudItem xs="12">
                 <MudSelect T="RemotePreference?"
-                           Label="Remote-Präferenz"
+                           Label="Remote Preference"
                            Value="_model.WorkMode"
                            ValueChanged="@((RemotePreference? v) => _model.WorkMode = v)"
                            Variant="Variant.Outlined"
@@ -97,7 +104,7 @@
                            AdornmentIcon="@Icons.Material.Outlined.LocationOn">
                     <MudSelectItem T="RemotePreference?" Value="@((RemotePreference?)RemotePreference.Remote)">Remote</MudSelectItem>
                     <MudSelectItem T="RemotePreference?" Value="@((RemotePreference?)RemotePreference.Hybrid)">Hybrid</MudSelectItem>
-                    <MudSelectItem T="RemotePreference?" Value="@((RemotePreference?)RemotePreference.OnSite)">Vor Ort</MudSelectItem>
+                    <MudSelectItem T="RemotePreference?" Value="@((RemotePreference?)RemotePreference.OnSite)">On-Site</MudSelectItem>
                 </MudSelect>
             </MudItem>
 
@@ -108,7 +115,22 @@
                               @bind-Value="_model.Skills"
                               Variant="Variant.Outlined"
                               Lines="3"
-                              Placeholder="z. B. C#, .NET, Azure, SQL" />
+                              Placeholder="e.g. C#, .NET, Azure, SQL" />
+            </MudItem>
+
+            <!-- Application Language -->
+            <MudItem xs="12">
+                <MudSelect T="ApplicationLanguage?"
+                           Label="Application Language"
+                           Value="_model.Language"
+                           ValueChanged="@((ApplicationLanguage? v) => _model.Language = v)"
+                           Variant="Variant.Outlined"
+                           Clearable="true"
+                           HelperText="Language for AI-generated application text"
+                           AdornmentIcon="@Icons.Material.Outlined.Translate">
+                    <MudSelectItem T="ApplicationLanguage?" Value="@((ApplicationLanguage?)ApplicationLanguage.German)">German</MudSelectItem>
+                    <MudSelectItem T="ApplicationLanguage?" Value="@((ApplicationLanguage?)ApplicationLanguage.English)">English</MudSelectItem>
+                </MudSelect>
             </MudItem>
 
             <!-- CV Upload (decorative — no FilesChanged handler wired) -->
@@ -119,7 +141,7 @@
                                    StartIcon="@Icons.Material.Filled.AttachFile"
                                    Color="Color.Default"
                                    OnClick="@context.OpenFilePickerAsync">
-                            Lebenslauf hochladen (PDF)
+                            Upload CV (PDF)
                         </MudButton>
                     </CustomContent>
                 </MudFileUpload>

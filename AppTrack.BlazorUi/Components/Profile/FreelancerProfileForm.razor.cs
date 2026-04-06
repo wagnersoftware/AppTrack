@@ -1,5 +1,4 @@
 using AppTrack.Frontend.Models;
-using Microsoft.AspNetCore.Components;
 
 namespace AppTrack.BlazorUi.Components.Profile;
 
@@ -21,4 +20,19 @@ public partial class FreelancerProfileForm
         _selectedType == type
             ? "cursor: pointer; border: 2px solid var(--mud-palette-primary);"
             : "cursor: pointer;";
+
+    private void OnRateKindChanged(RateKind? newKind)
+    {
+        if (_model.SelectedRateType == newKind) return;
+        _model.SelectedRateType = newKind;
+        if (newKind == RateKind.Hourly) _model.DailyRate = null;
+        else if (newKind == RateKind.Daily) _model.HourlyRate = null;
+        else { _model.HourlyRate = null; _model.DailyRate = null; }
+    }
+
+    private void OnRateValueChanged(decimal? value)
+    {
+        if (_model.SelectedRateType == RateKind.Hourly) _model.HourlyRate = value;
+        else if (_model.SelectedRateType == RateKind.Daily) _model.DailyRate = value;
+    }
 }
