@@ -89,3 +89,18 @@ input:-webkit-autofill:focus {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
     text-align: start;
 }
+
+/* ── Form inputs: white fill against gray page background ─────── */
+.mud-input.mud-input-outlined {
+    background-color: #ffffff;
+    border-radius: 4px;
+}
+
+/* ── Outlined buttons: white fill so they pop on gray background ─ */
+.mud-button-root.mud-button-outlined {
+    background-color: #ffffff;
+}
+
+.mud-button-root.mud-button-outlined:hover {
+    background-color: rgba(0, 120, 212, 0.06);
+}
