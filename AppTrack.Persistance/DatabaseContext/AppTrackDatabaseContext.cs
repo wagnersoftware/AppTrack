@@ -20,6 +20,8 @@ public class AppTrackDatabaseContext : DbContext
 
     public DbSet<DefaultPrompt> DefaultPrompts { get; set; }
 
+    public DbSet<FreelancerProfile> FreelancerProfiles { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppTrackDatabaseContext).Assembly);
