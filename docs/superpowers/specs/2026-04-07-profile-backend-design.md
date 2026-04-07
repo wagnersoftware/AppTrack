@@ -52,6 +52,44 @@ NSwag will generate additional standalone enum types (`RemotePreference`, `Appli
 
 ---
 
+## Shared Validation Layer (`AppTrack.Shared.Validation`)
+
+### New Interface
+
+**`Interfaces/IFreelancerProfileValidatable.cs`**
+
+```csharp
+public interface IFreelancerProfileValidatable
+{
+    string FirstName { get; }
+    string LastName { get; }
+    decimal? HourlyRate { get; }
+    decimal? DailyRate { get; }
+    string? Skills { get; }
+}
+```
+
+### New Base Validator
+
+**`Validators/FreelancerProfileBaseValidator.cs`**
+
+```csharp
+public abstract class FreelancerProfileBaseValidator<T> : AbstractValidator<T>
+    where T : IFreelancerProfileValidatable
+{
+    protected FreelancerProfileBaseValidator()
+    {
+        RuleFor(x => x.FirstName).NotEmpty().MaximumLength(100);
+        RuleFor(x => x.LastName).NotEmpty().MaximumLength(100);
+        RuleFor(x => x.HourlyRate).GreaterThan(0).When(x => x.HourlyRate.HasValue);
+        RuleFor(x => x.DailyRate).GreaterThan(0).When(x => x.DailyRate.HasValue);
+        RuleFor(x => x.Skills).MaximumLength(1000).When(x => x.Skills != null);
+    }
+}
+```
+
+---
+
 ## Application Layer (`AppTrack.Application`)
 
 ### Repository Contract
@@ -88,19 +126,14 @@ Extends `IGenericRepository<FreelancerProfile>`.
 
 ### Commands
 
-**`UpsertFreelancerProfileCommand`** (implements `IRequest<FreelancerProfileDto>`, `IUserScopedRequest`)
+**`UpsertFreelancerProfileCommand`** (implements `IRequest<FreelancerProfileDto>`, `IUserScopedRequest`, `IFreelancerProfileValidatable`)
 
 Fields: `FirstName`, `LastName`, `HourlyRate?`, `DailyRate?`, `AvailableFrom?`, `WorkMode?` (`Domain.Enums.RemotePreference?`), `Skills?`, `Language?` (`Domain.Enums.ApplicationLanguage?`).
 `UserId` is `[JsonIgnore]` — always set from JWT by the mediator pipeline.
 
-**`UpsertFreelancerProfileCommandValidator`** (inherits `AbstractValidator<UpsertFreelancerProfileCommand>`)
+**`UpsertFreelancerProfileCommandValidator`** (inherits `FreelancerProfileBaseValidator<UpsertFreelancerProfileCommand>`)
 
-Rules:
-- `FirstName` — `NotEmpty`, `MaxLength(100)`
-- `LastName` — `NotEmpty`, `MaxLength(100)`
-- `HourlyRate` — `GreaterThan(0)` when not null
-- `DailyRate` — `GreaterThan(0)` when not null
-- `Skills` — `MaxLength(1000)` when not null
+Empty additional constructor — all rules come from the shared base validator.
 
 **`UpsertFreelancerProfileCommandHandler`**
 
@@ -248,7 +281,40 @@ In `ApiServiceRegistration.cs` (frontend):
 services.AddScoped<IFreelancerProfileService, FreelancerProfileService>();
 ```
 
-No `FreelancerProfileModelValidator` is added in this iteration — the form relies entirely on server-side validation feedback for now.
+---
+
+## Frontend Models (`AppTrack.Frontend.Models`)
+
+### `FreelancerProfileModel` Update
+
+`FreelancerProfileModel` currently does not extend `ModelBase`. It must be updated to:
+
+```csharp
+public class FreelancerProfileModel : ModelBase, IFreelancerProfileValidatable
+```
+
+`ModelBase` provides `Id`, `CreationDate`, `ModifiedDate` (needed for round-tripping with the DTO). `IFreelancerProfileValidatable` enables the shared base validator.
+
+### New Frontend Validator
+
+**`Models/Validators/FreelancerProfileModelValidator.cs`**
+
+```csharp
+public class FreelancerProfileModelValidator : FreelancerProfileBaseValidator<FreelancerProfileModel>
+{
+    public FreelancerProfileModelValidator() { }
+}
+```
+
+No additional rules — all shared rules come from the base.
+
+### Service Registration in `Program.cs`
+
+```csharp
+builder.Services.AddTransient<IValidator<FreelancerProfileModel>, FreelancerProfileModelValidator>();
+```
+
+The generic `IModelValidator<>` → `ModelValidator<>` open-generic registration already covers this.
 
 ---
 
@@ -260,6 +326,7 @@ The form currently owns a `private readonly FreelancerProfileModel _model = new(
 
 **Changes to `FreelancerProfileForm.razor.cs`:**
 - Replace `private readonly FreelancerProfileModel _model = new()` with `[Parameter] public FreelancerProfileModel Model { get; set; } = new()`
+- Inject `[Inject] private IModelValidator<FreelancerProfileModel> ModelValidator { get; set; } = null!`
 - Override `OnParametersSet()` to sync `_availableFrom` from `Model.AvailableFrom`:
   ```csharp
   protected override void OnParametersSet()
@@ -269,23 +336,32 @@ The form currently owns a `private readonly FreelancerProfileModel _model = new(
           : null;
   }
   ```
-  This ensures the `MudDatePicker` shows the correct date when a saved profile is loaded.
-- All four method bodies (`OnAvailableFromChanged`, `OnRateKindChanged`, `OnRateValueChanged`, `SelectFreelancer`) currently reference `_model`; after the rename they must reference `Model` instead. `_selectedType` (the profile-type toggle) is **not** `_model` and is unchanged.
+- All four method bodies (`OnAvailableFromChanged`, `OnRateKindChanged`, `OnRateValueChanged`, `SelectFreelancer`) must reference `Model` instead of `_model`. `_selectedType` (the profile-type toggle) is unchanged.
+- Add field-change handlers that call `ModelValidator.ResetErrors(propertyName)` for every validated field (`FirstName`, `LastName`, `HourlyRate`, `DailyRate`, `Skills`). The remaining fields (`AvailableFrom`, `WorkMode`, `Language`, rate toggle) do not have validation rules and do not need `ResetErrors`.
+- Expose a `public bool Validate() => ModelValidator.Validate(Model)` method so parent components can trigger validation via a `@ref` capture.
+- Add helper: `private string GetFirstError(string propertyName) => ModelValidator.Errors.GetValueOrDefault(propertyName)?.FirstOrDefault() ?? string.Empty`
 
 **Changes to `FreelancerProfileForm.razor`:**
-- All references to `_model.*` in the markup become `Model.*`. This includes every `@bind-Value`, `Value=`, and `ValueChanged=` expression that currently reads from or writes to `_model`.
+- All references to `_model.*` become `Model.*`.
+- Add `Error` and `ErrorText` props to the five validated fields:
+  - `FirstName` → `Error="@ModelValidator.Errors.ContainsKey(nameof(Model.FirstName))"` `ErrorText="@GetFirstError(nameof(Model.FirstName))"`
+  - `LastName` — same pattern
+  - Rate numeric field — bound to `HourlyRate` or `DailyRate` depending on `SelectedRateType`; use `ErrorText` for whichever is active
+  - `Skills` — same pattern
+- Replace `@bind-Value` on validated fields with explicit `Value=` + `ValueChanged=` (matching `CreateJobApplicationDialog` pattern) so `ResetErrors` can be called on change.
 
 **Changes to `ProfileSetup.razor` and `ProfileSetupDialog.razor`:**
-- Both currently use `<FreelancerProfileForm />` with no parameters. Must become `<FreelancerProfileForm Model="_model" />` after the parent components declare their own `_model` field.
+- Both become `<FreelancerProfileForm @ref="_form" Model="_model" />`. The `@ref` gives the parent access to `_form.Validate()`.
 
 ### `ProfileSetup` Page
 
 **`ProfileSetup.razor.cs`** changes:
 1. Inject `IFreelancerProfileService` and `ISnackbar`
-2. Add `private FreelancerProfileModel _model = new()`
+2. Add `private FreelancerProfileModel _model = new()` and `private FreelancerProfileForm _form = null!`
 3. `OnInitializedAsync()`:
    - Call `GetProfileAsync()` — if success, `_model = result.Data!.ToModel()`; if 404 / error, keep empty model
 4. `Save()` (existing method):
+   - Call `if (!_form.Validate()) return;`
    - Call `UpsertProfileAsync(_model)`
    - On success: show snackbar "Profile saved", navigate to `/`
    - On error: show snackbar with `response.ErrorMessage`
@@ -294,9 +370,10 @@ The form currently owns a `private readonly FreelancerProfileModel _model = new(
 
 **`ProfileSetupDialog.razor.cs`** changes:
 1. Inject `IFreelancerProfileService` and `ISnackbar`
-2. Add `private FreelancerProfileModel _model = new()`
+2. Add `private FreelancerProfileModel _model = new()` and `private FreelancerProfileForm _form = null!`
 3. `OnInitializedAsync()` — same as page: load existing profile if available
 4. `Save()`:
+   - Call `if (!_form.Validate()) return;`
    - Call `UpsertProfileAsync(_model)`
    - On success: `MudDialog.Close()`
    - On error: show snackbar with `response.ErrorMessage`
@@ -347,4 +424,3 @@ Add `MockFreelancerProfileRepository.cs` in `Mocks/` following the existing mock
 - Employee profile type
 - Auto-trigger of `ProfileSetupDialog` on first login
 - Profile deletion
-- Frontend-side form validation (`FreelancerProfileModelValidator`)
