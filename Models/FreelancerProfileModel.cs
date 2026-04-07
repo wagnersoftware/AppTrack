@@ -1,6 +1,9 @@
+using AppTrack.Frontend.Models.Base;
+using AppTrack.Shared.Validation.Interfaces;
+
 namespace AppTrack.Frontend.Models;
 
-public class FreelancerProfileModel
+public class FreelancerProfileModel : ModelBase, IFreelancerProfileValidatable
 {
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
