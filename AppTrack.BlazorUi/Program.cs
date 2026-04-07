@@ -37,6 +37,7 @@ builder.Services.AddTransient<IValidator<JobApplicationModel>, JobApplicationMod
 builder.Services.AddTransient<IValidator<AiSettingsModel>, AiSettingsModelValidator>();
 builder.Services.AddTransient<IValidator<PromptParameterModel>, PromptParameterModelValidator>();
 builder.Services.AddTransient<IValidator<PromptModel>, PromptModelValidator>();
+builder.Services.AddTransient<IValidator<FreelancerProfileModel>, FreelancerProfileModelValidator>();
 builder.Services.AddTransient(typeof(IModelValidator<>), typeof(ModelValidator<>));
 
 await builder.Build().RunAsync();
