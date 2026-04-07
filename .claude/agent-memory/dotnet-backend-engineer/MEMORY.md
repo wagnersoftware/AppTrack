@@ -38,6 +38,19 @@
 - `AppTrack.Infrastructure/Identity/HttpContextUserContext.cs` — reads oid/sub claims
 - `AppTrack.Infrastructure/Mediator/Mediator.cs` — custom mediator; injects UserId before dispatch
 
+## Handler Validation Pattern
+- Handlers instantiate their own validator inline: `var validator = new XyzValidator(); var result = await validator.ValidateAsync(request, cancellationToken);`
+- Check `validationResult.Errors.Count > 0` (not `.Any()`) to avoid LINQ allocation — consistent with TreatWarningsAsErrors style
+- `UpsertFreelancerProfileCommandHandler` uses optimistic upsert: `GetByUserIdAsync` → create if null, else `ApplyTo` + update
+
+## FreelancerProfile Feature (Application layer, branch: feature/profile-setup-wizard)
+- `IFreelancerProfileRepository` at `AppTrack.Application/Contracts/Persistance/IFreelancerProfileRepository.cs`
+- `FreelancerProfileDto` at `AppTrack.Application/Features/FreelancerProfile/Dto/FreelancerProfileDto.cs`
+- Command: `UpsertFreelancerProfileCommand` — implements `IFreelancerProfileValidatable` (from Shared.Validation)
+- Query: `GetFreelancerProfileQuery` — no validatable interface (only UserId needed, injected by mediator)
+- Mappings: `AppTrack.Application/Mappings/FreelancerProfileMappings.cs` — `ToNewDomain`, `ApplyTo`, `ToDto`
+- `GetFreelancerProfileQueryHandler` throws `NotFoundException` when no profile found for user
+
 ## Infrastructure Project Note
 - `AppTrack.Infrastructure` uses `Microsoft.NET.Sdk` (not Web SDK)
 - Adding `<FrameworkReference Include="Microsoft.AspNetCore.App" />` grants access to all ASP.NET Core types
