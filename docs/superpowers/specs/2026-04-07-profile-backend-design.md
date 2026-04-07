@@ -16,15 +16,21 @@ The Blazor UI for the freelancer profile (form, dialog, page) was implemented in
 
 ### New Enums
 
+These are new types in `AppTrack.Domain.Enums` — separate from the identically-named enums in `AppTrack.Frontend.Models`. The frontend enums are kept; the domain enums are new additions. Mappings between them use explicit integer casts (same pattern as `JobApplicationStatus` ↔ `JobApplicationStatus` in `JobApplicationMappings.cs`).
+
 **`AppTrack.Domain/Enums/RemotePreference.cs`**
 ```
-Remote | Hybrid | OnSite
+Remote = 0 | Hybrid = 1 | OnSite = 2
 ```
 
 **`AppTrack.Domain/Enums/ApplicationLanguage.cs`**
 ```
-German | English
+German = 0 | English = 1
 ```
+
+Both enums must have **matching integer values** with their `AppTrack.Frontend.Models` counterparts to allow safe cast-based conversion in `ApiService/Mappings/FreelancerProfileMappings.cs`.
+
+NSwag will generate additional standalone enum types (`RemotePreference`, `ApplicationLanguage`) in `AppTrack.Frontend.ApiService.Base` when it reads the Swagger doc. These are used as cast targets in `FreelancerProfileMappings.cs` (see ApiService section).
 
 ### New Entity
 
@@ -38,9 +44,9 @@ German | English
 | `HourlyRate` | `decimal?` | Optional |
 | `DailyRate` | `decimal?` | Optional |
 | `AvailableFrom` | `DateOnly?` | Optional; EF Core 8+ maps to SQL `date` |
-| `WorkMode` | `RemotePreference?` | Optional enum |
+| `WorkMode` | `Domain.Enums.RemotePreference?` | Optional enum |
 | `Skills` | `string?` | Optional; free text |
-| `Language` | `ApplicationLanguage?` | Optional; preferred AI text language |
+| `Language` | `Domain.Enums.ApplicationLanguage?` | Optional; preferred AI text language |
 
 `SelectedRateType` (frontend `RateKind` UI toggle) is **not** stored — inferred from which rate field is non-null.
 
@@ -63,13 +69,28 @@ Extends `IGenericRepository<FreelancerProfile>`.
 
 **`Features/FreelancerProfile/Dto/FreelancerProfileDto.cs`**
 
-Mirrors all domain entity properties (plus `Id`, `CreationDate`, `ModifiedDate` from `BaseEntity`).
+| Field | Type |
+|---|---|
+| `Id` | `int` |
+| `UserId` | `string` |
+| `FirstName` | `string` |
+| `LastName` | `string` |
+| `HourlyRate` | `decimal?` |
+| `DailyRate` | `decimal?` |
+| `AvailableFrom` | `DateOnly?` |
+| `WorkMode` | `Domain.Enums.RemotePreference?` |
+| `Skills` | `string?` |
+| `Language` | `Domain.Enums.ApplicationLanguage?` |
+| `CreationDate` | `DateTime` |
+| `ModifiedDate` | `DateTime` |
+
+`UserId` is included in the DTO (same convention as `JobApplicationDto`). `CreationDate` and `ModifiedDate` are non-nullable `DateTime` (matching the `JobApplicationDto` convention — the domain `BaseEntity` nullable dates are unwrapped in the DTO with `?? default`).
 
 ### Commands
 
 **`UpsertFreelancerProfileCommand`** (implements `IRequest<FreelancerProfileDto>`, `IUserScopedRequest`)
 
-Fields: `FirstName`, `LastName`, `HourlyRate?`, `DailyRate?`, `AvailableFrom?`, `WorkMode?`, `Skills?`, `Language?`.
+Fields: `FirstName`, `LastName`, `HourlyRate?`, `DailyRate?`, `AvailableFrom?`, `WorkMode?` (`Domain.Enums.RemotePreference?`), `Skills?`, `Language?` (`Domain.Enums.ApplicationLanguage?`).
 `UserId` is `[JsonIgnore]` — always set from JWT by the mediator pipeline.
 
 **`UpsertFreelancerProfileCommandValidator`** (inherits `AbstractValidator<UpsertFreelancerProfileCommand>`)
@@ -83,29 +104,40 @@ Rules:
 
 **`UpsertFreelancerProfileCommandHandler`**
 
-1. Validate command → throw `BadRequestException` on failure
+1. Validate command → throw `BadRequestException` on failure (do not call repository)
 2. `GetByUserIdAsync(command.UserId)`
-3. If null → map command to new `FreelancerProfile`, call `UpsertAsync` (create)
-4. If found → apply command fields to existing entity, call `UpsertAsync` (update)
-5. Return DTO
+3. If null → `command.ToNewDomain()` → call `UpsertAsync` (create path)
+4. If found → `command.ApplyTo(existingEntity)` → call `UpsertAsync` (update path)
+   - `ApplyTo` updates all mutable fields but **must not overwrite `entity.Id`** (the `Id` is needed by `UpsertAsync` to detect the update path via `profile.Id > 0`)
+   - `ApplyTo` **may** overwrite `entity.UserId` (same pattern as `JobApplicationMappings.ApplyTo`; the mediator always sets the correct value via JWT)
+5. Return `entity.ToDto()`
 
 ### Query
 
-**`GetFreelancerProfileQuery`** (implements `IRequest<FreelancerProfileDto?>`, `IUserScopedRequest`)
+**`GetFreelancerProfileQuery`** (implements `IRequest<FreelancerProfileDto>`, `IUserScopedRequest`)
 
 `UserId` is `[JsonIgnore]`.
 
+**`GetFreelancerProfileQueryValidator`** (inherits `AbstractValidator<GetFreelancerProfileQuery>`)
+
+Empty constructor — no rules. Consistent with the established pattern: all existing `Get*` query validators in this codebase have empty constructors (e.g. `GetJobApplicationDefaultsByUserIdQueryValidator`). `UserId` is always set by the mediator from JWT, so no runtime rule is needed.
+
 **`GetFreelancerProfileQueryHandler`**
 
-1. `GetByUserIdAsync(query.UserId)`
-2. If null → throw `NotFoundException`
-3. Return DTO
+1. Instantiate and call `GetFreelancerProfileQueryValidator` (validator has no rules; validation will never fail — included for consistency with the handler pattern)
+2. `GetByUserIdAsync(query.UserId)`
+3. If null → throw `NotFoundException("FreelancerProfile", query.UserId)`
+4. Return `entity.ToDto()`
+
+The return type is `FreelancerProfileDto` (non-nullable). The 404 case is handled entirely by exception middleware — the handler never returns null.
 
 ### Mappings
 
 `FreelancerProfileMappings.cs` (internal static class in `AppTrack.Application/Mappings/`):
+
 - `UpsertFreelancerProfileCommand.ToNewDomain()` → `FreelancerProfile`
-- `UpsertFreelancerProfileCommand.ApplyTo(FreelancerProfile entity)`
+  - Maps all fields; `UserId` is set from `command.UserId`
+- `UpsertFreelancerProfileCommand.ApplyTo(FreelancerProfile entity)` — mutates the tracked entity in place
 - `FreelancerProfile.ToDto()` → `FreelancerProfileDto`
 
 ---
@@ -119,8 +151,8 @@ Rules:
 - `UserId` — required, max 450 chars (standard ASP.NET Identity key length)
 - `FirstName` — required, max 100 chars
 - `LastName` — required, max 100 chars
-- `HourlyRate` — precision(18, 2)
-- `DailyRate` — precision(18, 2)
+- `HourlyRate` — `HasPrecision(18, 2)`
+- `DailyRate` — `HasPrecision(18, 2)`
 - `Skills` — max 1000 chars
 
 ### Repository
@@ -131,7 +163,7 @@ Extends `GenericRepository<FreelancerProfile>`, implements `IFreelancerProfileRe
 
 `GetByUserIdAsync` — `_context.FreelancerProfiles.AsNoTracking().SingleOrDefaultAsync(x => x.UserId == userId)`
 
-`UpsertAsync` — checks if entity has `Id > 0` to decide between `_context.Add` + `SaveChanges` (create) or `_context.Update` + `SaveChanges` (update).
+`UpsertAsync` — delegates to inherited `CreateAsync(profile)` when `profile.Id == 0` (new entity), and to `UpdateAsync(profile)` when `profile.Id > 0` (existing entity). This is consistent with the pattern used in other repositories that extend `GenericRepository<T>`.
 
 ### DbContext
 
@@ -139,7 +171,14 @@ Add `DbSet<FreelancerProfile> FreelancerProfiles` to `AppTrackDatabaseContext`.
 
 ### Migration
 
-Generate via `dotnet ef migrations add AddFreelancerProfileTable`. Auto-applied on startup.
+Generate via `dotnet ef migrations add AddFreelancerProfileTable --project AppTrack.Persistance --startup-project AppTrack.Api`. Auto-applied on startup via `MigrationsHelper`.
+
+### Service Registration
+
+In `PersistanceServiceRegistration.cs`:
+```csharp
+services.AddScoped<IFreelancerProfileRepository, FreelancerProfileRepository>();
+```
 
 ---
 
@@ -149,10 +188,10 @@ Generate via `dotnet ef migrations add AddFreelancerProfileTable`. Auto-applied 
 
 **`Controllers/ProfileController.cs`** — `[Route("api/profile")]`, `[ApiController]`, `[Authorize]`
 
-| Method | Route | Command/Query | Response |
-|---|---|---|---|
-| `GET` | `/api/profile` | `GetFreelancerProfileQuery` | 200 `FreelancerProfileDto` / 404 |
-| `PUT` | `/api/profile` | `UpsertFreelancerProfileCommand` | 200 `FreelancerProfileDto` |
+| Method | Route | Command/Query | Success Response | Error Responses |
+|---|---|---|---|---|
+| `GET` | `/api/profile` | `GetFreelancerProfileQuery` | 200 `FreelancerProfileDto` | 401, 404 |
+| `PUT` | `/api/profile` | `UpsertFreelancerProfileCommand` | 200 `FreelancerProfileDto` | 400, 401 |
 
 Both endpoints get `UserId` from JWT via the mediator pipeline — it is never in the request body or route.
 
@@ -162,9 +201,15 @@ Both endpoints get `UserId` from JWT via the mediator pipeline — it is never i
 
 ### NSwag Client Regeneration
 
-After the API controller is in place and the API can be started, run NSwag regeneration via `clientsettings.nswag` to update `ServiceClient.cs` with:
-- `ProfileGETAsync()` → `FreelancerProfileDto`
-- `ProfilePUTAsync(UpsertFreelancerProfileCommand)` → `FreelancerProfileDto`
+The `clientsettings.nswag` uses a live Swagger URL (`https://localhost:7273/swagger/v1/swagger.json`) to generate `ServiceClient.cs`. To regenerate:
+
+1. Start `AppTrack.Api` locally (the API must be running)
+2. Run NSwag generation via the NSwag CLI or the `clientsettings.nswag` document
+3. The updated `ServiceClient.cs` will contain new methods:
+   - `ProfileGETAsync()` → `FreelancerProfileDto`
+   - `ProfilePUTAsync(UpsertFreelancerProfileCommand)` → `FreelancerProfileDto`
+
+The `clientsettings.nswag` also contains an embedded inline JSON snapshot; the regeneration step updates both the generated C# code and the cached inline spec.
 
 ### Service Contract
 
@@ -179,51 +224,101 @@ Task<Response<FreelancerProfileDto>> UpsertProfileAsync(FreelancerProfileModel m
 
 **`Services/FreelancerProfileService.cs`** — extends `BaseHttpService`
 
-Maps `FreelancerProfileModel` → `UpsertFreelancerProfileCommand` via internal mappings, calls NSwag client methods.
+Maps `FreelancerProfileModel` → `UpsertFreelancerProfileCommand` via internal mappings, calls the NSwag client.
 
 ### Mappings
 
 **`Mappings/FreelancerProfileMappings.cs`**
 
+NSwag generates standalone enum types `RemotePreference` and `ApplicationLanguage` in the `AppTrack.Frontend.ApiService.Base` namespace (from the Swagger doc). All casts use an integer intermediary to bridge between the three enum namespaces (Domain, Frontend.Models, ApiService.Base).
+
 - `FreelancerProfileModel.ToUpsertCommand()` → `UpsertFreelancerProfileCommand`
-  - `SelectedRateType` is NOT mapped (UI-only field)
+  - `SelectedRateType` is **not** mapped (UI-only field)
+  - `WorkMode` cast: `(AppTrack.Frontend.ApiService.Base.RemotePreference?)(int?)model.WorkMode`
+  - `Language` cast: `(AppTrack.Frontend.ApiService.Base.ApplicationLanguage?)(int?)model.Language`
 - `FreelancerProfileDto.ToModel()` → `FreelancerProfileModel`
-  - Sets `SelectedRateType` based on which rate is non-null (HourlyRate → `RateKind.Hourly`, DailyRate → `RateKind.Daily`)
+  - `WorkMode` cast: `(AppTrack.Frontend.Models.RemotePreference?)(int?)dto.WorkMode`
+  - `Language` cast: `(AppTrack.Frontend.Models.ApplicationLanguage?)(int?)dto.Language`
+  - `SelectedRateType` — derived: `HourlyRate != null → RateKind.Hourly`, `DailyRate != null → RateKind.Daily`, else `null`
+
+### Service Registration
+
+In `ApiServiceRegistration.cs` (frontend):
+```csharp
+services.AddScoped<IFreelancerProfileService, FreelancerProfileService>();
+```
+
+No `FreelancerProfileModelValidator` is added in this iteration — the form relies entirely on server-side validation feedback for now.
 
 ---
 
 ## Blazor UI Wiring (`AppTrack.BlazorUi`)
 
-### `FreelancerProfileForm`
+### `FreelancerProfileForm` Refactor
 
-Expose `[Parameter] EventCallback<FreelancerProfileModel> OnSave` and rename the private `_model` backing field to support external read-back, OR expose the form model via a `[Parameter]` so the parent (page/dialog) can read and submit it.
+The form currently owns a `private readonly FreelancerProfileModel _model = new()`. It must be refactored to accept the model as a `[Parameter]` so parent components can pass in a pre-loaded model and read back the user's edits.
 
-**Chosen approach:** expose `[Parameter] public FreelancerProfileModel Model { get; set; }` with `[Parameter] public EventCallback OnSaved { get; set; }`. Parent components own the model instance, pass it in, and handle saving.
+**Changes to `FreelancerProfileForm.razor.cs`:**
+- Replace `private readonly FreelancerProfileModel _model = new()` with `[Parameter] public FreelancerProfileModel Model { get; set; } = new()`
+- Override `OnParametersSet()` to sync `_availableFrom` from `Model.AvailableFrom`:
+  ```csharp
+  protected override void OnParametersSet()
+  {
+      _availableFrom = Model.AvailableFrom.HasValue
+          ? Model.AvailableFrom.Value.ToDateTime(TimeOnly.MinValue)
+          : null;
+  }
+  ```
+  This ensures the `MudDatePicker` shows the correct date when a saved profile is loaded.
+- All four method bodies (`OnAvailableFromChanged`, `OnRateKindChanged`, `OnRateValueChanged`, `SelectFreelancer`) currently reference `_model`; after the rename they must reference `Model` instead. `_selectedType` (the profile-type toggle) is **not** `_model` and is unchanged.
 
-### `ProfileSetup` page
+**Changes to `FreelancerProfileForm.razor`:**
+- All references to `_model.*` in the markup become `Model.*`. This includes every `@bind-Value`, `Value=`, and `ValueChanged=` expression that currently reads from or writes to `_model`.
 
-1. Inject `IFreelancerProfileService`
-2. On init: call `GetProfileAsync()` — if success, populate form model; if 404, start with empty model
-3. Save button: call `UpsertProfileAsync(model)`, show snackbar success/error, navigate to `/` on success
+**Changes to `ProfileSetup.razor` and `ProfileSetupDialog.razor`:**
+- Both currently use `<FreelancerProfileForm />` with no parameters. Must become `<FreelancerProfileForm Model="_model" />` after the parent components declare their own `_model` field.
+
+### `ProfileSetup` Page
+
+**`ProfileSetup.razor.cs`** changes:
+1. Inject `IFreelancerProfileService` and `ISnackbar`
+2. Add `private FreelancerProfileModel _model = new()`
+3. `OnInitializedAsync()`:
+   - Call `GetProfileAsync()` — if success, `_model = result.Data!.ToModel()`; if 404 / error, keep empty model
+4. `Save()` (existing method):
+   - Call `UpsertProfileAsync(_model)`
+   - On success: show snackbar "Profile saved", navigate to `/`
+   - On error: show snackbar with `response.ErrorMessage`
 
 ### `ProfileSetupDialog`
 
-1. Inject `IFreelancerProfileService`
-2. On init: call `GetProfileAsync()` — populate model if exists
-3. Save button: call `UpsertProfileAsync(model)`, close dialog on success
-4. Skip button: still calls `MudDialog.Cancel()` (unchanged)
+**`ProfileSetupDialog.razor.cs`** changes:
+1. Inject `IFreelancerProfileService` and `ISnackbar`
+2. Add `private FreelancerProfileModel _model = new()`
+3. `OnInitializedAsync()` — same as page: load existing profile if available
+4. `Save()`:
+   - Call `UpsertProfileAsync(_model)`
+   - On success: `MudDialog.Close()`
+   - On error: show snackbar with `response.ErrorMessage`
+5. `Skip()` unchanged: `MudDialog.Cancel()`
 
 ---
 
 ## Unit Tests (`AppTrack.Application.UnitTests`)
 
+### Mock
+
+Add `MockFreelancerProfileRepository.cs` in `Mocks/` following the existing mock pattern (returns a predefined `FreelancerProfile` entity for known `UserId`, null for unknown).
+
 ### `UpsertFreelancerProfileCommandHandlerTests`
 
 - `Handle_ShouldCreate_WhenNoExistingProfile` — mock returns null, verifies `UpsertAsync` called with new entity
 - `Handle_ShouldUpdate_WhenProfileExists` — mock returns existing entity, verifies `UpsertAsync` called with updated entity
-- `Handle_ShouldThrowBadRequestException_WhenFirstNameIsEmpty`
-- `Handle_ShouldThrowBadRequestException_WhenHourlyRateIsNegative`
 - `Handle_ShouldReturnDto_WhenCommandIsValid`
+- `Handle_ShouldThrowBadRequestException_WhenFirstNameIsEmpty`
+- `Handle_ShouldThrowBadRequestException_WhenLastNameIsEmpty`
+- `Handle_ShouldThrowBadRequestException_WhenHourlyRateIsNegative`
+- `Handle_ShouldNotCallUpsertAsync_WhenValidationFails` — verifies repository is never called when validation throws
 
 ### `UpsertFreelancerProfileCommandValidatorTests`
 
@@ -235,24 +330,14 @@ Expose `[Parameter] EventCallback<FreelancerProfileModel> OnSave` and rename the
 - `HourlyRate = null` → no error (optional)
 - `Skills` exceeding 1000 chars → error
 
+### `GetFreelancerProfileQueryValidatorTests`
+
+- Valid query (non-empty `UserId`) → no errors (the validator has no rules; this test documents that the validator exists and compiles)
+
 ### `GetFreelancerProfileQueryHandlerTests`
 
-- Profile exists → returns DTO
+- Profile exists → returns `FreelancerProfileDto`
 - Profile not found → throws `NotFoundException`
-
----
-
-## Service Registration
-
-In `PersistanceServiceRegistration.cs`:
-```csharp
-services.AddScoped<IFreelancerProfileRepository, FreelancerProfileRepository>();
-```
-
-In `ApiServiceRegistration.cs` (frontend):
-```csharp
-services.AddScoped<IFreelancerProfileService, FreelancerProfileService>();
-```
 
 ---
 
@@ -260,5 +345,6 @@ services.AddScoped<IFreelancerProfileService, FreelancerProfileService>();
 
 - CV file upload (still decorative)
 - Employee profile type
-- Auto-trigger of ProfileSetupDialog on first login
+- Auto-trigger of `ProfileSetupDialog` on first login
 - Profile deletion
+- Frontend-side form validation (`FreelancerProfileModelValidator`)
