@@ -5,6 +5,6 @@ namespace AppTrack.Frontend.ApiService.Contracts;
 
 public interface IFreelancerProfileService
 {
-    Task<Response<FreelancerProfileDto>> GetProfileAsync();
-    Task<Response<FreelancerProfileDto>> UpsertProfileAsync(FreelancerProfileModel model);
+    Task<Response<FreelancerProfileModel>> GetProfileAsync();
+    Task<Response<FreelancerProfileModel>> UpsertProfileAsync(FreelancerProfileModel model);
 }

@@ -11,18 +11,18 @@ public class FreelancerProfileService : BaseHttpService, IFreelancerProfileServi
     {
     }
 
-    public Task<Response<FreelancerProfileDto>> GetProfileAsync() =>
+    public Task<Response<FreelancerProfileModel>> GetProfileAsync() =>
         TryExecuteAsync(async () =>
         {
             var dto = await _client.ProfileGETAsync();
-            return dto;
+            return dto.ToModel();
         });
 
-    public Task<Response<FreelancerProfileDto>> UpsertProfileAsync(FreelancerProfileModel model) =>
+    public Task<Response<FreelancerProfileModel>> UpsertProfileAsync(FreelancerProfileModel model) =>
         TryExecuteAsync(async () =>
         {
             var command = model.ToUpsertCommand();
             var dto = await _client.ProfilePUTAsync(command);
-            return dto;
+            return dto.ToModel();
         });
 }
