@@ -2,15 +2,28 @@
     <TitleContent>
         <MudText Typo="Typo.h6">
             <MudIcon Icon="@Icons.Material.Filled.AccountCircle" Class="mr-2" />
-            Set Up Profile
+            My Profile
         </MudText>
     </TitleContent>
     <DialogContent>
-        <FreelancerProfileForm />
+        <FreelancerProfileForm @ref="_form" Model="_model" />
     </DialogContent>
     <DialogActions>
-        <MudButton Variant="Variant.Text" OnClick="Skip">Skip</MudButton>
+        <MudButton Variant="Variant.Text" OnClick="Skip" Disabled="_isBusy">Skip</MudButton>
         <MudSpacer />
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Save">Save</MudButton>
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   OnClick="Save"
+                   Disabled="_isBusy">
+            @if (_isBusy)
+            {
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+                <span>Saving…</span>
+            }
+            else
+            {
+                <span>Save</span>
+            }
+        </MudButton>
     </DialogActions>
 </MudDialog>
