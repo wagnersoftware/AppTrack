@@ -27,4 +27,9 @@ public class Response<T>
     /// The response data, not null in success case.
     /// </summary>
     public T? Data { get; set; }
+
+    /// <summary>
+    /// HTTP status code of the response. 0 if unknown (e.g. network error).
+    /// </summary>
+    public int StatusCode { get; set; }
 }
