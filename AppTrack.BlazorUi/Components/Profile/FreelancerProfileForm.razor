@@ -40,19 +40,27 @@
         <MudText Typo="Typo.subtitle1" Class="mb-2">Personal Details</MudText>
         <MudGrid Spacing="2">
 
-            <!-- First / Last Name -->
+            <!-- First Name -->
             <MudItem xs="12" sm="6">
                 <MudTextField T="string"
                               Label="First Name"
-                              @bind-Value="_model.FirstName"
+                              Value="@Model.FirstName"
+                              ValueChanged="@((string v) => OnFirstNameChanged(v))"
+                              Error="@ModelValidator.Errors.ContainsKey(nameof(Model.FirstName))"
+                              ErrorText="@GetFirstError(nameof(Model.FirstName))"
                               Variant="Variant.Outlined"
                               Adornment="Adornment.Start"
                               AdornmentIcon="@Icons.Material.Outlined.Person" />
             </MudItem>
+
+            <!-- Last Name -->
             <MudItem xs="12" sm="6">
                 <MudTextField T="string"
                               Label="Last Name"
-                              @bind-Value="_model.LastName"
+                              Value="@Model.LastName"
+                              ValueChanged="@((string v) => OnLastNameChanged(v))"
+                              Error="@ModelValidator.Errors.ContainsKey(nameof(Model.LastName))"
+                              ErrorText="@GetFirstError(nameof(Model.LastName))"
                               Variant="Variant.Outlined"
                               Adornment="Adornment.Start"
                               AdornmentIcon="@Icons.Material.Outlined.Person" />
@@ -60,7 +68,7 @@
 
             <!-- Rate Type Toggle -->
             <MudItem xs="12">
-                <MudToggleGroup T="RateKind?" Value="_model.SelectedRateType"
+                <MudToggleGroup T="RateKind?" Value="Model.SelectedRateType"
                                 ValueChanged="OnRateKindChanged"
                                 SelectionMode="SelectionMode.ToggleSelection"
                                 Color="Color.Primary" Outlined="true">
@@ -70,13 +78,19 @@
             </MudItem>
 
             <!-- Active Rate Field (hidden when no rate type selected) -->
-            @if (_model.SelectedRateType != null)
+            @if (Model.SelectedRateType != null)
             {
-                <MudItem @key="_model.SelectedRateType" xs="12" sm="6">
+                <MudItem @key="Model.SelectedRateType" xs="12" sm="6">
                     <MudNumericField T="decimal?"
-                                     Label="@(_model.SelectedRateType == RateKind.Hourly ? "Hourly Rate (€)" : "Daily Rate (€)")"
-                                     Value="@(_model.SelectedRateType == RateKind.Hourly ? _model.HourlyRate : _model.DailyRate)"
+                                     Label="@(Model.SelectedRateType == RateKind.Hourly ? "Hourly Rate (€)" : "Daily Rate (€)")"
+                                     Value="@(Model.SelectedRateType == RateKind.Hourly ? Model.HourlyRate : Model.DailyRate)"
                                      ValueChanged="OnRateValueChanged"
+                                     Error="@(Model.SelectedRateType == RateKind.Hourly
+                                               ? ModelValidator.Errors.ContainsKey(nameof(Model.HourlyRate))
+                                               : ModelValidator.Errors.ContainsKey(nameof(Model.DailyRate)))"
+                                     ErrorText="@(Model.SelectedRateType == RateKind.Hourly
+                                                  ? GetFirstError(nameof(Model.HourlyRate))
+                                                  : GetFirstError(nameof(Model.DailyRate)))"
                                      Variant="Variant.Outlined"
                                      Adornment="Adornment.Start"
                                      AdornmentIcon="@Icons.Material.Outlined.Euro" />
@@ -97,8 +111,8 @@
             <MudItem xs="12">
                 <MudSelect T="RemotePreference?"
                            Label="Remote Preference"
-                           Value="_model.WorkMode"
-                           ValueChanged="@((RemotePreference? v) => _model.WorkMode = v)"
+                           Value="Model.WorkMode"
+                           ValueChanged="@((RemotePreference? v) => Model.WorkMode = v)"
                            Variant="Variant.Outlined"
                            Clearable="true"
                            AdornmentIcon="@Icons.Material.Outlined.LocationOn">
@@ -112,7 +126,10 @@
             <MudItem xs="12">
                 <MudTextField T="string"
                               Label="Skills"
-                              @bind-Value="_model.Skills"
+                              Value="@(Model.Skills ?? string.Empty)"
+                              ValueChanged="@((string v) => OnSkillsChanged(v))"
+                              Error="@ModelValidator.Errors.ContainsKey(nameof(Model.Skills))"
+                              ErrorText="@GetFirstError(nameof(Model.Skills))"
                               Variant="Variant.Outlined"
                               Lines="3"
                               Placeholder="e.g. C#, .NET, Azure, SQL" />
@@ -122,8 +139,8 @@
             <MudItem xs="12">
                 <MudSelect T="ApplicationLanguage?"
                            Label="Application Language"
-                           Value="_model.Language"
-                           ValueChanged="@((ApplicationLanguage? v) => _model.Language = v)"
+                           Value="Model.Language"
+                           ValueChanged="@((ApplicationLanguage? v) => Model.Language = v)"
                            Variant="Variant.Outlined"
                            Clearable="true"
                            HelperText="Language for AI-generated application text"

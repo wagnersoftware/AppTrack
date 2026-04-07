@@ -1,39 +1,98 @@
 using AppTrack.Frontend.Models;
+using AppTrack.Frontend.Models.ModelValidator;
+using Microsoft.AspNetCore.Components;
 
 namespace AppTrack.BlazorUi.Components.Profile;
 
 public partial class FreelancerProfileForm
 {
-    private readonly FreelancerProfileModel _model = new();
+    [Parameter] public FreelancerProfileModel Model { get; set; } = new();
+    [Inject] private IModelValidator<FreelancerProfileModel> ModelValidator { get; set; } = null!;
+
     private string _selectedType = "Freelancer";
     private DateTime? _availableFrom;
 
+    protected override void OnParametersSet()
+    {
+        _availableFrom = Model.AvailableFrom.HasValue
+            ? Model.AvailableFrom.Value.ToDateTime(TimeOnly.MinValue)
+            : null;
+    }
+
+    public bool Validate() => ModelValidator.Validate(Model);
+
+    private string GetFirstError(string propertyName)
+    {
+        var errors = ModelValidator.Errors.GetValueOrDefault(propertyName);
+        return errors is { Count: > 0 } ? errors[0] : string.Empty;
+    }
+
     private void SelectFreelancer() => _selectedType = "Freelancer";
+
+    private void OnFirstNameChanged(string value)
+    {
+        Model.FirstName = value;
+        ModelValidator.ResetErrors(nameof(Model.FirstName));
+    }
+
+    private void OnLastNameChanged(string value)
+    {
+        Model.LastName = value;
+        ModelValidator.ResetErrors(nameof(Model.LastName));
+    }
 
     private void OnAvailableFromChanged(DateTime? date)
     {
         _availableFrom = date;
-        _model.AvailableFrom = date.HasValue ? DateOnly.FromDateTime(date.Value) : null;
+        Model.AvailableFrom = date.HasValue ? DateOnly.FromDateTime(date.Value) : null;
+    }
+
+    private void OnRateKindChanged(RateKind? newKind)
+    {
+        if (Model.SelectedRateType == newKind) return;
+        Model.SelectedRateType = newKind;
+        if (newKind == RateKind.Hourly)
+        {
+            Model.DailyRate = null;
+            ModelValidator.ResetErrors(nameof(Model.DailyRate));
+        }
+        else if (newKind == RateKind.Daily)
+        {
+            Model.HourlyRate = null;
+            ModelValidator.ResetErrors(nameof(Model.HourlyRate));
+        }
+        else
+        {
+            Model.HourlyRate = null;
+            Model.DailyRate = null;
+            ModelValidator.ResetErrors(nameof(Model.HourlyRate));
+            ModelValidator.ResetErrors(nameof(Model.DailyRate));
+        }
+    }
+
+    // Only called while SelectedRateType != null (enforced by the @if guard in the markup).
+    private void OnRateValueChanged(decimal? value)
+    {
+        if (Model.SelectedRateType == RateKind.Hourly)
+        {
+            Model.HourlyRate = value;
+            ModelValidator.ResetErrors(nameof(Model.HourlyRate));
+        }
+        else if (Model.SelectedRateType == RateKind.Daily)
+        {
+            Model.DailyRate = value;
+            ModelValidator.ResetErrors(nameof(Model.DailyRate));
+        }
+    }
+
+    private void OnSkillsChanged(string? value)
+    {
+        Model.Skills = value;
+        ModelValidator.ResetErrors(nameof(Model.Skills));
     }
 
     private string GetCardStyle(string type) =>
         _selectedType == type
             ? "cursor: pointer; border: 2px solid var(--mud-palette-primary);"
             : "cursor: pointer;";
-
-    private void OnRateKindChanged(RateKind? newKind)
-    {
-        if (_model.SelectedRateType == newKind) return;
-        _model.SelectedRateType = newKind;
-        if (newKind == RateKind.Hourly) _model.DailyRate = null;
-        else if (newKind == RateKind.Daily) _model.HourlyRate = null;
-        else { _model.HourlyRate = null; _model.DailyRate = null; }
-    }
-
-    // Only called while SelectedRateType != null (enforced by the @if guard in the markup).
-    private void OnRateValueChanged(decimal? value)
-    {
-        if (_model.SelectedRateType == RateKind.Hourly) _model.HourlyRate = value;
-        else if (_model.SelectedRateType == RateKind.Daily) _model.DailyRate = value;
-    }
 }
