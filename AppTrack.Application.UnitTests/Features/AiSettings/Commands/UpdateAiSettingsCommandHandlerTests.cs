@@ -3,6 +3,7 @@ using AppTrack.Application.Exceptions;
 using AppTrack.Application.Features.AiSettings.Commands.UpdateAiSettings;
 using AppTrack.Application.Features.AiSettings.Dto;
 using AppTrack.Application.UnitTests.Mocks;
+using AppTrack.Domain.Enums;
 using Moq;
 using Shouldly;
 using DomainAiSettings = AppTrack.Domain.AiSettings;
@@ -115,5 +116,23 @@ public class UpdateAiSettingsCommandHandlerTests
         await Should.ThrowAsync<BadRequestException>(() => _handler.Handle(command, CancellationToken.None));
 
         _mockRepo.Verify(r => r.UpdateAsync(It.IsAny<DomainAiSettings>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task Handle_ShouldReturnDto_WithLanguage_WhenLanguageIsGerman()
+    {
+        var command = new UpdateAiSettingsCommand
+        {
+            Id = ExistingId,
+            UserId = OwnerId,
+            SelectedChatModelId = 2,
+            Language = ApplicationLanguage.German,
+            Prompts = [],
+            PromptParameter = []
+        };
+
+        var result = await _handler.Handle(command, CancellationToken.None);
+
+        result.Language.ShouldBe(ApplicationLanguage.German);
     }
 }

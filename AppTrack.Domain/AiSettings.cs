@@ -1,10 +1,12 @@
 using AppTrack.Domain.Common;
+using AppTrack.Domain.Enums;
 
 namespace AppTrack.Domain;
 
 public class AiSettings : BaseEntity
 {
     public int SelectedChatModelId { get; set; }
+    public ApplicationLanguage Language { get; set; } = ApplicationLanguage.English;
 
     public string UserId { get; set; } = string.Empty;
 

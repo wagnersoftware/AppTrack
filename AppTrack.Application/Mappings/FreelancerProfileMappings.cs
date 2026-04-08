@@ -15,7 +15,6 @@ internal static class FreelancerProfileMappings
         AvailableFrom = command.AvailableFrom,
         WorkMode = command.WorkMode,
         Skills = command.Skills,
-        Language = command.Language,
     };
 
     internal static void ApplyTo(this UpsertFreelancerProfileCommand command, Domain.FreelancerProfile entity)
@@ -28,7 +27,6 @@ internal static class FreelancerProfileMappings
         entity.AvailableFrom = command.AvailableFrom;
         entity.WorkMode = command.WorkMode;
         entity.Skills = command.Skills;
-        entity.Language = command.Language;
     }
 
     internal static FreelancerProfileDto ToDto(this Domain.FreelancerProfile entity) => new()
@@ -42,7 +40,6 @@ internal static class FreelancerProfileMappings
         AvailableFrom = entity.AvailableFrom,
         WorkMode = entity.WorkMode,
         Skills = entity.Skills,
-        Language = entity.Language,
         CvBlobPath = entity.CvBlobPath,
         CvFileName = entity.CvFileName,
         CvText = entity.CvText,

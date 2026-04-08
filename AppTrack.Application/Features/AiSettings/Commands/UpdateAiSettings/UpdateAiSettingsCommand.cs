@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Features.AiSettings.Dto;
+using AppTrack.Domain.Enums;
 using AppTrack.Shared.Validation.Interfaces;
 
 namespace AppTrack.Application.Features.AiSettings.Commands.UpdateAiSettings;
@@ -8,6 +9,7 @@ namespace AppTrack.Application.Features.AiSettings.Commands.UpdateAiSettings;
 public class UpdateAiSettingsCommand : IRequest<AiSettingsDto>, IAiSettingsValidatable, IUserScopedRequest
 {
     public int SelectedChatModelId { get; set; }
+    public ApplicationLanguage Language { get; set; }
     public int Id { get; set; }
     [JsonIgnore]
     public string UserId { get; set; } = string.Empty;

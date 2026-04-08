@@ -1,4 +1,5 @@
 using AppTrack.Application.Contracts.Persistance;
+using AppTrack.Domain.Enums;
 using FluentValidation;
 
 namespace AppTrack.Application.Features.ApplicationText.Query.GeneratePromptQuery;
@@ -55,7 +56,8 @@ public class GeneratePromptQueryValidator : AbstractValidator<GeneratePromptQuer
 
         if (query.PromptName.StartsWith("Default_", StringComparison.Ordinal))
         {
-            var defaults = await _defaultPromptRepository.GetAsync();
+            var languageCode = aiSettings!.Language == ApplicationLanguage.German ? "de" : "en";
+            var defaults = await _defaultPromptRepository.GetByLanguageAsync(languageCode);
             var defaultPrompt = defaults.FirstOrDefault(
                 p => string.Equals(p.Name, query.PromptName, StringComparison.OrdinalIgnoreCase));
 

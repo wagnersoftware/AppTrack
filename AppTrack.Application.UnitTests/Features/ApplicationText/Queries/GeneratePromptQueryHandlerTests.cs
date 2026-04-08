@@ -65,7 +65,7 @@ public class GeneratePromptQueryHandlerTests
 
         // Default: no default prompts
         _mockDefaultPromptRepo
-            .Setup(r => r.GetAsync())
+            .Setup(r => r.GetByLanguageAsync(It.IsAny<string>()))
             .ReturnsAsync(new List<DefaultPrompt>());
 
         _mockPromptBuilder
@@ -158,7 +158,7 @@ public class GeneratePromptQueryHandlerTests
         const string defaultTemplate = "Write a cover letter for {Position}.";
 
         _mockDefaultPromptRepo
-            .Setup(r => r.GetAsync())
+            .Setup(r => r.GetByLanguageAsync(It.IsAny<string>()))
             .ReturnsAsync(new List<DefaultPrompt>
             {
                 DefaultPrompt.Create(defaultPromptName, defaultTemplate, "de"),
@@ -189,7 +189,7 @@ public class GeneratePromptQueryHandlerTests
             });
 
         _mockDefaultPromptRepo
-            .Setup(r => r.GetAsync())
+            .Setup(r => r.GetByLanguageAsync(It.IsAny<string>()))
             .ReturnsAsync(new List<DefaultPrompt>
             {
                 DefaultPrompt.Create(defaultPromptName, defaultTemplate, "de"),

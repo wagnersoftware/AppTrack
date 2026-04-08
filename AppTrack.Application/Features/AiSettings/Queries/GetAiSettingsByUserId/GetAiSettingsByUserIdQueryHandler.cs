@@ -3,6 +3,7 @@ using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Exceptions;
 using AppTrack.Application.Features.AiSettings.Dto;
 using AppTrack.Application.Mappings;
+using AppTrack.Domain.Enums;
 
 namespace AppTrack.Application.Features.AiSettings.Queries.GetAiSettingsByUserId;
 
@@ -37,7 +38,8 @@ public class GetAiSettingsByUserIdQueryHandler : IRequestHandler<GetAiSettingsBy
         }
 
         var dto = entity.ToDto();
-        var defaults = await _defaultPromptRepository.GetAsync();
+        var languageCode = entity.Language == ApplicationLanguage.German ? "de" : "en";
+        var defaults = await _defaultPromptRepository.GetByLanguageAsync(languageCode);
         dto.DefaultPrompts = defaults.Select(d => d.ToDto()).ToList();
         return dto;
     }

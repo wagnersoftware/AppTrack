@@ -3,6 +3,7 @@ using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Exceptions;
 using AppTrack.Application.Features.ApplicationText.Dto;
 using AppTrack.Domain.Contracts;
+using AppTrack.Domain.Enums;
 using AppTrack.Domain.Extensions;
 
 namespace AppTrack.Application.Features.ApplicationText.Query.GeneratePromptQuery;
@@ -44,7 +45,8 @@ public class GeneratePromptQueryHandler : IRequestHandler<GeneratePromptQuery, G
         string promptTemplate;
         if (request.PromptName.StartsWith("Default_", StringComparison.Ordinal))
         {
-            var defaults = await _defaultPromptRepository.GetAsync();
+            var languageCode = aiSettings!.Language == ApplicationLanguage.German ? "de" : "en";
+            var defaults = await _defaultPromptRepository.GetByLanguageAsync(languageCode);
             promptTemplate = defaults
                 .First(p => string.Equals(p.Name, request.PromptName, StringComparison.OrdinalIgnoreCase))
                 .PromptTemplate;

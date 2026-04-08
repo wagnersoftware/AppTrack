@@ -48,7 +48,7 @@ public class GeneratePromptQueryValidatorTests
 
         // Default: no default prompts
         _defaultPromptRepo
-            .Setup(r => r.GetAsync())
+            .Setup(r => r.GetByLanguageAsync(It.IsAny<string>()))
             .ReturnsAsync(new List<DefaultPrompt>());
 
         _validator = new GeneratePromptQueryValidator(_jobAppRepo.Object, _aiSettingsRepo.Object, _defaultPromptRepo.Object);
@@ -158,7 +158,7 @@ public class GeneratePromptQueryValidatorTests
         const string defaultPromptName = "Default_Cover_Letter";
 
         _defaultPromptRepo
-            .Setup(r => r.GetAsync())
+            .Setup(r => r.GetByLanguageAsync(It.IsAny<string>()))
             .ReturnsAsync(new List<DefaultPrompt>
             {
                 DefaultPrompt.Create(defaultPromptName, "Write a cover letter for {Position}.", "de"),
@@ -177,7 +177,7 @@ public class GeneratePromptQueryValidatorTests
             .ReturnsAsync(new DomainAiSettings { Id = 1, UserId = UserId }); // no user prompts
 
         _defaultPromptRepo
-            .Setup(r => r.GetAsync())
+            .Setup(r => r.GetByLanguageAsync(It.IsAny<string>()))
             .ReturnsAsync(new List<DefaultPrompt>
             {
                 DefaultPrompt.Create(defaultOnlyPromptName, " ", "de"), // empty template
