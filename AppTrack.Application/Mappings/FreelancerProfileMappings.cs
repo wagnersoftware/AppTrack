@@ -43,6 +43,9 @@ internal static class FreelancerProfileMappings
         WorkMode = entity.WorkMode,
         Skills = entity.Skills,
         Language = entity.Language,
+        CvBlobPath = entity.CvBlobPath,
+        CvFileName = entity.CvFileName,
+        CvText = entity.CvText,
         CreationDate = entity.CreationDate ?? default,
         ModifiedDate = entity.ModifiedDate ?? default,
     };

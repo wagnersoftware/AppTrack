@@ -14,6 +14,9 @@ public class FreelancerProfileDto
     public RemotePreference? WorkMode { get; set; }
     public string? Skills { get; set; }
     public ApplicationLanguage? Language { get; set; }
+    public string? CvBlobPath { get; set; }
+    public string? CvFileName { get; set; }
+    public string? CvText { get; set; }
     public DateTime CreationDate { get; set; }
     public DateTime ModifiedDate { get; set; }
 }
