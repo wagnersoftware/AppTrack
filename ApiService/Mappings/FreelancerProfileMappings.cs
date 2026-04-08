@@ -51,6 +51,7 @@ internal static class FreelancerProfileMappings
             SelectedRateType = selectedRateType,
             CreationDate = dto.CreationDate,
             ModifiedDate = dto.ModifiedDate,
+            CvFileName = dto.CvFileName,
         };
     }
 }
