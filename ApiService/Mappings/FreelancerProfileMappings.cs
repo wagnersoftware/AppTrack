@@ -18,9 +18,6 @@ internal static class FreelancerProfileMappings
             ? (AppTrack.Frontend.ApiService.Base.RemotePreference)(int)model.WorkMode.Value
             : default,
         Skills = model.Skills,
-        Language = model.Language.HasValue
-            ? (AppTrack.Frontend.ApiService.Base.ApplicationLanguage)(int)model.Language.Value
-            : default,
     };
 
     internal static FreelancerProfileModel ToModel(this FreelancerProfileDto dto)
@@ -47,7 +44,6 @@ internal static class FreelancerProfileMappings
                 : (DateOnly?)null,
             WorkMode = (AppTrack.Frontend.Models.RemotePreference)(int)dto.WorkMode,
             Skills = dto.Skills,
-            Language = (AppTrack.Frontend.Models.ApplicationLanguage)(int)dto.Language,
             SelectedRateType = selectedRateType,
             CreationDate = dto.CreationDate,
             ModifiedDate = dto.ModifiedDate,

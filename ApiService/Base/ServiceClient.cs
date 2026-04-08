@@ -2016,6 +2016,9 @@ namespace AppTrack.Frontend.ApiService.Base
         [System.Text.Json.Serialization.JsonPropertyName("selectedChatModelId")]
         public int SelectedChatModelId { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("language")]
+        public ApplicationLanguage Language { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("id")]
         public int Id { get; set; }
 
@@ -2167,9 +2170,6 @@ namespace AppTrack.Frontend.ApiService.Base
 
         [System.Text.Json.Serialization.JsonPropertyName("skills")]
         public string Skills { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("language")]
-        public ApplicationLanguage Language { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("cvBlobPath")]
         public string CvBlobPath { get; set; }
@@ -2402,6 +2402,9 @@ namespace AppTrack.Frontend.ApiService.Base
         [System.Text.Json.Serialization.JsonPropertyName("selectedChatModelId")]
         public int SelectedChatModelId { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("language")]
+        public ApplicationLanguage Language { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("id")]
         public int Id { get; set; }
 
@@ -2495,9 +2498,6 @@ namespace AppTrack.Frontend.ApiService.Base
 
         [System.Text.Json.Serialization.JsonPropertyName("skills")]
         public string Skills { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("language")]
-        public ApplicationLanguage Language { get; set; }
 
     }
 

@@ -13,6 +13,5 @@ public class FreelancerProfileModel : ModelBase, IFreelancerProfileValidatable
     public DateOnly? AvailableFrom { get; set; }
     public RemotePreference? WorkMode { get; set; }
     public string? Skills { get; set; }
-    public ApplicationLanguage? Language { get; set; }
     public string? CvFileName { get; set; }
 }

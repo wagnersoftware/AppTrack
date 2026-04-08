@@ -41,6 +41,19 @@
                     }
                 </MudSelect>
             </MudItem>
+            <!-- Application Language -->
+            <MudItem xs="12" sm="6">
+                <MudSelect T="ApplicationLanguage"
+                           Label="Application Language"
+                           Value="_model.Language"
+                           ValueChanged="@((ApplicationLanguage v) => _model.Language = v)"
+                           Variant="Variant.Outlined"
+                           HelperText="Language for AI-generated text"
+                           AdornmentIcon="@Icons.Material.Outlined.Translate">
+                    <MudSelectItem T="ApplicationLanguage" Value="ApplicationLanguage.English">English</MudSelectItem>
+                    <MudSelectItem T="ApplicationLanguage" Value="ApplicationLanguage.German">German</MudSelectItem>
+                </MudSelect>
+            </MudItem>
             <!-- Default Prompts (read-only) -->
             <MudItem xs="12">
                 <MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">

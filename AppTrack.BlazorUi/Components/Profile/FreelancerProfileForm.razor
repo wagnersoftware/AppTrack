@@ -135,21 +135,6 @@
                               Placeholder="e.g. C#, .NET, Azure, SQL" />
             </MudItem>
 
-            <!-- Application Language -->
-            <MudItem xs="12">
-                <MudSelect T="ApplicationLanguage?"
-                           Label="Application Language"
-                           Value="Model.Language"
-                           ValueChanged="@((ApplicationLanguage? v) => Model.Language = v)"
-                           Variant="Variant.Outlined"
-                           Clearable="true"
-                           HelperText="Language for AI-generated application text"
-                           AdornmentIcon="@Icons.Material.Outlined.Translate">
-                    <MudSelectItem T="ApplicationLanguage?" Value="@((ApplicationLanguage?)ApplicationLanguage.German)">German</MudSelectItem>
-                    <MudSelectItem T="ApplicationLanguage?" Value="@((ApplicationLanguage?)ApplicationLanguage.English)">English</MudSelectItem>
-                </MudSelect>
-            </MudItem>
-
             <!-- CV Upload -->
             <MudItem xs="12">
                 @if (_cvUploading)
