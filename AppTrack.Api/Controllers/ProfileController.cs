@@ -1,5 +1,6 @@
 using AppTrack.Api.Models;
 using AppTrack.Application.Contracts.Mediator;
+using AppTrack.Application.Features.FreelancerProfile.Commands.UploadCv;
 using AppTrack.Application.Features.FreelancerProfile.Commands.UpsertFreelancerProfile;
 using AppTrack.Application.Features.FreelancerProfile.Dto;
 using AppTrack.Application.Features.FreelancerProfile.Queries.GetFreelancerProfile;
@@ -38,6 +39,24 @@ public class ProfileController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<FreelancerProfileDto>> Put([FromBody] UpsertFreelancerProfileCommand command)
     {
+        var dto = await _mediator.Send(command);
+        return Ok(dto);
+    }
+
+    // POST api/profile/cv
+    [HttpPost("cv")]
+    [ProducesResponseType(typeof(FreelancerProfileDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<FreelancerProfileDto>> UploadCv(IFormFile file)
+    {
+        var command = new UploadCvCommand
+        {
+            FileStream = file.OpenReadStream(),
+            FileName = file.FileName,
+            ContentType = file.ContentType,
+            FileSizeBytes = file.Length,
+        };
         var dto = await _mediator.Send(command);
         return Ok(dto);
     }
