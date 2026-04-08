@@ -5,8 +5,8 @@ namespace AppTrack.Frontend.Models;
 
 public class FreelancerProfileModel : ModelBase, IFreelancerProfileValidatable
 {
-    public string FirstName { get; set; } = string.Empty;
-    public string LastName { get; set; } = string.Empty;
+    public string? FirstName { get; set; }
+    public string? LastName { get; set; }
     public RateKind? SelectedRateType { get; set; }
     public decimal? HourlyRate { get; set; }
     public decimal? DailyRate { get; set; }

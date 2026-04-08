@@ -9,12 +9,12 @@ public abstract class FreelancerProfileBaseValidator<T> : AbstractValidator<T>
     protected FreelancerProfileBaseValidator()
     {
         RuleFor(x => x.FirstName)
-            .NotEmpty().WithMessage("{PropertyName} is required")
-            .MaximumLength(100).WithMessage("{PropertyName} must not exceed 100 characters.");
+            .MaximumLength(100).WithMessage("{PropertyName} must not exceed 100 characters.")
+            .When(x => !string.IsNullOrEmpty(x.FirstName));
 
         RuleFor(x => x.LastName)
-            .NotEmpty().WithMessage("{PropertyName} is required")
-            .MaximumLength(100).WithMessage("{PropertyName} must not exceed 100 characters.");
+            .MaximumLength(100).WithMessage("{PropertyName} must not exceed 100 characters.")
+            .When(x => !string.IsNullOrEmpty(x.LastName));
 
         RuleFor(x => x.HourlyRate)
             .GreaterThan(0).WithMessage("{PropertyName} must be greater than 0.")

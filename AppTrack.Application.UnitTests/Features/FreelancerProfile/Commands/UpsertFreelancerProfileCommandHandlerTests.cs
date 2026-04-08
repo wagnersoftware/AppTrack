@@ -72,32 +72,6 @@ public class UpsertFreelancerProfileCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_ShouldThrowBadRequestException_WhenFirstNameIsEmpty()
-    {
-        // Arrange
-        var command = ValidCommand();
-        command.FirstName = string.Empty;
-
-        // Act & Assert
-        var ex = await Should.ThrowAsync<BadRequestException>(() => _handler.Handle(command, CancellationToken.None));
-
-        ex.ValidationErrors.ShouldContainKey("FirstName");
-    }
-
-    [Fact]
-    public async Task Handle_ShouldThrowBadRequestException_WhenLastNameIsEmpty()
-    {
-        // Arrange
-        var command = ValidCommand();
-        command.LastName = string.Empty;
-
-        // Act & Assert
-        var ex = await Should.ThrowAsync<BadRequestException>(() => _handler.Handle(command, CancellationToken.None));
-
-        ex.ValidationErrors.ShouldContainKey("LastName");
-    }
-
-    [Fact]
     public async Task Handle_ShouldThrowBadRequestException_WhenHourlyRateIsNegative()
     {
         // Arrange
@@ -115,7 +89,7 @@ public class UpsertFreelancerProfileCommandHandlerTests
     {
         // Arrange
         var command = ValidCommand();
-        command.FirstName = string.Empty;
+        command.HourlyRate = -10;
 
         // Act & Assert
         await Should.ThrowAsync<BadRequestException>(() => _handler.Handle(command, CancellationToken.None));

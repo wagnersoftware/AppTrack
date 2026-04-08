@@ -7,8 +7,8 @@ internal static class FreelancerProfileMappings
 {
     internal static UpsertFreelancerProfileCommand ToUpsertCommand(this FreelancerProfileModel model) => new()
     {
-        FirstName = model.FirstName,
-        LastName = model.LastName,
+        FirstName = model.FirstName ?? string.Empty,
+        LastName = model.LastName ?? string.Empty,
         HourlyRate = (double?)model.HourlyRate,
         DailyRate = (double?)model.DailyRate,
         AvailableFrom = model.AvailableFrom.HasValue
@@ -38,8 +38,8 @@ internal static class FreelancerProfileMappings
         return new()
         {
             Id = dto.Id,
-            FirstName = dto.FirstName ?? string.Empty,
-            LastName = dto.LastName ?? string.Empty,
+            FirstName = dto.FirstName,
+            LastName = dto.LastName,
             HourlyRate = (decimal?)dto.HourlyRate,
             DailyRate = (decimal?)dto.DailyRate,
             AvailableFrom = dto.AvailableFrom.HasValue

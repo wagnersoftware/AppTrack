@@ -11,8 +11,6 @@ public class UpsertFreelancerProfileCommandValidatorTests
     private static UpsertFreelancerProfileCommand ValidCommand() => new()
     {
         UserId = "user-1",
-        FirstName = "Anna",
-        LastName = "Müller",
         HourlyRate = null,
         DailyRate = null,
         Skills = null,
@@ -26,19 +24,37 @@ public class UpsertFreelancerProfileCommandValidatorTests
     }
 
     [Fact]
-    public async Task Validate_ShouldHaveError_WhenFirstNameIsEmpty()
+    public async Task Validate_ShouldPass_WhenFirstNameIsNull()
     {
         var command = ValidCommand();
-        command.FirstName = string.Empty;
+        command.FirstName = null;
+        var result = await _validator.TestValidateAsync(command);
+        result.ShouldNotHaveValidationErrorFor(x => x.FirstName);
+    }
+
+    [Fact]
+    public async Task Validate_ShouldPass_WhenLastNameIsNull()
+    {
+        var command = ValidCommand();
+        command.LastName = null;
+        var result = await _validator.TestValidateAsync(command);
+        result.ShouldNotHaveValidationErrorFor(x => x.LastName);
+    }
+
+    [Fact]
+    public async Task Validate_ShouldHaveError_WhenFirstNameExceedsMaxLength()
+    {
+        var command = ValidCommand();
+        command.FirstName = new string('x', 101);
         var result = await _validator.TestValidateAsync(command);
         result.ShouldHaveValidationErrorFor(x => x.FirstName);
     }
 
     [Fact]
-    public async Task Validate_ShouldHaveError_WhenLastNameIsEmpty()
+    public async Task Validate_ShouldHaveError_WhenLastNameExceedsMaxLength()
     {
         var command = ValidCommand();
-        command.LastName = string.Empty;
+        command.LastName = new string('x', 101);
         var result = await _validator.TestValidateAsync(command);
         result.ShouldHaveValidationErrorFor(x => x.LastName);
     }
