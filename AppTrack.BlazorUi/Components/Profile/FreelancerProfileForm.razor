@@ -150,18 +150,27 @@
                 </MudSelect>
             </MudItem>
 
-            <!-- CV Upload (decorative — no FilesChanged handler wired) -->
+            <!-- CV Upload -->
             <MudItem xs="12">
-                <MudFileUpload T="IBrowserFile" Accept=".pdf,.doc,.docx">
-                    <CustomContent>
-                        <MudButton Variant="Variant.Outlined"
-                                   StartIcon="@Icons.Material.Filled.AttachFile"
-                                   Color="Color.Default"
-                                   OnClick="@context.OpenFilePickerAsync">
-                            Upload CV (PDF)
-                        </MudButton>
-                    </CustomContent>
-                </MudFileUpload>
+                @if (_cvUploading)
+                {
+                    <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+                }
+                else
+                {
+                    <MudFileUpload T="IBrowserFile" Accept=".pdf" FilesChanged="OnCvFileChanged">
+                        <CustomContent>
+                            <MudButton Variant="Variant.Outlined"
+                                       StartIcon="@Icons.Material.Filled.AttachFile"
+                                       Color="Color.Default"
+                                       OnClick="@context.OpenFilePickerAsync">
+                                @(string.IsNullOrEmpty(Model.CvFileName)
+                                    ? "Upload CV (PDF)"
+                                    : $"Replace CV · {Model.CvFileName}")
+                            </MudButton>
+                        </CustomContent>
+                    </MudFileUpload>
+                }
             </MudItem>
 
         </MudGrid>

@@ -1,6 +1,9 @@
+using AppTrack.Frontend.ApiService.Contracts;
 using AppTrack.Frontend.Models;
 using AppTrack.Frontend.Models.ModelValidator;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
+using MudBlazor;
 
 namespace AppTrack.BlazorUi.Components.Profile;
 
@@ -8,9 +11,12 @@ public partial class FreelancerProfileForm
 {
     [Parameter] public FreelancerProfileModel Model { get; set; } = new();
     [Inject] private IModelValidator<FreelancerProfileModel> ModelValidator { get; set; } = null!;
+    [Inject] private IFreelancerProfileService ProfileService { get; set; } = null!;
+    [Inject] private ISnackbar Snackbar { get; set; } = null!;
 
     private string _selectedType = "Freelancer";
     private DateTime? _availableFrom;
+    private bool _cvUploading;
 
     protected override void OnParametersSet()
     {
@@ -95,4 +101,26 @@ public partial class FreelancerProfileForm
         _selectedType == type
             ? "cursor: pointer; border: 2px solid var(--mud-palette-primary);"
             : "cursor: pointer;";
+
+    private async Task OnCvFileChanged(IBrowserFile file)
+    {
+        _cvUploading = true;
+        StateHasChanged();
+
+        var response = await ProfileService.UploadCvAsync(file);
+
+        _cvUploading = false;
+
+        if (response.Success)
+        {
+            Model.CvFileName = response.Data?.CvFileName;
+            Snackbar.Add("CV uploaded successfully", Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add(response.DisplayMessage, Severity.Error);
+        }
+
+        StateHasChanged();
+    }
 }
