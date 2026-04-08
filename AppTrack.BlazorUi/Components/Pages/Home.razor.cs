@@ -17,6 +17,7 @@ public partial class Home
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
     [Inject] private IErrorHandlingService ErrorHandlingService { get; set; } = null!;
+    [Inject] private ProfileSetupSessionState ProfileSetupSession { get; set; } = null!;
 
     private static readonly DialogOptions _dialogOptions = new()
     {
@@ -55,9 +56,13 @@ public partial class Home
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         if (authState.User.Identity?.IsAuthenticated != true) return;
 
-        var profileResponse = await ProfileService.GetProfileAsync();
-        if (profileResponse.StatusCode == 404)
-            await DialogService.ShowAsync<ProfileSetupDialog>("", _dialogOptions);
+        if (!ProfileSetupSession.HasChecked)
+        {
+            ProfileSetupSession.HasChecked = true;
+            var profileResponse = await ProfileService.GetProfileAsync();
+            if (profileResponse.StatusCode == 404)
+                await DialogService.ShowAsync<ProfileSetupDialog>("", _dialogOptions);
+        }
 
         await LoadJobApplicationsAsync();
     }
