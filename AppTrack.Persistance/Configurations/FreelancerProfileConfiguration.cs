@@ -28,5 +28,11 @@ public class FreelancerProfileConfiguration : IEntityTypeConfiguration<Freelance
 
         builder.Property(x => x.Skills)
             .HasMaxLength(1000);
+
+        builder.Property(x => x.CvBlobPath)
+            .HasMaxLength(500);
+
+        builder.Property(x => x.CvFileName)
+            .HasMaxLength(255);
     }
 }
