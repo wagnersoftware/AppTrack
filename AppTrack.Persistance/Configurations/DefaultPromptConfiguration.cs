@@ -24,19 +24,27 @@ public class DefaultPromptConfiguration : IEntityTypeConfiguration<DefaultPrompt
 
         builder.HasData(
             Seed(1, "Default_Cover_Letter",
-                "Write a professional cover letter for the {Position} position at {Company}. Job description: {JobDescription}"),
+                "Write a professional cover letter for the {Position} position at {Company}. Job description: {JobDescription}", "de"),
             Seed(2, "Default_LinkedIn_Message",
-                "Write a short LinkedIn message to {ContactPerson} regarding the {Position} position at {Company}."),
+                "Write a short LinkedIn message to {ContactPerson} regarding the {Position} position at {Company}.", "de"),
             Seed(3, "Default_Introduction",
-                "Introduce me in a few sentences as an applicant for the {Position} position at {Company}."),
+                "Introduce me in a few sentences as an applicant for the {Position} position at {Company}.", "de"),
             Seed(4, "Default_Follow_Up",
-                "Write a short follow-up email to {ContactPerson} regarding my application for the {Position} position at {Company}.")
+                "Write a short follow-up email to {ContactPerson} regarding my application for the {Position} position at {Company}.", "de"),
+            Seed(5, "Default_Cover_Letter",
+                "Write a professional cover letter for the {Position} position at {Company}. Job description: {JobDescription}", "en"),
+            Seed(6, "Default_LinkedIn_Message",
+                "Write a short LinkedIn message to {ContactPerson} regarding the {Position} position at {Company}.", "en"),
+            Seed(7, "Default_Introduction",
+                "Introduce me in a few sentences as an applicant for the {Position} position at {Company}.", "en"),
+            Seed(8, "Default_Follow_Up",
+                "Write a short follow-up email to {ContactPerson} regarding my application for the {Position} position at {Company}.", "en")
         );
     }
 
-    private static DefaultPrompt Seed(int id, string name, string promptTemplate)
+    private static DefaultPrompt Seed(int id, string name, string promptTemplate, string language)
     {
-        var p = DefaultPrompt.Create(name, promptTemplate, "de");
+        var p = DefaultPrompt.Create(name, promptTemplate, language);
         p.Id = id;
         return p;
     }
