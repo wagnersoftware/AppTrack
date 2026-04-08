@@ -67,7 +67,7 @@ public class UploadCvCommandHandlerTests
 
         await _handler.Handle(command, CancellationToken.None);
 
-        _mockExtractor.Verify(e => e.ExtractText(command.FileStream), Times.Once);
+        _mockExtractor.Verify(e => e.ExtractText(It.IsAny<Stream>()), Times.Once);
         _mockRepo.Verify(
             r => r.UpsertAsync(It.Is<AppTrack.Domain.FreelancerProfile>(p => p.CvText == MockPdfTextExtractor.ExtractedText)),
             Times.Once);

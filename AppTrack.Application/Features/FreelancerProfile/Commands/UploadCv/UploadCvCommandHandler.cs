@@ -33,10 +33,14 @@ public class UploadCvCommandHandler : IRequestHandler<UploadCvCommand, Freelance
             throw new BadRequestException("Invalid CV upload request", validationResult);
         }
 
-        var extractedText = _pdfTextExtractor.ExtractText(request.FileStream);
-        request.FileStream.Position = 0; // reset for blob upload
+        using var memStream = new MemoryStream();
+        await request.FileStream.CopyToAsync(memStream, cancellationToken);
+        memStream.Position = 0;
 
-        var blobPath = await _cvStorageService.UploadAsync(request.UserId, request.FileStream, request.FileName);
+        var extractedText = _pdfTextExtractor.ExtractText(memStream);
+        memStream.Position = 0;
+
+        var blobPath = await _cvStorageService.UploadAsync(request.UserId, memStream, request.FileName);
 
         var profile = await _repository.GetByUserIdAsync(request.UserId)
             ?? new Domain.FreelancerProfile { UserId = request.UserId };

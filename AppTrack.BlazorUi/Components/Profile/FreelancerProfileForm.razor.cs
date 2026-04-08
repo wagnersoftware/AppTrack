@@ -107,20 +107,24 @@ public partial class FreelancerProfileForm
         _cvUploading = true;
         StateHasChanged();
 
-        var response = await ProfileService.UploadCvAsync(file);
-
-        _cvUploading = false;
-
-        if (response.Success)
+        try
         {
-            Model.CvFileName = response.Data?.CvFileName;
-            Snackbar.Add("CV uploaded successfully", Severity.Success);
-        }
-        else
-        {
-            Snackbar.Add(response.DisplayMessage, Severity.Error);
-        }
+            var response = await ProfileService.UploadCvAsync(file);
 
-        StateHasChanged();
+            if (response.Success)
+            {
+                Model.CvFileName = response.Data?.CvFileName;
+                Snackbar.Add("CV uploaded successfully", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Add(response.DisplayMessage, Severity.Error);
+            }
+        }
+        finally
+        {
+            _cvUploading = false;
+            StateHasChanged();
+        }
     }
 }

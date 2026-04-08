@@ -6,22 +6,21 @@ namespace AppTrack.Infrastructure.CvStorage;
 
 public class AzureBlobStorageService : ICvStorageService
 {
-    private readonly AzureStorageSettings _settings;
+    private readonly BlobContainerClient _containerClient;
 
     public AzureBlobStorageService(IOptions<AzureStorageSettings> settings)
     {
-        _settings = settings.Value;
+        var serviceClient = new BlobServiceClient(settings.Value.ConnectionString);
+        _containerClient = serviceClient.GetBlobContainerClient(settings.Value.ContainerName);
     }
 
     public async Task<string> UploadAsync(string userId, Stream stream, string fileName)
     {
         var blobPath = $"{userId}/cv.pdf";
 
-        var serviceClient = new BlobServiceClient(_settings.ConnectionString);
-        var containerClient = serviceClient.GetBlobContainerClient(_settings.ContainerName);
-        await containerClient.CreateIfNotExistsAsync();
+        await _containerClient.CreateIfNotExistsAsync();
 
-        var blobClient = containerClient.GetBlobClient(blobPath);
+        var blobClient = _containerClient.GetBlobClient(blobPath);
         await blobClient.UploadAsync(stream, overwrite: true);
 
         return blobPath;
@@ -29,9 +28,7 @@ public class AzureBlobStorageService : ICvStorageService
 
     public async Task DeleteAsync(string blobPath)
     {
-        var serviceClient = new BlobServiceClient(_settings.ConnectionString);
-        var containerClient = serviceClient.GetBlobContainerClient(_settings.ContainerName);
-        var blobClient = containerClient.GetBlobClient(blobPath);
+        var blobClient = _containerClient.GetBlobClient(blobPath);
         await blobClient.DeleteIfExistsAsync();
     }
 }
