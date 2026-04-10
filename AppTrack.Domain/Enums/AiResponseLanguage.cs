@@ -1,6 +1,6 @@
 namespace AppTrack.Domain.Enums;
 
-public enum ApplicationLanguage
+public enum AiResponseLanguage
 {
     German = 0,
     English = 1

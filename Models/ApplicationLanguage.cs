@@ -1,6 +1,6 @@
 namespace AppTrack.Frontend.Models;
 
-public enum ApplicationLanguage
+public enum AiResponseLanguage
 {
     German,
     English

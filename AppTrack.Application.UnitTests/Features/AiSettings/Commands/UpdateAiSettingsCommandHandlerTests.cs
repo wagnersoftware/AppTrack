@@ -126,13 +126,13 @@ public class UpdateAiSettingsCommandHandlerTests
             Id = ExistingId,
             UserId = OwnerId,
             SelectedChatModelId = 2,
-            Language = ApplicationLanguage.German,
+            Language = AiResponseLanguage.German,
             Prompts = [],
             PromptParameter = []
         };
 
         var result = await _handler.Handle(command, CancellationToken.None);
 
-        result.Language.ShouldBe(ApplicationLanguage.German);
+        result.Language.ShouldBe(AiResponseLanguage.German);
     }
 }

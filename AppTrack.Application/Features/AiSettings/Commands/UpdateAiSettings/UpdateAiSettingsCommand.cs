@@ -9,7 +9,7 @@ namespace AppTrack.Application.Features.AiSettings.Commands.UpdateAiSettings;
 public class UpdateAiSettingsCommand : IRequest<AiSettingsDto>, IAiSettingsValidatable, IUserScopedRequest
 {
     public int SelectedChatModelId { get; set; }
-    public ApplicationLanguage Language { get; set; }
+    public AiResponseLanguage Language { get; set; }
     public int Id { get; set; }
     [JsonIgnore]
     public string UserId { get; set; } = string.Empty;

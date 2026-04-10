@@ -6,7 +6,7 @@ namespace AppTrack.Domain;
 public class AiSettings : BaseEntity
 {
     public int SelectedChatModelId { get; set; }
-    public ApplicationLanguage Language { get; set; } = ApplicationLanguage.English;
+    public AiResponseLanguage Language { get; set; } = AiResponseLanguage.English;
 
     public string UserId { get; set; } = string.Empty;
 

@@ -3,7 +3,6 @@ using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Exceptions;
 using AppTrack.Application.Features.FreelancerProfile.Dto;
 using AppTrack.Application.Mappings;
-using AppTrack.Domain;
 
 namespace AppTrack.Application.Features.FreelancerProfile.Queries.GetFreelancerProfile;
 

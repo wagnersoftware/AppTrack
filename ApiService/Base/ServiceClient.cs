@@ -2017,7 +2017,7 @@ namespace AppTrack.Frontend.ApiService.Base
         public int SelectedChatModelId { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("language")]
-        public ApplicationLanguage Language { get; set; }
+        public AiResponseLanguage Language { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("id")]
         public int Id { get; set; }
@@ -2037,7 +2037,7 @@ namespace AppTrack.Frontend.ApiService.Base
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.6.3.0 (NJsonSchema v11.5.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum ApplicationLanguage
+    public enum AiResponseLanguage
     {
 
         _0 = 0,
@@ -2403,7 +2403,7 @@ namespace AppTrack.Frontend.ApiService.Base
         public int SelectedChatModelId { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("language")]
-        public ApplicationLanguage Language { get; set; }
+        public AiResponseLanguage Language { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("id")]
         public int Id { get; set; }

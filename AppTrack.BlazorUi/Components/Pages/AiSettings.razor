@@ -41,17 +41,17 @@
                     }
                 </MudSelect>
             </MudItem>
-            <!-- Application Language -->
+            <!-- AI Response Language -->
             <MudItem xs="12" sm="6">
-                <MudSelect T="ApplicationLanguage"
-                           Label="Application Language"
+                <MudSelect T="AiResponseLanguage"
+                           Label="AI Response Language"
                            Value="_model.Language"
-                           ValueChanged="@((ApplicationLanguage v) => _model.Language = v)"
+                           ValueChanged="@((AiResponseLanguage v) => _model.Language = v)"
                            Variant="Variant.Outlined"
                            HelperText="Language for AI-generated text"
                            AdornmentIcon="@Icons.Material.Outlined.Translate">
-                    <MudSelectItem T="ApplicationLanguage" Value="ApplicationLanguage.English">English</MudSelectItem>
-                    <MudSelectItem T="ApplicationLanguage" Value="ApplicationLanguage.German">German</MudSelectItem>
+                    <MudSelectItem T="AiResponseLanguage" Value="AiResponseLanguage.English">English</MudSelectItem>
+                    <MudSelectItem T="AiResponseLanguage" Value="AiResponseLanguage.German">German</MudSelectItem>
                 </MudSelect>
             </MudItem>
             <!-- Default Prompts (read-only) -->
