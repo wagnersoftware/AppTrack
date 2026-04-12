@@ -17,15 +17,6 @@ public partial class ProfileSetupDialog
     private bool _isBusy;
     private bool _cvBusy;
 
-    protected override async Task OnInitializedAsync()
-    {
-        var response = await ProfileService.GetProfileAsync();
-        if (response.Success && response.Data is not null)
-        {
-            _model = response.Data;
-        }
-    }
-
     private async Task Save()
     {
         if (!_form.Validate()) return;
