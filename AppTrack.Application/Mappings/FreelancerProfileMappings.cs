@@ -8,8 +8,8 @@ internal static class FreelancerProfileMappings
     internal static Domain.FreelancerProfile ToNewDomain(this UpsertFreelancerProfileCommand command) => new()
     {
         UserId = command.UserId,
-        FirstName = command.FirstName ?? string.Empty,
-        LastName = command.LastName ?? string.Empty,
+        FirstName = command.FirstName,
+        LastName = command.LastName,
         HourlyRate = command.HourlyRate,
         DailyRate = command.DailyRate,
         AvailableFrom = command.AvailableFrom,
@@ -20,8 +20,8 @@ internal static class FreelancerProfileMappings
     internal static void ApplyTo(this UpsertFreelancerProfileCommand command, Domain.FreelancerProfile entity)
     {
         entity.UserId = command.UserId;
-        entity.FirstName = command.FirstName ?? string.Empty;
-        entity.LastName = command.LastName ?? string.Empty;
+        entity.FirstName = command.FirstName;
+        entity.LastName = command.LastName;
         entity.HourlyRate = command.HourlyRate;
         entity.DailyRate = command.DailyRate;
         entity.AvailableFrom = command.AvailableFrom;

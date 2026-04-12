@@ -96,4 +96,25 @@ public class UpsertFreelancerProfileCommandHandlerTests
 
         _mockRepo.Verify(r => r.UpsertAsync(It.IsAny<AppTrack.Domain.FreelancerProfile>()), Times.Never);
     }
+
+    [Fact]
+    public async Task Handle_ShouldCreate_WhenNamesAreNull()
+    {
+        // Arrange — use a userId with no existing profile to hit the create-path
+        var command = new UpsertFreelancerProfileCommand
+        {
+            UserId = "nameless-user",
+            FirstName = null,
+            LastName = null,
+        };
+
+        // Act
+        var result = await _handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.ShouldNotBeNull();
+        result.FirstName.ShouldBeNull();
+        result.LastName.ShouldBeNull();
+        _mockRepo.Verify(r => r.UpsertAsync(It.Is<AppTrack.Domain.FreelancerProfile>(p => p.Id == 0)), Times.Once);
+    }
 }
