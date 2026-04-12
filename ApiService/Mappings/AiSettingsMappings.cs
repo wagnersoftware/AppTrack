@@ -10,6 +10,7 @@ internal static class AiSettingsMappings
     {
         Id = dto.Id,
         SelectedChatModelId = dto.SelectedChatModelId,
+        Language = (AppTrack.Frontend.Models.AiResponseLanguage)(int)dto.Language,
         PromptParameter = new ObservableCollection<PromptParameterModel>(
             (dto.PromptParameter ?? []).Select(p => p.ToModel())),
         Prompts = new ObservableCollection<PromptModel>(
@@ -35,6 +36,7 @@ internal static class AiSettingsMappings
     {
         Id = model.Id,
         SelectedChatModelId = model.SelectedChatModelId,
+        Language = (AppTrack.Frontend.ApiService.Base.AiResponseLanguage)(int)model.Language,
         PromptParameter = model.PromptParameter.Select(p => p.ToDto()).ToList(),
         Prompts = model.Prompts.Select(p => p.ToDto()).ToList(),
     };

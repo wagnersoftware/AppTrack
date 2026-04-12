@@ -38,7 +38,33 @@
 - `AppTrack.Infrastructure/Identity/HttpContextUserContext.cs` — reads oid/sub claims
 - `AppTrack.Infrastructure/Mediator/Mediator.cs` — custom mediator; injects UserId before dispatch
 
+## Handler Validation Pattern
+- Handlers instantiate their own validator inline: `var validator = new XyzValidator(); var result = await validator.ValidateAsync(request, cancellationToken);`
+- Check `validationResult.Errors.Count > 0` (not `.Any()`) to avoid LINQ allocation — consistent with TreatWarningsAsErrors style
+- `UpsertFreelancerProfileCommandHandler` uses optimistic upsert: `GetByUserIdAsync` → create if null, else `ApplyTo` + update
+
+## FreelancerProfile Feature (Application layer, branch: feature/profile-setup-wizard)
+- `IFreelancerProfileRepository` at `AppTrack.Application/Contracts/Persistance/IFreelancerProfileRepository.cs`
+- `FreelancerProfileDto` at `AppTrack.Application/Features/FreelancerProfile/Dto/FreelancerProfileDto.cs`
+- Command: `UpsertFreelancerProfileCommand` — implements `IFreelancerProfileValidatable` (from Shared.Validation)
+- Query: `GetFreelancerProfileQuery` — no validatable interface (only UserId needed, injected by mediator)
+- Mappings: `AppTrack.Application/Mappings/FreelancerProfileMappings.cs` — `ToNewDomain`, `ApplyTo`, `ToDto`
+- `GetFreelancerProfileQueryHandler` throws `NotFoundException` when no profile found for user
+
 ## Infrastructure Project Note
 - `AppTrack.Infrastructure` uses `Microsoft.NET.Sdk` (not Web SDK)
 - Adding `<FrameworkReference Include="Microsoft.AspNetCore.App" />` grants access to all ASP.NET Core types
 - After adding FrameworkReference, individual `Microsoft.Extensions.*` PackageReferences become redundant (NU1510 = build error due to TreatWarningsAsErrors); remove them all — only keep non-framework packages (e.g. SendGrid)
+
+## NuGet Package ID vs. Namespace: PdfPig
+- NuGet package ID: `PdfPig` (NOT `UglyToad.PdfPig`) — the `UglyToad.PdfPig` package ID only has pre-release versions
+- C# using namespace: `using UglyToad.PdfPig;` — correct, this is the library's namespace inside the `PdfPig` package
+- Latest stable version: 0.1.9 (as of Apr 2026; 0.1.14 also available)
+- `PdfDocument.Open(stream)` returns an `IDisposable`; use `using var document = ...`
+
+## CV Storage Feature (Infrastructure layer, branch: feature/profile-setup-wizard)
+- `AzureStorageSettings` at `AppTrack.Infrastructure/CvStorage/AzureStorageSettings.cs` — ConnectionString + ContainerName
+- `AzureBlobStorageService` implements `ICvStorageService` — creates `BlobServiceClient` per call (stateless, scoped DI)
+- `PdfPigTextExtractor` implements `IPdfTextExtractor` — registered as Singleton (stateless)
+- Blob path convention: `{userId}/cv.pdf` (one CV per user, overwrite on re-upload)
+- Dev appsettings: `"ConnectionString": "UseDevelopmentStorage=true"` (Azurite), `"ContainerName": "cv-uploads"`

@@ -1,0 +1,187 @@
+<MudStack Spacing="4">
+
+    <!-- ── Section 1: Profile Type ─────────────────────────────── -->
+    <div>
+        <MudText Typo="Typo.subtitle1" Class="mb-2">Profile Type</MudText>
+        <MudGrid Spacing="2">
+            <MudItem xs="12" sm="6">
+                <MudCard @onclick="SelectFreelancer"
+                         Style="@GetCardStyle("Freelancer")"
+                         Elevation="2">
+                    <MudCardContent>
+                        <MudStack AlignItems="AlignItems.Center" Spacing="1">
+                            <MudIcon Icon="@Icons.Material.Filled.WorkspacePremium"
+                                     Size="Size.Large"
+                                     Color="Color.Primary" />
+                            <MudText Typo="Typo.h6">Freelancer</MudText>
+                        </MudStack>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudTooltip Text="Coming soon">
+                    <MudCard Style="pointer-events: none; opacity: 0.5;" Elevation="1">
+                        <MudCardContent>
+                            <MudStack AlignItems="AlignItems.Center" Spacing="1">
+                                <MudIcon Icon="@Icons.Material.Filled.BusinessCenter"
+                                         Size="Size.Large"
+                                         Color="Color.Secondary" />
+                                <MudText Typo="Typo.h6">Employee</MudText>
+                            </MudStack>
+                        </MudCardContent>
+                    </MudCard>
+                </MudTooltip>
+            </MudItem>
+        </MudGrid>
+    </div>
+
+    <!-- ── Section 2: Personal Details ─────────────────────────── -->
+    <div>
+        <MudText Typo="Typo.subtitle1" Class="mb-2">Personal Details</MudText>
+        <MudGrid Spacing="2">
+
+            <!-- First Name -->
+            <MudItem xs="12" sm="6">
+                <MudTextField T="string"
+                              Label="First Name"
+                              Value="@Model.FirstName"
+                              ValueChanged="@((string v) => OnFirstNameChanged(v))"
+                              Error="@ModelValidator.Errors.ContainsKey(nameof(Model.FirstName))"
+                              ErrorText="@GetFirstError(nameof(Model.FirstName))"
+                              Variant="Variant.Outlined"
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Outlined.Person" />
+            </MudItem>
+
+            <!-- Last Name -->
+            <MudItem xs="12" sm="6">
+                <MudTextField T="string"
+                              Label="Last Name"
+                              Value="@Model.LastName"
+                              ValueChanged="@((string v) => OnLastNameChanged(v))"
+                              Error="@ModelValidator.Errors.ContainsKey(nameof(Model.LastName))"
+                              ErrorText="@GetFirstError(nameof(Model.LastName))"
+                              Variant="Variant.Outlined"
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Outlined.Person" />
+            </MudItem>
+
+            <!-- Rate Type Toggle -->
+            <MudItem xs="12">
+                <MudToggleGroup T="RateKind?" Value="Model.SelectedRateType"
+                                ValueChanged="OnRateKindChanged"
+                                SelectionMode="SelectionMode.ToggleSelection"
+                                Color="Color.Primary" Outlined="true">
+                    <MudToggleItem Value="@((RateKind?)RateKind.Hourly)">Hourly Rate</MudToggleItem>
+                    <MudToggleItem Value="@((RateKind?)RateKind.Daily)">Daily Rate</MudToggleItem>
+                </MudToggleGroup>
+            </MudItem>
+
+            <!-- Active Rate Field (hidden when no rate type selected) -->
+            @if (Model.SelectedRateType != null)
+            {
+                <MudItem @key="Model.SelectedRateType" xs="12" sm="6">
+                    <MudNumericField T="decimal?"
+                                     Label="@(Model.SelectedRateType == RateKind.Hourly ? "Hourly Rate (€)" : "Daily Rate (€)")"
+                                     Value="@(Model.SelectedRateType == RateKind.Hourly ? Model.HourlyRate : Model.DailyRate)"
+                                     ValueChanged="OnRateValueChanged"
+                                     Error="@(Model.SelectedRateType == RateKind.Hourly
+                                               ? ModelValidator.Errors.ContainsKey(nameof(Model.HourlyRate))
+                                               : ModelValidator.Errors.ContainsKey(nameof(Model.DailyRate)))"
+                                     ErrorText="@(Model.SelectedRateType == RateKind.Hourly
+                                                  ? GetFirstError(nameof(Model.HourlyRate))
+                                                  : GetFirstError(nameof(Model.DailyRate)))"
+                                     Variant="Variant.Outlined"
+                                     Adornment="Adornment.Start"
+                                     AdornmentIcon="@Icons.Material.Outlined.Euro" />
+                </MudItem>
+            }
+
+            <!-- Available From -->
+            <MudItem xs="12">
+                <MudDatePicker Label="Available From"
+                               Date="_availableFrom"
+                               DateChanged="OnAvailableFromChanged"
+                               Variant="Variant.Outlined"
+                               DateFormat="dd.MM.yyyy"
+                               Editable="true" />
+            </MudItem>
+
+            <!-- Remote Preference -->
+            <MudItem xs="12">
+                <MudSelect T="RemotePreference?"
+                           Label="Remote Preference"
+                           Value="Model.WorkMode"
+                           ValueChanged="@((RemotePreference? v) => Model.WorkMode = v)"
+                           Variant="Variant.Outlined"
+                           Clearable="true"
+                           AdornmentIcon="@Icons.Material.Outlined.LocationOn">
+                    <MudSelectItem T="RemotePreference?" Value="@((RemotePreference?)RemotePreference.Remote)">Remote</MudSelectItem>
+                    <MudSelectItem T="RemotePreference?" Value="@((RemotePreference?)RemotePreference.Hybrid)">Hybrid</MudSelectItem>
+                    <MudSelectItem T="RemotePreference?" Value="@((RemotePreference?)RemotePreference.OnSite)">On-Site</MudSelectItem>
+                </MudSelect>
+            </MudItem>
+
+            <!-- Skills -->
+            <MudItem xs="12">
+                <MudTextField T="string"
+                              Label="Skills"
+                              Value="@(Model.Skills ?? string.Empty)"
+                              ValueChanged="@((string v) => OnSkillsChanged(v))"
+                              Error="@ModelValidator.Errors.ContainsKey(nameof(Model.Skills))"
+                              ErrorText="@GetFirstError(nameof(Model.Skills))"
+                              Variant="Variant.Outlined"
+                              Lines="3"
+                              Placeholder="e.g. C#, .NET, Azure, SQL" />
+            </MudItem>
+
+            <!-- CV Delete Confirmation -->
+            <MudMessageBox @ref="_cvDeleteConfirmBox"
+                           Title="Delete CV"
+                           CancelText="Cancel">
+                <MessageContent>Are you sure you want to delete your CV?</MessageContent>
+                <YesButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Error">Delete</MudButton>
+                </YesButton>
+            </MudMessageBox>
+
+            <!-- CV Upload -->
+            <MudItem xs="12">
+                @if (_cvBusy)
+                {
+                    <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+                }
+                <div style="@(_cvBusy ? "display:none" : "")">
+                    <MudStack Row="false" Spacing="1">
+                        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                            <MudFileUpload T="IBrowserFile" Accept=".pdf" FilesChanged="OnCvFileChanged">
+                                <SelectedTemplate />
+                                <CustomContent>
+                                    <MudButton Variant="Variant.Outlined"
+                                               StartIcon="@Icons.Material.Filled.AttachFile"
+                                               Color="Color.Default"
+                                               OnClick="@context.OpenFilePickerAsync">
+                                        @(string.IsNullOrEmpty(Model.CvFileName) ? "Upload CV (PDF)" : "Replace CV")
+                                    </MudButton>
+                                </CustomContent>
+                            </MudFileUpload>
+                            @if (!string.IsNullOrEmpty(Model.CvFileName))
+                            {
+                                <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                               Color="Color.Error"
+                                               Size="Size.Small"
+                                               OnClick="OnCvDeleteClicked" />
+                            }
+                        </MudStack>
+                        @if (!string.IsNullOrEmpty(Model.CvFileName))
+                        {
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">@Model.CvFileName</MudText>
+                        }
+                    </MudStack>
+                </div>
+            </MudItem>
+
+        </MudGrid>
+    </div>
+
+</MudStack>

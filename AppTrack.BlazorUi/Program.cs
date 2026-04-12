@@ -20,6 +20,7 @@ builder.Services.AddMudServices(config =>
     config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomRight;
 });
 builder.Services.AddScoped<IErrorHandlingService, ErrorHandlingService>();
+builder.Services.AddScoped<ProfileSetupSessionState>();
 
 builder.Services.AddMsalAuthentication(options =>
 {
@@ -37,6 +38,7 @@ builder.Services.AddTransient<IValidator<JobApplicationModel>, JobApplicationMod
 builder.Services.AddTransient<IValidator<AiSettingsModel>, AiSettingsModelValidator>();
 builder.Services.AddTransient<IValidator<PromptParameterModel>, PromptParameterModelValidator>();
 builder.Services.AddTransient<IValidator<PromptModel>, PromptModelValidator>();
+builder.Services.AddTransient<IValidator<FreelancerProfileModel>, FreelancerProfileModelValidator>();
 builder.Services.AddTransient(typeof(IModelValidator<>), typeof(ModelValidator<>));
 
 await builder.Build().RunAsync();

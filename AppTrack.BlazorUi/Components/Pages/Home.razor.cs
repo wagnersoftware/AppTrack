@@ -12,10 +12,12 @@ public partial class Home
 {
     [Inject] private IJobApplicationService JobApplicationService { get; set; } = null!;
     [Inject] private IApplicationTextService ApplicationTextService { get; set; } = null!;
+    [Inject] private IFreelancerProfileService ProfileService { get; set; } = null!;
     [Inject] private AuthenticationStateProvider AuthenticationStateProvider { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
     [Inject] private IErrorHandlingService ErrorHandlingService { get; set; } = null!;
+    [Inject] private ProfileSetupSessionState ProfileSetupSession { get; set; } = null!;
 
     private static readonly DialogOptions _dialogOptions = new()
     {
@@ -52,8 +54,17 @@ public partial class Home
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        if (authState.User.Identity?.IsAuthenticated == true)
-            await LoadJobApplicationsAsync();
+        if (authState.User.Identity?.IsAuthenticated != true) return;
+
+        if (!ProfileSetupSession.HasChecked)
+        {
+            ProfileSetupSession.HasChecked = true;
+            var profileResponse = await ProfileService.GetProfileAsync();
+            if (profileResponse.StatusCode == 404)
+                await DialogService.ShowAsync<ProfileSetupDialog>("", _dialogOptions);
+        }
+
+        await LoadJobApplicationsAsync();
     }
 
     private async Task LoadJobApplicationsAsync()

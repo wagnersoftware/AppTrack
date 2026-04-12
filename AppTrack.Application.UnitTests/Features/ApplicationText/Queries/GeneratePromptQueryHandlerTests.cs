@@ -161,7 +161,7 @@ public class GeneratePromptQueryHandlerTests
             .Setup(r => r.GetAsync())
             .ReturnsAsync(new List<DefaultPrompt>
             {
-                DefaultPrompt.Create(defaultPromptName, defaultTemplate, "de"),
+                DefaultPrompt.Create(defaultPromptName, defaultTemplate),
             });
 
         var query = new GeneratePromptQuery { JobApplicationId = JobApplicationId, UserId = UserId, PromptName = defaultPromptName };
@@ -192,7 +192,7 @@ public class GeneratePromptQueryHandlerTests
             .Setup(r => r.GetAsync())
             .ReturnsAsync(new List<DefaultPrompt>
             {
-                DefaultPrompt.Create(defaultPromptName, defaultTemplate, "de"),
+                DefaultPrompt.Create(defaultPromptName, defaultTemplate),
             });
 
         var query = new GeneratePromptQuery { JobApplicationId = JobApplicationId, UserId = UserId, PromptName = defaultPromptName };

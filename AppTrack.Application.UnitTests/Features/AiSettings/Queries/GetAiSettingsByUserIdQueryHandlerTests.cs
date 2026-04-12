@@ -15,7 +15,6 @@ public class GetAiSettingsByUserIdQueryHandlerTests
 
     public GetAiSettingsByUserIdQueryHandlerTests()
     {
-        // Default: return empty list so existing tests are unaffected
         _mockDefaultPromptRepo
             .Setup(r => r.GetAsync())
             .ReturnsAsync(new List<DefaultPrompt>());
@@ -74,8 +73,8 @@ public class GetAiSettingsByUserIdQueryHandlerTests
 
         var defaults = new List<DefaultPrompt>
         {
-            DefaultPrompt.Create("Default_Anschreiben", "Template A", "de"),
-            DefaultPrompt.Create("Default_Vorstellung", "Template B", "de"),
+            DefaultPrompt.Create("Default_Cover_Letter", "Template A"),
+            DefaultPrompt.Create("Default_Introduction", "Template B"),
         };
         _mockDefaultPromptRepo
             .Setup(r => r.GetAsync())
@@ -85,7 +84,7 @@ public class GetAiSettingsByUserIdQueryHandlerTests
 
         result.DefaultPrompts.ShouldNotBeNull();
         result.DefaultPrompts.Count.ShouldBe(2);
-        result.DefaultPrompts[0].Name.ShouldBe("Default_Anschreiben");
-        result.DefaultPrompts[1].Name.ShouldBe("Default_Vorstellung");
+        result.DefaultPrompts[0].Name.ShouldBe("Default_Cover_Letter");
+        result.DefaultPrompts[1].Name.ShouldBe("Default_Introduction");
     }
 }

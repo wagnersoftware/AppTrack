@@ -15,11 +15,7 @@ public class DefaultPromptConfiguration : IEntityTypeConfiguration<DefaultPrompt
         builder.Property(x => x.PromptTemplate)
             .IsRequired();
 
-        builder.Property(x => x.Language)
-            .IsRequired()
-            .HasMaxLength(10);
-
-        builder.HasIndex(x => new { x.Name, x.Language })
+        builder.HasIndex(x => x.Name)
             .IsUnique();
 
         builder.HasData(
@@ -36,7 +32,7 @@ public class DefaultPromptConfiguration : IEntityTypeConfiguration<DefaultPrompt
 
     private static DefaultPrompt Seed(int id, string name, string promptTemplate)
     {
-        var p = DefaultPrompt.Create(name, promptTemplate, "de");
+        var p = DefaultPrompt.Create(name, promptTemplate);
         p.Id = id;
         return p;
     }

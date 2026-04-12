@@ -27,9 +27,9 @@ public class BaseHttpService
 
         return apiEx.StatusCode switch
         {
-            400 => new Response<T> { ErrorMessage = "Invalid data was submitted", ErrorDetails = validationErrors, Success = false },
-            404 => new Response<T> { ErrorMessage = "The record was not found", ErrorDetails = validationErrors, Success = false },
-            _ => new Response<T> { ErrorMessage = "Something went wrong, please try again", ErrorDetails = validationErrors, Success = false },
+            400 => new Response<T> { ErrorMessage = "Invalid data was submitted", ErrorDetails = validationErrors, Success = false, StatusCode = 400 },
+            404 => new Response<T> { ErrorMessage = "The record was not found", ErrorDetails = validationErrors, Success = false, StatusCode = 404 },
+            _ => new Response<T> { ErrorMessage = "Something went wrong, please try again", ErrorDetails = validationErrors, Success = false, StatusCode = apiEx.StatusCode },
         };
     }
 

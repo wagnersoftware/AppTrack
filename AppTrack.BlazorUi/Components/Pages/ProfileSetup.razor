@@ -1,0 +1,30 @@
+@page "/profile/setup"
+
+<PageTitle>My Profile - AppTrack</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="mt-6">
+    <MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-4">
+        <MudIcon Icon="@Icons.Material.Filled.AccountCircle" Class="mr-2" Color="Color.Primary" />
+        <MudText Typo="Typo.h5">My Profile</MudText>
+    </MudStack>
+
+    <FreelancerProfileForm @ref="_form" Model="_model" OnCvBusyChanged="@(busy => _cvBusy = busy)" />
+
+    <MudStack Row="true" Justify="Justify.FlexEnd" Class="mt-4">
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   StartIcon="@Icons.Material.Filled.Save"
+                   OnClick="Save"
+                   Disabled="_isBusy || _cvBusy">
+            @if (_isBusy)
+            {
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+                <span>Saving&#x2026;</span>
+            }
+            else
+            {
+                <span>Save</span>
+            }
+        </MudButton>
+    </MudStack>
+</MudContainer>

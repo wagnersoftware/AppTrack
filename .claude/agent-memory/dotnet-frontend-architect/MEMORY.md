@@ -119,6 +119,20 @@ constant with `BackdropClick = false, MaxWidth = Small` for the child. Call
 ## SonarAnalyzer Rules (enforced as errors)
 - **S6608**: Use index (`list[0]`) instead of `Enumerable.First()` on indexable collections
   (`List<T>`, arrays). Apply everywhere — LINQ `First()` on a `List` is a build error.
+- **S5693**: Flags any explicit `maxAllowedSize` on `IBrowserFile.OpenReadStream`. Suppress
+  with `#pragma warning disable S5693` / `#pragma warning restore S5693` around the call
+  when the limit is intentional and documented.
+
+## Response<T> Property Names
+`ApiService/Base/Response.cs` uses: `Success` (not `IsSuccess`), `Data`, `DisplayMessage`
+(not `Message` — falls back from `ErrorDetails` to `ErrorMessage` automatically). Never
+use `IsSuccess` or `Message` — they do not exist on `Response<T>`.
+
+## MudFileUpload (MudBlazor 9.x)
+- Named render fragment for the activator button: `<CustomContent>` (NOT `ActivatorContent`)
+- `@context` is `MudFileUploadContext`; call `context.OpenFilePickerAsync()` in the button's `OnClick`
+- `FilesChanged="OnCvFileChanged"` wires the upload callback; the file picker opens via the button click
+- `ActivatorContent` is not a valid slot name — it causes RZ10012 + MUD0002 build errors
 
 ## Key File Paths
 - WPF MainViewModel: `AppTrack.Wpf/ViewModel/MainViewModel.cs`

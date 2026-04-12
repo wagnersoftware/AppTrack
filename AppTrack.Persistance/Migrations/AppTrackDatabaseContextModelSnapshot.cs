@@ -33,6 +33,9 @@ namespace AppTrack.Persistance.Migrations
                     b.Property<DateTime?>("CreationDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("Language")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("ModifiedDate")
                         .HasColumnType("datetime2");
 
@@ -124,11 +127,6 @@ namespace AppTrack.Persistance.Migrations
                     b.Property<DateTime?>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Language")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
                     b.Property<DateTime?>("ModifiedDate")
                         .HasColumnType("datetime2");
 
@@ -143,7 +141,7 @@ namespace AppTrack.Persistance.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Name", "Language")
+                    b.HasIndex("Name")
                         .IsUnique();
 
                     b.ToTable("DefaultPrompts");
@@ -152,31 +150,88 @@ namespace AppTrack.Persistance.Migrations
                         new
                         {
                             Id = 1,
-                            Language = "de",
                             Name = "Default_Cover_Letter",
                             PromptTemplate = "Write a professional cover letter for the {Position} position at {Company}. Job description: {JobDescription}"
                         },
                         new
                         {
                             Id = 2,
-                            Language = "de",
                             Name = "Default_LinkedIn_Message",
                             PromptTemplate = "Write a short LinkedIn message to {ContactPerson} regarding the {Position} position at {Company}."
                         },
                         new
                         {
                             Id = 3,
-                            Language = "de",
                             Name = "Default_Introduction",
                             PromptTemplate = "Introduce me in a few sentences as an applicant for the {Position} position at {Company}."
                         },
                         new
                         {
                             Id = 4,
-                            Language = "de",
                             Name = "Default_Follow_Up",
                             PromptTemplate = "Write a short follow-up email to {ContactPerson} regarding my application for the {Position} position at {Company}."
                         });
+                });
+
+            modelBuilder.Entity("AppTrack.Domain.FreelancerProfile", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateOnly?>("AvailableFrom")
+                        .HasColumnType("date");
+
+                    b.Property<DateTime?>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CvBlobPath")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("CvFileName")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("CvText")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("DailyRate")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("FirstName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<decimal?>("HourlyRate")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("LastName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Skills")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int?>("WorkMode")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("FreelancerProfiles");
                 });
 
             modelBuilder.Entity("AppTrack.Domain.JobApplication", b =>

@@ -72,8 +72,8 @@ public class GetPromptNamesQueryHandlerTests
 
         var defaults = new List<DefaultPrompt>
         {
-            DefaultPrompt.Create("Default_Anschreiben", "template", "de"),
-            DefaultPrompt.Create("Default_Vorstellung", "template", "de"),
+            DefaultPrompt.Create("Default_Anschreiben", "template"),
+            DefaultPrompt.Create("Default_Vorstellung", "template"),
         };
         _mockDefaultPromptRepo.Setup(r => r.GetAsync()).ReturnsAsync(defaults);
 
@@ -93,7 +93,7 @@ public class GetPromptNamesQueryHandlerTests
 
         var defaults = new List<DefaultPrompt>
         {
-            DefaultPrompt.Create("Default_Anschreiben", "template", "de"),
+            DefaultPrompt.Create("Default_Anschreiben", "template"),
         };
         _mockDefaultPromptRepo.Setup(r => r.GetAsync()).ReturnsAsync(defaults);
 

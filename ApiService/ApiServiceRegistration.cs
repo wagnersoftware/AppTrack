@@ -39,6 +39,7 @@ public static class ApiServiceRegistration
         services.AddScoped<IAiSettingsService, AiSettingsService>();
         services.AddScoped<IApplicationTextService, ApplicationTextService>();
         services.AddScoped<IChatModelsService, ChatModelsService>();
+        services.AddScoped<IFreelancerProfileService, FreelancerProfileService>();
 
         return services;
     }

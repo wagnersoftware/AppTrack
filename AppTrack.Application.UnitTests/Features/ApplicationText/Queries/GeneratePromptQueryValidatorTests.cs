@@ -161,7 +161,7 @@ public class GeneratePromptQueryValidatorTests
             .Setup(r => r.GetAsync())
             .ReturnsAsync(new List<DefaultPrompt>
             {
-                DefaultPrompt.Create(defaultPromptName, "Write a cover letter for {Position}.", "de"),
+                DefaultPrompt.Create(defaultPromptName, "Write a cover letter for {Position}."),
             });
 
         var result = await _validator.TestValidateAsync(BuildValidQuery(promptName: defaultPromptName));
@@ -180,7 +180,7 @@ public class GeneratePromptQueryValidatorTests
             .Setup(r => r.GetAsync())
             .ReturnsAsync(new List<DefaultPrompt>
             {
-                DefaultPrompt.Create(defaultOnlyPromptName, " ", "de"), // empty template
+                DefaultPrompt.Create(defaultOnlyPromptName, " "), // empty template
             });
 
         _jobAppRepo
