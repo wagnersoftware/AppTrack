@@ -141,8 +141,7 @@
                 {
                     <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
                 }
-                else
-                {
+                <div style="@(_cvUploading ? "display:none" : "")">
                     <MudFileUpload T="IBrowserFile" Accept=".pdf" FilesChanged="OnCvFileChanged">
                         <CustomContent>
                             <MudButton Variant="Variant.Outlined"
@@ -155,7 +154,7 @@
                             </MudButton>
                         </CustomContent>
                     </MudFileUpload>
-                }
+                </div>
             </MudItem>
 
         </MudGrid>

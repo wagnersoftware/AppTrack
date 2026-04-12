@@ -1,4 +1,5 @@
 using AppTrack.Application.Contracts.CvStorage;
+using Azure.Identity;
 using Azure.Storage.Blobs;
 using Microsoft.Extensions.Options;
 
@@ -10,7 +11,9 @@ public class AzureBlobStorageService : ICvStorageService
 
     public AzureBlobStorageService(IOptions<AzureStorageSettings> settings)
     {
-        var serviceClient = new BlobServiceClient(settings.Value.ConnectionString);
+        var serviceClient = new BlobServiceClient(
+            new Uri(settings.Value.ServiceUrl),
+            new DefaultAzureCredential());
         _containerClient = serviceClient.GetBlobContainerClient(settings.Value.ContainerName);
     }
 
