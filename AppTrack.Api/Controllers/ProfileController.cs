@@ -1,5 +1,6 @@
 using AppTrack.Api.Models;
 using AppTrack.Application.Contracts.Mediator;
+using AppTrack.Application.Features.FreelancerProfile.Commands.DeleteCv;
 using AppTrack.Application.Features.FreelancerProfile.Commands.UploadCv;
 using AppTrack.Application.Features.FreelancerProfile.Commands.UpsertFreelancerProfile;
 using AppTrack.Application.Features.FreelancerProfile.Dto;
@@ -40,6 +41,17 @@ public class ProfileController : ControllerBase
     public async Task<ActionResult<FreelancerProfileDto>> Put([FromBody] UpsertFreelancerProfileCommand command)
     {
         var dto = await _mediator.Send(command);
+        return Ok(dto);
+    }
+
+    // DELETE api/profile/cv
+    [HttpDelete("cv")]
+    [ProducesResponseType(typeof(FreelancerProfileDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<FreelancerProfileDto>> DeleteCv()
+    {
+        var dto = await _mediator.Send(new DeleteCvCommand());
         return Ok(dto);
     }
 

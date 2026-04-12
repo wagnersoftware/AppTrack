@@ -15,6 +15,7 @@ public partial class ProfileSetup
     private FreelancerProfileModel _model = new();
     private FreelancerProfileForm _form = null!;
     private bool _isBusy;
+    private bool _cvBusy;
 
     protected override async Task OnInitializedAsync()
     {

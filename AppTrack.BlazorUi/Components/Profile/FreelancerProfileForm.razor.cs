@@ -10,13 +10,14 @@ namespace AppTrack.BlazorUi.Components.Profile;
 public partial class FreelancerProfileForm
 {
     [Parameter] public FreelancerProfileModel Model { get; set; } = new();
+    [Parameter] public EventCallback<bool> OnCvBusyChanged { get; set; }
     [Inject] private IModelValidator<FreelancerProfileModel> ModelValidator { get; set; } = null!;
     [Inject] private IFreelancerProfileService ProfileService { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
 
     private string _selectedType = "Freelancer";
     private DateTime? _availableFrom;
-    private bool _cvUploading;
+    private bool _cvBusy;
 
     protected override void OnParametersSet()
     {
@@ -104,8 +105,8 @@ public partial class FreelancerProfileForm
 
     private async Task OnCvFileChanged(IBrowserFile file)
     {
-        _cvUploading = true;
-        StateHasChanged();
+        _cvBusy = true;
+        await OnCvBusyChanged.InvokeAsync(true);
 
         try
         {
@@ -123,8 +124,34 @@ public partial class FreelancerProfileForm
         }
         finally
         {
-            _cvUploading = false;
-            StateHasChanged();
+            _cvBusy = false;
+            await OnCvBusyChanged.InvokeAsync(false);
+        }
+    }
+
+    private async Task OnCvDeleteClicked()
+    {
+        _cvBusy = true;
+        await OnCvBusyChanged.InvokeAsync(true);
+
+        try
+        {
+            var response = await ProfileService.DeleteCvAsync();
+
+            if (response.Success)
+            {
+                Model.CvFileName = null;
+                Snackbar.Add("CV deleted successfully", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Add(response.DisplayMessage, Severity.Error);
+            }
+        }
+        finally
+        {
+            _cvBusy = false;
+            await OnCvBusyChanged.InvokeAsync(false);
         }
     }
 }
