@@ -152,26 +152,30 @@
                     <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
                 }
                 <div style="@(_cvBusy ? "display:none" : "")">
-                    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
-                        <MudFileUpload T="IBrowserFile" Accept=".pdf" FilesChanged="OnCvFileChanged">
-                            <SelectedTemplate />
-                            <CustomContent>
-                                <MudButton Variant="Variant.Outlined"
-                                           StartIcon="@Icons.Material.Filled.AttachFile"
-                                           Color="Color.Default"
-                                           OnClick="@context.OpenFilePickerAsync">
-                                    @(string.IsNullOrEmpty(Model.CvFileName)
-                                        ? "Upload CV (PDF)"
-                                        : $"Replace CV · {Model.CvFileName}")
-                                </MudButton>
-                            </CustomContent>
-                        </MudFileUpload>
+                    <MudStack Row="false" Spacing="1">
+                        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                            <MudFileUpload T="IBrowserFile" Accept=".pdf" FilesChanged="OnCvFileChanged">
+                                <SelectedTemplate />
+                                <CustomContent>
+                                    <MudButton Variant="Variant.Outlined"
+                                               StartIcon="@Icons.Material.Filled.AttachFile"
+                                               Color="Color.Default"
+                                               OnClick="@context.OpenFilePickerAsync">
+                                        @(string.IsNullOrEmpty(Model.CvFileName) ? "Upload CV (PDF)" : "Replace CV")
+                                    </MudButton>
+                                </CustomContent>
+                            </MudFileUpload>
+                            @if (!string.IsNullOrEmpty(Model.CvFileName))
+                            {
+                                <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                               Color="Color.Error"
+                                               Size="Size.Small"
+                                               OnClick="OnCvDeleteClicked" />
+                            }
+                        </MudStack>
                         @if (!string.IsNullOrEmpty(Model.CvFileName))
                         {
-                            <MudIconButton Icon="@Icons.Material.Filled.Delete"
-                                           Color="Color.Error"
-                                           Size="Size.Small"
-                                           OnClick="OnCvDeleteClicked" />
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">@Model.CvFileName</MudText>
                         }
                     </MudStack>
                 </div>
