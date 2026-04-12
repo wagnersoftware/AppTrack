@@ -7,8 +7,8 @@ internal static class FreelancerProfileMappings
 {
     internal static UpsertFreelancerProfileCommand ToUpsertCommand(this FreelancerProfileModel model) => new()
     {
-        FirstName = model.FirstName ?? string.Empty,
-        LastName = model.LastName ?? string.Empty,
+        FirstName = model.FirstName,
+        LastName = model.LastName,
         HourlyRate = (double?)model.HourlyRate,
         DailyRate = (double?)model.DailyRate,
         AvailableFrom = model.AvailableFrom.HasValue
