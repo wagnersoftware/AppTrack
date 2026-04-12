@@ -19,6 +19,7 @@
 #pragma warning disable 8604 // Disable "CS8604 Possible null reference argument for parameter"
 #pragma warning disable 8625 // Disable "CS8625 Cannot convert null literal to non-nullable reference type"
 #pragma warning disable 8765 // Disable "CS8765 Nullability of type of parameter doesn't match overridden member (possibly because of nullability attributes)."
+#nullable enable annotations
 
 namespace AppTrack.Frontend.ApiService.Base
 {
@@ -2150,10 +2151,10 @@ namespace AppTrack.Frontend.ApiService.Base
         public string UserId { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("firstName")]
-        public string FirstName { get; set; }
+        public string? FirstName { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("lastName")]
-        public string LastName { get; set; }
+        public string? LastName { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("hourlyRate")]
         public double? HourlyRate { get; set; }
@@ -2478,10 +2479,10 @@ namespace AppTrack.Frontend.ApiService.Base
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("firstName")]
-        public string FirstName { get; set; }
+        public string? FirstName { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("lastName")]
-        public string LastName { get; set; }
+        public string? LastName { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("hourlyRate")]
         public double? HourlyRate { get; set; }
@@ -2497,7 +2498,7 @@ namespace AppTrack.Frontend.ApiService.Base
         public RemotePreference WorkMode { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("skills")]
-        public string Skills { get; set; }
+        public string? Skills { get; set; }
 
     }
 
