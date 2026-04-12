@@ -13,11 +13,9 @@ public class FreelancerProfileConfiguration : IEntityTypeConfiguration<Freelance
             .HasMaxLength(450);
 
         builder.Property(x => x.FirstName)
-            .IsRequired()
             .HasMaxLength(100);
 
         builder.Property(x => x.LastName)
-            .IsRequired()
             .HasMaxLength(100);
 
         builder.Property(x => x.HourlyRate)
