@@ -18,6 +18,7 @@ public partial class FreelancerProfileForm
     private string _selectedType = "Freelancer";
     private DateTime? _availableFrom;
     private bool _cvBusy;
+    private MudMessageBox? _cvDeleteConfirmBox;
 
     protected override void OnParametersSet()
     {
@@ -131,6 +132,9 @@ public partial class FreelancerProfileForm
 
     private async Task OnCvDeleteClicked()
     {
+        var confirmed = await _cvDeleteConfirmBox!.ShowAsync();
+        if (confirmed != true) return;
+
         _cvBusy = true;
         await OnCvBusyChanged.InvokeAsync(true);
 

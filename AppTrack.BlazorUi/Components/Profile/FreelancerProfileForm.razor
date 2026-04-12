@@ -135,6 +135,16 @@
                               Placeholder="e.g. C#, .NET, Azure, SQL" />
             </MudItem>
 
+            <!-- CV Delete Confirmation -->
+            <MudMessageBox @ref="_cvDeleteConfirmBox"
+                           Title="Delete CV"
+                           CancelText="Cancel">
+                <MessageContent>Are you sure you want to delete your CV?</MessageContent>
+                <YesButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Error">Delete</MudButton>
+                </YesButton>
+            </MudMessageBox>
+
             <!-- CV Upload -->
             <MudItem xs="12">
                 @if (_cvBusy)
