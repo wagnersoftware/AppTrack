@@ -12,13 +12,16 @@ public class UpsertFreelancerProfileCommandHandler : IRequestHandler<UpsertFreel
 
     private readonly IFreelancerProfileRepository _repository;
     private readonly IAiSettingsRepository _aiSettingsRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
     public UpsertFreelancerProfileCommandHandler(
         IFreelancerProfileRepository repository,
-        IAiSettingsRepository aiSettingsRepository)
+        IAiSettingsRepository aiSettingsRepository,
+        IUnitOfWork unitOfWork)
     {
         _repository = repository;
         _aiSettingsRepository = aiSettingsRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<FreelancerProfileDto> Handle(UpsertFreelancerProfileCommand request, CancellationToken cancellationToken)
@@ -33,22 +36,25 @@ public class UpsertFreelancerProfileCommandHandler : IRequestHandler<UpsertFreel
 
         var existing = await _repository.GetByUserIdAsync(request.UserId);
 
-        AppTrack.Domain.FreelancerProfile savedProfile;
+        AppTrack.Domain.FreelancerProfile savedProfile = null!;
 
-        if (existing == null)
+        await _unitOfWork.ExecuteInTransactionAsync(async ct =>
         {
-            var newProfile = request.ToNewDomain();
-            await _repository.UpsertAsync(newProfile);
-            savedProfile = newProfile;
-        }
-        else
-        {
-            request.ApplyTo(existing);
-            await _repository.UpsertAsync(existing);
-            savedProfile = existing;
-        }
+            if (existing == null)
+            {
+                var newProfile = request.ToNewDomain();
+                await _repository.UpsertAsync(newProfile);
+                savedProfile = newProfile;
+            }
+            else
+            {
+                request.ApplyTo(existing);
+                await _repository.UpsertAsync(existing);
+                savedProfile = existing;
+            }
 
-        await SyncBuiltInParametersAsync(savedProfile);
+            await SyncBuiltInParametersAsync(savedProfile);
+        }, cancellationToken);
 
         return savedProfile.ToDto();
     }

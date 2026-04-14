@@ -13,13 +13,20 @@ public class UpsertFreelancerProfileCommandHandlerTests
 {
     private readonly Mock<IFreelancerProfileRepository> _mockRepo;
     private readonly Mock<IAiSettingsRepository> _mockAiSettingsRepo;
+    private readonly Mock<IUnitOfWork> _mockUnitOfWork;
     private readonly UpsertFreelancerProfileCommandHandler _handler;
 
     public UpsertFreelancerProfileCommandHandlerTests()
     {
         _mockRepo = MockFreelancerProfileRepository.GetMock();
         _mockAiSettingsRepo = MockAiSettingsRepository.GetMock();
-        _handler = new UpsertFreelancerProfileCommandHandler(_mockRepo.Object, _mockAiSettingsRepo.Object);
+
+        _mockUnitOfWork = new Mock<IUnitOfWork>();
+        _mockUnitOfWork
+            .Setup(u => u.ExecuteInTransactionAsync(It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()))
+            .Returns<Func<CancellationToken, Task>, CancellationToken>((action, ct) => action(ct));
+
+        _handler = new UpsertFreelancerProfileCommandHandler(_mockRepo.Object, _mockAiSettingsRepo.Object, _mockUnitOfWork.Object);
     }
 
     private static UpsertFreelancerProfileCommand ValidCommand(string userId = MockFreelancerProfileRepository.ExistingUserId) => new()
