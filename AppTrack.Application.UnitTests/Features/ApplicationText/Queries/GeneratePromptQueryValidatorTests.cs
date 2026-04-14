@@ -40,10 +40,10 @@ public class GeneratePromptQueryValidatorTests
         aiSettings.Prompts.Add(DomainPrompt.Create(PromptName, "Write a cover letter for {position}"));
 
         _aiSettingsRepo
-            .Setup(r => r.GetByUserIdIncludePromptParameterAsync(UserId))
+            .Setup(r => r.GetByUserIdWithPromptsReadOnlyAsync(UserId))
             .ReturnsAsync(aiSettings);
         _aiSettingsRepo
-            .Setup(r => r.GetByUserIdIncludePromptParameterAsync(It.Is<string>(id => id != UserId)))
+            .Setup(r => r.GetByUserIdWithPromptsReadOnlyAsync(It.Is<string>(id => id != UserId)))
             .ReturnsAsync((DomainAiSettings?)null);
 
         // Default: no built-in prompts
@@ -140,7 +140,7 @@ public class GeneratePromptQueryValidatorTests
         aiSettingsWithEmptyTemplate.Prompts.Add(DomainPrompt.Create(PromptName, " "));
 
         _aiSettingsRepo
-            .Setup(r => r.GetByUserIdIncludePromptParameterAsync(emptyTemplateUser))
+            .Setup(r => r.GetByUserIdWithPromptsReadOnlyAsync(emptyTemplateUser))
             .ReturnsAsync(aiSettingsWithEmptyTemplate);
 
         _jobAppRepo
@@ -173,7 +173,7 @@ public class GeneratePromptQueryValidatorTests
     {
         const string builtInOnlyPromptName = "Default_Empty";
         _aiSettingsRepo
-            .Setup(r => r.GetByUserIdIncludePromptParameterAsync(UserId))
+            .Setup(r => r.GetByUserIdWithPromptsReadOnlyAsync(UserId))
             .ReturnsAsync(new DomainAiSettings { Id = 1, UserId = UserId }); // no user prompts
 
         _builtInPromptRepo

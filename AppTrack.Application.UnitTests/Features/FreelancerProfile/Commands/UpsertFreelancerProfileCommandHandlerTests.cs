@@ -174,7 +174,7 @@ public class UpsertFreelancerProfileCommandHandlerTests
             SelectedChatModelId = 1,
         };
         _mockAiSettingsRepo
-            .Setup(r => r.GetByUserIdTrackedAsync("sync-user"))
+            .Setup(r => r.GetByUserIdWithPromptParameterAsync("sync-user"))
             .ReturnsAsync(aiSettings);
         _mockRepo
             .Setup(r => r.GetByUserIdAsync("sync-user"))
@@ -213,7 +213,7 @@ public class UpsertFreelancerProfileCommandHandlerTests
             PromptParameter = new List<AppTrack.Domain.PromptParameter> { existingParam },
         };
         _mockAiSettingsRepo
-            .Setup(r => r.GetByUserIdTrackedAsync("update-user"))
+            .Setup(r => r.GetByUserIdWithPromptParameterAsync("update-user"))
             .ReturnsAsync(aiSettings);
         _mockRepo
             .Setup(r => r.GetByUserIdAsync("update-user"))
@@ -246,7 +246,7 @@ public class UpsertFreelancerProfileCommandHandlerTests
             PromptParameter = new List<AppTrack.Domain.PromptParameter> { existingParam },
         };
         _mockAiSettingsRepo
-            .Setup(r => r.GetByUserIdTrackedAsync("remove-user"))
+            .Setup(r => r.GetByUserIdWithPromptParameterAsync("remove-user"))
             .ReturnsAsync(aiSettings);
         _mockRepo
             .Setup(r => r.GetByUserIdAsync("remove-user"))

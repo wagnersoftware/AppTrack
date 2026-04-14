@@ -45,7 +45,7 @@ public class GeneratePromptQueryValidator : AbstractValidator<GeneratePromptQuer
 
     private async Task ValidateAiSettings(GeneratePromptQuery query, ValidationContext<GeneratePromptQuery> context, CancellationToken token)
     {
-        var aiSettings = await _aiSettingsRepository.GetByUserIdIncludePromptParameterAsync(query.UserId);
+        var aiSettings = await _aiSettingsRepository.GetByUserIdWithPromptsReadOnlyAsync(query.UserId);
 
         if (aiSettings == null)
         {

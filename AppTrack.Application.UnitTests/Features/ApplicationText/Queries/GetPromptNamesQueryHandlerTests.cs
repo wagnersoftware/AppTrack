@@ -32,7 +32,7 @@ public class GetPromptNamesQueryHandlerTests
         aiSettings.Prompts.Add(Prompt.Create("Cover_Letter", "template A"));
         aiSettings.Prompts.Add(Prompt.Create("LinkedIn_Message", "template B"));
         _mockAiSettingsRepo
-            .Setup(r => r.GetByUserIdIncludePromptParameterAsync(UserId))
+            .Setup(r => r.GetByUserIdWithPromptsReadOnlyAsync(UserId))
             .ReturnsAsync(aiSettings);
 
         var result = await CreateHandler().Handle(new GetPromptNamesQuery { UserId = UserId }, CancellationToken.None);
@@ -44,7 +44,7 @@ public class GetPromptNamesQueryHandlerTests
     public async Task Handle_ShouldReturnEmptyList_WhenAiSettingsHaveNoPromptsAndNoBuiltIns()
     {
         _mockAiSettingsRepo
-            .Setup(r => r.GetByUserIdIncludePromptParameterAsync(UserId))
+            .Setup(r => r.GetByUserIdWithPromptsReadOnlyAsync(UserId))
             .ReturnsAsync(new DomainAiSettings { Id = 1, UserId = UserId });
 
         var result = await CreateHandler().Handle(new GetPromptNamesQuery { UserId = UserId }, CancellationToken.None);
@@ -56,7 +56,7 @@ public class GetPromptNamesQueryHandlerTests
     public async Task Handle_ShouldThrowBadRequestException_WhenAiSettingsNotFound()
     {
         _mockAiSettingsRepo
-            .Setup(r => r.GetByUserIdIncludePromptParameterAsync(UserId))
+            .Setup(r => r.GetByUserIdWithPromptsReadOnlyAsync(UserId))
             .ReturnsAsync((DomainAiSettings?)null);
 
         await Should.ThrowAsync<BadRequestException>(() =>
@@ -67,7 +67,7 @@ public class GetPromptNamesQueryHandlerTests
     public async Task Handle_ShouldReturnBuiltInPromptNames_WhenUserHasNoPrompts()
     {
         _mockAiSettingsRepo
-            .Setup(r => r.GetByUserIdIncludePromptParameterAsync(UserId))
+            .Setup(r => r.GetByUserIdWithPromptsReadOnlyAsync(UserId))
             .ReturnsAsync(new DomainAiSettings { Id = 1, UserId = UserId });
 
         var builtIns = new List<BuiltInPrompt>
@@ -88,7 +88,7 @@ public class GetPromptNamesQueryHandlerTests
         var aiSettings = new DomainAiSettings { Id = 1, UserId = UserId };
         aiSettings.Prompts.Add(Prompt.Create("My_Custom_Prompt", "template"));
         _mockAiSettingsRepo
-            .Setup(r => r.GetByUserIdIncludePromptParameterAsync(UserId))
+            .Setup(r => r.GetByUserIdWithPromptsReadOnlyAsync(UserId))
             .ReturnsAsync(aiSettings);
 
         var builtIns = new List<BuiltInPrompt>

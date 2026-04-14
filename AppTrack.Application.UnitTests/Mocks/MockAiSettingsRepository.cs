@@ -20,11 +20,11 @@ public static class MockAiSettingsRepository
         };
 
         mockRepo.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(aiSettings);
-        mockRepo.Setup(r => r.GetByIdIncludePromptParameterAsync(1)).ReturnsAsync(aiSettings);
+        mockRepo.Setup(r => r.GetByIdWithPromptsAsync(1)).ReturnsAsync(aiSettings);
         mockRepo.Setup(r => r.CreateAsync(It.IsAny<AiSettings>())).Returns(Task.CompletedTask);
         mockRepo.Setup(r => r.UpdateAsync(It.IsAny<AiSettings>())).Returns(Task.CompletedTask);
-        mockRepo.Setup(r => r.GetByUserIdTrackedAsync(ExistingUserId)).ReturnsAsync(aiSettings);
-        mockRepo.Setup(r => r.GetByUserIdTrackedAsync(It.Is<string>(id => id != ExistingUserId))).ReturnsAsync((AiSettings?)null);
+        mockRepo.Setup(r => r.GetByUserIdWithPromptParameterAsync(ExistingUserId)).ReturnsAsync(aiSettings);
+        mockRepo.Setup(r => r.GetByUserIdWithPromptParameterAsync(It.Is<string>(id => id != ExistingUserId))).ReturnsAsync((AiSettings?)null);
 
         return mockRepo;
     }

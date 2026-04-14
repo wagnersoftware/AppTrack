@@ -28,7 +28,7 @@ public class GetAiSettingsByUserIdQueryHandler : IRequestHandler<GetAiSettingsBy
         if (validationResult.Errors.Any())
             throw new BadRequestException($"Invalid request", validationResult);
 
-        var entity = await _aiSettingsRepository.GetByUserIdIncludePromptParameterAsync(request.UserId);
+        var entity = await _aiSettingsRepository.GetByUserIdWithPromptsReadOnlyAsync(request.UserId);
 
         if (entity == null)
         {

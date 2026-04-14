@@ -24,7 +24,7 @@ public class GetPromptNamesQueryHandler : IRequestHandler<GetPromptNamesQuery, G
         if (validationResult.Errors.Any())
             throw new BadRequestException("Invalid request.", validationResult);
 
-        var aiSettings = await _aiSettingsRepository.GetByUserIdIncludePromptParameterAsync(request.UserId);
+        var aiSettings = await _aiSettingsRepository.GetByUserIdWithPromptsReadOnlyAsync(request.UserId);
         var builtInPrompts = await _builtInPromptRepository.GetAsync();
 
         var userPromptNames = aiSettings!.Prompts.Select(p => p.Name);

@@ -17,7 +17,7 @@ public class GetPromptNamesQueryValidator : AbstractValidator<GetPromptNamesQuer
 
     private async Task ValidateAiSettings(GetPromptNamesQuery query, ValidationContext<GetPromptNamesQuery> context, CancellationToken token)
     {
-        var aiSettings = await _aiSettingsRepository.GetByUserIdIncludePromptParameterAsync(query.UserId);
+        var aiSettings = await _aiSettingsRepository.GetByUserIdWithPromptsReadOnlyAsync(query.UserId);
 
         if (aiSettings == null)
             context.AddFailure("AI settings not found for this user.");

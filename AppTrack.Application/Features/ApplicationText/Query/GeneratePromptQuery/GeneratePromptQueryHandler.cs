@@ -34,7 +34,7 @@ public class GeneratePromptQueryHandler : IRequestHandler<GeneratePromptQuery, G
         if (validationResult.Errors.Any())
             throw new BadRequestException("Invalid generate prompt request.", validationResult);
 
-        var aiSettings = await _aiSettingsRepository.GetByUserIdIncludePromptParameterAsync(request.UserId);
+        var aiSettings = await _aiSettingsRepository.GetByUserIdWithPromptsReadOnlyAsync(request.UserId);
         var jobApplication = await _jobApplicationRepository.GetByIdAsync(request.JobApplicationId);
 
         var applicantParameter = aiSettings!.PromptParameter.ToList();

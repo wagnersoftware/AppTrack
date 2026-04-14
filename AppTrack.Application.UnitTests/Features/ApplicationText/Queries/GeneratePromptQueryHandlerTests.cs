@@ -60,7 +60,7 @@ public class GeneratePromptQueryHandlerTests
             .ReturnsAsync((JobApplication?)null);
 
         _mockAiSettingsRepo
-            .Setup(r => r.GetByUserIdIncludePromptParameterAsync(UserId))
+            .Setup(r => r.GetByUserIdWithPromptsReadOnlyAsync(UserId))
             .ReturnsAsync(existingAiSettings);
 
         // Default: no built-in prompts
@@ -96,7 +96,7 @@ public class GeneratePromptQueryHandlerTests
         const string secondTemplate = "LinkedIn template for {Name}";
 
         _mockAiSettingsRepo
-            .Setup(r => r.GetByUserIdIncludePromptParameterAsync(UserId))
+            .Setup(r => r.GetByUserIdWithPromptsReadOnlyAsync(UserId))
             .ReturnsAsync(new DomainAiSettings
             {
                 Id = 1,
@@ -140,7 +140,7 @@ public class GeneratePromptQueryHandlerTests
         const string noSettingsUser = "user-no-settings";
 
         _mockAiSettingsRepo
-            .Setup(r => r.GetByUserIdIncludePromptParameterAsync(noSettingsUser))
+            .Setup(r => r.GetByUserIdWithPromptsReadOnlyAsync(noSettingsUser))
             .ReturnsAsync((DomainAiSettings?)null);
 
         _mockJobApplicationRepo
@@ -179,7 +179,7 @@ public class GeneratePromptQueryHandlerTests
 
         // User also has a prompt with the same name — must be ignored
         _mockAiSettingsRepo
-            .Setup(r => r.GetByUserIdIncludePromptParameterAsync(UserId))
+            .Setup(r => r.GetByUserIdWithPromptsReadOnlyAsync(UserId))
             .ReturnsAsync(new DomainAiSettings
             {
                 Id = 1,

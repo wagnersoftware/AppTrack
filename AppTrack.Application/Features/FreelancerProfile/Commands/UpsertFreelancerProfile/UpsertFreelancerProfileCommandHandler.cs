@@ -61,7 +61,7 @@ public class UpsertFreelancerProfileCommandHandler : IRequestHandler<UpsertFreel
 
     private async Task SyncBuiltInParametersAsync(AppTrack.Domain.FreelancerProfile profile)
     {
-        var aiSettings = await _aiSettingsRepository.GetByUserIdTrackedAsync(profile.UserId);
+        var aiSettings = await _aiSettingsRepository.GetByUserIdWithPromptParameterAsync(profile.UserId);
 
         if (aiSettings is null)
         {

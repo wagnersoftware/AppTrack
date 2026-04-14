@@ -46,7 +46,7 @@ public class GenerateApplicationTextCommandValidator : AbstractValidator<Generat
         CancellationToken token)
     {
         var aiSettings = await _aiSettingsRepository
-            .GetByUserIdIncludePromptParameterAsync(command.UserId);
+            .GetByUserIdWithPromptsReadOnlyAsync(command.UserId);
 
         if (aiSettings == null)
         {

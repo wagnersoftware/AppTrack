@@ -30,7 +30,7 @@ public class GetAiSettingsByUserIdQueryHandlerTests
         var existingSettings = new DomainAiSettings { Id = 1, UserId = userId, SelectedChatModelId = 3 };
 
         _mockRepo
-            .Setup(r => r.GetByUserIdIncludePromptParameterAsync(userId))
+            .Setup(r => r.GetByUserIdWithPromptsReadOnlyAsync(userId))
             .ReturnsAsync(existingSettings);
 
         var result = await CreateHandler().Handle(new GetAiSettingsByUserIdQuery { UserId = userId }, CancellationToken.None);
@@ -49,7 +49,7 @@ public class GetAiSettingsByUserIdQueryHandlerTests
         const string userId = "new-user";
 
         _mockRepo
-            .Setup(r => r.GetByUserIdIncludePromptParameterAsync(userId))
+            .Setup(r => r.GetByUserIdWithPromptsReadOnlyAsync(userId))
             .ReturnsAsync((DomainAiSettings?)null);
 
         _mockRepo
@@ -68,7 +68,7 @@ public class GetAiSettingsByUserIdQueryHandlerTests
     {
         const string userId = "user-1";
         _mockRepo
-            .Setup(r => r.GetByUserIdIncludePromptParameterAsync(userId))
+            .Setup(r => r.GetByUserIdWithPromptsReadOnlyAsync(userId))
             .ReturnsAsync(new DomainAiSettings { Id = 1, UserId = userId });
 
         var builtInPrompts = new List<BuiltInPrompt>
