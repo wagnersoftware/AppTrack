@@ -15,7 +15,7 @@ public partial class ProfileSetup
     private FreelancerProfileModel _model = new();
     private FreelancerProfileForm _form = null!;
     private bool _isBusy;
-    private bool _cvBusy;
+    private MudMessageBox _deleteConfirmBox = null!;
 
     protected override async Task OnInitializedAsync()
     {
@@ -23,6 +23,27 @@ public partial class ProfileSetup
         if (response.Success && response.Data is not null)
         {
             _model = response.Data;
+        }
+    }
+
+    private async Task ConfirmDeleteProfile()
+    {
+        var confirmed = await _deleteConfirmBox.ShowAsync();
+        if (confirmed != true) return;
+
+        _isBusy = true;
+        StateHasChanged();
+        var response = await ProfileService.DeleteProfileAsync();
+        _isBusy = false;
+
+        if (response.Success)
+        {
+            Snackbar.Add("Profile deleted successfully.", Severity.Success);
+            Navigation.NavigateTo("/");
+        }
+        else
+        {
+            Snackbar.Add(response.DisplayMessage, Severity.Error);
         }
     }
 

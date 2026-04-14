@@ -17,7 +17,7 @@ public partial class FreelancerProfileForm
 
     private string _selectedType = "Freelancer";
     private DateTime? _availableFrom;
-    private bool _cvBusy;
+    private bool _isBusy;
     private MudMessageBox? _cvDeleteConfirmBox;
 
     protected override void OnParametersSet()
@@ -106,7 +106,7 @@ public partial class FreelancerProfileForm
 
     private async Task OnCvFileChanged(IBrowserFile file)
     {
-        _cvBusy = true;
+        _isBusy = true;
         await OnCvBusyChanged.InvokeAsync(true);
 
         try
@@ -125,7 +125,7 @@ public partial class FreelancerProfileForm
         }
         finally
         {
-            _cvBusy = false;
+            _isBusy = false;
             await OnCvBusyChanged.InvokeAsync(false);
         }
     }
@@ -135,7 +135,7 @@ public partial class FreelancerProfileForm
         var confirmed = await _cvDeleteConfirmBox!.ShowAsync();
         if (confirmed != true) return;
 
-        _cvBusy = true;
+        _isBusy = true;
         await OnCvBusyChanged.InvokeAsync(true);
 
         try
@@ -154,7 +154,7 @@ public partial class FreelancerProfileForm
         }
         finally
         {
-            _cvBusy = false;
+            _isBusy = false;
             await OnCvBusyChanged.InvokeAsync(false);
         }
     }

@@ -10,4 +10,5 @@ public interface IFreelancerProfileService
     Task<Response<FreelancerProfileModel>> UpsertProfileAsync(FreelancerProfileModel model);
     Task<Response<FreelancerProfileModel>> UploadCvAsync(IBrowserFile file);
     Task<Response<FreelancerProfileModel>> DeleteCvAsync();
+    Task<Response<bool>> DeleteProfileAsync();
 }
