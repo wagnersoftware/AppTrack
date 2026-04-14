@@ -1,41 +1,6 @@
 <MudStack Spacing="4">
 
-    <!-- ── Section 1: Profile Type ─────────────────────────────── -->
-    <div>
-        <MudText Typo="Typo.subtitle1" Class="mb-2">Profile Type</MudText>
-        <MudGrid Spacing="2">
-            <MudItem xs="12" sm="6">
-                <MudCard @onclick="SelectFreelancer"
-                         Style="@GetCardStyle("Freelancer")"
-                         Elevation="2">
-                    <MudCardContent>
-                        <MudStack AlignItems="AlignItems.Center" Spacing="1">
-                            <MudIcon Icon="@Icons.Material.Filled.WorkspacePremium"
-                                     Size="Size.Large"
-                                     Color="Color.Primary" />
-                            <MudText Typo="Typo.h6">Freelancer</MudText>
-                        </MudStack>
-                    </MudCardContent>
-                </MudCard>
-            </MudItem>
-            <MudItem xs="12" sm="6">
-                <MudTooltip Text="Coming soon">
-                    <MudCard Style="pointer-events: none; opacity: 0.5;" Elevation="1">
-                        <MudCardContent>
-                            <MudStack AlignItems="AlignItems.Center" Spacing="1">
-                                <MudIcon Icon="@Icons.Material.Filled.BusinessCenter"
-                                         Size="Size.Large"
-                                         Color="Color.Secondary" />
-                                <MudText Typo="Typo.h6">Employee</MudText>
-                            </MudStack>
-                        </MudCardContent>
-                    </MudCard>
-                </MudTooltip>
-            </MudItem>
-        </MudGrid>
-    </div>
-
-    <!-- ── Section 2: Personal Details ─────────────────────────── -->
+    <!-- ── Section 1: Personal Details ─────────────────────────── -->
     <div>
         <MudText Typo="Typo.subtitle1" Class="mb-2">Personal Details</MudText>
         <MudGrid Spacing="2">

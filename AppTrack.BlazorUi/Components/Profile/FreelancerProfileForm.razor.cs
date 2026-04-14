@@ -16,7 +16,6 @@ public partial class FreelancerProfileForm
     [Inject] private IFreelancerProfileService ProfileService { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
 
-    private string _selectedType = "Freelancer";
     private DateTime? _availableFrom;
     private bool _isBusy;
     private MudMessageBox? _cvDeleteConfirmBox;
@@ -35,8 +34,6 @@ public partial class FreelancerProfileForm
         var errors = ModelValidator.Errors.GetValueOrDefault(propertyName);
         return errors is { Count: > 0 } ? errors[0] : string.Empty;
     }
-
-    private void SelectFreelancer() => _selectedType = "Freelancer";
 
     private void OnFirstNameChanged(string value)
     {
@@ -99,11 +96,6 @@ public partial class FreelancerProfileForm
         Model.Skills = value;
         ModelValidator.ResetErrors(nameof(Model.Skills));
     }
-
-    private string GetCardStyle(string type) =>
-        _selectedType == type
-            ? "cursor: pointer; border: 2px solid var(--mud-palette-primary);"
-            : "cursor: pointer;";
 
     private async Task OnCvFileChanged(IBrowserFile file)
     {
