@@ -39,11 +39,11 @@ public class FreelancerProfileService : BaseHttpService, IFreelancerProfileServi
             return dto.ToModel();
         });
 
-    public Task<Response<FreelancerProfileModel>> DeleteCvAsync() =>
+    public Task<Response<bool>> DeleteCvAsync() =>
         TryExecuteAsync(async () =>
         {
-            var dto = await _client.CvDELETEAsync();
-            return dto.ToModel();
+            await _client.CvDELETEAsync();
+            return true;
         });
 
     public Task<Response<bool>> DeleteProfileAsync() =>

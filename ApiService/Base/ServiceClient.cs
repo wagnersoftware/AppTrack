@@ -2371,7 +2371,7 @@ namespace AppTrack.Frontend.ApiService.Base
         public System.DateTime? AvailableFrom { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("workMode")]
-        public RemotePreference WorkMode { get; set; }
+        public RemotePreference? WorkMode { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("skills")]
         public string Skills { get; set; }
