@@ -8,8 +8,7 @@ public class BuiltInPromptConfiguration : IEntityTypeConfiguration<BuiltInPrompt
 {
     public void Configure(EntityTypeBuilder<BuiltInPrompt> builder)
     {
-        // Keep the existing SQL table name to avoid a breaking schema migration.
-        builder.ToTable("DefaultPrompts");
+        builder.ToTable("BuiltInPrompts");
 
         builder.Property(x => x.Name)
             .IsRequired()
