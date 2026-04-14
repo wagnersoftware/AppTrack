@@ -23,6 +23,7 @@ public class AiSettingsRepository : GenericRepository<AiSettings>, IAiSettingsRe
     {
         return await _context.AiSettings.AsNoTracking()
             .Include(s => s.PromptParameter)
+            .Include(s => s.BuiltInPromptParameter)
             .Include(s => s.Prompts)
             .FirstOrDefaultAsync(s => s.UserId == userId);
     }
@@ -31,6 +32,7 @@ public class AiSettingsRepository : GenericRepository<AiSettings>, IAiSettingsRe
     {
         return await _context.AiSettings
             .Include(s => s.PromptParameter)
+            .Include(s => s.BuiltInPromptParameter)
             .FirstOrDefaultAsync(s => s.UserId == userId);
     }
 }

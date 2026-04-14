@@ -78,18 +78,19 @@ public class UpsertFreelancerProfileCommandHandler : IRequestHandler<UpsertFreel
             [$"{BuiltInPrefix}AvailableFrom"] = profile.AvailableFrom?.ToString("yyyy-MM-dd"),
             [$"{BuiltInPrefix}WorkMode"] = profile.WorkMode?.ToString(),
             [$"{BuiltInPrefix}Skills"] = profile.Skills,
+            [$"{BuiltInPrefix}CvText"] = profile.CvText,
         };
 
         foreach (var (key, value) in parameters)
         {
-            var existingParam = aiSettings.PromptParameter
+            var existingParam = aiSettings.BuiltInPromptParameter
                 .FirstOrDefault(p => p.Key == key);
 
             if (string.IsNullOrEmpty(value))
             {
                 if (existingParam is not null)
                 {
-                    aiSettings.PromptParameter.Remove(existingParam);
+                    aiSettings.BuiltInPromptParameter.Remove(existingParam);
                 }
             }
             else
@@ -100,7 +101,7 @@ public class UpsertFreelancerProfileCommandHandler : IRequestHandler<UpsertFreel
                 }
                 else
                 {
-                    aiSettings.PromptParameter.Add(AppTrack.Domain.PromptParameter.Create(key, value));
+                    aiSettings.BuiltInPromptParameter.Add(AppTrack.Domain.BuiltInPromptParameter.Create(key, value));
                 }
             }
         }

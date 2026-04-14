@@ -2,6 +2,7 @@ using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Exceptions;
 using AppTrack.Application.Features.ApplicationText.Dto;
+using AppTrack.Domain;
 using AppTrack.Domain.Contracts;
 using AppTrack.Domain.Extensions;
 
@@ -37,7 +38,11 @@ public class GeneratePromptQueryHandler : IRequestHandler<GeneratePromptQuery, G
         var aiSettings = await _aiSettingsRepository.GetByUserIdWithPromptsReadOnlyAsync(request.UserId);
         var jobApplication = await _jobApplicationRepository.GetByIdAsync(request.JobApplicationId);
 
-        var applicantParameter = aiSettings!.PromptParameter.ToList();
+        var builtInParameters = aiSettings!.BuiltInPromptParameter
+            .Select(p => PromptParameter.Create(p.Key, p.Value));
+        var applicantParameter = aiSettings!.PromptParameter
+            .Concat(builtInParameters)
+            .ToList();
         var jobApplicationParameter = jobApplication!.ToPromptParameters().ToList();
         var promptParameter = jobApplicationParameter.Union(applicantParameter).ToList();
 

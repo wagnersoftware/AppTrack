@@ -192,11 +192,11 @@ public class UpsertFreelancerProfileCommandHandlerTests
         // Act
         await _handler.Handle(command, CancellationToken.None);
 
-        // Assert: parameters were added and UpdateAsync was called
-        aiSettings.PromptParameter.ShouldContain(p => p.Key == "builtIn_FirstName" && p.Value == "Alice");
-        aiSettings.PromptParameter.ShouldContain(p => p.Key == "builtIn_HourlyRate" && p.Value == "90");
-        aiSettings.PromptParameter.ShouldContain(p => p.Key == "builtIn_WorkMode" && p.Value == "Remote");
-        aiSettings.PromptParameter.ShouldContain(p => p.Key == "builtIn_AvailableFrom" && p.Value == "2025-06-01");
+        // Assert: parameters were added to BuiltInPromptParameter and UpdateAsync was called
+        aiSettings.BuiltInPromptParameter.ShouldContain(p => p.Key == "builtIn_FirstName" && p.Value == "Alice");
+        aiSettings.BuiltInPromptParameter.ShouldContain(p => p.Key == "builtIn_HourlyRate" && p.Value == "90");
+        aiSettings.BuiltInPromptParameter.ShouldContain(p => p.Key == "builtIn_WorkMode" && p.Value == "Remote");
+        aiSettings.BuiltInPromptParameter.ShouldContain(p => p.Key == "builtIn_AvailableFrom" && p.Value == "2025-06-01");
         _mockAiSettingsRepo.Verify(r => r.UpdateAsync(aiSettings), Times.Once);
     }
 
@@ -204,13 +204,13 @@ public class UpsertFreelancerProfileCommandHandlerTests
     public async Task Handle_ShouldUpdateExistingBuiltInParameter_WhenParameterAlreadyExists()
     {
         // Arrange
-        var existingParam = AppTrack.Domain.PromptParameter.Create("builtIn_FirstName", "OldName");
+        var existingParam = AppTrack.Domain.BuiltInPromptParameter.Create("builtIn_FirstName", "OldName");
         var aiSettings = new AppTrack.Domain.AiSettings
         {
             Id = 99,
             UserId = "update-user",
             SelectedChatModelId = 1,
-            PromptParameter = new List<AppTrack.Domain.PromptParameter> { existingParam },
+            BuiltInPromptParameter = new List<AppTrack.Domain.BuiltInPromptParameter> { existingParam },
         };
         _mockAiSettingsRepo
             .Setup(r => r.GetByUserIdWithPromptParameterAsync("update-user"))
@@ -230,20 +230,20 @@ public class UpsertFreelancerProfileCommandHandlerTests
 
         // Assert: value updated in-place, collection still has one entry for that key
         existingParam.Value.ShouldBe("NewName");
-        aiSettings.PromptParameter.Count(p => p.Key == "builtIn_FirstName").ShouldBe(1);
+        aiSettings.BuiltInPromptParameter.Count(p => p.Key == "builtIn_FirstName").ShouldBe(1);
     }
 
     [Fact]
     public async Task Handle_ShouldRemoveBuiltInParameter_WhenFieldBecomesNull()
     {
         // Arrange
-        var existingParam = AppTrack.Domain.PromptParameter.Create("builtIn_FirstName", "OldName");
+        var existingParam = AppTrack.Domain.BuiltInPromptParameter.Create("builtIn_FirstName", "OldName");
         var aiSettings = new AppTrack.Domain.AiSettings
         {
             Id = 99,
             UserId = "remove-user",
             SelectedChatModelId = 1,
-            PromptParameter = new List<AppTrack.Domain.PromptParameter> { existingParam },
+            BuiltInPromptParameter = new List<AppTrack.Domain.BuiltInPromptParameter> { existingParam },
         };
         _mockAiSettingsRepo
             .Setup(r => r.GetByUserIdWithPromptParameterAsync("remove-user"))
@@ -262,7 +262,7 @@ public class UpsertFreelancerProfileCommandHandlerTests
         await _handler.Handle(command, CancellationToken.None);
 
         // Assert: the parameter was removed
-        aiSettings.PromptParameter.ShouldNotContain(p => p.Key == "builtIn_FirstName");
+        aiSettings.BuiltInPromptParameter.ShouldNotContain(p => p.Key == "builtIn_FirstName");
         _mockAiSettingsRepo.Verify(r => r.UpdateAsync(aiSettings), Times.Once);
     }
 }

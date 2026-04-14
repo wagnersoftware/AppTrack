@@ -22,6 +22,8 @@ public class AppTrackDatabaseContext : DbContext
 
     public DbSet<FreelancerProfile> FreelancerProfiles { get; set; }
 
+    public DbSet<BuiltInPromptParameter> BuiltInPromptParameter { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppTrackDatabaseContext).Assembly);

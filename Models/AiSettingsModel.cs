@@ -11,6 +11,7 @@ public partial class AiSettingsModel : ModelBase, IAiSettingsValidatable
     public ObservableCollection<PromptParameterModel> PromptParameter { get; set; } = new ObservableCollection<PromptParameterModel>();
     public ObservableCollection<PromptModel> Prompts { get; set; } = new ObservableCollection<PromptModel>();
     public List<PromptModel> BuiltInPrompts { get; set; } = [];
+    public List<PromptParameterModel> BuiltInPromptParameter { get; set; } = [];
 
     IEnumerable<IPromptParameterValidatable> IAiSettingsValidatable.PromptParameter => PromptParameter;
     IEnumerable<IPromptValidatable> IAiSettingsValidatable.Prompts => Prompts;

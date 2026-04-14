@@ -78,13 +78,18 @@
 - Migration `20260414193220_RenameDefaultPrefixToBuiltIn` renames ids 1–8 in `DefaultPrompts` table
   - Ids 5–8 (English variants from `AddEnglishDefaultPrompts` raw InsertData) renamed with `_en` suffix to avoid unique index collision
 
-## builtIn_ PromptParameter Sync (branch: feature/builtinprompt-parameters)
-- After profile upsert, handler syncs 7 `builtIn_` keys into `AiSettings.PromptParameter` for the user
-- New repo method: `IAiSettingsRepository.GetByUserIdTrackedAsync(string userId)` — tracked EF query, includes PromptParameter only (no Prompts)
-- Rule: null/empty field → remove existing param if present; non-empty → add or update in-place
-- `PromptParameter.Value` is updated directly on the tracked entity (EF change tracking handles the UPDATE)
-- `AiSettings.PromptParameter` collection property name is `PromptParameter` (singular, not `PromptParameters`)
+## builtIn_ PromptParameter Sync (updated Apr 2026 - branch: feature/builtinprompt-parameters)
+- After profile upsert, handler syncs 7 `builtIn_` keys into `AiSettings.BuiltInPromptParameter` (separate table, not `PromptParameter`)
+- `BuiltInPromptParameter` domain entity at `AppTrack.Domain/BuiltInPromptParameter.cs` — FK `AiSettingsId` on `AiSettings`
+- `AiSettings` has two collections: `PromptParameter` (user-editable) and `BuiltInPromptParameter` (handler-managed, read-only for user)
+- `UpdateAiSettings` command does NOT touch `BuiltInPromptParameter`
+- `GeneratePromptQueryHandler` merges both collections: `PromptParameter.Concat(builtInParameters)` before building prompt
+- EF config: `BuiltInPromptParameterConfiguration.cs` — Key max 50, Value max 500, unique index (AiSettingsId, Key)
+- `AiSettingsRepository.GetByUserIdWithPromptsReadOnlyAsync` and `GetByUserIdWithPromptParameterAsync` both include `BuiltInPromptParameter`
+- `AiSettingsDto.BuiltInPromptParameter` added as `List<PromptParameterDto>` — mapped in `AiSettingsMappings.ToDto`
+- Migration: `20260414195556_AddBuiltInPromptParameterTable` — includes data migration SQL to move existing `builtIn_%` rows from `PromptParameter`
 - `MockAiSettingsRepository.ExistingUserId = "user1"` — constant added to facilitate test setup
+- Rule: null/empty field → remove existing param if present; non-empty → add or update in-place
 
 ## CV Storage Feature (Infrastructure layer, branch: feature/profile-setup-wizard)
 - `AzureStorageSettings` at `AppTrack.Infrastructure/CvStorage/AzureStorageSettings.cs` — ConnectionString + ContainerName

@@ -128,6 +128,11 @@ constant with `BackdropClick = false, MaxWidth = Small` for the child. Call
 (not `Message` — falls back from `ErrorDetails` to `ErrorMessage` automatically). Never
 use `IsSuccess` or `Message` — they do not exist on `Response<T>`.
 
+## MudExpansionPanel (MudBlazor 9.x)
+- Correct attribute to control initial collapsed state: `Expanded="false"` (NOT `IsExpanded`)
+- `IsExpanded` triggers MUD0002 build error — it is not a valid attribute in MudBlazor 9.x
+- Both panels in a shared `<MudExpansionPanels>` container; `Expanded="false"` makes them start collapsed
+
 ## MudFileUpload (MudBlazor 9.x)
 - Named render fragment for the activator button: `<CustomContent>` (NOT `ActivatorContent`)
 - `@context` is `MudFileUploadContext`; call `context.OpenFilePickerAsync()` in the button's `OnClick`
