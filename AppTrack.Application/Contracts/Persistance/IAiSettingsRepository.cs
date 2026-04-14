@@ -6,5 +6,7 @@ public interface IAiSettingsRepository : IGenericRepository<AiSettings>
 {
     Task<AiSettings?> GetByUserIdIncludePromptParameterAsync(string userId);
 
-    Task<AiSettings?> GetByIdWithPromptParameterAsync(int id);
+    Task<AiSettings?> GetByIdIncludePromptParameterAsync(int id);
+
+    Task<AiSettings?> GetByUserIdTrackedAsync(string userId);
 }

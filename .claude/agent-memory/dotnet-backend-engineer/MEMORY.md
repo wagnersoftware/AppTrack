@@ -62,6 +62,20 @@
 - Latest stable version: 0.1.9 (as of Apr 2026; 0.1.14 also available)
 - `PdfDocument.Open(stream)` returns an `IDisposable`; use `using var document = ...`
 
+## Namespace vs. Domain Type Collision (recurring gotcha)
+- When a handler or test file is nested under `AppTrack.Application.Features.FreelancerProfile.*` (or any other Feature namespace), `FreelancerProfile` resolves as the namespace segment, not `AppTrack.Domain.FreelancerProfile`
+- Same issue in test namespace `AppTrack.Application.UnitTests.Features.FreelancerProfile.Commands` — `FreelancerProfile` and `AiSettings` both clash
+- Fix: use fully-qualified type names (`AppTrack.Domain.FreelancerProfile`, `AppTrack.Domain.AiSettings`, `AppTrack.Domain.PromptParameter`) instead of a `using AppTrack.Domain;` import in those files
+- Private helper methods in handlers must not carry `CancellationToken` unless they actually pass it to an async call — SonarAnalyzer (S1172) treats unused method parameters as errors
+
+## builtIn_ PromptParameter Sync (branch: feature/builtinprompt-parameters)
+- After profile upsert, handler syncs 7 `builtIn_` keys into `AiSettings.PromptParameter` for the user
+- New repo method: `IAiSettingsRepository.GetByUserIdTrackedAsync(string userId)` — tracked EF query, includes PromptParameter only (no Prompts)
+- Rule: null/empty field → remove existing param if present; non-empty → add or update in-place
+- `PromptParameter.Value` is updated directly on the tracked entity (EF change tracking handles the UPDATE)
+- `AiSettings.PromptParameter` collection property name is `PromptParameter` (singular, not `PromptParameters`)
+- `MockAiSettingsRepository.ExistingUserId = "user1"` — constant added to facilitate test setup
+
 ## CV Storage Feature (Infrastructure layer, branch: feature/profile-setup-wizard)
 - `AzureStorageSettings` at `AppTrack.Infrastructure/CvStorage/AzureStorageSettings.cs` — ConnectionString + ContainerName
 - `AzureBlobStorageService` implements `ICvStorageService` — creates `BlobServiceClient` per call (stateless, scoped DI)

@@ -25,7 +25,7 @@ public class UpdateAiSettingsCommandHandler : IRequestHandler<UpdateAiSettingsCo
             throw new BadRequestException($"One or more validation errors occurred.", validationResult);
         }
 
-        var aiSettingsToUpdate = await _aiSettingsRepository.GetByIdWithPromptParameterAsync(request.Id);
+        var aiSettingsToUpdate = await _aiSettingsRepository.GetByIdIncludePromptParameterAsync(request.Id);
         request.ApplyTo(aiSettingsToUpdate!);
 
         await _aiSettingsRepository.UpdateAsync(aiSettingsToUpdate!);
