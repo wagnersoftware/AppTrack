@@ -68,6 +68,16 @@
 - Fix: use fully-qualified type names (`AppTrack.Domain.FreelancerProfile`, `AppTrack.Domain.AiSettings`, `AppTrack.Domain.PromptParameter`) instead of a `using AppTrack.Domain;` import in those files
 - Private helper methods in handlers must not carry `CancellationToken` unless they actually pass it to an async call — SonarAnalyzer (S1172) treats unused method parameters as errors
 
+## BuiltIn Prompt Prefix Convention (as of Apr 2026 - branch: feature/builtinprompt-parameters)
+- Reserved prefix for built-in prompts is `builtIn_` (was `Default_`, renamed Apr 2026)
+- `BuiltInPrompt.Create()` guard: `name.StartsWith("builtIn_", StringComparison.Ordinal)`
+- `PromptBaseValidator<T>`: blocks `builtIn_` prefix (OrdinalIgnoreCase) — user prompts may not use it
+- `PromptParameterBaseValidator<T>`: blocks `builtIn_` key prefix (OrdinalIgnoreCase) — user parameters may not use it
+- `GeneratePromptQueryHandler` + `GeneratePromptQueryValidator`: route by `builtIn_` prefix to `IBuiltInPromptRepository`
+- Seed data in `BuiltInPromptConfiguration.HasData`: ids 1–4 now named `builtIn_Cover_Letter` etc.
+- Migration `20260414193220_RenameDefaultPrefixToBuiltIn` renames ids 1–8 in `DefaultPrompts` table
+  - Ids 5–8 (English variants from `AddEnglishDefaultPrompts` raw InsertData) renamed with `_en` suffix to avoid unique index collision
+
 ## builtIn_ PromptParameter Sync (branch: feature/builtinprompt-parameters)
 - After profile upsert, handler syncs 7 `builtIn_` keys into `AiSettings.PromptParameter` for the user
 - New repo method: `IAiSettingsRepository.GetByUserIdTrackedAsync(string userId)` — tracked EF query, includes PromptParameter only (no Prompts)

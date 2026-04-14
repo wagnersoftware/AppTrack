@@ -152,9 +152,9 @@ public class GeneratePromptQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_ShouldBuildPromptFromBuiltInRepository_WhenPromptNameHasDefaultPrefix()
+    public async Task Handle_ShouldBuildPromptFromBuiltInRepository_WhenPromptNameHasBuiltInPrefix()
     {
-        const string builtInPromptName = "Default_Cover_Letter";
+        const string builtInPromptName = "builtIn_Cover_Letter";
         const string builtInTemplate = "Write a cover letter for {Position}.";
 
         _mockBuiltInPromptRepo
@@ -171,9 +171,9 @@ public class GeneratePromptQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_ShouldUseBuiltInTemplate_NotUserTemplate_WhenPromptNameHasDefaultPrefix()
+    public async Task Handle_ShouldUseBuiltInTemplate_NotUserTemplate_WhenPromptNameHasBuiltInPrefix()
     {
-        const string builtInPromptName = "Default_Cover_Letter";
+        const string builtInPromptName = "builtIn_Cover_Letter";
         const string userTemplate = "User's own template";
         const string builtInTemplate = "Write a cover letter for {Position}.";
 
@@ -184,7 +184,7 @@ public class GeneratePromptQueryHandlerTests
             {
                 Id = 1,
                 UserId = UserId,
-                Prompts = new List<Prompt> { Prompt.Create("Default_Cover_Letter", userTemplate) },
+                Prompts = new List<Prompt> { Prompt.Create("builtIn_Cover_Letter", userTemplate) },
                 PromptParameter = new List<PromptParameter>()
             });
 

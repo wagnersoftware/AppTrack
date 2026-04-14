@@ -76,11 +76,11 @@ public class PromptDtoValidatorTests
     }
 
     [Fact]
-    public void Validate_ShouldHaveError_WhenNameStartsWithDefaultPrefix()
+    public void Validate_ShouldHaveError_WhenNameStartsWithBuiltInPrefix()
     {
         var dto = BuildValidDto();
-        dto.Name = "Default_Cover_Letter";
+        dto.Name = "builtIn_Cover_Letter";
         _validator.TestValidate(dto).ShouldHaveValidationErrorFor(x => x.Name)
-            .WithErrorMessage("A prompt name must not start with 'Default_'.");
+            .WithErrorMessage("A prompt name must not start with 'builtIn_'.");
     }
 }

@@ -10,7 +10,9 @@ public abstract class PromptParameterBaseValidator<T> : AbstractValidator<T>
     {
         RuleFor(x => x.Key)
             .NotEmpty().WithMessage("Key is required.")
-            .MaximumLength(50).WithMessage("Key must not exceed 50 characters.");
+            .MaximumLength(50).WithMessage("Key must not exceed 50 characters.")
+            .Must(k => !k.StartsWith("builtIn_", StringComparison.OrdinalIgnoreCase))
+                .WithMessage("A parameter key must not start with 'builtIn_'.");
 
         RuleFor(x => x.Value)
             .NotEmpty().WithMessage("Value is required.")

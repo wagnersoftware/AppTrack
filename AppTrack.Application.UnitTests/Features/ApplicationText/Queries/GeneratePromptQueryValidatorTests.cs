@@ -124,10 +124,10 @@ public class GeneratePromptQueryValidatorTests
     }
 
     [Fact]
-    public async Task Validate_ShouldHaveError_WhenDefaultPrefixedPromptNotFoundInBuiltInRepository()
+    public async Task Validate_ShouldHaveError_WhenBuiltInPrefixedPromptNotFoundInBuiltInRepository()
     {
-        // Default_ name not present in built-in repo — user prompts must not be checked as fallback
-        var result = await _validator.TestValidateAsync(BuildValidQuery(promptName: "Default_NonExistent"));
+        // builtIn_ name not present in built-in repo — user prompts must not be checked as fallback
+        var result = await _validator.TestValidateAsync(BuildValidQuery(promptName: "builtIn_NonExistent"));
         result.IsValid.ShouldBeFalse();
         result.Errors.ShouldContain(e => e.ErrorMessage == "Prompt not found in AI settings.");
     }
@@ -153,9 +153,9 @@ public class GeneratePromptQueryValidatorTests
     }
 
     [Fact]
-    public async Task Validate_ShouldPass_WhenDefaultPrefixedPromptExistsInBuiltInRepository()
+    public async Task Validate_ShouldPass_WhenBuiltInPrefixedPromptExistsInBuiltInRepository()
     {
-        const string builtInPromptName = "Default_Cover_Letter";
+        const string builtInPromptName = "builtIn_Cover_Letter";
 
         _builtInPromptRepo
             .Setup(r => r.GetAsync())
@@ -171,7 +171,7 @@ public class GeneratePromptQueryValidatorTests
     [Fact]
     public async Task Validate_ShouldHaveError_WhenBuiltInPromptTemplateIsEmpty()
     {
-        const string builtInOnlyPromptName = "Default_Empty";
+        const string builtInOnlyPromptName = "builtIn_Empty";
         _aiSettingsRepo
             .Setup(r => r.GetByUserIdWithPromptsReadOnlyAsync(UserId))
             .ReturnsAsync(new DomainAiSettings { Id = 1, UserId = UserId }); // no user prompts

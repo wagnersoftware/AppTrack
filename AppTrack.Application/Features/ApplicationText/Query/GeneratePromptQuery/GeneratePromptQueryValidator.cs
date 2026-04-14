@@ -53,7 +53,7 @@ public class GeneratePromptQueryValidator : AbstractValidator<GeneratePromptQuer
             return;
         }
 
-        if (query.PromptName.StartsWith("Default_", StringComparison.Ordinal))
+        if (query.PromptName.StartsWith("builtIn_", StringComparison.Ordinal))
         {
             var defaults = await _builtInPromptRepository.GetAsync();
             var builtInPrompt = defaults.FirstOrDefault(

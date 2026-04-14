@@ -73,8 +73,8 @@ public class GetAiSettingsByUserIdQueryHandlerTests
 
         var builtInPrompts = new List<BuiltInPrompt>
         {
-            BuiltInPrompt.Create("Default_Cover_Letter", "Template A"),
-            BuiltInPrompt.Create("Default_Introduction", "Template B"),
+            BuiltInPrompt.Create("builtIn_Cover_Letter", "Template A"),
+            BuiltInPrompt.Create("builtIn_Introduction", "Template B"),
         };
         _mockBuiltInPromptRepo
             .Setup(r => r.GetAsync())
@@ -84,7 +84,7 @@ public class GetAiSettingsByUserIdQueryHandlerTests
 
         result.BuiltInPrompts.ShouldNotBeNull();
         result.BuiltInPrompts.Count.ShouldBe(2);
-        result.BuiltInPrompts[0].Name.ShouldBe("Default_Cover_Letter");
-        result.BuiltInPrompts[1].Name.ShouldBe("Default_Introduction");
+        result.BuiltInPrompts[0].Name.ShouldBe("builtIn_Cover_Letter");
+        result.BuiltInPrompts[1].Name.ShouldBe("builtIn_Introduction");
     }
 }

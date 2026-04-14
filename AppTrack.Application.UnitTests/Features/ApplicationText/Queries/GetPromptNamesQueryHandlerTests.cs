@@ -72,14 +72,14 @@ public class GetPromptNamesQueryHandlerTests
 
         var builtIns = new List<BuiltInPrompt>
         {
-            BuiltInPrompt.Create("Default_Anschreiben", "template"),
-            BuiltInPrompt.Create("Default_Vorstellung", "template"),
+            BuiltInPrompt.Create("builtIn_Anschreiben", "template"),
+            BuiltInPrompt.Create("builtIn_Vorstellung", "template"),
         };
         _mockBuiltInPromptRepo.Setup(r => r.GetAsync()).ReturnsAsync(builtIns);
 
         var result = await CreateHandler().Handle(new GetPromptNamesQuery { UserId = UserId }, CancellationToken.None);
 
-        result.Names.ShouldBe(["Default_Anschreiben", "Default_Vorstellung"]);
+        result.Names.ShouldBe(["builtIn_Anschreiben", "builtIn_Vorstellung"]);
     }
 
     [Fact]
@@ -93,14 +93,14 @@ public class GetPromptNamesQueryHandlerTests
 
         var builtIns = new List<BuiltInPrompt>
         {
-            BuiltInPrompt.Create("Default_Anschreiben", "template"),
+            BuiltInPrompt.Create("builtIn_Anschreiben", "template"),
         };
         _mockBuiltInPromptRepo.Setup(r => r.GetAsync()).ReturnsAsync(builtIns);
 
         var result = await CreateHandler().Handle(new GetPromptNamesQuery { UserId = UserId }, CancellationToken.None);
 
         result.Names[0].ShouldBe("My_Custom_Prompt");
-        result.Names[^1].ShouldBe("Default_Anschreiben");
+        result.Names[^1].ShouldBe("builtIn_Anschreiben");
     }
 
 }

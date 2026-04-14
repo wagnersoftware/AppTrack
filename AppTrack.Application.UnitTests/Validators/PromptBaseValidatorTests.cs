@@ -58,10 +58,10 @@ public class PromptBaseValidatorTests
     }
 
     [Fact]
-    public async Task NameStartingWithDefaultPrefix_ShouldFail()
+    public async Task NameStartingWithBuiltInPrefix_ShouldFail()
     {
-        var result = await _validator.ValidateAsync(new TestPrompt { Name = "Default_Something", PromptTemplate = "Hello" });
+        var result = await _validator.ValidateAsync(new TestPrompt { Name = "builtIn_Something", PromptTemplate = "Hello" });
         result.IsValid.ShouldBeFalse();
-        result.Errors.ShouldContain(e => e.PropertyName == "Name" && e.ErrorMessage == "A prompt name must not start with 'Default_'.");
+        result.Errors.ShouldContain(e => e.PropertyName == "Name" && e.ErrorMessage == "A prompt name must not start with 'builtIn_'.");
     }
 }
