@@ -31,36 +31,31 @@
                               AdornmentIcon="@Icons.Material.Outlined.Person" />
             </MudItem>
 
-            <!-- Rate Type Toggle -->
-            <MudItem xs="12">
-                <MudToggleGroup T="RateKind?" Value="Model.SelectedRateType"
-                                ValueChanged="OnRateKindChanged"
-                                SelectionMode="SelectionMode.ToggleSelection"
-                                Color="Color.Primary" Outlined="true">
-                    <MudToggleItem Value="@((RateKind?)RateKind.Hourly)">Hourly Rate</MudToggleItem>
-                    <MudToggleItem Value="@((RateKind?)RateKind.Daily)">Daily Rate</MudToggleItem>
-                </MudToggleGroup>
+            <!-- Hourly Rate -->
+            <MudItem xs="12" sm="6">
+                <MudNumericField T="decimal?"
+                                 Label="Hourly Rate (€)"
+                                 Value="Model.HourlyRate"
+                                 ValueChanged="@((decimal? v) => OnHourlyRateChanged(v))"
+                                 Error="@ModelValidator.Errors.ContainsKey(nameof(Model.HourlyRate))"
+                                 ErrorText="@GetFirstError(nameof(Model.HourlyRate))"
+                                 Variant="Variant.Outlined"
+                                 Adornment="Adornment.Start"
+                                 AdornmentIcon="@Icons.Material.Outlined.Euro" />
             </MudItem>
 
-            <!-- Active Rate Field (hidden when no rate type selected) -->
-            @if (Model.SelectedRateType != null)
-            {
-                <MudItem @key="Model.SelectedRateType" xs="12" sm="6">
-                    <MudNumericField T="decimal?"
-                                     Label="@(Model.SelectedRateType == RateKind.Hourly ? "Hourly Rate (€)" : "Daily Rate (€)")"
-                                     Value="@(Model.SelectedRateType == RateKind.Hourly ? Model.HourlyRate : Model.DailyRate)"
-                                     ValueChanged="OnRateValueChanged"
-                                     Error="@(Model.SelectedRateType == RateKind.Hourly
-                                               ? ModelValidator.Errors.ContainsKey(nameof(Model.HourlyRate))
-                                               : ModelValidator.Errors.ContainsKey(nameof(Model.DailyRate)))"
-                                     ErrorText="@(Model.SelectedRateType == RateKind.Hourly
-                                                  ? GetFirstError(nameof(Model.HourlyRate))
-                                                  : GetFirstError(nameof(Model.DailyRate)))"
-                                     Variant="Variant.Outlined"
-                                     Adornment="Adornment.Start"
-                                     AdornmentIcon="@Icons.Material.Outlined.Euro" />
-                </MudItem>
-            }
+            <!-- Daily Rate -->
+            <MudItem xs="12" sm="6">
+                <MudNumericField T="decimal?"
+                                 Label="Daily Rate (€)"
+                                 Value="Model.DailyRate"
+                                 ValueChanged="@((decimal? v) => OnDailyRateChanged(v))"
+                                 Error="@ModelValidator.Errors.ContainsKey(nameof(Model.DailyRate))"
+                                 ErrorText="@GetFirstError(nameof(Model.DailyRate))"
+                                 Variant="Variant.Outlined"
+                                 Adornment="Adornment.Start"
+                                 AdornmentIcon="@Icons.Material.Outlined.Euro" />
+            </MudItem>
 
             <!-- Available From -->
             <MudItem xs="12">

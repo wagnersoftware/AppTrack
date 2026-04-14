@@ -20,37 +20,23 @@ internal static class FreelancerProfileMappings
         Skills = model.Skills,
     };
 
-    internal static FreelancerProfileModel ToModel(this FreelancerProfileDto dto)
+    internal static FreelancerProfileModel ToModel(this FreelancerProfileDto dto) => new()
     {
-        RateKind? selectedRateType = null;
-        if (dto.HourlyRate.HasValue)
-        {
-            selectedRateType = RateKind.Hourly;
-        }
-        else if (dto.DailyRate.HasValue)
-        {
-            selectedRateType = RateKind.Daily;
-        }
-
-        return new()
-        {
-            Id = dto.Id,
-            FirstName = dto.FirstName,
-            LastName = dto.LastName,
-            HourlyRate = (decimal?)dto.HourlyRate,
-            DailyRate = (decimal?)dto.DailyRate,
-            AvailableFrom = dto.AvailableFrom.HasValue
-                ? DateOnly.FromDateTime(dto.AvailableFrom.Value)
-                : (DateOnly?)null,
-            WorkMode = dto.WorkMode.HasValue
-                ? (AppTrack.Frontend.Models.RemotePreference)(int)dto.WorkMode.Value
-                : (AppTrack.Frontend.Models.RemotePreference?)null,
-            Skills = dto.Skills,
-            SelectedRateType = selectedRateType,
-            CreationDate = dto.CreationDate,
-            ModifiedDate = dto.ModifiedDate,
-            CvFileName = dto.CvFileName,
-            CvUploadDate = dto.CvUploadDate,
-        };
-    }
+        Id = dto.Id,
+        FirstName = dto.FirstName,
+        LastName = dto.LastName,
+        HourlyRate = (decimal?)dto.HourlyRate,
+        DailyRate = (decimal?)dto.DailyRate,
+        AvailableFrom = dto.AvailableFrom.HasValue
+            ? DateOnly.FromDateTime(dto.AvailableFrom.Value)
+            : (DateOnly?)null,
+        WorkMode = dto.WorkMode.HasValue
+            ? (AppTrack.Frontend.Models.RemotePreference)(int)dto.WorkMode.Value
+            : (AppTrack.Frontend.Models.RemotePreference?)null,
+        Skills = dto.Skills,
+        CreationDate = dto.CreationDate,
+        ModifiedDate = dto.ModifiedDate,
+        CvFileName = dto.CvFileName,
+        CvUploadDate = dto.CvUploadDate,
+    };
 }

@@ -53,42 +53,16 @@ public partial class FreelancerProfileForm
         Model.AvailableFrom = date.HasValue ? DateOnly.FromDateTime(date.Value) : null;
     }
 
-    private void OnRateKindChanged(RateKind? newKind)
+    private void OnHourlyRateChanged(decimal? value)
     {
-        if (Model.SelectedRateType == newKind) return;
-        Model.SelectedRateType = newKind;
-        if (newKind == RateKind.Hourly)
-        {
-            Model.DailyRate = null;
-            ModelValidator.ResetErrors(nameof(Model.DailyRate));
-        }
-        else if (newKind == RateKind.Daily)
-        {
-            Model.HourlyRate = null;
-            ModelValidator.ResetErrors(nameof(Model.HourlyRate));
-        }
-        else
-        {
-            Model.HourlyRate = null;
-            Model.DailyRate = null;
-            ModelValidator.ResetErrors(nameof(Model.HourlyRate));
-            ModelValidator.ResetErrors(nameof(Model.DailyRate));
-        }
+        Model.HourlyRate = value;
+        ModelValidator.ResetErrors(nameof(Model.HourlyRate));
     }
 
-    // Only called while SelectedRateType != null (enforced by the @if guard in the markup).
-    private void OnRateValueChanged(decimal? value)
+    private void OnDailyRateChanged(decimal? value)
     {
-        if (Model.SelectedRateType == RateKind.Hourly)
-        {
-            Model.HourlyRate = value;
-            ModelValidator.ResetErrors(nameof(Model.HourlyRate));
-        }
-        else if (Model.SelectedRateType == RateKind.Daily)
-        {
-            Model.DailyRate = value;
-            ModelValidator.ResetErrors(nameof(Model.DailyRate));
-        }
+        Model.DailyRate = value;
+        ModelValidator.ResetErrors(nameof(Model.DailyRate));
     }
 
     private void OnSkillsChanged(string? value)
