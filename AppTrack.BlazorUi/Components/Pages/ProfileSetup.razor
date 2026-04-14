@@ -8,23 +8,37 @@
         <MudText Typo="Typo.h5">My Profile</MudText>
     </MudStack>
 
-    <FreelancerProfileForm @ref="_form" Model="_model" OnCvBusyChanged="@(busy => _cvBusy = busy)" />
+    @if (_isBusy)
+    {
+        <MudProgressLinear Indeterminate="true" Color="Color.Primary" Class="mb-2" />
+    }
 
-    <MudStack Row="true" Justify="Justify.FlexEnd" Class="mt-4">
+    <FreelancerProfileForm @ref="_form" Model="_model" OnCvBusyChanged="@(busy => _isBusy = busy)" Disabled="_isBusy" />
+
+    <MudStack Row="true" Justify="Justify.SpaceBetween" Class="mt-4">
+        <MudButton Variant="Variant.Outlined"
+                   Color="Color.Error"
+                   StartIcon="@Icons.Material.Filled.DeleteForever"
+                   OnClick="ConfirmDeleteProfile"
+                   Disabled="_isBusy">
+            Delete Profile
+        </MudButton>
+
         <MudButton Variant="Variant.Filled"
                    Color="Color.Primary"
                    StartIcon="@Icons.Material.Filled.Save"
                    OnClick="Save"
-                   Disabled="_isBusy || _cvBusy">
-            @if (_isBusy)
-            {
-                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
-                <span>Saving&#x2026;</span>
-            }
-            else
-            {
-                <span>Save</span>
-            }
+                   Disabled="_isBusy">
+            Save
         </MudButton>
     </MudStack>
+
+    <MudMessageBox @ref="_deleteConfirmBox" Title="Delete Profile" CancelText="Cancel">
+        <MessageContent>
+            Are you sure you want to delete your profile? This will also remove your uploaded CV. This action cannot be undone.
+        </MessageContent>
+        <YesButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Error" StartIcon="@Icons.Material.Filled.DeleteForever">Delete</MudButton>
+        </YesButton>
+    </MudMessageBox>
 </MudContainer>

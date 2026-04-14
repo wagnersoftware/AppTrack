@@ -6,7 +6,7 @@
         </MudText>
     </TitleContent>
     <DialogContent>
-        <FreelancerProfileForm @ref="_form" Model="_model" OnCvBusyChanged="@(busy => _cvBusy = busy)" />
+        <FreelancerProfileForm @ref="_form" Model="_model" OnCvBusyChanged="@(busy => _isBusy = busy)" Disabled="_isBusy" />
     </DialogContent>
     <DialogActions>
         <MudButton Variant="Variant.Text" OnClick="Skip" Disabled="_isBusy">Skip</MudButton>
@@ -14,7 +14,7 @@
         <MudButton Variant="Variant.Filled"
                    Color="Color.Primary"
                    OnClick="Save"
-                   Disabled="_isBusy || _cvBusy">
+                   Disabled="_isBusy">
             @if (_isBusy)
             {
                 <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />

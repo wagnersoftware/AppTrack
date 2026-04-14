@@ -8,14 +8,13 @@ namespace AppTrack.BlazorUi.Components.Pages;
 
 public partial class ProfileSetup
 {
-    [Inject] private NavigationManager Navigation { get; set; } = null!;
     [Inject] private IFreelancerProfileService ProfileService { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
 
     private FreelancerProfileModel _model = new();
     private FreelancerProfileForm _form = null!;
     private bool _isBusy;
-    private bool _cvBusy;
+    private MudMessageBox _deleteConfirmBox = null!;
 
     protected override async Task OnInitializedAsync()
     {
@@ -26,18 +25,39 @@ public partial class ProfileSetup
         }
     }
 
+    private async Task ConfirmDeleteProfile()
+    {
+        var confirmed = await _deleteConfirmBox.ShowAsync();
+        if (confirmed != true) return;
+
+        _isBusy = true;
+        await InvokeAsync(StateHasChanged);
+        var response = await ProfileService.DeleteProfileAsync();
+        _isBusy = false;
+
+        if (response.Success)
+        {
+            _model = new FreelancerProfileModel();
+            Snackbar.Add("Profile deleted successfully.", Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add(response.DisplayMessage, Severity.Error);
+        }
+    }
+
     private async Task Save()
     {
         if (!_form.Validate()) return;
 
         _isBusy = true;
+        await InvokeAsync(StateHasChanged);
         var response = await ProfileService.UpsertProfileAsync(_model);
         _isBusy = false;
 
         if (response.Success)
         {
             Snackbar.Add("Profile saved", Severity.Success);
-            Navigation.NavigateTo("/");
         }
         else
         {
