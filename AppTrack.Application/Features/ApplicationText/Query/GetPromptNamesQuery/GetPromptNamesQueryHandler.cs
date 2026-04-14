@@ -8,12 +8,12 @@ namespace AppTrack.Application.Features.ApplicationText.Query.GetPromptNamesQuer
 public class GetPromptNamesQueryHandler : IRequestHandler<GetPromptNamesQuery, GetPromptNamesDto>
 {
     private readonly IAiSettingsRepository _aiSettingsRepository;
-    private readonly IDefaultPromptRepository _defaultPromptRepository;
+    private readonly IBuiltInPromptRepository _builtInPromptRepository;
 
-    public GetPromptNamesQueryHandler(IAiSettingsRepository aiSettingsRepository, IDefaultPromptRepository defaultPromptRepository)
+    public GetPromptNamesQueryHandler(IAiSettingsRepository aiSettingsRepository, IBuiltInPromptRepository builtInPromptRepository)
     {
         _aiSettingsRepository = aiSettingsRepository;
-        _defaultPromptRepository = defaultPromptRepository;
+        _builtInPromptRepository = builtInPromptRepository;
     }
 
     public async Task<GetPromptNamesDto> Handle(GetPromptNamesQuery request, CancellationToken cancellationToken)
@@ -25,12 +25,12 @@ public class GetPromptNamesQueryHandler : IRequestHandler<GetPromptNamesQuery, G
             throw new BadRequestException("Invalid request.", validationResult);
 
         var aiSettings = await _aiSettingsRepository.GetByUserIdIncludePromptParameterAsync(request.UserId);
-        var defaults = await _defaultPromptRepository.GetAsync();
+        var builtInPrompts = await _builtInPromptRepository.GetAsync();
 
-        var userNames = aiSettings!.Prompts.Select(p => p.Name);
-        var defaultNames = defaults.Select(d => d.Name);
+        var userPromptNames = aiSettings!.Prompts.Select(p => p.Name);
+        var builtInPromptNames = builtInPrompts.Select(d => d.Name);
 
-        var names = userNames.Concat(defaultNames).ToList();
+        var names = userPromptNames.Concat(builtInPromptNames).ToList();
         return new GetPromptNamesDto { Names = names };
     }
 }

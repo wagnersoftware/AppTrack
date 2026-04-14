@@ -29,7 +29,7 @@ public static class PersistanceServiceRegistration
         services.AddScoped<IJobApplicationDefaultsRepository, JobApplicationDefaultsRepository>();
         services.AddScoped<IAiSettingsRepository, AiSettingsRepository>();
         services.AddScoped<IChatModelRepository, ChatModelRepository>();
-        services.AddScoped<IDefaultPromptRepository, DefaultPromptRepository>();
+        services.AddScoped<IBuiltInPromptRepository, BuiltInPromptRepository>();
         services.AddScoped<IFreelancerProfileRepository, FreelancerProfileRepository>();
 
         return services;

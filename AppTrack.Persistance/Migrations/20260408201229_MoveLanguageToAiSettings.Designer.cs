@@ -119,7 +119,7 @@ namespace AppTrack.Persistance.Migrations
                         });
                 });
 
-            modelBuilder.Entity("AppTrack.Domain.DefaultPrompt", b =>
+            modelBuilder.Entity("AppTrack.Domain.BuiltInPrompt", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()

@@ -7,16 +7,16 @@ public class GeneratePromptQueryValidator : AbstractValidator<GeneratePromptQuer
 {
     private readonly IJobApplicationRepository _jobApplicationRepository;
     private readonly IAiSettingsRepository _aiSettingsRepository;
-    private readonly IDefaultPromptRepository _defaultPromptRepository;
+    private readonly IBuiltInPromptRepository _builtInPromptRepository;
 
     public GeneratePromptQueryValidator(
         IJobApplicationRepository jobApplicationRepository,
         IAiSettingsRepository aiSettingsRepository,
-        IDefaultPromptRepository defaultPromptRepository)
+        IBuiltInPromptRepository builtInPromptRepository)
     {
         _jobApplicationRepository = jobApplicationRepository;
         _aiSettingsRepository = aiSettingsRepository;
-        _defaultPromptRepository = defaultPromptRepository;
+        _builtInPromptRepository = builtInPromptRepository;
 
         RuleFor(x => x.JobApplicationId)
             .NotEmpty().WithMessage("{PropertyName} is required")
@@ -55,17 +55,17 @@ public class GeneratePromptQueryValidator : AbstractValidator<GeneratePromptQuer
 
         if (query.PromptName.StartsWith("Default_", StringComparison.Ordinal))
         {
-            var defaults = await _defaultPromptRepository.GetAsync();
-            var defaultPrompt = defaults.FirstOrDefault(
+            var defaults = await _builtInPromptRepository.GetAsync();
+            var builtInPrompt = defaults.FirstOrDefault(
                 p => string.Equals(p.Name, query.PromptName, StringComparison.OrdinalIgnoreCase));
 
-            if (defaultPrompt == null)
+            if (builtInPrompt == null)
             {
                 context.AddFailure("Prompt not found in AI settings.");
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(defaultPrompt.PromptTemplate))
+            if (string.IsNullOrWhiteSpace(builtInPrompt.PromptTemplate))
                 context.AddFailure("Prompt template is empty.");
         }
         else

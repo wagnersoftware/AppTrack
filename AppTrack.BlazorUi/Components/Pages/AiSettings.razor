@@ -54,22 +54,22 @@
                     <MudSelectItem T="AiResponseLanguage" Value="AiResponseLanguage.German">German</MudSelectItem>
                 </MudSelect>
             </MudItem>
-            <!-- Default Prompts (read-only) -->
+            <!-- Built-In Prompts (read-only) -->
             <MudItem xs="12">
                 <MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">
                     <MudIcon Icon="@Icons.Material.Filled.Lock" Size="Size.Small" Color="Color.Secondary" Class="mr-1" />
-                    <MudText Typo="Typo.subtitle1">Default Prompts</MudText>
+                    <MudText Typo="Typo.subtitle1">Built-In Prompts</MudText>
                 </MudStack>
-                @if (_model.DefaultPrompts.Count == 0)
+                @if (_model.BuiltInPrompts.Count == 0)
                 {
                     <MudText Typo="Typo.body2" Color="Color.Secondary" Class="ml-1">
-                        No default prompts available.
+                        No built-in prompts available.
                     </MudText>
                 }
                 else
                 {
                     <MudPaper Outlined="true" Class="pa-0" Style="max-height: 260px; overflow-y: auto;">
-                        @foreach (var prompt in _model.DefaultPrompts)
+                        @foreach (var prompt in _model.BuiltInPrompts)
                         {
                             <MudStack Row="true"
                                       AlignItems="AlignItems.Center"

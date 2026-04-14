@@ -18,7 +18,7 @@ public class AppTrackDatabaseContext : DbContext
 
     public DbSet<ChatModel> ChatModels { get; set; }
 
-    public DbSet<DefaultPrompt> DefaultPrompts { get; set; }
+    public DbSet<BuiltInPrompt> BuiltInPrompts { get; set; }
 
     public DbSet<FreelancerProfile> FreelancerProfiles { get; set; }
 

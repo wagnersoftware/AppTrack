@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED: Use superpowers:subagent-driven-development (if subagents available) or superpowers:executing-plans to implement this plan. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Move `ApplicationLanguage Language` from `FreelancerProfile` to `AiSettings`, wire it to `DefaultPromptRepository.GetByLanguageAsync`, and default to English.
+**Goal:** Move `ApplicationLanguage Language` from `FreelancerProfile` to `AiSettings`, wire it to `BuiltInPromptRepository.GetByLanguageAsync`, and default to English.
 
 **Architecture:** The field controls AI text-generation language, so it belongs in `AiSettings` alongside model selection. The `GetAiSettingsByUserIdQueryHandler` and `GeneratePromptQueryHandler`/`GeneratePromptQueryValidator` switch from `GetAsync()` to `GetByLanguageAsync(code)` where `code` is `"de"` or `"en"`.
 
@@ -128,44 +128,44 @@ Expected: `Build succeeded. 0 Warning(s). 0 Error(s).`
 - Modify: `AppTrack.Application/Features/ApplicationText/Query/GeneratePromptQuery/GeneratePromptQueryHandler.cs`
 - Modify: `AppTrack.Application/Features/ApplicationText/Query/GeneratePromptQuery/GeneratePromptQueryValidator.cs`
 
-**Context:** `DefaultPrompt.Language` is a string ISO 639-1 code ("de" or "en"). `ApplicationLanguage.German = 0`, `ApplicationLanguage.English = 1`. Use inline conversion: `entity.Language == ApplicationLanguage.German ? "de" : "en"`.
+**Context:** `BuiltInPrompt.Language` is a string ISO 639-1 code ("de" or "en"). `ApplicationLanguage.German = 0`, `ApplicationLanguage.English = 1`. Use inline conversion: `entity.Language == ApplicationLanguage.German ? "de" : "en"`.
 
 - [ ] **Step 1: Update `GetAiSettingsByUserIdQueryHandler` to use `GetByLanguageAsync`**
 
-Replace the line that loads default prompts:
+Replace the line that loads built-in prompts:
 ```csharp
 // BEFORE
-var defaults = await _defaultPromptRepository.GetAsync();
+var defaults = await _builtInPromptRepository.GetAsync();
 
 // AFTER
 var languageCode = entity.Language == ApplicationLanguage.German ? "de" : "en";
-var defaults = await _defaultPromptRepository.GetByLanguageAsync(languageCode);
+var defaults = await _builtInPromptRepository.GetByLanguageAsync(languageCode);
 ```
 Add `using AppTrack.Domain.Enums;` if not present.
 
-- [ ] **Step 2: Update `GeneratePromptQueryHandler` to use language-filtered defaults**
+- [ ] **Step 2: Update `GeneratePromptQueryHandler` to use language-filtered built-in prompts**
 
-In the handler's `Handle` method, where it loads defaults for a `Default_` prompt, replace:
+In the handler's `Handle` method, where it loads built-in prompts for a `Default_` prompt, replace:
 ```csharp
 // BEFORE
-var defaults = await _defaultPromptRepository.GetAsync();
+var defaults = await _builtInPromptRepository.GetAsync();
 
 // AFTER
 var languageCode = aiSettings!.Language == ApplicationLanguage.German ? "de" : "en";
-var defaults = await _defaultPromptRepository.GetByLanguageAsync(languageCode);
+var defaults = await _builtInPromptRepository.GetByLanguageAsync(languageCode);
 ```
 Add `using AppTrack.Domain.Enums;` if not present. Note: `aiSettings` is already loaded on line 37 of the handler.
 
-- [ ] **Step 3: Update `GeneratePromptQueryValidator` to use language-filtered defaults**
+- [ ] **Step 3: Update `GeneratePromptQueryValidator` to use language-filtered built-in prompts**
 
 In `ValidateAiSettings`, replace:
 ```csharp
 // BEFORE
-var defaults = await _defaultPromptRepository.GetAsync();
+var defaults = await _builtInPromptRepository.GetAsync();
 
 // AFTER
 var languageCode = aiSettings!.Language == ApplicationLanguage.German ? "de" : "en";
-var defaults = await _defaultPromptRepository.GetByLanguageAsync(languageCode);
+var defaults = await _builtInPromptRepository.GetByLanguageAsync(languageCode);
 ```
 Note: `aiSettings` is already loaded earlier in `ValidateAiSettings`.
 Add `using AppTrack.Domain.Enums;` if not present.
@@ -188,66 +188,66 @@ Expected: `Build succeeded. 0 Warning(s). 0 Error(s).`
 
 - [ ] **Step 1: Update `GetAiSettingsByUserIdQueryHandlerTests` to use `GetByLanguageAsync`**
 
-The tests currently mock `_mockDefaultPromptRepo.Setup(r => r.GetAsync())`. These must be updated to mock `GetByLanguageAsync` instead.
+The tests currently mock `_mockBuiltInPromptRepo.Setup(r => r.GetAsync())`. These must be updated to mock `GetByLanguageAsync` instead.
 
 Replace the constructor setup:
 ```csharp
 // BEFORE
-_mockDefaultPromptRepo
+_mockBuiltInPromptRepo
     .Setup(r => r.GetAsync())
-    .ReturnsAsync(new List<DefaultPrompt>());
+    .ReturnsAsync(new List<BuiltInPrompt>());
 
 // AFTER
-_mockDefaultPromptRepo
+_mockBuiltInPromptRepo
     .Setup(r => r.GetByLanguageAsync(It.IsAny<string>()))
-    .ReturnsAsync(new List<DefaultPrompt>());
+    .ReturnsAsync(new List<BuiltInPrompt>());
 ```
 
-Update `Handle_ShouldPopulateDefaultPrompts_InReturnedDto` — replace the mock setup:
+Update `Handle_ShouldPopulateBuiltInPrompts_InReturnedDto` — replace the mock setup:
 ```csharp
 // BEFORE
-_mockDefaultPromptRepo
+_mockBuiltInPromptRepo
     .Setup(r => r.GetAsync())
-    .ReturnsAsync(defaults);
+    .ReturnsAsync(builtIns);
 
 // AFTER
-_mockDefaultPromptRepo
+_mockBuiltInPromptRepo
     .Setup(r => r.GetByLanguageAsync(It.IsAny<string>()))
-    .ReturnsAsync(defaults);
+    .ReturnsAsync(builtIns);
 ```
 
 Add new test verifying English is used by default:
 ```csharp
 [Fact]
-public async Task Handle_ShouldRequestEnglishDefaultPrompts_WhenLanguageIsEnglish()
+public async Task Handle_ShouldRequestEnglishBuiltInPrompts_WhenLanguageIsEnglish()
 {
     const string userId = "user-1";
     _mockRepo
         .Setup(r => r.GetByUserIdIncludePromptParameterAsync(userId))
         .ReturnsAsync(new DomainAiSettings { Id = 1, UserId = userId, Language = ApplicationLanguage.English });
-    _mockDefaultPromptRepo
+    _mockBuiltInPromptRepo
         .Setup(r => r.GetByLanguageAsync("en"))
-        .ReturnsAsync(new List<DefaultPrompt>());
+        .ReturnsAsync(new List<BuiltInPrompt>());
 
     await CreateHandler().Handle(new GetAiSettingsByUserIdQuery { UserId = userId }, CancellationToken.None);
 
-    _mockDefaultPromptRepo.Verify(r => r.GetByLanguageAsync("en"), Times.Once);
+    _mockBuiltInPromptRepo.Verify(r => r.GetByLanguageAsync("en"), Times.Once);
 }
 
 [Fact]
-public async Task Handle_ShouldRequestGermanDefaultPrompts_WhenLanguageIsGerman()
+public async Task Handle_ShouldRequestGermanBuiltInPrompts_WhenLanguageIsGerman()
 {
     const string userId = "user-1";
     _mockRepo
         .Setup(r => r.GetByUserIdIncludePromptParameterAsync(userId))
         .ReturnsAsync(new DomainAiSettings { Id = 1, UserId = userId, Language = ApplicationLanguage.German });
-    _mockDefaultPromptRepo
+    _mockBuiltInPromptRepo
         .Setup(r => r.GetByLanguageAsync("de"))
-        .ReturnsAsync(new List<DefaultPrompt>());
+        .ReturnsAsync(new List<BuiltInPrompt>());
 
     await CreateHandler().Handle(new GetAiSettingsByUserIdQuery { UserId = userId }, CancellationToken.None);
 
-    _mockDefaultPromptRepo.Verify(r => r.GetByLanguageAsync("de"), Times.Once);
+    _mockBuiltInPromptRepo.Verify(r => r.GetByLanguageAsync("de"), Times.Once);
 }
 ```
 Add `using AppTrack.Domain.Enums;` at the top.

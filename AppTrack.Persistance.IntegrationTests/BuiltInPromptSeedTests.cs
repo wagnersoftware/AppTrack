@@ -4,11 +4,11 @@ using Shouldly;
 
 namespace AppTrack.Persistance.IntegrationTests;
 
-public class DefaultPromptSeedTests
+public class BuiltInPromptSeedTests
 {
     private readonly AppTrackDatabaseContext _context;
 
-    public DefaultPromptSeedTests()
+    public BuiltInPromptSeedTests()
     {
         var options = new DbContextOptionsBuilder<AppTrackDatabaseContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
@@ -19,18 +19,18 @@ public class DefaultPromptSeedTests
     }
 
     [Fact]
-    public async Task AllDefaultPrompts_ShouldStartWithDefaultPrefix()
+    public async Task AllBuiltInPrompts_ShouldStartWithDefaultPrefix()
     {
-        var prompts = await _context.DefaultPrompts.ToListAsync();
+        var prompts = await _context.BuiltInPrompts.ToListAsync();
 
         prompts.ShouldNotBeEmpty();
         prompts.ShouldAllBe(p => p.Name.StartsWith("Default_", StringComparison.Ordinal));
     }
 
     [Fact]
-    public async Task AllDefaultPrompts_ShouldNotContainSpaces()
+    public async Task AllBuiltInPrompts_ShouldNotContainSpaces()
     {
-        var prompts = await _context.DefaultPrompts.ToListAsync();
+        var prompts = await _context.BuiltInPrompts.ToListAsync();
 
         prompts.ShouldNotBeEmpty();
         prompts.ShouldAllBe(p => !p.Name.Contains(' '));

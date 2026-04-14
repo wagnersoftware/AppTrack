@@ -19,14 +19,14 @@ public class GeneratePromptQueryValidatorTests
 
     private readonly Mock<IJobApplicationRepository> _jobAppRepo;
     private readonly Mock<IAiSettingsRepository> _aiSettingsRepo;
-    private readonly Mock<IDefaultPromptRepository> _defaultPromptRepo;
+    private readonly Mock<IBuiltInPromptRepository> _builtInPromptRepo;
     private readonly GeneratePromptQueryValidator _validator;
 
     public GeneratePromptQueryValidatorTests()
     {
         _jobAppRepo = new Mock<IJobApplicationRepository>();
         _aiSettingsRepo = new Mock<IAiSettingsRepository>();
-        _defaultPromptRepo = new Mock<IDefaultPromptRepository>();
+        _builtInPromptRepo = new Mock<IBuiltInPromptRepository>();
 
         var jobApplication = new DomainJobApplication { Id = ExistingJobApplicationId, UserId = UserId };
         _jobAppRepo
@@ -46,12 +46,12 @@ public class GeneratePromptQueryValidatorTests
             .Setup(r => r.GetByUserIdIncludePromptParameterAsync(It.Is<string>(id => id != UserId)))
             .ReturnsAsync((DomainAiSettings?)null);
 
-        // Default: no default prompts
-        _defaultPromptRepo
+        // Default: no built-in prompts
+        _builtInPromptRepo
             .Setup(r => r.GetAsync())
-            .ReturnsAsync(new List<DefaultPrompt>());
+            .ReturnsAsync(new List<BuiltInPrompt>());
 
-        _validator = new GeneratePromptQueryValidator(_jobAppRepo.Object, _aiSettingsRepo.Object, _defaultPromptRepo.Object);
+        _validator = new GeneratePromptQueryValidator(_jobAppRepo.Object, _aiSettingsRepo.Object, _builtInPromptRepo.Object);
     }
 
     private static GeneratePromptQuery BuildValidQuery(
@@ -124,9 +124,9 @@ public class GeneratePromptQueryValidatorTests
     }
 
     [Fact]
-    public async Task Validate_ShouldHaveError_WhenDefaultPrefixedPromptNotFoundInDefaultRepository()
+    public async Task Validate_ShouldHaveError_WhenDefaultPrefixedPromptNotFoundInBuiltInRepository()
     {
-        // Default_ name not present in default repo — user prompts must not be checked as fallback
+        // Default_ name not present in built-in repo — user prompts must not be checked as fallback
         var result = await _validator.TestValidateAsync(BuildValidQuery(promptName: "Default_NonExistent"));
         result.IsValid.ShouldBeFalse();
         result.Errors.ShouldContain(e => e.ErrorMessage == "Prompt not found in AI settings.");
@@ -153,34 +153,34 @@ public class GeneratePromptQueryValidatorTests
     }
 
     [Fact]
-    public async Task Validate_ShouldPass_WhenDefaultPrefixedPromptExistsInDefaultRepository()
+    public async Task Validate_ShouldPass_WhenDefaultPrefixedPromptExistsInBuiltInRepository()
     {
-        const string defaultPromptName = "Default_Cover_Letter";
+        const string builtInPromptName = "Default_Cover_Letter";
 
-        _defaultPromptRepo
+        _builtInPromptRepo
             .Setup(r => r.GetAsync())
-            .ReturnsAsync(new List<DefaultPrompt>
+            .ReturnsAsync(new List<BuiltInPrompt>
             {
-                DefaultPrompt.Create(defaultPromptName, "Write a cover letter for {Position}."),
+                BuiltInPrompt.Create(builtInPromptName, "Write a cover letter for {Position}."),
             });
 
-        var result = await _validator.TestValidateAsync(BuildValidQuery(promptName: defaultPromptName));
+        var result = await _validator.TestValidateAsync(BuildValidQuery(promptName: builtInPromptName));
         result.IsValid.ShouldBeTrue();
     }
 
     [Fact]
-    public async Task Validate_ShouldHaveError_WhenDefaultPromptTemplateIsEmpty()
+    public async Task Validate_ShouldHaveError_WhenBuiltInPromptTemplateIsEmpty()
     {
-        const string defaultOnlyPromptName = "Default_Empty";
+        const string builtInOnlyPromptName = "Default_Empty";
         _aiSettingsRepo
             .Setup(r => r.GetByUserIdIncludePromptParameterAsync(UserId))
             .ReturnsAsync(new DomainAiSettings { Id = 1, UserId = UserId }); // no user prompts
 
-        _defaultPromptRepo
+        _builtInPromptRepo
             .Setup(r => r.GetAsync())
-            .ReturnsAsync(new List<DefaultPrompt>
+            .ReturnsAsync(new List<BuiltInPrompt>
             {
-                DefaultPrompt.Create(defaultOnlyPromptName, " "), // empty template
+                BuiltInPrompt.Create(builtInOnlyPromptName, " "), // empty template
             });
 
         _jobAppRepo
@@ -188,8 +188,8 @@ public class GeneratePromptQueryValidatorTests
             .ReturnsAsync(new DomainJobApplication { Id = ExistingJobApplicationId, UserId = UserId });
 
         var localValidator = new GeneratePromptQueryValidator(
-            _jobAppRepo.Object, _aiSettingsRepo.Object, _defaultPromptRepo.Object);
-        var result = await localValidator.TestValidateAsync(BuildValidQuery(promptName: defaultOnlyPromptName));
+            _jobAppRepo.Object, _aiSettingsRepo.Object, _builtInPromptRepo.Object);
+        var result = await localValidator.TestValidateAsync(BuildValidQuery(promptName: builtInOnlyPromptName));
 
         result.IsValid.ShouldBeFalse();
         result.Errors.ShouldContain(e => e.ErrorMessage == "Prompt template is empty.");

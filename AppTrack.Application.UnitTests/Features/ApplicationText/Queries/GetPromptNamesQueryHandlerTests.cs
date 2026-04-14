@@ -12,18 +12,18 @@ public class GetPromptNamesQueryHandlerTests
 {
     private const string UserId = "user-1";
     private readonly Mock<IAiSettingsRepository> _mockAiSettingsRepo = new();
-    private readonly Mock<IDefaultPromptRepository> _mockDefaultPromptRepo = new();
+    private readonly Mock<IBuiltInPromptRepository> _mockBuiltInPromptRepo = new();
 
     public GetPromptNamesQueryHandlerTests()
     {
-        // Default: no default prompts (keeps existing tests unaffected)
-        _mockDefaultPromptRepo
+        // Default: no built-in prompts (keeps existing tests unaffected)
+        _mockBuiltInPromptRepo
             .Setup(r => r.GetAsync())
-            .ReturnsAsync(new List<DefaultPrompt>());
+            .ReturnsAsync(new List<BuiltInPrompt>());
     }
 
     private GetPromptNamesQueryHandler CreateHandler() =>
-        new(_mockAiSettingsRepo.Object, _mockDefaultPromptRepo.Object);
+        new(_mockAiSettingsRepo.Object, _mockBuiltInPromptRepo.Object);
 
     [Fact]
     public async Task Handle_ShouldReturnNamesInInsertionOrder_WhenAiSettingsHaveMultiplePrompts()
@@ -41,7 +41,7 @@ public class GetPromptNamesQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_ShouldReturnEmptyList_WhenAiSettingsHaveNoPromptsAndNoDefaults()
+    public async Task Handle_ShouldReturnEmptyList_WhenAiSettingsHaveNoPromptsAndNoBuiltIns()
     {
         _mockAiSettingsRepo
             .Setup(r => r.GetByUserIdIncludePromptParameterAsync(UserId))
@@ -64,18 +64,18 @@ public class GetPromptNamesQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_ShouldReturnDefaultPromptNames_WhenUserHasNoPrompts()
+    public async Task Handle_ShouldReturnBuiltInPromptNames_WhenUserHasNoPrompts()
     {
         _mockAiSettingsRepo
             .Setup(r => r.GetByUserIdIncludePromptParameterAsync(UserId))
             .ReturnsAsync(new DomainAiSettings { Id = 1, UserId = UserId });
 
-        var defaults = new List<DefaultPrompt>
+        var builtIns = new List<BuiltInPrompt>
         {
-            DefaultPrompt.Create("Default_Anschreiben", "template"),
-            DefaultPrompt.Create("Default_Vorstellung", "template"),
+            BuiltInPrompt.Create("Default_Anschreiben", "template"),
+            BuiltInPrompt.Create("Default_Vorstellung", "template"),
         };
-        _mockDefaultPromptRepo.Setup(r => r.GetAsync()).ReturnsAsync(defaults);
+        _mockBuiltInPromptRepo.Setup(r => r.GetAsync()).ReturnsAsync(builtIns);
 
         var result = await CreateHandler().Handle(new GetPromptNamesQuery { UserId = UserId }, CancellationToken.None);
 
@@ -83,7 +83,7 @@ public class GetPromptNamesQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_ShouldReturnUserNamesThenDefaultNames_WithUserNamesFirst()
+    public async Task Handle_ShouldReturnUserNamesThenBuiltInNames_WithUserNamesFirst()
     {
         var aiSettings = new DomainAiSettings { Id = 1, UserId = UserId };
         aiSettings.Prompts.Add(Prompt.Create("My_Custom_Prompt", "template"));
@@ -91,11 +91,11 @@ public class GetPromptNamesQueryHandlerTests
             .Setup(r => r.GetByUserIdIncludePromptParameterAsync(UserId))
             .ReturnsAsync(aiSettings);
 
-        var defaults = new List<DefaultPrompt>
+        var builtIns = new List<BuiltInPrompt>
         {
-            DefaultPrompt.Create("Default_Anschreiben", "template"),
+            BuiltInPrompt.Create("Default_Anschreiben", "template"),
         };
-        _mockDefaultPromptRepo.Setup(r => r.GetAsync()).ReturnsAsync(defaults);
+        _mockBuiltInPromptRepo.Setup(r => r.GetAsync()).ReturnsAsync(builtIns);
 
         var result = await CreateHandler().Handle(new GetPromptNamesQuery { UserId = UserId }, CancellationToken.None);
 

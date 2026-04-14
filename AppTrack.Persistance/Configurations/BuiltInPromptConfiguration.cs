@@ -4,10 +4,13 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AppTrack.Persistance.Configurations;
 
-public class DefaultPromptConfiguration : IEntityTypeConfiguration<DefaultPrompt>
+public class BuiltInPromptConfiguration : IEntityTypeConfiguration<BuiltInPrompt>
 {
-    public void Configure(EntityTypeBuilder<DefaultPrompt> builder)
+    public void Configure(EntityTypeBuilder<BuiltInPrompt> builder)
     {
+        // Keep the existing SQL table name to avoid a breaking schema migration.
+        builder.ToTable("DefaultPrompts");
+
         builder.Property(x => x.Name)
             .IsRequired()
             .HasMaxLength(100);
@@ -30,9 +33,9 @@ public class DefaultPromptConfiguration : IEntityTypeConfiguration<DefaultPrompt
         );
     }
 
-    private static DefaultPrompt Seed(int id, string name, string promptTemplate)
+    private static BuiltInPrompt Seed(int id, string name, string promptTemplate)
     {
-        var p = DefaultPrompt.Create(name, promptTemplate);
+        var p = BuiltInPrompt.Create(name, promptTemplate);
         p.Id = id;
         return p;
     }

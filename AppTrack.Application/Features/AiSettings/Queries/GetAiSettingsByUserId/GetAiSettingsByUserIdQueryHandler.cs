@@ -9,12 +9,12 @@ namespace AppTrack.Application.Features.AiSettings.Queries.GetAiSettingsByUserId
 public class GetAiSettingsByUserIdQueryHandler : IRequestHandler<GetAiSettingsByUserIdQuery, AiSettingsDto>
 {
     private readonly IAiSettingsRepository _aiSettingsRepository;
-    private readonly IDefaultPromptRepository _defaultPromptRepository;
+    private readonly IBuiltInPromptRepository _builtInPromptRepository;
 
-    public GetAiSettingsByUserIdQueryHandler(IAiSettingsRepository aiSettingsRepository, IDefaultPromptRepository defaultPromptRepository)
+    public GetAiSettingsByUserIdQueryHandler(IAiSettingsRepository aiSettingsRepository, IBuiltInPromptRepository builtInPromptRepository)
     {
         _aiSettingsRepository = aiSettingsRepository;
-        _defaultPromptRepository = defaultPromptRepository;
+        _builtInPromptRepository = builtInPromptRepository;
     }
 
     /// <summary>
@@ -37,8 +37,8 @@ public class GetAiSettingsByUserIdQueryHandler : IRequestHandler<GetAiSettingsBy
         }
 
         var dto = entity.ToDto();
-        var defaults = await _defaultPromptRepository.GetAsync();
-        dto.DefaultPrompts = defaults.Select(d => d.ToDto()).ToList();
+        var defaults = await _builtInPromptRepository.GetAsync();
+        dto.BuiltInPrompts = defaults.Select(d => d.ToDto()).ToList();
         return dto;
     }
 }

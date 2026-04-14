@@ -21,14 +21,14 @@ public class GeneratePromptQueryHandlerTests
     private readonly Mock<IAiSettingsRepository> _mockAiSettingsRepo;
     private readonly Mock<IJobApplicationRepository> _mockJobApplicationRepo;
     private readonly Mock<IPromptBuilder> _mockPromptBuilder;
-    private readonly Mock<IDefaultPromptRepository> _mockDefaultPromptRepo;
+    private readonly Mock<IBuiltInPromptRepository> _mockBuiltInPromptRepo;
 
     public GeneratePromptQueryHandlerTests()
     {
         _mockAiSettingsRepo = new Mock<IAiSettingsRepository>();
         _mockJobApplicationRepo = new Mock<IJobApplicationRepository>();
         _mockPromptBuilder = new Mock<IPromptBuilder>();
-        _mockDefaultPromptRepo = new Mock<IDefaultPromptRepository>();
+        _mockBuiltInPromptRepo = new Mock<IBuiltInPromptRepository>();
 
         var existingJobApplication = new JobApplication
         {
@@ -63,10 +63,10 @@ public class GeneratePromptQueryHandlerTests
             .Setup(r => r.GetByUserIdIncludePromptParameterAsync(UserId))
             .ReturnsAsync(existingAiSettings);
 
-        // Default: no default prompts
-        _mockDefaultPromptRepo
+        // Default: no built-in prompts
+        _mockBuiltInPromptRepo
             .Setup(r => r.GetAsync())
-            .ReturnsAsync(new List<DefaultPrompt>());
+            .ReturnsAsync(new List<BuiltInPrompt>());
 
         _mockPromptBuilder
             .Setup(b => b.BuildPrompt(It.IsAny<IEnumerable<PromptParameter>>(), It.IsAny<string>()))
@@ -74,7 +74,7 @@ public class GeneratePromptQueryHandlerTests
     }
 
     private GeneratePromptQueryHandler CreateHandler() =>
-        new(_mockAiSettingsRepo.Object, _mockJobApplicationRepo.Object, _mockPromptBuilder.Object, _mockDefaultPromptRepo.Object);
+        new(_mockAiSettingsRepo.Object, _mockJobApplicationRepo.Object, _mockPromptBuilder.Object, _mockBuiltInPromptRepo.Object);
 
     [Fact]
     public async Task Handle_ShouldReturnGeneratedPromptDto_WhenQueryIsValid()
@@ -152,30 +152,30 @@ public class GeneratePromptQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_ShouldBuildPromptFromDefaultRepository_WhenPromptNameHasDefaultPrefix()
+    public async Task Handle_ShouldBuildPromptFromBuiltInRepository_WhenPromptNameHasDefaultPrefix()
     {
-        const string defaultPromptName = "Default_Cover_Letter";
-        const string defaultTemplate = "Write a cover letter for {Position}.";
+        const string builtInPromptName = "Default_Cover_Letter";
+        const string builtInTemplate = "Write a cover letter for {Position}.";
 
-        _mockDefaultPromptRepo
+        _mockBuiltInPromptRepo
             .Setup(r => r.GetAsync())
-            .ReturnsAsync(new List<DefaultPrompt>
+            .ReturnsAsync(new List<BuiltInPrompt>
             {
-                DefaultPrompt.Create(defaultPromptName, defaultTemplate),
+                BuiltInPrompt.Create(builtInPromptName, builtInTemplate),
             });
 
-        var query = new GeneratePromptQuery { JobApplicationId = JobApplicationId, UserId = UserId, PromptName = defaultPromptName };
+        var query = new GeneratePromptQuery { JobApplicationId = JobApplicationId, UserId = UserId, PromptName = builtInPromptName };
         await CreateHandler().Handle(query, CancellationToken.None);
 
-        _mockPromptBuilder.Verify(b => b.BuildPrompt(It.IsAny<IEnumerable<PromptParameter>>(), defaultTemplate), Times.Once);
+        _mockPromptBuilder.Verify(b => b.BuildPrompt(It.IsAny<IEnumerable<PromptParameter>>(), builtInTemplate), Times.Once);
     }
 
     [Fact]
-    public async Task Handle_ShouldUseDefaultTemplate_NotUserTemplate_WhenPromptNameHasDefaultPrefix()
+    public async Task Handle_ShouldUseBuiltInTemplate_NotUserTemplate_WhenPromptNameHasDefaultPrefix()
     {
-        const string defaultPromptName = "Default_Cover_Letter";
+        const string builtInPromptName = "Default_Cover_Letter";
         const string userTemplate = "User's own template";
-        const string defaultTemplate = "Write a cover letter for {Position}.";
+        const string builtInTemplate = "Write a cover letter for {Position}.";
 
         // User also has a prompt with the same name — must be ignored
         _mockAiSettingsRepo
@@ -188,17 +188,17 @@ public class GeneratePromptQueryHandlerTests
                 PromptParameter = new List<PromptParameter>()
             });
 
-        _mockDefaultPromptRepo
+        _mockBuiltInPromptRepo
             .Setup(r => r.GetAsync())
-            .ReturnsAsync(new List<DefaultPrompt>
+            .ReturnsAsync(new List<BuiltInPrompt>
             {
-                DefaultPrompt.Create(defaultPromptName, defaultTemplate),
+                BuiltInPrompt.Create(builtInPromptName, builtInTemplate),
             });
 
-        var query = new GeneratePromptQuery { JobApplicationId = JobApplicationId, UserId = UserId, PromptName = defaultPromptName };
+        var query = new GeneratePromptQuery { JobApplicationId = JobApplicationId, UserId = UserId, PromptName = builtInPromptName };
         await CreateHandler().Handle(query, CancellationToken.None);
 
-        _mockPromptBuilder.Verify(b => b.BuildPrompt(It.IsAny<IEnumerable<PromptParameter>>(), defaultTemplate), Times.Once);
+        _mockPromptBuilder.Verify(b => b.BuildPrompt(It.IsAny<IEnumerable<PromptParameter>>(), builtInTemplate), Times.Once);
         _mockPromptBuilder.Verify(b => b.BuildPrompt(It.IsAny<IEnumerable<PromptParameter>>(), userTemplate), Times.Never);
     }
 }
