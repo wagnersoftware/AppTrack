@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED: Use superpowers:subagent-driven-development (if subagents available) or superpowers:executing-plans to implement this plan. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Add a global `DefaultPrompt` table seeded with 4 German dummy prompts that every user sees (read-only) alongside their own prompts in AI Settings and the Generate Text dropdown.
+**Goal:** Add a global `BuiltInPrompt` table seeded with 4 German dummy prompts that every user sees (read-only) alongside their own prompts in AI Settings and the Generate Text dropdown.
 
-**Architecture:** New `DefaultPrompt` domain entity with its own EF Core table; handlers for `GetAiSettings`, `GetPromptNames`, and `GeneratePrompt` are extended to include defaults alongside user prompts. Frontend shows defaults in a separate read-only section. Language column is present for future i18n but no filtering is applied yet.
+**Architecture:** New `BuiltInPrompt` domain entity with its own EF Core table; handlers for `GetAiSettings`, `GetPromptNames`, and `GeneratePrompt` are extended to include defaults alongside user prompts. Frontend shows defaults in a separate read-only section. Language column is present for future i18n but no filtering is applied yet.
 
 **Tech Stack:** .NET 10, EF Core 10, xUnit, Moq, Shouldly, MudBlazor, NSwag
 
@@ -14,11 +14,11 @@
 
 | Action | File |
 |--------|------|
-| Create | `AppTrack.Domain/DefaultPrompt.cs` |
-| Create | `AppTrack.Application/Contracts/Persistance/IDefaultPromptRepository.cs` |
-| Create | `AppTrack.Persistance/Configurations/DefaultPromptConfiguration.cs` |
+| Create | `AppTrack.Domain/BuiltInPrompt.cs` |
+| Create | `AppTrack.Application/Contracts/Persistance/IBuiltInPromptRepository.cs` |
+| Create | `AppTrack.Persistance/Configurations/BuiltInPromptConfiguration.cs` |
 | Modify | `AppTrack.Persistance/DatabaseContext/AppTrackDatabaseContext.cs` |
-| Create | `AppTrack.Persistance/Repositories/DefaultPromptRepository.cs` |
+| Create | `AppTrack.Persistance/Repositories/BuiltInPromptRepository.cs` |
 | Modify | `AppTrack.Persistance/PersistanceServiceRegistration.cs` |
 | Modify | `AppTrack.Application/Features/AiSettings/Dto/AiSettingsDto.cs` |
 | Modify | `AppTrack.Application/Mappings/AiSettingsMappings.cs` |
@@ -26,7 +26,7 @@
 | Modify | `AppTrack.Application/Features/ApplicationText/Query/GetPromptNamesQuery/GetPromptNamesQueryHandler.cs` |
 | Modify | `AppTrack.Application/Features/ApplicationText/Query/GeneratePromptQuery/GeneratePromptQueryValidator.cs` |
 | Modify | `AppTrack.Application/Features/ApplicationText/Query/GeneratePromptQuery/GeneratePromptQueryHandler.cs` |
-| Create | `AppTrack.Application.UnitTests/Domain/DefaultPromptFactoryTests.cs` |
+| Create | `AppTrack.Application.UnitTests/Domain/BuiltInPromptFactoryTests.cs` |
 | Modify | `AppTrack.Application.UnitTests/Features/AiSettings/Queries/GetAiSettingsByUserIdQueryHandlerTests.cs` |
 | Modify | `AppTrack.Application.UnitTests/Features/ApplicationText/Queries/GetPromptNamesQueryHandlerTests.cs` |
 | Modify | `AppTrack.Application.UnitTests/Features/ApplicationText/Queries/GeneratePromptQueryValidatorTests.cs` |
@@ -40,27 +40,27 @@
 
 ## Chunk 1: Domain + Persistence
 
-### Task 1: `DefaultPrompt` domain entity + factory tests
+### Task 1: `BuiltInPrompt` domain entity + factory tests
 
 **Files:**
-- Create: `AppTrack.Domain/DefaultPrompt.cs`
-- Create: `AppTrack.Application.UnitTests/Domain/DefaultPromptFactoryTests.cs`
+- Create: `AppTrack.Domain/BuiltInPrompt.cs`
+- Create: `AppTrack.Application.UnitTests/Domain/BuiltInPromptFactoryTests.cs`
 
 - [ ] **Step 1: Write the failing factory tests**
 
 ```csharp
-// AppTrack.Application.UnitTests/Domain/DefaultPromptFactoryTests.cs
+// AppTrack.Application.UnitTests/Domain/BuiltInPromptFactoryTests.cs
 using AppTrack.Domain;
 using Shouldly;
 
 namespace AppTrack.Application.UnitTests.Domain;
 
-public class DefaultPromptFactoryTests
+public class BuiltInPromptFactoryTests
 {
     [Fact]
-    public void Create_ShouldReturnDefaultPrompt_WhenAllArgumentsAreValid()
+    public void Create_ShouldReturnBuiltInPrompt_WhenAllArgumentsAreValid()
     {
-        var result = DefaultPrompt.Create("Anschreiben", "Template text", "de");
+        var result = BuiltInPrompt.Create("Anschreiben", "Template text", "de");
 
         result.ShouldNotBeNull();
         result.Name.ShouldBe("Anschreiben");
@@ -71,19 +71,19 @@ public class DefaultPromptFactoryTests
     [Fact]
     public void Create_ShouldThrowArgumentNullException_WhenNameIsNull()
     {
-        Should.Throw<ArgumentNullException>(() => DefaultPrompt.Create(null, "template", "de"));
+        Should.Throw<ArgumentNullException>(() => BuiltInPrompt.Create(null, "template", "de"));
     }
 
     [Fact]
     public void Create_ShouldThrowArgumentNullException_WhenPromptTemplateIsNull()
     {
-        Should.Throw<ArgumentNullException>(() => DefaultPrompt.Create("Name", null, "de"));
+        Should.Throw<ArgumentNullException>(() => BuiltInPrompt.Create("Name", null, "de"));
     }
 
     [Fact]
     public void Create_ShouldThrowArgumentNullException_WhenLanguageIsNull()
     {
-        Should.Throw<ArgumentNullException>(() => DefaultPrompt.Create("Name", "template", null));
+        Should.Throw<ArgumentNullException>(() => BuiltInPrompt.Create("Name", "template", null));
     }
 }
 ```
@@ -91,21 +91,21 @@ public class DefaultPromptFactoryTests
 - [ ] **Step 2: Run tests to verify they fail**
 
 ```bash
-dotnet test test/AppTrack.Application.UnitTests/AppTrack.Application.UnitTests.csproj --filter "FullyQualifiedName~DefaultPromptFactoryTests" --configuration Release
+dotnet test test/AppTrack.Application.UnitTests/AppTrack.Application.UnitTests.csproj --filter "FullyQualifiedName~BuiltInPromptFactoryTests" --configuration Release
 ```
-Expected: compile error — `DefaultPrompt` does not exist.
+Expected: compile error — `BuiltInPrompt` does not exist.
 
-- [ ] **Step 3: Create `DefaultPrompt.cs`**
+- [ ] **Step 3: Create `BuiltInPrompt.cs`**
 
 Pattern: same as `AppTrack.Domain/Prompt.cs` — public setters (required for EF Core), private constructor, static `Create` factory with null checks.
 
 ```csharp
-// AppTrack.Domain/DefaultPrompt.cs
+// AppTrack.Domain/BuiltInPrompt.cs
 using AppTrack.Domain.Common;
 
 namespace AppTrack.Domain;
 
-public class DefaultPrompt : BaseEntity
+public class BuiltInPrompt : BaseEntity
 {
     public string Name { get; set; } = string.Empty;
     public string PromptTemplate { get; set; } = string.Empty;
@@ -113,13 +113,13 @@ public class DefaultPrompt : BaseEntity
 
     private DefaultPrompt() { }
 
-    public static DefaultPrompt Create(string? name, string? promptTemplate, string? language)
+    public static BuiltInPrompt Create(string? name, string? promptTemplate, string? language)
     {
         ArgumentNullException.ThrowIfNull(name);
         ArgumentNullException.ThrowIfNull(promptTemplate);
         ArgumentNullException.ThrowIfNull(language);
 
-        return new DefaultPrompt
+        return new BuiltInPrompt
         {
             Name = name,
             PromptTemplate = promptTemplate,
@@ -132,37 +132,37 @@ public class DefaultPrompt : BaseEntity
 - [ ] **Step 4: Run tests — expect pass**
 
 ```bash
-dotnet test test/AppTrack.Application.UnitTests/AppTrack.Application.UnitTests.csproj --filter "FullyQualifiedName~DefaultPromptFactoryTests" --configuration Release
+dotnet test test/AppTrack.Application.UnitTests/AppTrack.Application.UnitTests.csproj --filter "FullyQualifiedName~BuiltInPromptFactoryTests" --configuration Release
 ```
 Expected: 4 tests pass.
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add AppTrack.Domain/DefaultPrompt.cs test/AppTrack.Application.UnitTests/Domain/DefaultPromptFactoryTests.cs
-git commit -m "feat: add DefaultPrompt domain entity with Create factory"
+git add AppTrack.Domain/BuiltInPrompt.cs test/AppTrack.Application.UnitTests/Domain/BuiltInPromptFactoryTests.cs
+git commit -m "feat: add BuiltInPrompt domain entity with Create factory"
 ```
 
 ---
 
-### Task 2: `IDefaultPromptRepository` interface
+### Task 2: `IBuiltInPromptRepository` interface
 
 **Files:**
-- Create: `AppTrack.Application/Contracts/Persistance/IDefaultPromptRepository.cs`
+- Create: `AppTrack.Application/Contracts/Persistance/IBuiltInPromptRepository.cs`
 
 - [ ] **Step 1: Create the interface**
 
 Pattern: same as `AppTrack.Application/Contracts/Persistance/IAiSettingsRepository.cs`.
 
 ```csharp
-// AppTrack.Application/Contracts/Persistance/IDefaultPromptRepository.cs
+// AppTrack.Application/Contracts/Persistance/IBuiltInPromptRepository.cs
 using AppTrack.Domain;
 
 namespace AppTrack.Application.Contracts.Persistance;
 
-public interface IDefaultPromptRepository : IGenericRepository<DefaultPrompt>
+public interface IBuiltInPromptRepository : IGenericRepository<BuiltInPrompt>
 {
-    Task<IReadOnlyList<DefaultPrompt>> GetByLanguageAsync(string language);
+    Task<IReadOnlyList<BuiltInPrompt>> GetByLanguageAsync(string language);
 }
 ```
 
@@ -176,8 +176,8 @@ Expected: 0 errors, 0 warnings.
 - [ ] **Step 3: Commit**
 
 ```bash
-git add AppTrack.Application/Contracts/Persistance/IDefaultPromptRepository.cs
-git commit -m "feat: add IDefaultPromptRepository interface"
+git add AppTrack.Application/Contracts/Persistance/IBuiltInPromptRepository.cs
+git commit -m "feat: add IBuiltInPromptRepository interface"
 ```
 
 ---
@@ -185,28 +185,28 @@ git commit -m "feat: add IDefaultPromptRepository interface"
 ### Task 3: Persistence — configuration, repository, DbContext, DI, EF migration
 
 **Files:**
-- Create: `AppTrack.Persistance/Configurations/DefaultPromptConfiguration.cs`
+- Create: `AppTrack.Persistance/Configurations/BuiltInPromptConfiguration.cs`
 - Modify: `AppTrack.Persistance/DatabaseContext/AppTrackDatabaseContext.cs`
-- Create: `AppTrack.Persistance/Repositories/DefaultPromptRepository.cs`
+- Create: `AppTrack.Persistance/Repositories/BuiltInPromptRepository.cs`
 - Modify: `AppTrack.Persistance/PersistanceServiceRegistration.cs`
 
 > **Note on `HasData` seed IDs:** EF Core `HasData` requires explicit primary key values. Use the `Create` factory and then set `Id` via the public `BaseEntity.Id` property. `CreationDate`/`ModifiedDate` will be `null` for seed rows — this is fine since `BaseEntity` declares them as `DateTime?`.
 
-- [ ] **Step 1: Create `DefaultPromptConfiguration.cs`**
+- [ ] **Step 1: Create `BuiltInPromptConfiguration.cs`**
 
 Reference: `AppTrack.Persistance/Configurations/PromptConfiguration.cs` for property/index patterns, `AppTrack.Persistance/Configurations/ChatModelsConfiguration.cs` for `HasData` pattern.
 
 ```csharp
-// AppTrack.Persistance/Configurations/DefaultPromptConfiguration.cs
+// AppTrack.Persistance/Configurations/BuiltInPromptConfiguration.cs
 using AppTrack.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AppTrack.Persistance.Configurations;
 
-public class DefaultPromptConfiguration : IEntityTypeConfiguration<DefaultPrompt>
+public class BuiltInPromptConfiguration : IEntityTypeConfiguration<BuiltInPrompt>
 {
-    public void Configure(EntityTypeBuilder<DefaultPrompt> builder)
+    public void Configure(EntityTypeBuilder<BuiltInPrompt> builder)
     {
         builder.Property(x => x.Name)
             .IsRequired()
@@ -234,31 +234,31 @@ public class DefaultPromptConfiguration : IEntityTypeConfiguration<DefaultPrompt
         );
     }
 
-    private static DefaultPrompt Seed(int id, string name, string promptTemplate)
+    private static BuiltInPrompt Seed(int id, string name, string promptTemplate)
     {
-        var p = DefaultPrompt.Create(name, promptTemplate, "de");
+        var p = BuiltInPrompt.Create(name, promptTemplate, "de");
         p.Id = id;
         return p;
     }
 }
 ```
 
-- [ ] **Step 2: Add `DbSet<DefaultPrompt>` to `AppTrackDatabaseContext`**
+- [ ] **Step 2: Add `DbSet<BuiltInPrompt>` to `AppTrackDatabaseContext`**
 
 File: `AppTrack.Persistance/DatabaseContext/AppTrackDatabaseContext.cs`
 
 Add after the existing `DbSet` declarations (after `public DbSet<ChatModel> ChatModels { get; set; }`):
 
 ```csharp
-public DbSet<DefaultPrompt> DefaultPrompts { get; set; }
+public DbSet<BuiltInPrompt> BuiltInPrompts { get; set; }
 ```
 
-- [ ] **Step 3: Create `DefaultPromptRepository.cs`**
+- [ ] **Step 3: Create `BuiltInPromptRepository.cs`**
 
 Pattern: same as `AppTrack.Persistance/Repositories/AiSettingsRepository.cs`.
 
 ```csharp
-// AppTrack.Persistance/Repositories/DefaultPromptRepository.cs
+// AppTrack.Persistance/Repositories/BuiltInPromptRepository.cs
 using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Domain;
 using AppTrack.Persistance.DatabaseContext;
@@ -266,15 +266,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AppTrack.Persistance.Repositories;
 
-public class DefaultPromptRepository : GenericRepository<DefaultPrompt>, IDefaultPromptRepository
+public class BuiltInPromptRepository : GenericRepository<BuiltInPrompt>, IBuiltInPromptRepository
 {
-    public DefaultPromptRepository(AppTrackDatabaseContext dbContext) : base(dbContext)
+    public BuiltInPromptRepository(AppTrackDatabaseContext dbContext) : base(dbContext)
     {
     }
 
-    public async Task<IReadOnlyList<DefaultPrompt>> GetByLanguageAsync(string language)
+    public async Task<IReadOnlyList<BuiltInPrompt>> GetByLanguageAsync(string language)
     {
-        return await _context.DefaultPrompts
+        return await _context.BuiltInPrompts
             .AsNoTracking()
             .Where(p => p.Language == language)
             .ToListAsync();
@@ -289,7 +289,7 @@ File: `AppTrack.Persistance/PersistanceServiceRegistration.cs`
 Add after `services.AddScoped<IChatModelRepository, ChatModelRepository>();`:
 
 ```csharp
-services.AddScoped<IDefaultPromptRepository, DefaultPromptRepository>();
+services.AddScoped<IBuiltInPromptRepository, BuiltInPromptRepository>();
 ```
 
 - [ ] **Step 5: Build to verify no errors**
@@ -308,7 +308,7 @@ dotnet ef migrations add AddDefaultPromptsTable --project AppTrack.Persistance -
 ```
 
 Verify that a new migration file was created in `AppTrack.Persistance/Migrations/` containing:
-- `CreateTable` for `DefaultPrompts`
+- `CreateTable` for `BuiltInPrompts`
 - `InsertData` for all 4 seed rows
 - `CreateIndex` for the unique `(Name, Language)` index
 
@@ -326,8 +326,8 @@ Expected: all existing tests + 4 new factory tests pass.
 - [ ] **Step 9: Commit**
 
 ```bash
-git add AppTrack.Persistance/ AppTrack.Application/Contracts/Persistance/IDefaultPromptRepository.cs
-git commit -m "feat: add DefaultPrompt persistence — configuration, repository, DI, migration"
+git add AppTrack.Persistance/ AppTrack.Application/Contracts/Persistance/IBuiltInPromptRepository.cs
+git commit -m "feat: add BuiltInPrompt persistence — configuration, repository, DI, migration"
 ```
 
 ---
@@ -363,18 +363,18 @@ namespace AppTrack.Application.UnitTests.Features.AiSettings.Queries;
 public class GetAiSettingsByUserIdQueryHandlerTests
 {
     private readonly Mock<IAiSettingsRepository> _mockRepo = new();
-    private readonly Mock<IDefaultPromptRepository> _mockDefaultPromptRepo = new();
+    private readonly Mock<IBuiltInPromptRepository> _mockBuiltInPromptRepo = new();
 
     public GetAiSettingsByUserIdQueryHandlerTests()
     {
         // Default: return empty list so existing tests are unaffected
-        _mockDefaultPromptRepo
+        _mockBuiltInPromptRepo
             .Setup(r => r.GetAsync())
-            .ReturnsAsync(new List<DefaultPrompt>());
+            .ReturnsAsync(new List<BuiltInPrompt>());
     }
 
     private GetAiSettingsByUserIdQueryHandler CreateHandler() =>
-        new(_mockRepo.Object, _mockDefaultPromptRepo.Object);
+        new(_mockRepo.Object, _mockBuiltInPromptRepo.Object);
 
     [Fact]
     public async Task Handle_ShouldReturnExistingAiSettings_WhenAiSettingsExistForUser()
@@ -417,28 +417,28 @@ public class GetAiSettingsByUserIdQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_ShouldPopulateDefaultPrompts_InReturnedDto()
+    public async Task Handle_ShouldPopulateBuiltInPrompts_InReturnedDto()
     {
         const string userId = "user-1";
         _mockRepo
             .Setup(r => r.GetByUserIdIncludePromptParameterAsync(userId))
             .ReturnsAsync(new DomainAiSettings { Id = 1, UserId = userId });
 
-        var defaults = new List<DefaultPrompt>
+        var defaults = new List<BuiltInPrompt>
         {
-            DefaultPrompt.Create("Anschreiben", "Template A", "de"),
-            DefaultPrompt.Create("Vorstellung", "Template B", "de"),
+            BuiltInPrompt.Create("Anschreiben", "Template A", "de"),
+            BuiltInPrompt.Create("Vorstellung", "Template B", "de"),
         };
-        _mockDefaultPromptRepo
+        _mockBuiltInPromptRepo
             .Setup(r => r.GetAsync())
             .ReturnsAsync(defaults);
 
         var result = await CreateHandler().Handle(new GetAiSettingsByUserIdQuery { UserId = userId }, CancellationToken.None);
 
-        result.DefaultPrompts.ShouldNotBeNull();
-        result.DefaultPrompts.Count.ShouldBe(2);
-        result.DefaultPrompts[0].Name.ShouldBe("Anschreiben");
-        result.DefaultPrompts[1].Name.ShouldBe("Vorstellung");
+        result.BuiltInPrompts.ShouldNotBeNull();
+        result.BuiltInPrompts.Count.ShouldBe(2);
+        result.BuiltInPrompts[0].Name.ShouldBe("Anschreiben");
+        result.BuiltInPrompts[1].Name.ShouldBe("Vorstellung");
     }
 }
 ```
@@ -448,26 +448,26 @@ public class GetAiSettingsByUserIdQueryHandlerTests
 ```bash
 dotnet test test/AppTrack.Application.UnitTests/AppTrack.Application.UnitTests.csproj --filter "FullyQualifiedName~GetAiSettingsByUserIdQueryHandlerTests" --configuration Release
 ```
-Expected: compile errors — `IDefaultPromptRepository` not recognized by handler constructor, `AiSettingsDto.DefaultPrompts` doesn't exist.
+Expected: compile errors — `IBuiltInPromptRepository` not recognized by handler constructor, `AiSettingsDto.BuiltInPrompts` doesn't exist.
 
-- [ ] **Step 3: Add `DefaultPrompts` to `AiSettingsDto`**
+- [ ] **Step 3: Add `BuiltInPrompts` to `AiSettingsDto`**
 
 File: `AppTrack.Application/Features/AiSettings/Dto/AiSettingsDto.cs`
 
 Add after `public List<PromptDto> Prompts { get; set; } = new List<PromptDto>();`:
 
 ```csharp
-public List<PromptDto> DefaultPrompts { get; set; } = new List<PromptDto>();
+public List<PromptDto> BuiltInPrompts { get; set; } = new List<PromptDto>();
 ```
 
-- [ ] **Step 4: Add `ToDto` extension for `DefaultPrompt` in `AiSettingsMappings.cs`**
+- [ ] **Step 4: Add `ToDto` extension for `BuiltInPrompt` in `AiSettingsMappings.cs`**
 
 File: `AppTrack.Application/Mappings/AiSettingsMappings.cs`
 
 Add a new extension method after `internal static PromptDto ToDto(this Prompt entity)`:
 
 ```csharp
-internal static PromptDto ToDto(this DefaultPrompt entity) => new()
+internal static PromptDto ToDto(this BuiltInPrompt entity) => new()
 {
     Id = entity.Id,
     Name = entity.Name,
@@ -475,7 +475,7 @@ internal static PromptDto ToDto(this DefaultPrompt entity) => new()
 };
 ```
 
-Also add `using AppTrack.Domain;` at the top if not already present (it already is — `DefaultPrompt` is in `AppTrack.Domain`).
+Also add `using AppTrack.Domain;` at the top if not already present (it already is — `BuiltInPrompt` is in `AppTrack.Domain`).
 
 - [ ] **Step 5: Update `GetAiSettingsByUserIdQueryHandler`**
 
@@ -493,12 +493,12 @@ namespace AppTrack.Application.Features.AiSettings.Queries.GetAiSettingsByUserId
 public class GetAiSettingsByUserIdQueryHandler : IRequestHandler<GetAiSettingsByUserIdQuery, AiSettingsDto>
 {
     private readonly IAiSettingsRepository _aiSettingsRepository;
-    private readonly IDefaultPromptRepository _defaultPromptRepository;
+    private readonly IBuiltInPromptRepository _builtInPromptRepository;
 
-    public GetAiSettingsByUserIdQueryHandler(IAiSettingsRepository aiSettingsRepository, IDefaultPromptRepository defaultPromptRepository)
+    public GetAiSettingsByUserIdQueryHandler(IAiSettingsRepository aiSettingsRepository, IBuiltInPromptRepository builtInPromptRepository)
     {
         _aiSettingsRepository = aiSettingsRepository;
-        _defaultPromptRepository = defaultPromptRepository;
+        _builtInPromptRepository = builtInPromptRepository;
     }
 
     /// <summary>
@@ -521,8 +521,8 @@ public class GetAiSettingsByUserIdQueryHandler : IRequestHandler<GetAiSettingsBy
         }
 
         var dto = entity.ToDto();
-        var defaults = await _defaultPromptRepository.GetAsync();
-        dto.DefaultPrompts = defaults.Select(d => d.ToDto()).ToList();
+        var defaults = await _builtInPromptRepository.GetAsync();
+        dto.BuiltInPrompts = defaults.Select(d => d.ToDto()).ToList();
         return dto;
     }
 }
@@ -546,7 +546,7 @@ Expected: all tests pass (build may fail on other handlers that reference `Gener
 
 ```bash
 git add AppTrack.Application/Features/AiSettings/Dto/AiSettingsDto.cs AppTrack.Application/Mappings/AiSettingsMappings.cs AppTrack.Application/Features/AiSettings/Queries/ test/AppTrack.Application.UnitTests/Features/AiSettings/
-git commit -m "feat: extend AiSettingsDto with DefaultPrompts, populate in GetAiSettingsByUserIdQueryHandler"
+git commit -m "feat: extend AiSettingsDto with BuiltInPrompts, populate in GetAiSettingsByUserIdQueryHandler"
 ```
 
 ---
@@ -577,18 +577,18 @@ public class GetPromptNamesQueryHandlerTests
 {
     private const string UserId = "user-1";
     private readonly Mock<IAiSettingsRepository> _mockAiSettingsRepo = new();
-    private readonly Mock<IDefaultPromptRepository> _mockDefaultPromptRepo = new();
+    private readonly Mock<IBuiltInPromptRepository> _mockBuiltInPromptRepo = new();
 
     public GetPromptNamesQueryHandlerTests()
     {
         // Default: no default prompts (keeps existing tests unaffected)
-        _mockDefaultPromptRepo
+        _mockBuiltInPromptRepo
             .Setup(r => r.GetAsync())
-            .ReturnsAsync(new List<DefaultPrompt>());
+            .ReturnsAsync(new List<BuiltInPrompt>());
     }
 
     private GetPromptNamesQueryHandler CreateHandler() =>
-        new(_mockAiSettingsRepo.Object, _mockDefaultPromptRepo.Object);
+        new(_mockAiSettingsRepo.Object, _mockBuiltInPromptRepo.Object);
 
     [Fact]
     public async Task Handle_ShouldReturnNamesInInsertionOrder_WhenAiSettingsHaveMultiplePrompts()
@@ -629,18 +629,18 @@ public class GetPromptNamesQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_ShouldReturnDefaultPromptNames_WhenUserHasNoPrompts()
+    public async Task Handle_ShouldReturnBuiltInPromptNames_WhenUserHasNoPrompts()
     {
         _mockAiSettingsRepo
             .Setup(r => r.GetByUserIdIncludePromptParameterAsync(UserId))
             .ReturnsAsync(new DomainAiSettings { Id = 1, UserId = UserId });
 
-        var defaults = new List<DefaultPrompt>
+        var defaults = new List<BuiltInPrompt>
         {
-            DefaultPrompt.Create("Anschreiben", "template", "de"),
-            DefaultPrompt.Create("Vorstellung", "template", "de"),
+            BuiltInPrompt.Create("Anschreiben", "template", "de"),
+            BuiltInPrompt.Create("Vorstellung", "template", "de"),
         };
-        _mockDefaultPromptRepo.Setup(r => r.GetAsync()).ReturnsAsync(defaults);
+        _mockBuiltInPromptRepo.Setup(r => r.GetAsync()).ReturnsAsync(defaults);
 
         var result = await CreateHandler().Handle(new GetPromptNamesQuery { UserId = UserId }, CancellationToken.None);
 
@@ -648,7 +648,7 @@ public class GetPromptNamesQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_ShouldReturnUserNamesThenDefaultNames_WithUserNamesFirst()
+    public async Task Handle_ShouldReturnUserNamesThenBuiltInNames_WithUserNamesFirst()
     {
         var aiSettings = new DomainAiSettings { Id = 1, UserId = UserId };
         aiSettings.Prompts.Add(Prompt.Create("My Custom Prompt", "template"));
@@ -656,11 +656,11 @@ public class GetPromptNamesQueryHandlerTests
             .Setup(r => r.GetByUserIdIncludePromptParameterAsync(UserId))
             .ReturnsAsync(aiSettings);
 
-        var defaults = new List<DefaultPrompt>
+        var defaults = new List<BuiltInPrompt>
         {
-            DefaultPrompt.Create("Anschreiben", "template", "de"),
+            BuiltInPrompt.Create("Anschreiben", "template", "de"),
         };
-        _mockDefaultPromptRepo.Setup(r => r.GetAsync()).ReturnsAsync(defaults);
+        _mockBuiltInPromptRepo.Setup(r => r.GetAsync()).ReturnsAsync(defaults);
 
         var result = await CreateHandler().Handle(new GetPromptNamesQuery { UserId = UserId }, CancellationToken.None);
 
@@ -677,12 +677,12 @@ public class GetPromptNamesQueryHandlerTests
             .Setup(r => r.GetByUserIdIncludePromptParameterAsync(UserId))
             .ReturnsAsync(aiSettings);
 
-        var defaults = new List<DefaultPrompt>
+        var defaults = new List<BuiltInPrompt>
         {
-            DefaultPrompt.Create("Anschreiben", "default template", "de"),
-            DefaultPrompt.Create("Vorstellung", "template", "de"),
+            BuiltInPrompt.Create("Anschreiben", "default template", "de"),
+            BuiltInPrompt.Create("Vorstellung", "template", "de"),
         };
-        _mockDefaultPromptRepo.Setup(r => r.GetAsync()).ReturnsAsync(defaults);
+        _mockBuiltInPromptRepo.Setup(r => r.GetAsync()).ReturnsAsync(defaults);
 
         var result = await CreateHandler().Handle(new GetPromptNamesQuery { UserId = UserId }, CancellationToken.None);
 
@@ -716,12 +716,12 @@ namespace AppTrack.Application.Features.ApplicationText.Query.GetPromptNamesQuer
 public class GetPromptNamesQueryHandler : IRequestHandler<GetPromptNamesQuery, GetPromptNamesDto>
 {
     private readonly IAiSettingsRepository _aiSettingsRepository;
-    private readonly IDefaultPromptRepository _defaultPromptRepository;
+    private readonly IBuiltInPromptRepository _builtInPromptRepository;
 
-    public GetPromptNamesQueryHandler(IAiSettingsRepository aiSettingsRepository, IDefaultPromptRepository defaultPromptRepository)
+    public GetPromptNamesQueryHandler(IAiSettingsRepository aiSettingsRepository, IBuiltInPromptRepository builtInPromptRepository)
     {
         _aiSettingsRepository = aiSettingsRepository;
-        _defaultPromptRepository = defaultPromptRepository;
+        _builtInPromptRepository = builtInPromptRepository;
     }
 
     public async Task<GetPromptNamesDto> Handle(GetPromptNamesQuery request, CancellationToken cancellationToken)
@@ -733,7 +733,7 @@ public class GetPromptNamesQueryHandler : IRequestHandler<GetPromptNamesQuery, G
             throw new BadRequestException("Invalid request.", validationResult);
 
         var aiSettings = await _aiSettingsRepository.GetByUserIdIncludePromptParameterAsync(request.UserId);
-        var defaults = await _defaultPromptRepository.GetAsync();
+        var defaults = await _builtInPromptRepository.GetAsync();
 
         var userNames = aiSettings!.Prompts.Select(p => p.Name).ToList();
         var defaultNames = defaults
@@ -798,14 +798,14 @@ public class GeneratePromptQueryValidatorTests
 
     private readonly Mock<IJobApplicationRepository> _jobAppRepo;
     private readonly Mock<IAiSettingsRepository> _aiSettingsRepo;
-    private readonly Mock<IDefaultPromptRepository> _defaultPromptRepo;
+    private readonly Mock<IBuiltInPromptRepository> _builtInPromptRepo;
     private readonly GeneratePromptQueryValidator _validator;
 
     public GeneratePromptQueryValidatorTests()
     {
         _jobAppRepo = new Mock<IJobApplicationRepository>();
         _aiSettingsRepo = new Mock<IAiSettingsRepository>();
-        _defaultPromptRepo = new Mock<IDefaultPromptRepository>();
+        _builtInPromptRepo = new Mock<IBuiltInPromptRepository>();
 
         var jobApplication = new DomainJobApplication { Id = ExistingJobApplicationId, UserId = UserId };
         _jobAppRepo
@@ -826,11 +826,11 @@ public class GeneratePromptQueryValidatorTests
             .ReturnsAsync((DomainAiSettings?)null);
 
         // Default: no default prompts
-        _defaultPromptRepo
+        _builtInPromptRepo
             .Setup(r => r.GetAsync())
-            .ReturnsAsync(new List<DefaultPrompt>());
+            .ReturnsAsync(new List<BuiltInPrompt>());
 
-        _validator = new GeneratePromptQueryValidator(_jobAppRepo.Object, _aiSettingsRepo.Object, _defaultPromptRepo.Object);
+        _validator = new GeneratePromptQueryValidator(_jobAppRepo.Object, _aiSettingsRepo.Object, _builtInPromptRepo.Object);
     }
 
     private static GeneratePromptQuery BuildValidQuery(
@@ -923,7 +923,7 @@ public class GeneratePromptQueryValidatorTests
     }
 
     [Fact]
-    public async Task Validate_ShouldPass_WhenPromptNameExistsInDefaultPromptsOnly()
+    public async Task Validate_ShouldPass_WhenPromptNameExistsInBuiltInPromptsOnly()
     {
         const string defaultOnlyPromptName = "Anschreiben";
         // User has no prompt with this name
@@ -931,35 +931,35 @@ public class GeneratePromptQueryValidatorTests
             .Setup(r => r.GetByUserIdIncludePromptParameterAsync(UserId))
             .ReturnsAsync(new DomainAiSettings { Id = 1, UserId = UserId }); // no prompts
 
-        _defaultPromptRepo
+        _builtInPromptRepo
             .Setup(r => r.GetAsync())
-            .ReturnsAsync(new List<DefaultPrompt>
+            .ReturnsAsync(new List<BuiltInPrompt>
             {
-                DefaultPrompt.Create(defaultOnlyPromptName, "Schreibe ein Anschreiben für {Position}.", "de"),
+                BuiltInPrompt.Create(defaultOnlyPromptName, "Schreibe ein Anschreiben für {Position}.", "de"),
             });
 
         _jobAppRepo
             .Setup(r => r.GetByIdAsync(ExistingJobApplicationId))
             .ReturnsAsync(new DomainJobApplication { Id = ExistingJobApplicationId, UserId = UserId });
 
-        var localValidator = new GeneratePromptQueryValidator(_jobAppRepo.Object, _aiSettingsRepo.Object, _defaultPromptRepo.Object);
+        var localValidator = new GeneratePromptQueryValidator(_jobAppRepo.Object, _aiSettingsRepo.Object, _builtInPromptRepo.Object);
         var result = await localValidator.TestValidateAsync(BuildValidQuery(promptName: defaultOnlyPromptName));
         result.IsValid.ShouldBeTrue();
     }
 
     [Fact]
-    public async Task Validate_ShouldHaveError_WhenDefaultPromptTemplateIsEmpty()
+    public async Task Validate_ShouldHaveError_WhenBuiltInPromptTemplateIsEmpty()
     {
         const string defaultOnlyPromptName = "EmptyDefault";
         _aiSettingsRepo
             .Setup(r => r.GetByUserIdIncludePromptParameterAsync(UserId))
             .ReturnsAsync(new DomainAiSettings { Id = 1, UserId = UserId }); // no user prompts
 
-        _defaultPromptRepo
+        _builtInPromptRepo
             .Setup(r => r.GetAsync())
-            .ReturnsAsync(new List<DefaultPrompt>
+            .ReturnsAsync(new List<BuiltInPrompt>
             {
-                DefaultPrompt.Create(defaultOnlyPromptName, " ", "de"), // empty template
+                BuiltInPrompt.Create(defaultOnlyPromptName, " ", "de"), // empty template
             });
 
         _jobAppRepo
@@ -967,7 +967,7 @@ public class GeneratePromptQueryValidatorTests
             .ReturnsAsync(new DomainJobApplication { Id = ExistingJobApplicationId, UserId = UserId });
 
         var localValidator = new GeneratePromptQueryValidator(
-            _jobAppRepo.Object, _aiSettingsRepo.Object, _defaultPromptRepo.Object);
+            _jobAppRepo.Object, _aiSettingsRepo.Object, _builtInPromptRepo.Object);
         var result = await localValidator.TestValidateAsync(BuildValidQuery(promptName: defaultOnlyPromptName));
 
         result.IsValid.ShouldBeFalse();
@@ -978,7 +978,7 @@ public class GeneratePromptQueryValidatorTests
 
 - [ ] **Step 2: Write the failing handler test**
 
-Add one test to `GeneratePromptQueryHandlerTests.cs`. The handler constructor also needs the new `IDefaultPromptRepository` parameter. Replace the entire file:
+Add one test to `GeneratePromptQueryHandlerTests.cs`. The handler constructor also needs the new `IBuiltInPromptRepository` parameter. Replace the entire file:
 
 ```csharp
 // AppTrack.Application.UnitTests/Features/ApplicationText/Queries/GeneratePromptQueryHandlerTests.cs
@@ -1004,14 +1004,14 @@ public class GeneratePromptQueryHandlerTests
     private readonly Mock<IAiSettingsRepository> _mockAiSettingsRepo;
     private readonly Mock<IJobApplicationRepository> _mockJobApplicationRepo;
     private readonly Mock<IPromptBuilder> _mockPromptBuilder;
-    private readonly Mock<IDefaultPromptRepository> _mockDefaultPromptRepo;
+    private readonly Mock<IBuiltInPromptRepository> _mockBuiltInPromptRepo;
 
     public GeneratePromptQueryHandlerTests()
     {
         _mockAiSettingsRepo = new Mock<IAiSettingsRepository>();
         _mockJobApplicationRepo = new Mock<IJobApplicationRepository>();
         _mockPromptBuilder = new Mock<IPromptBuilder>();
-        _mockDefaultPromptRepo = new Mock<IDefaultPromptRepository>();
+        _mockBuiltInPromptRepo = new Mock<IBuiltInPromptRepository>();
 
         var existingJobApplication = new JobApplication
         {
@@ -1047,9 +1047,9 @@ public class GeneratePromptQueryHandlerTests
             .ReturnsAsync(existingAiSettings);
 
         // Default: no default prompts
-        _mockDefaultPromptRepo
+        _mockBuiltInPromptRepo
             .Setup(r => r.GetAsync())
-            .ReturnsAsync(new List<DefaultPrompt>());
+            .ReturnsAsync(new List<BuiltInPrompt>());
 
         _mockPromptBuilder
             .Setup(b => b.BuildPrompt(It.IsAny<IEnumerable<PromptParameter>>(), It.IsAny<string>()))
@@ -1057,7 +1057,7 @@ public class GeneratePromptQueryHandlerTests
     }
 
     private GeneratePromptQueryHandler CreateHandler() =>
-        new(_mockAiSettingsRepo.Object, _mockJobApplicationRepo.Object, _mockPromptBuilder.Object, _mockDefaultPromptRepo.Object);
+        new(_mockAiSettingsRepo.Object, _mockJobApplicationRepo.Object, _mockPromptBuilder.Object, _mockBuiltInPromptRepo.Object);
 
     [Fact]
     public async Task Handle_ShouldReturnGeneratedPromptDto_WhenQueryIsValid()
@@ -1137,8 +1137,8 @@ public class GeneratePromptQueryHandlerTests
     [Fact]
     public async Task Handle_ShouldBuildPromptFromDefaultTemplate_WhenPromptNameNotInUserSettings()
     {
-        const string defaultPromptName = "Anschreiben";
-        const string defaultTemplate = "Schreibe ein Anschreiben für {Position}.";
+        const string builtInPromptName = "Anschreiben";
+        const string builtInTemplate = "Schreibe ein Anschreiben für {Position}.";
 
         // User has no prompt with this name
         _mockAiSettingsRepo
@@ -1151,11 +1151,11 @@ public class GeneratePromptQueryHandlerTests
                 PromptParameter = new List<PromptParameter>()
             });
 
-        _mockDefaultPromptRepo
+        _mockBuiltInPromptRepo
             .Setup(r => r.GetAsync())
-            .ReturnsAsync(new List<DefaultPrompt>
+            .ReturnsAsync(new List<BuiltInPrompt>
             {
-                DefaultPrompt.Create(defaultPromptName, defaultTemplate, "de"),
+                BuiltInPrompt.Create(builtInPromptName, builtInTemplate, "de"),
             });
 
         _mockJobApplicationRepo
@@ -1174,10 +1174,10 @@ public class GeneratePromptQueryHandlerTests
                 StartDate = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc)
             });
 
-        var query = new GeneratePromptQuery { JobApplicationId = JobApplicationId, UserId = UserId, PromptName = defaultPromptName };
+        var query = new GeneratePromptQuery { JobApplicationId = JobApplicationId, UserId = UserId, PromptName = builtInPromptName };
         await CreateHandler().Handle(query, CancellationToken.None);
 
-        _mockPromptBuilder.Verify(b => b.BuildPrompt(It.IsAny<IEnumerable<PromptParameter>>(), defaultTemplate), Times.Once);
+        _mockPromptBuilder.Verify(b => b.BuildPrompt(It.IsAny<IEnumerable<PromptParameter>>(), builtInTemplate), Times.Once);
     }
 }
 ```
@@ -1203,16 +1203,16 @@ public class GeneratePromptQueryValidator : AbstractValidator<GeneratePromptQuer
 {
     private readonly IJobApplicationRepository _jobApplicationRepository;
     private readonly IAiSettingsRepository _aiSettingsRepository;
-    private readonly IDefaultPromptRepository _defaultPromptRepository;
+    private readonly IBuiltInPromptRepository _builtInPromptRepository;
 
     public GeneratePromptQueryValidator(
         IJobApplicationRepository jobApplicationRepository,
         IAiSettingsRepository aiSettingsRepository,
-        IDefaultPromptRepository defaultPromptRepository)
+        IBuiltInPromptRepository builtInPromptRepository)
     {
         _jobApplicationRepository = jobApplicationRepository;
         _aiSettingsRepository = aiSettingsRepository;
-        _defaultPromptRepository = defaultPromptRepository;
+        _builtInPromptRepository = builtInPromptRepository;
 
         RuleFor(x => x.JobApplicationId)
             .NotEmpty().WithMessage("{PropertyName} is required")
@@ -1259,17 +1259,17 @@ public class GeneratePromptQueryValidator : AbstractValidator<GeneratePromptQuer
             return;
         }
 
-        var defaults = await _defaultPromptRepository.GetAsync();
-        var defaultPrompt = defaults.FirstOrDefault(
+        var defaults = await _builtInPromptRepository.GetAsync();
+        var builtInPrompt = defaults.FirstOrDefault(
             p => string.Equals(p.Name, query.PromptName, StringComparison.OrdinalIgnoreCase));
 
-        if (defaultPrompt == null)
+        if (builtInPrompt == null)
         {
             context.AddFailure("Prompt not found in AI settings.");
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(defaultPrompt.PromptTemplate))
+        if (string.IsNullOrWhiteSpace(builtInPrompt.PromptTemplate))
             context.AddFailure("Prompt template is empty.");
     }
 }
@@ -1294,23 +1294,23 @@ public class GeneratePromptQueryHandler : IRequestHandler<GeneratePromptQuery, G
     private readonly IAiSettingsRepository _aiSettingsRepository;
     private readonly IJobApplicationRepository _jobApplicationRepository;
     private readonly IPromptBuilder _promptBuilder;
-    private readonly IDefaultPromptRepository _defaultPromptRepository;
+    private readonly IBuiltInPromptRepository _builtInPromptRepository;
 
     public GeneratePromptQueryHandler(
         IAiSettingsRepository aiSettingsRepository,
         IJobApplicationRepository jobApplicationRepository,
         IPromptBuilder promptBuilder,
-        IDefaultPromptRepository defaultPromptRepository)
+        IBuiltInPromptRepository builtInPromptRepository)
     {
         _aiSettingsRepository = aiSettingsRepository;
         _jobApplicationRepository = jobApplicationRepository;
         _promptBuilder = promptBuilder;
-        _defaultPromptRepository = defaultPromptRepository;
+        _builtInPromptRepository = builtInPromptRepository;
     }
 
     public async Task<GeneratedPromptDto> Handle(GeneratePromptQuery request, CancellationToken cancellationToken)
     {
-        var validator = new GeneratePromptQueryValidator(_jobApplicationRepository, _aiSettingsRepository, _defaultPromptRepository);
+        var validator = new GeneratePromptQueryValidator(_jobApplicationRepository, _aiSettingsRepository, _builtInPromptRepository);
         var validationResult = await validator.ValidateAsync(request);
 
         if (validationResult.Errors.Any())
@@ -1333,7 +1333,7 @@ public class GeneratePromptQueryHandler : IRequestHandler<GeneratePromptQuery, G
         }
         else
         {
-            var defaults = await _defaultPromptRepository.GetAsync();
+            var defaults = await _builtInPromptRepository.GetAsync();
             promptTemplate = defaults
                 .First(p => string.Equals(p.Name, request.PromptName, StringComparison.OrdinalIgnoreCase))
                 .PromptTemplate;
@@ -1389,9 +1389,9 @@ dotnet tool run nswag run nswag.json
 
 After completion, stop the API (`Ctrl+C`).
 
-- [ ] **Step 3: Verify the generated `ServiceClient.cs` has `DefaultPrompts`**
+- [ ] **Step 3: Verify the generated `ServiceClient.cs` has `BuiltInPrompts`**
 
-Open `AppTrack.BlazorUi/ApiService/Base/ServiceClient.cs` and confirm the generated `AiSettingsDto` class now has a `DefaultPrompts` property (type `ICollection<PromptDto>?` or similar). Also confirm `PromptDto` is unchanged (Id, Name, PromptTemplate).
+Open `AppTrack.BlazorUi/ApiService/Base/ServiceClient.cs` and confirm the generated `AiSettingsDto` class now has a `BuiltInPrompts` property (type `ICollection<PromptDto>?` or similar). Also confirm `PromptDto` is unchanged (Id, Name, PromptTemplate).
 
 - [ ] **Step 4: Build to verify no compile errors from the regenerated client**
 
@@ -1400,23 +1400,23 @@ dotnet build AppTrack.sln --configuration Release
 ```
 Expected: 0 errors, 0 warnings.
 
-- [ ] **Step 5: Add `DefaultPrompts` to `AiSettingsModel`**
+- [ ] **Step 5: Add `BuiltInPrompts` to `AiSettingsModel`**
 
 File: `Models/AiSettingsModel.cs`
 
 Add after `public ObservableCollection<PromptModel> Prompts { get; set; } = new ObservableCollection<PromptModel>();`:
 
 ```csharp
-public List<PromptModel> DefaultPrompts { get; set; } = [];
+public List<PromptModel> BuiltInPrompts { get; set; } = [];
 ```
 
 Do NOT add this to the `IAiSettingsValidatable` interface or to the explicit interface implementations — it is display-only and not validated.
 
-- [ ] **Step 6: Update frontend mapping to populate `DefaultPrompts`**
+- [ ] **Step 6: Update frontend mapping to populate `BuiltInPrompts`**
 
 File: `ApiService/Mappings/AiSettingsMappings.cs`
 
-In the `ToModel(this AiSettingsDto dto)` method, add the `DefaultPrompts` mapping. Full replacement of that method:
+In the `ToModel(this AiSettingsDto dto)` method, add the `BuiltInPrompts` mapping. Full replacement of that method:
 
 ```csharp
 internal static AiSettingsModel ToModel(this AiSettingsDto dto) => new()
@@ -1427,11 +1427,11 @@ internal static AiSettingsModel ToModel(this AiSettingsDto dto) => new()
         (dto.PromptParameter ?? []).Select(p => p.ToModel())),
     Prompts = new ObservableCollection<PromptModel>(
         (dto.Prompts ?? []).Select(p => p.ToModel())),
-    DefaultPrompts = (dto.DefaultPrompts ?? []).Select(p => p.ToModel()).ToList(),
+    BuiltInPrompts = (dto.BuiltInPrompts ?? []).Select(p => p.ToModel()).ToList(),
 };
 ```
 
-> **Important — NSwag nullability:** After regeneration, check whether the generated `AiSettingsDto.DefaultPrompts` is nullable (`ICollection<PromptDto>?`) or non-nullable (`ICollection<PromptDto>`). If it is **non-nullable**, remove the `?? []` null-coalescing operator: `DefaultPrompts = dto.DefaultPrompts.Select(p => p.ToModel()).ToList()`. Using `?? []` on a non-nullable reference generates CS8073 which fails the build under `TreatWarningsAsErrors = true`. Check the generated property in `ServiceClient.cs` before writing this line.
+> **Important — NSwag nullability:** After regeneration, check whether the generated `AiSettingsDto.BuiltInPrompts` is nullable (`ICollection<PromptDto>?`) or non-nullable (`ICollection<PromptDto>`). If it is **non-nullable**, remove the `?? []` null-coalescing operator: `BuiltInPrompts = dto.BuiltInPrompts.Select(p => p.ToModel()).ToList()`. Using `?? []` on a non-nullable reference generates CS8073 which fails the build under `TreatWarningsAsErrors = true`. Check the generated property in `ServiceClient.cs` before writing this line.
 
 *(The existing `PromptDto.ToModel()` extension method in the same file is reused for default prompts.)*
 
@@ -1446,7 +1446,7 @@ Expected: 0 errors, 0 warnings.
 
 ```bash
 git add AppTrack.BlazorUi/ApiService/Base/ServiceClient.cs Models/AiSettingsModel.cs ApiService/Mappings/AiSettingsMappings.cs
-git commit -m "feat: regenerate NSwag client, add DefaultPrompts to AiSettingsModel and mapping"
+git commit -m "feat: regenerate NSwag client, add BuiltInPrompts to AiSettingsModel and mapping"
 ```
 
 ---
@@ -1456,7 +1456,7 @@ git commit -m "feat: regenerate NSwag client, add DefaultPrompts to AiSettingsMo
 **Files:**
 - Modify: `AppTrack.BlazorUi/Components/Pages/AiSettings.razor`
 
-No changes needed to `AiSettings.razor.cs` — `_model.DefaultPrompts` is populated automatically through the mapping updated in Task 7.
+No changes needed to `AiSettings.razor.cs` — `_model.BuiltInPrompts` is populated automatically through the mapping updated in Task 7.
 
 - [ ] **Step 1: Add the Default Prompts section above the existing Prompts section**
 
@@ -1471,7 +1471,7 @@ Replace that block with the following two `<MudItem>` blocks — first the new D
         <MudIcon Icon="@Icons.Material.Filled.Lock" Size="Size.Small" Color="Color.Secondary" Class="mr-1" />
         <MudText Typo="Typo.subtitle1">Default Prompts</MudText>
     </MudStack>
-    @if (_model.DefaultPrompts.Count == 0)
+    @if (_model.BuiltInPrompts.Count == 0)
     {
         <MudText Typo="Typo.body2" Color="Color.Secondary" Class="ml-1">
             No default prompts available.
@@ -1480,7 +1480,7 @@ Replace that block with the following two `<MudItem>` blocks — first the new D
     else
     {
         <MudPaper Outlined="true" Class="pa-0" Style="max-height: 260px; overflow-y: auto;">
-            @foreach (var prompt in _model.DefaultPrompts)
+            @foreach (var prompt in _model.BuiltInPrompts)
             {
                 <MudStack Row="true"
                           AlignItems="AlignItems.Center"

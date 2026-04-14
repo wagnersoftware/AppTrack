@@ -21,7 +21,7 @@ No spaces are allowed in any prompt name. Underscores are used as word separator
 
 ## Changes
 
-### 1. `DefaultPrompt.Create()` — Domain (`AppTrack.Domain`)
+### 1. `BuiltInPrompt.Create()` — Domain (`AppTrack.Domain`)
 
 Add two guards immediately after the existing `ArgumentNullException.ThrowIfNull` calls:
 
@@ -36,6 +36,8 @@ if (name.Contains(' '))
 ```
 
 > **Important:** Changes 1 and 3 must be committed atomically. Applying the guards before renaming the seed entries will cause an immediate build/runtime failure because the existing names (`"Anschreiben"` etc.) violate the new guards.
+
+
 
 ### 2. `PromptBaseValidator` — Shared (`AppTrack.Shared.Validation`)
 
@@ -66,11 +68,11 @@ Create a new EF Core migration that updates the four existing rows via `UpdateDa
 
 ### 4. Init Test — Persistence Integration Tests (`AppTrack.Persistance.IntegrationTests`)
 
-Add a new test class `DefaultPromptSeedTests` using the InMemory database.
+Add a new test class `BuiltInPromptSeedTests` using the InMemory database.
 
 Two tests:
-- All seeded `DefaultPrompt` names start with `"Default_"`
-- All seeded `DefaultPrompt` names contain no spaces
+- All seeded `BuiltInPrompt` names start with `"Default_"`
+- All seeded `BuiltInPrompt` names contain no spaces
 
 These tests act as a safety net for future additions to the seed data.
 
@@ -91,7 +93,7 @@ All existing test fixtures that use prompt names with spaces must be renamed to 
 - Add: `Validate_ShouldHaveError_WhenNameContainsSpace`
 - Add: `Validate_ShouldHaveError_WhenNameStartsWithDefaultPrefix`
 
-**`DefaultPromptFactoryTests.cs`**
+**`BuiltInPromptFactoryTests.cs`**
 - Update valid-prompt test: both the `Create(...)` argument and the `result.Name.ShouldBe(...)` assertion from `"Anschreiben"` → `"Default_Cover_Letter"`
 - Add: `Create_ShouldThrowArgumentException_WhenNameDoesNotStartWithDefaultPrefix`
 - Add: `Create_ShouldThrowArgumentException_WhenNameContainsSpace`
@@ -110,9 +112,9 @@ Existing user prompts in the database that happen to contain spaces are not migr
 
 | Layer | Test type | File | What is tested |
 |---|---|---|---|
-| Domain | Unit | `DefaultPromptFactoryTests` | `Create()` throws on missing prefix and on spaces (2 new negative tests) |
+| Domain | Unit | `BuiltInPromptFactoryTests` | `Create()` throws on missing prefix and on spaces (2 new negative tests) |
 | Shared validation | Unit | `PromptBaseValidatorTests` | New rules block spaces and `Default_` prefix in user prompts (2 new tests) |
 | Shared validation | Unit | `AiSettingsBaseValidatorTests` | Existing valid-prompt fixture renamed to avoid spaces |
 | Backend | Unit | `PromptDtoValidatorTests` | Fixture renamed + 2 new test cases for the new rules |
-| Persistence | Integration | `DefaultPromptSeedTests` | All seed entries follow the naming convention (safety net for future additions) |
+| Persistence | Integration | `BuiltInPromptSeedTests` | All seed entries follow the naming convention (safety net for future additions) |
 | Frontend | — | — | No unit tests exist for `PromptModelValidator`; rules propagate automatically via `PromptBaseValidator` |

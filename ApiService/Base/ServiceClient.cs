@@ -2236,8 +2236,8 @@ namespace AppTrack.Frontend.ApiService.Base
         [System.Text.Json.Serialization.JsonPropertyName("prompts")]
         public System.Collections.Generic.ICollection<PromptDto> Prompts { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("defaultPrompts")]
-        public System.Collections.Generic.ICollection<PromptDto> DefaultPrompts { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("builtInPrompts")]
+        public System.Collections.Generic.ICollection<PromptDto> BuiltInPrompts { get; set; }
 
     }
 

@@ -12,23 +12,23 @@ public class GeneratePromptQueryHandler : IRequestHandler<GeneratePromptQuery, G
     private readonly IAiSettingsRepository _aiSettingsRepository;
     private readonly IJobApplicationRepository _jobApplicationRepository;
     private readonly IPromptBuilder _promptBuilder;
-    private readonly IDefaultPromptRepository _defaultPromptRepository;
+    private readonly IBuiltInPromptRepository _builtInPromptRepository;
 
     public GeneratePromptQueryHandler(
         IAiSettingsRepository aiSettingsRepository,
         IJobApplicationRepository jobApplicationRepository,
         IPromptBuilder promptBuilder,
-        IDefaultPromptRepository defaultPromptRepository)
+        IBuiltInPromptRepository builtInPromptRepository)
     {
         _aiSettingsRepository = aiSettingsRepository;
         _jobApplicationRepository = jobApplicationRepository;
         _promptBuilder = promptBuilder;
-        _defaultPromptRepository = defaultPromptRepository;
+        _builtInPromptRepository = builtInPromptRepository;
     }
 
     public async Task<GeneratedPromptDto> Handle(GeneratePromptQuery request, CancellationToken cancellationToken)
     {
-        var validator = new GeneratePromptQueryValidator(_jobApplicationRepository, _aiSettingsRepository, _defaultPromptRepository);
+        var validator = new GeneratePromptQueryValidator(_jobApplicationRepository, _aiSettingsRepository, _builtInPromptRepository);
         var validationResult = await validator.ValidateAsync(request);
 
         if (validationResult.Errors.Any())
@@ -44,7 +44,7 @@ public class GeneratePromptQueryHandler : IRequestHandler<GeneratePromptQuery, G
         string promptTemplate;
         if (request.PromptName.StartsWith("Default_", StringComparison.Ordinal))
         {
-            var defaults = await _defaultPromptRepository.GetAsync();
+            var defaults = await _builtInPromptRepository.GetAsync();
             promptTemplate = defaults
                 .First(p => string.Equals(p.Name, request.PromptName, StringComparison.OrdinalIgnoreCase))
                 .PromptTemplate;

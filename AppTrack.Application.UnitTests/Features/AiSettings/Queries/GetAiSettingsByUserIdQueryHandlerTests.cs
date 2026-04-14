@@ -11,17 +11,17 @@ namespace AppTrack.Application.UnitTests.Features.AiSettings.Queries;
 public class GetAiSettingsByUserIdQueryHandlerTests
 {
     private readonly Mock<IAiSettingsRepository> _mockRepo = new();
-    private readonly Mock<IDefaultPromptRepository> _mockDefaultPromptRepo = new();
+    private readonly Mock<IBuiltInPromptRepository> _mockBuiltInPromptRepo = new();
 
     public GetAiSettingsByUserIdQueryHandlerTests()
     {
-        _mockDefaultPromptRepo
+        _mockBuiltInPromptRepo
             .Setup(r => r.GetAsync())
-            .ReturnsAsync(new List<DefaultPrompt>());
+            .ReturnsAsync(new List<BuiltInPrompt>());
     }
 
     private GetAiSettingsByUserIdQueryHandler CreateHandler() =>
-        new(_mockRepo.Object, _mockDefaultPromptRepo.Object);
+        new(_mockRepo.Object, _mockBuiltInPromptRepo.Object);
 
     [Fact]
     public async Task Handle_ShouldReturnExistingAiSettings_WhenAiSettingsExistForUser()
@@ -64,27 +64,27 @@ public class GetAiSettingsByUserIdQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_ShouldPopulateDefaultPrompts_InReturnedDto()
+    public async Task Handle_ShouldPopulateBuiltInPrompts_InReturnedDto()
     {
         const string userId = "user-1";
         _mockRepo
             .Setup(r => r.GetByUserIdIncludePromptParameterAsync(userId))
             .ReturnsAsync(new DomainAiSettings { Id = 1, UserId = userId });
 
-        var defaults = new List<DefaultPrompt>
+        var builtInPrompts = new List<BuiltInPrompt>
         {
-            DefaultPrompt.Create("Default_Cover_Letter", "Template A"),
-            DefaultPrompt.Create("Default_Introduction", "Template B"),
+            BuiltInPrompt.Create("Default_Cover_Letter", "Template A"),
+            BuiltInPrompt.Create("Default_Introduction", "Template B"),
         };
-        _mockDefaultPromptRepo
+        _mockBuiltInPromptRepo
             .Setup(r => r.GetAsync())
-            .ReturnsAsync(defaults);
+            .ReturnsAsync(builtInPrompts);
 
         var result = await CreateHandler().Handle(new GetAiSettingsByUserIdQuery { UserId = userId }, CancellationToken.None);
 
-        result.DefaultPrompts.ShouldNotBeNull();
-        result.DefaultPrompts.Count.ShouldBe(2);
-        result.DefaultPrompts[0].Name.ShouldBe("Default_Cover_Letter");
-        result.DefaultPrompts[1].Name.ShouldBe("Default_Introduction");
+        result.BuiltInPrompts.ShouldNotBeNull();
+        result.BuiltInPrompts.Count.ShouldBe(2);
+        result.BuiltInPrompts[0].Name.ShouldBe("Default_Cover_Letter");
+        result.BuiltInPrompts[1].Name.ShouldBe("Default_Introduction");
     }
 }

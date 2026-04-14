@@ -48,11 +48,11 @@ public async Task Validate_ShouldHaveError_WhenXIsY()
 - Fix: use fully qualified type name `AppTrack.Domain.FreelancerProfile` in all `It.Is<>` and `It.IsAny<>` calls
 - Do NOT add `using AppTrack.Domain;` in these test files (it is unnecessary and confusing)
 
-## IDefaultPromptRepository: GetAsync → GetByLanguageAsync
-- `IDefaultPromptRepository.GetAsync()` was replaced by `GetByLanguageAsync(string languageCode)` where `languageCode` is `"en"` or `"de"` derived from `AiSettings.Language`
-- Any test that mocked `r.GetAsync()` on `IDefaultPromptRepository` must be updated to `r.GetByLanguageAsync(It.IsAny<string>())` (or a specific code string if verifying routing)
+## IBuiltInPromptRepository: GetAsync → GetByLanguageAsync
+- `IBuiltInPromptRepository.GetAsync()` was replaced by `GetByLanguageAsync(string languageCode)` where `languageCode` is `"en"` or `"de"` derived from `AiSettings.Language`
+- Any test that mocked `r.GetAsync()` on `IBuiltInPromptRepository` must be updated to `r.GetByLanguageAsync(It.IsAny<string>())` (or a specific code string if verifying routing)
 - Affected test files: `GeneratePromptQueryHandlerTests.cs`, `GeneratePromptQueryValidatorTests.cs`, `GetAiSettingsByUserIdQueryHandlerTests.cs`
-- Default (fallback) constructor setup pattern: `.Setup(r => r.GetByLanguageAsync(It.IsAny<string>())).ReturnsAsync(new List<DefaultPrompt>())`
+- Default (fallback) constructor setup pattern: `.Setup(r => r.GetByLanguageAsync(It.IsAny<string>())).ReturnsAsync(new List<BuiltInPrompt>())`
 
 ## Key Rules
 - `TreatWarningsAsErrors = true` — zero warnings tolerated, build must be clean

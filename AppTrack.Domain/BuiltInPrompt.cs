@@ -2,14 +2,14 @@ using AppTrack.Domain.Common;
 
 namespace AppTrack.Domain;
 
-public class DefaultPrompt : BaseEntity
+public class BuiltInPrompt : BaseEntity
 {
     public string Name { get; set; } = string.Empty;
     public string PromptTemplate { get; set; } = string.Empty;
 
-    private DefaultPrompt() { }
+    private BuiltInPrompt() { }
 
-    public static DefaultPrompt Create(string? name, string? promptTemplate)
+    public static BuiltInPrompt Create(string? name, string? promptTemplate)
     {
         ArgumentNullException.ThrowIfNull(name);
         ArgumentNullException.ThrowIfNull(promptTemplate);
@@ -22,7 +22,7 @@ public class DefaultPrompt : BaseEntity
         if (name.Contains(' '))
             throw new ArgumentException("Default prompt names must not contain spaces.", nameof(name));
 
-        return new DefaultPrompt
+        return new BuiltInPrompt
         {
             Name = name,
             PromptTemplate = promptTemplate

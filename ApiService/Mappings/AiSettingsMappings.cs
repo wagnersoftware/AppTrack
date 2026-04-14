@@ -15,7 +15,7 @@ internal static class AiSettingsMappings
             (dto.PromptParameter ?? []).Select(p => p.ToModel())),
         Prompts = new ObservableCollection<PromptModel>(
             (dto.Prompts ?? []).Select(p => p.ToModel())),
-        DefaultPrompts = dto.DefaultPrompts.Select(p => p.ToModel()).ToList(),
+        BuiltInPrompts = dto.BuiltInPrompts.Select(p => p.ToModel()).ToList(),
     };
 
     internal static PromptParameterModel ToModel(this PromptParameterDto dto) => new()

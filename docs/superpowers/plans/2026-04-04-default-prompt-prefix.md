@@ -4,7 +4,7 @@
 
 **Goal:** Enforce a `Default_` prefix on all default prompts and prevent user prompts from using this prefix or spaces in their names.
 
-**Architecture:** Add two rules to the shared `PromptBaseValidator` (no spaces, no `Default_` prefix) so they propagate to all inheriting validators automatically. Add guards in `DefaultPrompt.Create()` for domain-level enforcement. Rename the four seeded default prompts to English `Default_`-prefixed names via EF Core data migration.
+**Architecture:** Add two rules to the shared `PromptBaseValidator` (no spaces, no `Default_` prefix) so they propagate to all inheriting validators automatically. Add guards in `BuiltInPrompt.Create()` for domain-level enforcement. Rename the four seeded built-in prompts to English `Default_`-prefixed names via EF Core data migration.
 
 **Tech Stack:** .NET 10, FluentValidation 12, EF Core 10, xUnit, Shouldly, EF Core InMemory (integration tests)
 
@@ -159,54 +159,54 @@ git commit -m "feat: block spaces and Default_ prefix in user prompt names"
 
 ## Chunk 2: Domain guards + seed rename + migration (atomic)
 
-> These three changes **must land in the same commit**. Adding guards to `DefaultPrompt.Create()` before renaming the seed entries will break the build because the existing seed names (`"Anschreiben"` etc.) violate the guards. The strategy is: write the failing tests first, then implement all three changes together.
+> These three changes **must land in the same commit**. Adding guards to `BuiltInPrompt.Create()` before renaming the seed entries will break the build because the existing seed names (`"Anschreiben"` etc.) violate the guards. The strategy is: write the failing tests first, then implement all three changes together.
 
 ### Task 2: Domain guards, seed rename, and EF migration (atomic)
 
 **Files:**
-- Modify: `AppTrack.Domain/DefaultPrompt.cs`
-- Modify: `AppTrack.Application.UnitTests/Domain/DefaultPromptFactoryTests.cs`
-- Modify: `AppTrack.Persistance/Configurations/DefaultPromptConfiguration.cs`
+- Modify: `AppTrack.Domain/BuiltInPrompt.cs`
+- Modify: `AppTrack.Application.UnitTests/Domain/BuiltInPromptFactoryTests.cs`
+- Modify: `AppTrack.Persistance/Configurations/BuiltInPromptConfiguration.cs`
 - Create: new EF Core migration (auto-generated name, e.g. `..._RenameDefaultPrompts`)
 
-- [ ] **Step 1: Write the two new failing guard tests in `DefaultPromptFactoryTests.cs`**
+- [ ] **Step 1: Write the two new failing guard tests in `BuiltInPromptFactoryTests.cs`**
 
-Add at the end of the `DefaultPromptFactoryTests` class:
+Add at the end of the `BuiltInPromptFactoryTests` class:
 
 ```csharp
 [Fact]
 public void Create_ShouldThrowArgumentException_WhenNameDoesNotStartWithDefaultPrefix()
 {
-    Should.Throw<ArgumentException>(() => DefaultPrompt.Create("Cover_Letter", "template", "de"));
+    Should.Throw<ArgumentException>(() => BuiltInPrompt.Create("Cover_Letter", "template", "de"));
 }
 
 [Fact]
 public void Create_ShouldThrowArgumentException_WhenNameContainsSpace()
 {
-    Should.Throw<ArgumentException>(() => DefaultPrompt.Create("Default_Cover Letter", "template", "de"));
+    Should.Throw<ArgumentException>(() => BuiltInPrompt.Create("Default_Cover Letter", "template", "de"));
 }
 ```
 
 - [ ] **Step 2: Run the new tests to verify they fail**
 
 ```bash
-dotnet test AppTrack.Application.UnitTests/AppTrack.Application.UnitTests.csproj --filter "FullyQualifiedName~DefaultPromptFactoryTests.Create_ShouldThrowArgumentException_WhenNameDoesNotStartWithDefaultPrefix|FullyQualifiedName~DefaultPromptFactoryTests.Create_ShouldThrowArgumentException_WhenNameContainsSpace" --configuration Release
+dotnet test AppTrack.Application.UnitTests/AppTrack.Application.UnitTests.csproj --filter "FullyQualifiedName~BuiltInPromptFactoryTests.Create_ShouldThrowArgumentException_WhenNameDoesNotStartWithDefaultPrefix|FullyQualifiedName~BuiltInPromptFactoryTests.Create_ShouldThrowArgumentException_WhenNameContainsSpace" --configuration Release
 ```
 
 Expected: both FAIL — no guards exist yet.
 
-- [ ] **Step 3: Add guards to `DefaultPrompt.Create()` in `AppTrack.Domain/DefaultPrompt.cs`**
+- [ ] **Step 3: Add guards to `BuiltInPrompt.Create()` in `AppTrack.Domain/BuiltInPrompt.cs`**
 
 The current method body:
 
 ```csharp
-public static DefaultPrompt Create(string? name, string? promptTemplate, string? language)
+public static BuiltInPrompt Create(string? name, string? promptTemplate, string? language)
 {
     ArgumentNullException.ThrowIfNull(name);
     ArgumentNullException.ThrowIfNull(promptTemplate);
     ArgumentNullException.ThrowIfNull(language);
 
-    return new DefaultPrompt
+    return new BuiltInPrompt
     {
         Name = name,
         PromptTemplate = promptTemplate,
@@ -218,7 +218,7 @@ public static DefaultPrompt Create(string? name, string? promptTemplate, string?
 Replace with:
 
 ```csharp
-public static DefaultPrompt Create(string? name, string? promptTemplate, string? language)
+public static BuiltInPrompt Create(string? name, string? promptTemplate, string? language)
 {
     ArgumentNullException.ThrowIfNull(name);
     ArgumentNullException.ThrowIfNull(promptTemplate);
@@ -232,7 +232,7 @@ public static DefaultPrompt Create(string? name, string? promptTemplate, string?
     if (name.Contains(' '))
         throw new ArgumentException("Default prompt names must not contain spaces.", nameof(name));
 
-    return new DefaultPrompt
+    return new BuiltInPrompt
     {
         Name = name,
         PromptTemplate = promptTemplate,
@@ -241,7 +241,7 @@ public static DefaultPrompt Create(string? name, string? promptTemplate, string?
 }
 ```
 
-- [ ] **Step 4: Rename seed entries in `DefaultPromptConfiguration.cs`**
+- [ ] **Step 4: Rename seed entries in `BuiltInPromptConfiguration.cs`**
 
 Replace the four `Seed(...)` calls inside `Configure`:
 
@@ -260,17 +260,17 @@ builder.HasData(
 
 Note: prompt templates are also translated to English to be consistent with the English names. The `language` field in the `Seed()` helper remains `"de"` — the language field tracks which locale these prompts are intended for, not the language of the template text. No change is needed here.
 
-- [ ] **Step 5: Update the three existing passing tests in `DefaultPromptFactoryTests.cs`**
+- [ ] **Step 5: Update the three existing passing tests in `BuiltInPromptFactoryTests.cs`**
 
-**`Create_ShouldReturnDefaultPrompt_WhenAllArgumentsAreValid`** — update both the `Create(...)` argument and the `.ShouldBe(...)` assertion:
+**`Create_ShouldReturnBuiltInPrompt_WhenAllArgumentsAreValid`** — update both the `Create(...)` argument and the `.ShouldBe(...)` assertion:
 
 ```csharp
 // Before:
-var result = DefaultPrompt.Create("Anschreiben", "Template text", "de");
+var result = BuiltInPrompt.Create("Anschreiben", "Template text", "de");
 result.Name.ShouldBe("Anschreiben");
 
 // After:
-var result = DefaultPrompt.Create("Default_Cover_Letter", "Template text", "de");
+var result = BuiltInPrompt.Create("Default_Cover_Letter", "Template text", "de");
 result.Name.ShouldBe("Default_Cover_Letter");
 ```
 
@@ -278,12 +278,12 @@ result.Name.ShouldBe("Default_Cover_Letter");
 
 ```csharp
 // Before (both tests):
-Should.Throw<ArgumentNullException>(() => DefaultPrompt.Create("Name", null, "de"));
-Should.Throw<ArgumentNullException>(() => DefaultPrompt.Create("Name", "template", null));
+Should.Throw<ArgumentNullException>(() => BuiltInPrompt.Create("Name", null, "de"));
+Should.Throw<ArgumentNullException>(() => BuiltInPrompt.Create("Name", "template", null));
 
 // After (both tests):
-Should.Throw<ArgumentNullException>(() => DefaultPrompt.Create("Default_Name", null, "de"));
-Should.Throw<ArgumentNullException>(() => DefaultPrompt.Create("Default_Name", "template", null));
+Should.Throw<ArgumentNullException>(() => BuiltInPrompt.Create("Default_Name", null, "de"));
+Should.Throw<ArgumentNullException>(() => BuiltInPrompt.Create("Default_Name", "template", null));
 ```
 
 - [ ] **Step 6: Generate the EF Core data migration**
@@ -307,21 +307,21 @@ Expected: all tests PASS.
 - [ ] **Step 8: Commit atomically**
 
 ```bash
-git add AppTrack.Domain/DefaultPrompt.cs
-git add AppTrack.Application.UnitTests/Domain/DefaultPromptFactoryTests.cs
-git add AppTrack.Persistance/Configurations/DefaultPromptConfiguration.cs
+git add AppTrack.Domain/BuiltInPrompt.cs
+git add AppTrack.Application.UnitTests/Domain/BuiltInPromptFactoryTests.cs
+git add AppTrack.Persistance/Configurations/BuiltInPromptConfiguration.cs
 git add AppTrack.Persistance/Migrations/
-git commit -m "feat: add Default_ prefix guards to DefaultPrompt.Create, rename seed data, add migration"
+git commit -m "feat: add Default_ prefix guards to BuiltInPrompt.Create, rename seed data, add migration"
 ```
 
 ---
 
 ## Chunk 3: Persistence init tests
 
-### Task 3: Add `DefaultPromptSeedTests`
+### Task 3: Add `BuiltInPromptSeedTests`
 
 **Files:**
-- Create: `AppTrack.Persistance.IntegrationTests/DefaultPromptSeedTests.cs`
+- Create: `AppTrack.Persistance.IntegrationTests/BuiltInPromptSeedTests.cs`
 
 - [ ] **Step 1: Create the test class**
 
@@ -332,11 +332,11 @@ using Shouldly;
 
 namespace AppTrack.Persistance.IntegrationTests;
 
-public class DefaultPromptSeedTests
+public class BuiltInPromptSeedTests
 {
     private readonly AppTrackDatabaseContext _context;
 
-    public DefaultPromptSeedTests()
+    public BuiltInPromptSeedTests()
     {
         var options = new DbContextOptionsBuilder<AppTrackDatabaseContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
@@ -347,18 +347,18 @@ public class DefaultPromptSeedTests
     }
 
     [Fact]
-    public async Task AllDefaultPrompts_ShouldStartWithDefaultPrefix()
+    public async Task AllBuiltInPrompts_ShouldStartWithDefaultPrefix()
     {
-        var prompts = await _context.DefaultPrompts.ToListAsync();
+        var prompts = await _context.BuiltInPrompts.ToListAsync();
 
         prompts.ShouldNotBeEmpty();
         prompts.ShouldAllBe(p => p.Name.StartsWith("Default_", StringComparison.Ordinal));
     }
 
     [Fact]
-    public async Task AllDefaultPrompts_ShouldNotContainSpaces()
+    public async Task AllBuiltInPrompts_ShouldNotContainSpaces()
     {
-        var prompts = await _context.DefaultPrompts.ToListAsync();
+        var prompts = await _context.BuiltInPrompts.ToListAsync();
 
         prompts.ShouldNotBeEmpty();
         prompts.ShouldAllBe(p => !p.Name.Contains(' '));
@@ -366,7 +366,7 @@ public class DefaultPromptSeedTests
 }
 ```
 
-> **Note:** `UseInMemoryDatabase` + `EnsureCreated()` applies the `HasData` seed entries. The tests verify that the seed data in `DefaultPromptConfiguration.HasData()` follows the naming convention. This is the safety net for future additions.
+> **Note:** `UseInMemoryDatabase` + `EnsureCreated()` applies the `HasData` seed entries. The tests verify that the seed data in `BuiltInPromptConfiguration.HasData()` follows the naming convention. This is the safety net for future additions.
 
 - [ ] **Step 2: Run the persistence integration tests**
 
@@ -387,6 +387,6 @@ Expected: 0 errors, 0 warnings.
 - [ ] **Step 4: Commit**
 
 ```bash
-git add AppTrack.Persistance.IntegrationTests/DefaultPromptSeedTests.cs
-git commit -m "test: add DefaultPromptSeedTests to enforce Default_ prefix on seed data"
+git add AppTrack.Persistance.IntegrationTests/BuiltInPromptSeedTests.cs
+git commit -m "test: add BuiltInPromptSeedTests to enforce Default_ prefix on seed data"
 ```
