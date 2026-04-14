@@ -15,7 +15,6 @@ public partial class ProfileSetupDialog
     private FreelancerProfileModel _model = new();
     private FreelancerProfileForm _form = null!;
     private bool _isBusy;
-    private bool _cvBusy;
 
     private async Task Save()
     {

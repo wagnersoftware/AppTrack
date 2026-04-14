@@ -149,13 +149,13 @@
             <MudItem xs="12">
                 <MudStack Row="false" Spacing="1">
                     <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
-                        <MudFileUpload T="IBrowserFile" Accept=".pdf" FilesChanged="OnCvFileChanged" Disabled="_isBusy">
+                        <MudFileUpload T="IBrowserFile" Accept=".pdf" FilesChanged="OnCvFileChanged" Disabled="_isBusy || Disabled">
                             <SelectedTemplate />
                             <CustomContent>
                                 <MudButton Variant="Variant.Outlined"
                                            StartIcon="@Icons.Material.Filled.AttachFile"
                                            Color="Color.Default"
-                                           Disabled="_isBusy"
+                                           Disabled="_isBusy || Disabled"
                                            OnClick="@context.OpenFilePickerAsync">
                                     @(string.IsNullOrEmpty(Model.CvFileName) ? "Upload CV (PDF)" : "Replace CV")
                                 </MudButton>
@@ -166,7 +166,7 @@
                             <MudIconButton Icon="@Icons.Material.Filled.Delete"
                                            Color="Color.Error"
                                            Size="Size.Small"
-                                           Disabled="_isBusy"
+                                           Disabled="_isBusy || Disabled"
                                            OnClick="OnCvDeleteClicked" />
                         }
                     </MudStack>

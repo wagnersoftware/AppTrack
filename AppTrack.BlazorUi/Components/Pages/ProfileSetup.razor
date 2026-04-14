@@ -13,7 +13,7 @@
         <MudProgressLinear Indeterminate="true" Color="Color.Primary" Class="mb-2" />
     }
 
-    <FreelancerProfileForm @ref="_form" Model="_model" OnCvBusyChanged="@(busy => _isBusy = busy)" />
+    <FreelancerProfileForm @ref="_form" Model="_model" OnCvBusyChanged="@(busy => _isBusy = busy)" Disabled="_isBusy" />
 
     <MudStack Row="true" Justify="Justify.SpaceBetween" Class="mt-4">
         <MudButton Variant="Variant.Outlined"

@@ -31,7 +31,7 @@ public partial class ProfileSetup
         if (confirmed != true) return;
 
         _isBusy = true;
-        StateHasChanged();
+        await InvokeAsync(StateHasChanged);
         var response = await ProfileService.DeleteProfileAsync();
         _isBusy = false;
 
@@ -51,6 +51,7 @@ public partial class ProfileSetup
         if (!_form.Validate()) return;
 
         _isBusy = true;
+        await InvokeAsync(StateHasChanged);
         var response = await ProfileService.UpsertProfileAsync(_model);
         _isBusy = false;
 

@@ -11,6 +11,7 @@ public partial class FreelancerProfileForm
 {
     [Parameter] public FreelancerProfileModel Model { get; set; } = new();
     [Parameter] public EventCallback<bool> OnCvBusyChanged { get; set; }
+    [Parameter] public bool Disabled { get; set; }
     [Inject] private IModelValidator<FreelancerProfileModel> ModelValidator { get; set; } = null!;
     [Inject] private IFreelancerProfileService ProfileService { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
