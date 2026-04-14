@@ -8,7 +8,6 @@ namespace AppTrack.BlazorUi.Components.Pages;
 
 public partial class ProfileSetup
 {
-    [Inject] private NavigationManager Navigation { get; set; } = null!;
     [Inject] private IFreelancerProfileService ProfileService { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
 
@@ -38,8 +37,8 @@ public partial class ProfileSetup
 
         if (response.Success)
         {
+            _model = new FreelancerProfileModel();
             Snackbar.Add("Profile deleted successfully.", Severity.Success);
-            Navigation.NavigateTo("/");
         }
         else
         {
@@ -58,7 +57,6 @@ public partial class ProfileSetup
         if (response.Success)
         {
             Snackbar.Add("Profile saved", Severity.Success);
-            Navigation.NavigateTo("/");
         }
         else
         {
