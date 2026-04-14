@@ -43,6 +43,7 @@ internal static class FreelancerProfileMappings
         CvBlobPath = entity.CvBlobPath,
         CvFileName = entity.CvFileName,
         CvText = entity.CvText,
+        CvUploadDate = entity.CvUploadDate,
         CreationDate = entity.CreationDate ?? default,
         ModifiedDate = entity.ModifiedDate ?? default,
     };

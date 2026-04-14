@@ -16,4 +16,5 @@ public class FreelancerProfile : BaseEntity
     public string? CvBlobPath { get; set; }
     public string? CvFileName { get; set; }
     public string? CvText { get; set; }
+    public DateTime? CvUploadDate { get; set; }
 }

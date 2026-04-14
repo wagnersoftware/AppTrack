@@ -48,6 +48,7 @@ public class UploadCvCommandHandler : IRequestHandler<UploadCvCommand, Freelance
         profile.CvBlobPath = blobPath;
         profile.CvFileName = request.FileName;
         profile.CvText = extractedText;
+        profile.CvUploadDate = DateTime.UtcNow;
 
         try
         {
