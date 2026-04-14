@@ -143,7 +143,7 @@ public class UpsertFreelancerProfileCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_ShouldSkipParameterSync_WhenNoAiSettingsForUser()
+    public async Task Handle_ShouldCreateAiSettings_WhenNoAiSettingsForUser()
     {
         // Arrange — "new-user" has no AiSettings in the mock
         var command = ValidCommand(userId: "new-user");
@@ -151,8 +151,9 @@ public class UpsertFreelancerProfileCommandHandlerTests
         // Act
         await _handler.Handle(command, CancellationToken.None);
 
-        // Assert: UpdateAsync never called because GetByUserIdTrackedAsync returns null
-        _mockAiSettingsRepo.Verify(r => r.UpdateAsync(It.IsAny<AppTrack.Domain.AiSettings>()), Times.Never);
+        // Assert: CreateAsync called to bootstrap AiSettings, then UpdateAsync to sync parameters
+        _mockAiSettingsRepo.Verify(r => r.CreateAsync(It.IsAny<AppTrack.Domain.AiSettings>()), Times.Once);
+        _mockAiSettingsRepo.Verify(r => r.UpdateAsync(It.IsAny<AppTrack.Domain.AiSettings>()), Times.Once);
     }
 
     [Fact]

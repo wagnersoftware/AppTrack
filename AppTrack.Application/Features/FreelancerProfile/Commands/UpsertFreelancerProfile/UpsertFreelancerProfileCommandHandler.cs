@@ -59,7 +59,8 @@ public class UpsertFreelancerProfileCommandHandler : IRequestHandler<UpsertFreel
 
         if (aiSettings is null)
         {
-            return;
+            aiSettings = new AppTrack.Domain.AiSettings { UserId = profile.UserId };
+            await _aiSettingsRepository.CreateAsync(aiSettings);
         }
 
         var parameters = new Dictionary<string, string?>
