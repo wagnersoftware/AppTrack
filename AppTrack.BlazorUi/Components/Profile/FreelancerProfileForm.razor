@@ -172,7 +172,13 @@
                     </MudStack>
                     @if (!string.IsNullOrEmpty(Model.CvFileName))
                     {
-                        <MudText Typo="Typo.caption" Color="Color.Secondary">@Model.CvFileName</MudText>
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">
+                            @Model.CvFileName
+                            @if (Model.CvUploadDate.HasValue)
+                            {
+                                <span> &middot; Uploaded @Model.CvUploadDate.Value.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</span>
+                            }
+                        </MudText>
                     }
                 </MudStack>
             </MudItem>

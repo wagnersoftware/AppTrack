@@ -30,6 +30,7 @@ public class DeleteCvCommandHandler : IRequestHandler<DeleteCvCommand, Freelance
             profile.CvBlobPath = null;
             profile.CvFileName = null;
             profile.CvText = null;
+            profile.CvUploadDate = null;
             await _repository.UpsertAsync(profile);
 
             await _cvStorageService.DeleteAsync(blobPath);

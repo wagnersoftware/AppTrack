@@ -117,6 +117,7 @@ public partial class FreelancerProfileForm
             if (response.Success)
             {
                 Model.CvFileName = response.Data?.CvFileName;
+                Model.CvUploadDate = response.Data?.CvUploadDate;
                 Snackbar.Add("CV uploaded successfully", Severity.Success);
             }
             else
@@ -146,6 +147,7 @@ public partial class FreelancerProfileForm
             if (response.Success)
             {
                 Model.CvFileName = null;
+                Model.CvUploadDate = null;
                 Snackbar.Add("CV deleted successfully", Severity.Success);
             }
             else

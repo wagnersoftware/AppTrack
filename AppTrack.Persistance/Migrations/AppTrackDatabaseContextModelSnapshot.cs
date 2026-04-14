@@ -198,6 +198,9 @@ namespace AppTrack.Persistance.Migrations
                     b.Property<string>("CvText")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime?>("CvUploadDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<decimal?>("DailyRate")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");

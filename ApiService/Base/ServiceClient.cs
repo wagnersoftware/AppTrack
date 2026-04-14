@@ -2382,6 +2382,9 @@ namespace AppTrack.Frontend.ApiService.Base
         [System.Text.Json.Serialization.JsonPropertyName("cvFileName")]
         public string CvFileName { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("cvUploadDate")]
+        public System.DateTime? CvUploadDate { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("cvText")]
         public string CvText { get; set; }
 

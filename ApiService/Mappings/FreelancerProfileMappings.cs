@@ -50,6 +50,7 @@ internal static class FreelancerProfileMappings
             CreationDate = dto.CreationDate,
             ModifiedDate = dto.ModifiedDate,
             CvFileName = dto.CvFileName,
+            CvUploadDate = dto.CvUploadDate,
         };
     }
 }

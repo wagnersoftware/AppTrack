@@ -16,6 +16,7 @@ public class FreelancerProfileDto
     public string? CvBlobPath { get; set; }
     public string? CvFileName { get; set; }
     public string? CvText { get; set; }
+    public DateTime? CvUploadDate { get; set; }
     public DateTime CreationDate { get; set; }
     public DateTime ModifiedDate { get; set; }
 }
