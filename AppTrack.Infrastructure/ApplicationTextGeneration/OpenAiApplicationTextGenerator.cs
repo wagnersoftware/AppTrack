@@ -37,7 +37,8 @@ public class OpenAiApplicationTextGenerator : IApplicationTextGenerator
                 new { role = "system", content = "You are a professional assistant helping with job applications and related communication. Only use information explicitly provided in the prompt. Do not invent, assume or add any skills, experience or qualifications that are not mentioned in the applicant's data." },
                 new { role = "user", content = prompt }
             },
-            max_tokens = _maxTokens
+            max_tokens = _maxTokens,
+            temperature = 0
         });
 
         HttpResponseMessage response;
