@@ -30,7 +30,7 @@ public class GetAiSettingsByUserIdQueryHandlerTests
         var existingSettings = new DomainAiSettings { Id = 1, UserId = userId, SelectedChatModelId = 3 };
 
         _mockRepo
-            .Setup(r => r.GetByUserIdIncludePromptParameterAsync(userId))
+            .Setup(r => r.GetByUserIdWithPromptsReadOnlyAsync(userId))
             .ReturnsAsync(existingSettings);
 
         var result = await CreateHandler().Handle(new GetAiSettingsByUserIdQuery { UserId = userId }, CancellationToken.None);
@@ -49,7 +49,7 @@ public class GetAiSettingsByUserIdQueryHandlerTests
         const string userId = "new-user";
 
         _mockRepo
-            .Setup(r => r.GetByUserIdIncludePromptParameterAsync(userId))
+            .Setup(r => r.GetByUserIdWithPromptsReadOnlyAsync(userId))
             .ReturnsAsync((DomainAiSettings?)null);
 
         _mockRepo
@@ -68,13 +68,13 @@ public class GetAiSettingsByUserIdQueryHandlerTests
     {
         const string userId = "user-1";
         _mockRepo
-            .Setup(r => r.GetByUserIdIncludePromptParameterAsync(userId))
+            .Setup(r => r.GetByUserIdWithPromptsReadOnlyAsync(userId))
             .ReturnsAsync(new DomainAiSettings { Id = 1, UserId = userId });
 
         var builtInPrompts = new List<BuiltInPrompt>
         {
-            BuiltInPrompt.Create("Default_Cover_Letter", "Template A"),
-            BuiltInPrompt.Create("Default_Introduction", "Template B"),
+            BuiltInPrompt.Create("builtIn_Cover_Letter", "Template A"),
+            BuiltInPrompt.Create("builtIn_Introduction", "Template B"),
         };
         _mockBuiltInPromptRepo
             .Setup(r => r.GetAsync())
@@ -84,7 +84,7 @@ public class GetAiSettingsByUserIdQueryHandlerTests
 
         result.BuiltInPrompts.ShouldNotBeNull();
         result.BuiltInPrompts.Count.ShouldBe(2);
-        result.BuiltInPrompts[0].Name.ShouldBe("Default_Cover_Letter");
-        result.BuiltInPrompts[1].Name.ShouldBe("Default_Introduction");
+        result.BuiltInPrompts[0].Name.ShouldBe("builtIn_Cover_Letter");
+        result.BuiltInPrompts[1].Name.ShouldBe("builtIn_Introduction");
     }
 }

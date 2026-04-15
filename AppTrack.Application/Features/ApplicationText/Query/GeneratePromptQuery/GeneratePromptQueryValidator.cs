@@ -1,4 +1,5 @@
 using AppTrack.Application.Contracts.Persistance;
+using AppTrack.Domain;
 using FluentValidation;
 
 namespace AppTrack.Application.Features.ApplicationText.Query.GeneratePromptQuery;
@@ -45,7 +46,7 @@ public class GeneratePromptQueryValidator : AbstractValidator<GeneratePromptQuer
 
     private async Task ValidateAiSettings(GeneratePromptQuery query, ValidationContext<GeneratePromptQuery> context, CancellationToken token)
     {
-        var aiSettings = await _aiSettingsRepository.GetByUserIdIncludePromptParameterAsync(query.UserId);
+        var aiSettings = await _aiSettingsRepository.GetByUserIdWithPromptsReadOnlyAsync(query.UserId);
 
         if (aiSettings == null)
         {
@@ -53,7 +54,7 @@ public class GeneratePromptQueryValidator : AbstractValidator<GeneratePromptQuer
             return;
         }
 
-        if (query.PromptName.StartsWith("Default_", StringComparison.Ordinal))
+        if (query.PromptName.StartsWith(BuiltInParameterKeys.Prefix, StringComparison.Ordinal))
         {
             var defaults = await _builtInPromptRepository.GetAsync();
             var builtInPrompt = defaults.FirstOrDefault(

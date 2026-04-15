@@ -19,12 +19,12 @@ public class BuiltInPromptSeedTests
     }
 
     [Fact]
-    public async Task AllBuiltInPrompts_ShouldStartWithDefaultPrefix()
+    public async Task AllBuiltInPrompts_ShouldStartWithBuiltInPrefix()
     {
         var prompts = await _context.BuiltInPrompts.ToListAsync();
 
         prompts.ShouldNotBeEmpty();
-        prompts.ShouldAllBe(p => p.Name.StartsWith("Default_", StringComparison.Ordinal));
+        prompts.ShouldAllBe(p => p.Name.StartsWith("builtIn_", StringComparison.Ordinal));
     }
 
     [Fact]

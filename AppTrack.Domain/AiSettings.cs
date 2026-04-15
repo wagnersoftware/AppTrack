@@ -12,5 +12,7 @@ public class AiSettings : BaseEntity
 
     public ICollection<PromptParameter> PromptParameter { get; set; } = new List<PromptParameter>();
 
+    public ICollection<BuiltInPromptParameter> BuiltInPromptParameter { get; set; } = new List<BuiltInPromptParameter>();
+
     public ICollection<Prompt> Prompts { get; set; } = new List<Prompt>();
 }

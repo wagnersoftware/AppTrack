@@ -60,7 +60,7 @@ public class GeneratePromptQueryHandlerTests
             .ReturnsAsync((JobApplication?)null);
 
         _mockAiSettingsRepo
-            .Setup(r => r.GetByUserIdIncludePromptParameterAsync(UserId))
+            .Setup(r => r.GetByUserIdWithPromptsReadOnlyAsync(UserId))
             .ReturnsAsync(existingAiSettings);
 
         // Default: no built-in prompts
@@ -96,7 +96,7 @@ public class GeneratePromptQueryHandlerTests
         const string secondTemplate = "LinkedIn template for {Name}";
 
         _mockAiSettingsRepo
-            .Setup(r => r.GetByUserIdIncludePromptParameterAsync(UserId))
+            .Setup(r => r.GetByUserIdWithPromptsReadOnlyAsync(UserId))
             .ReturnsAsync(new DomainAiSettings
             {
                 Id = 1,
@@ -140,7 +140,7 @@ public class GeneratePromptQueryHandlerTests
         const string noSettingsUser = "user-no-settings";
 
         _mockAiSettingsRepo
-            .Setup(r => r.GetByUserIdIncludePromptParameterAsync(noSettingsUser))
+            .Setup(r => r.GetByUserIdWithPromptsReadOnlyAsync(noSettingsUser))
             .ReturnsAsync((DomainAiSettings?)null);
 
         _mockJobApplicationRepo
@@ -152,9 +152,9 @@ public class GeneratePromptQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_ShouldBuildPromptFromBuiltInRepository_WhenPromptNameHasDefaultPrefix()
+    public async Task Handle_ShouldBuildPromptFromBuiltInRepository_WhenPromptNameHasBuiltInPrefix()
     {
-        const string builtInPromptName = "Default_Cover_Letter";
+        const string builtInPromptName = "builtIn_Cover_Letter";
         const string builtInTemplate = "Write a cover letter for {Position}.";
 
         _mockBuiltInPromptRepo
@@ -171,20 +171,20 @@ public class GeneratePromptQueryHandlerTests
     }
 
     [Fact]
-    public async Task Handle_ShouldUseBuiltInTemplate_NotUserTemplate_WhenPromptNameHasDefaultPrefix()
+    public async Task Handle_ShouldUseBuiltInTemplate_NotUserTemplate_WhenPromptNameHasBuiltInPrefix()
     {
-        const string builtInPromptName = "Default_Cover_Letter";
+        const string builtInPromptName = "builtIn_Cover_Letter";
         const string userTemplate = "User's own template";
         const string builtInTemplate = "Write a cover letter for {Position}.";
 
         // User also has a prompt with the same name — must be ignored
         _mockAiSettingsRepo
-            .Setup(r => r.GetByUserIdIncludePromptParameterAsync(UserId))
+            .Setup(r => r.GetByUserIdWithPromptsReadOnlyAsync(UserId))
             .ReturnsAsync(new DomainAiSettings
             {
                 Id = 1,
                 UserId = UserId,
-                Prompts = new List<Prompt> { Prompt.Create("Default_Cover_Letter", userTemplate) },
+                Prompts = new List<Prompt> { Prompt.Create("builtIn_Cover_Letter", userTemplate) },
                 PromptParameter = new List<PromptParameter>()
             });
 

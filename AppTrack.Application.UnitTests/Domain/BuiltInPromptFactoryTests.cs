@@ -8,10 +8,10 @@ public class BuiltInPromptFactoryTests
     [Fact]
     public void Create_ShouldReturnBuiltInPrompt_WhenAllArgumentsAreValid()
     {
-        var result = BuiltInPrompt.Create("Default_Cover_Letter", "Template text");
+        var result = BuiltInPrompt.Create("builtIn_Cover_Letter", "Template text");
 
         result.ShouldNotBeNull();
-        result.Name.ShouldBe("Default_Cover_Letter");
+        result.Name.ShouldBe("builtIn_Cover_Letter");
         result.PromptTemplate.ShouldBe("Template text");
     }
 
@@ -24,7 +24,7 @@ public class BuiltInPromptFactoryTests
     [Fact]
     public void Create_ShouldThrowArgumentNullException_WhenPromptTemplateIsNull()
     {
-        Should.Throw<ArgumentNullException>(() => BuiltInPrompt.Create("Default_Name", null));
+        Should.Throw<ArgumentNullException>(() => BuiltInPrompt.Create("builtIn_Name", null));
     }
 
     [Fact]
@@ -36,6 +36,6 @@ public class BuiltInPromptFactoryTests
     [Fact]
     public void Create_ShouldThrowArgumentException_WhenNameContainsSpace()
     {
-        Should.Throw<ArgumentException>(() => BuiltInPrompt.Create("Default_Cover Letter", "template"));
+        Should.Throw<ArgumentException>(() => BuiltInPrompt.Create("builtIn_Cover Letter", "template"));
     }
 }

@@ -1,3 +1,4 @@
+using AppTrack.Domain;
 using AppTrack.Shared.Validation.Interfaces;
 using FluentValidation;
 
@@ -12,8 +13,8 @@ public abstract class PromptBaseValidator<T> : AbstractValidator<T>
             .NotEmpty().WithMessage("Name is required.")
             .MaximumLength(100).WithMessage("Name must not exceed 100 characters.")
             .Must(n => !n.Contains(' ')).WithMessage("A prompt name must not contain spaces.")
-            .Must(n => !n.StartsWith("Default_", StringComparison.OrdinalIgnoreCase))
-                .WithMessage("A prompt name must not start with 'Default_'.");
+            .Must(n => !n.StartsWith(BuiltInParameterKeys.Prefix, StringComparison.OrdinalIgnoreCase))
+                .WithMessage($"A prompt name must not start with '{BuiltInParameterKeys.Prefix}'.");
 
         RuleFor(x => x.PromptTemplate)
             .NotEmpty().WithMessage("Prompt template is required.");

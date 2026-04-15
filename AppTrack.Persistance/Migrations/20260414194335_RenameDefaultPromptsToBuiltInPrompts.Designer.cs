@@ -4,6 +4,7 @@ using AppTrack.Persistance.DatabaseContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AppTrack.Persistance.Migrations
 {
     [DbContext(typeof(AppTrackDatabaseContext))]
-    partial class AppTrackDatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20260414194335_RenameDefaultPromptsToBuiltInPrompts")]
+    partial class RenameDefaultPromptsToBuiltInPrompts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -106,40 +109,6 @@ namespace AppTrack.Persistance.Migrations
                             Name = "builtIn_Follow_Up",
                             PromptTemplate = "Write a short follow-up email to {ContactPerson} regarding my application for the {Position} position at {Company}."
                         });
-                });
-
-            modelBuilder.Entity("AppTrack.Domain.BuiltInPromptParameter", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AiSettingsId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("CreationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Key")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AiSettingsId", "Key")
-                        .IsUnique();
-
-                    b.ToTable("BuiltInPromptParameter");
                 });
 
             modelBuilder.Entity("AppTrack.Domain.ChatModel", b =>
@@ -444,17 +413,6 @@ namespace AppTrack.Persistance.Migrations
                     b.ToTable("PromptParameter");
                 });
 
-            modelBuilder.Entity("AppTrack.Domain.BuiltInPromptParameter", b =>
-                {
-                    b.HasOne("AppTrack.Domain.AiSettings", "AiSettings")
-                        .WithMany("BuiltInPromptParameter")
-                        .HasForeignKey("AiSettingsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("AiSettings");
-                });
-
             modelBuilder.Entity("AppTrack.Domain.Prompt", b =>
                 {
                     b.HasOne("AppTrack.Domain.AiSettings", "AiSettings")
@@ -479,8 +437,6 @@ namespace AppTrack.Persistance.Migrations
 
             modelBuilder.Entity("AppTrack.Domain.AiSettings", b =>
                 {
-                    b.Navigation("BuiltInPromptParameter");
-
                     b.Navigation("PromptParameter");
 
                     b.Navigation("Prompts");

@@ -4,7 +4,9 @@ namespace AppTrack.Application.Contracts.Persistance;
 
 public interface IAiSettingsRepository : IGenericRepository<AiSettings>
 {
-    Task<AiSettings?> GetByUserIdIncludePromptParameterAsync(string userId);
+    Task<AiSettings?> GetByUserIdWithPromptsReadOnlyAsync(string userId);
 
-    Task<AiSettings?> GetByIdWithPromptParameterAsync(int id);
+    Task<AiSettings?> GetByIdWithPromptsAsync(int id);
+
+    Task<AiSettings?> GetByUserIdWithPromptParameterAsync(string userId);
 }

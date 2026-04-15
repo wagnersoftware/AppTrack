@@ -38,6 +38,7 @@ internal static class AiSettingsMappings
         Language = entity.Language,
         UserId = entity.UserId,
         PromptParameter = entity.PromptParameter.Select(p => p.ToDto()).ToList(),
+        BuiltInPromptParameter = entity.BuiltInPromptParameter.Select(p => new PromptParameterDto { Id = p.Id, Key = p.Key, Value = p.Value }).ToList(),
         Prompts = entity.Prompts.Select(p => p.ToDto()).ToList(),
     };
 

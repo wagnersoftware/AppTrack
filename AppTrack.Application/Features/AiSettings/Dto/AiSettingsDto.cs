@@ -9,6 +9,7 @@ public class AiSettingsDto
     public int Id { get; set; }
     public string UserId { get; set; } = string.Empty;
     public List<PromptParameterDto> PromptParameter { get; set; } = new List<PromptParameterDto>();
+    public List<PromptParameterDto> BuiltInPromptParameter { get; set; } = new List<PromptParameterDto>();
     public List<PromptDto> Prompts { get; set; } = new List<PromptDto>();
     public List<PromptDto> BuiltInPrompts { get; set; } = new List<PromptDto>();
 }

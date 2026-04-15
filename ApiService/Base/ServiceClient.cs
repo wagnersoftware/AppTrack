@@ -2239,6 +2239,9 @@ namespace AppTrack.Frontend.ApiService.Base
         [System.Text.Json.Serialization.JsonPropertyName("builtInPrompts")]
         public System.Collections.Generic.ICollection<PromptDto> BuiltInPrompts { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("builtInPromptParameter")]
+        public System.Collections.Generic.ICollection<PromptParameterDto> BuiltInPromptParameter { get; set; }
+
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.6.3.0 (NJsonSchema v11.5.2.0 (Newtonsoft.Json v13.0.0.0))")]

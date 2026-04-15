@@ -16,10 +16,10 @@ public class GetPromptNamesQueryValidatorTests
     public GetPromptNamesQueryValidatorTests()
     {
         _mockAiSettingsRepo
-            .Setup(r => r.GetByUserIdIncludePromptParameterAsync(UserId))
+            .Setup(r => r.GetByUserIdWithPromptsReadOnlyAsync(UserId))
             .ReturnsAsync(new DomainAiSettings { Id = 1, UserId = UserId });
         _mockAiSettingsRepo
-            .Setup(r => r.GetByUserIdIncludePromptParameterAsync(It.Is<string>(id => id != UserId)))
+            .Setup(r => r.GetByUserIdWithPromptsReadOnlyAsync(It.Is<string>(id => id != UserId)))
             .ReturnsAsync((DomainAiSettings?)null);
 
         _validator = new GetPromptNamesQueryValidator(_mockAiSettingsRepo.Object);

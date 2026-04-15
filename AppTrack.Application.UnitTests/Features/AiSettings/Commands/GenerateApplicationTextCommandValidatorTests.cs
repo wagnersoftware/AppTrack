@@ -46,10 +46,10 @@ public class GenerateApplicationTextCommandValidatorTests
         aiSettings.Prompts.Add(DomainPrompt.Create("Default", "Write a cover letter for {position}"));
 
         _aiSettingsRepo
-            .Setup(r => r.GetByUserIdIncludePromptParameterAsync(UserId))
+            .Setup(r => r.GetByUserIdWithPromptsReadOnlyAsync(UserId))
             .ReturnsAsync(aiSettings);
         _aiSettingsRepo
-            .Setup(r => r.GetByUserIdIncludePromptParameterAsync(It.Is<string>(id => id != UserId)))
+            .Setup(r => r.GetByUserIdWithPromptsReadOnlyAsync(It.Is<string>(id => id != UserId)))
             .ReturnsAsync((DomainAiSettings?)null);
 
         _chatModelRepo
@@ -126,7 +126,7 @@ public class GenerateApplicationTextCommandValidatorTests
             SelectedChatModelId = 9999
         };
         _aiSettingsRepo
-            .Setup(r => r.GetByUserIdIncludePromptParameterAsync("user-no-model"))
+            .Setup(r => r.GetByUserIdWithPromptsReadOnlyAsync("user-no-model"))
             .ReturnsAsync(aiSettingsWithMissingModel);
 
         var command = BuildValidCommand(userId: "user-no-model");
@@ -148,7 +148,7 @@ public class GenerateApplicationTextCommandValidatorTests
         };
 
         _aiSettingsRepo
-            .Setup(r => r.GetByUserIdIncludePromptParameterAsync(userWithNullApiModel))
+            .Setup(r => r.GetByUserIdWithPromptsReadOnlyAsync(userWithNullApiModel))
             .ReturnsAsync(aiSettingsForUser);
         _chatModelRepo
             .Setup(r => r.GetByIdAsync(20))

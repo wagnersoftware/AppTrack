@@ -8,8 +8,7 @@ public class BuiltInPromptConfiguration : IEntityTypeConfiguration<BuiltInPrompt
 {
     public void Configure(EntityTypeBuilder<BuiltInPrompt> builder)
     {
-        // Keep the existing SQL table name to avoid a breaking schema migration.
-        builder.ToTable("DefaultPrompts");
+        builder.ToTable("BuiltInPrompts");
 
         builder.Property(x => x.Name)
             .IsRequired()
@@ -22,13 +21,13 @@ public class BuiltInPromptConfiguration : IEntityTypeConfiguration<BuiltInPrompt
             .IsUnique();
 
         builder.HasData(
-            Seed(1, "Default_Cover_Letter",
+            Seed(1, "builtIn_Cover_Letter",
                 "Write a professional cover letter for the {Position} position at {Company}. Job description: {JobDescription}"),
-            Seed(2, "Default_LinkedIn_Message",
+            Seed(2, "builtIn_LinkedIn_Message",
                 "Write a short LinkedIn message to {ContactPerson} regarding the {Position} position at {Company}."),
-            Seed(3, "Default_Introduction",
+            Seed(3, "builtIn_Introduction",
                 "Introduce me in a few sentences as an applicant for the {Position} position at {Company}."),
-            Seed(4, "Default_Follow_Up",
+            Seed(4, "builtIn_Follow_Up",
                 "Write a short follow-up email to {ContactPerson} regarding my application for the {Position} position at {Company}.")
         );
     }

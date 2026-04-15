@@ -62,6 +62,35 @@
 - Latest stable version: 0.1.9 (as of Apr 2026; 0.1.14 also available)
 - `PdfDocument.Open(stream)` returns an `IDisposable`; use `using var document = ...`
 
+## Namespace vs. Domain Type Collision (recurring gotcha)
+- When a handler or test file is nested under `AppTrack.Application.Features.FreelancerProfile.*` (or any other Feature namespace), `FreelancerProfile` resolves as the namespace segment, not `AppTrack.Domain.FreelancerProfile`
+- Same issue in test namespace `AppTrack.Application.UnitTests.Features.FreelancerProfile.Commands` — `FreelancerProfile` and `AiSettings` both clash
+- Fix: use fully-qualified type names (`AppTrack.Domain.FreelancerProfile`, `AppTrack.Domain.AiSettings`, `AppTrack.Domain.PromptParameter`) instead of a `using AppTrack.Domain;` import in those files
+- Private helper methods in handlers must not carry `CancellationToken` unless they actually pass it to an async call — SonarAnalyzer (S1172) treats unused method parameters as errors
+
+## BuiltIn Prompt Prefix Convention (as of Apr 2026 - branch: feature/builtinprompt-parameters)
+- Reserved prefix for built-in prompts is `builtIn_` — centralised in `BuiltInParameterKeys.Prefix` (was magic string before Apr 2026 refactor)
+- `BuiltInParameterKeys` static class at `AppTrack.Domain/BuiltInParameterKeys.cs` — `Prefix` + 8 named key constants (FirstName, LastName, HourlyRate, DailyRate, AvailableFrom, WorkMode, Skills, CvText)
+- `BuiltInPrompt.Create()` guard: uses `BuiltInParameterKeys.Prefix`
+- `PromptBaseValidator<T>` and `PromptParameterBaseValidator<T>`: use `BuiltInParameterKeys.Prefix` (OrdinalIgnoreCase) — `AppTrack.Shared.Validation` now references `AppTrack.Domain`
+- `GeneratePromptQueryHandler` + `GeneratePromptQueryValidator`: route by `BuiltInParameterKeys.Prefix` (Ordinal) to `IBuiltInPromptRepository`
+- Seed data in `BuiltInPromptConfiguration.HasData`: ids 1–4 named `builtIn_Cover_Letter` etc. — full prompt name strings are data values, not replaced by constants
+- Migration `20260414193220_RenameDefaultPrefixToBuiltIn` renames ids 1–8 in `DefaultPrompts` table
+  - Ids 5–8 (English variants from `AddEnglishDefaultPrompts` raw InsertData) renamed with `_en` suffix to avoid unique index collision
+
+## builtIn_ PromptParameter Sync (updated Apr 2026 - branch: feature/builtinprompt-parameters)
+- After profile upsert, handler syncs 7 `builtIn_` keys into `AiSettings.BuiltInPromptParameter` (separate table, not `PromptParameter`)
+- `BuiltInPromptParameter` domain entity at `AppTrack.Domain/BuiltInPromptParameter.cs` — FK `AiSettingsId` on `AiSettings`
+- `AiSettings` has two collections: `PromptParameter` (user-editable) and `BuiltInPromptParameter` (handler-managed, read-only for user)
+- `UpdateAiSettings` command does NOT touch `BuiltInPromptParameter`
+- `GeneratePromptQueryHandler` merges both collections: `PromptParameter.Concat(builtInParameters)` before building prompt
+- EF config: `BuiltInPromptParameterConfiguration.cs` — Key max 50, Value max 500, unique index (AiSettingsId, Key)
+- `AiSettingsRepository.GetByUserIdWithPromptsReadOnlyAsync` and `GetByUserIdWithPromptParameterAsync` both include `BuiltInPromptParameter`
+- `AiSettingsDto.BuiltInPromptParameter` added as `List<PromptParameterDto>` — mapped in `AiSettingsMappings.ToDto`
+- Migration: `20260414195556_AddBuiltInPromptParameterTable` — includes data migration SQL to move existing `builtIn_%` rows from `PromptParameter`
+- `MockAiSettingsRepository.ExistingUserId = "user1"` — constant added to facilitate test setup
+- Rule: null/empty field → remove existing param if present; non-empty → add or update in-place
+
 ## CV Storage Feature (Infrastructure layer, branch: feature/profile-setup-wizard)
 - `AzureStorageSettings` at `AppTrack.Infrastructure/CvStorage/AzureStorageSettings.cs` — ConnectionString + ContainerName
 - `AzureBlobStorageService` implements `ICvStorageService` — creates `BlobServiceClient` per call (stateless, scoped DI)
