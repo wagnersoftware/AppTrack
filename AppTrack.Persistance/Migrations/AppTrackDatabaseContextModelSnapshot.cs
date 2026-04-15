@@ -132,8 +132,7 @@ namespace AppTrack.Persistance.Migrations
 
                     b.Property<string>("Value")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
