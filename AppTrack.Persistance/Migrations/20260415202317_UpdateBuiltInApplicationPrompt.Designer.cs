@@ -4,6 +4,7 @@ using AppTrack.Persistance.DatabaseContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AppTrack.Persistance.Migrations
 {
     [DbContext(typeof(AppTrackDatabaseContext))]
-    partial class AppTrackDatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20260415202317_UpdateBuiltInApplicationPrompt")]
+    partial class UpdateBuiltInApplicationPrompt
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -86,25 +89,25 @@ namespace AppTrack.Persistance.Migrations
                         {
                             Id = 1,
                             Name = "builtIn_Application",
-                            PromptTemplate = "Here is my resume. Using the information you gather from it, please write a brief and professional application for the following job posting that explains why I am the perfect freelancer for this position.\n\nMy personal data:\nMy CV: {{builtIn_CvText}}\nMy Name: {{builtIn_FirstName}} {{builtIn_LastName}}\nMy Hourly Rate: {{builtIn_HourlyRate}}\nMy Daily Rate: {{builtIn_DailyRate}}\nMy Skills: {{builtIn_Skills}}\nMy Work Mode: {{builtIn_WorkMode}}\nAvailable From: {{builtIn_AvailableFrom}}\n\nJob posting:\nJob Description: {{JobDescription}}\nContact Person: {{ContactPerson}}\nPosition: {{Position}}"
+                            PromptTemplate = "Here is my resume. Using the information you gather from it, please write a brief and professional application for the following job posting that explains why I am the perfect freelancer for this position.\n\nMy personal data:\nMy CV: {builtIn_CvText}\nMy Name: {builtIn_FirstName} {builtIn_LastName}\nMy Hourly Rate: {builtIn_HourlyRate}\nMy Daily Rate: {builtIn_DailyRate}\nMy Skills: {builtIn_Skills}\nMy Work Mode: {builtIn_WorkMode}\nAvailable From: {builtIn_AvailableFrom}\n\nJob posting:\nJob Description: {JobDescription}\nContact Person: {ContactPerson}\nPosition: {Position}"
                         },
                         new
                         {
                             Id = 2,
                             Name = "builtIn_LinkedIn_Message",
-                            PromptTemplate = "Write a short LinkedIn message to {{ContactPerson}} regarding the {{Position}} position at {{Company}}."
+                            PromptTemplate = "Write a short LinkedIn message to {ContactPerson} regarding the {Position} position at {Company}."
                         },
                         new
                         {
                             Id = 3,
                             Name = "builtIn_Introduction",
-                            PromptTemplate = "Introduce me in a few sentences as an applicant for the {{Position}} position at {{Company}}."
+                            PromptTemplate = "Introduce me in a few sentences as an applicant for the {Position} position at {Company}."
                         },
                         new
                         {
                             Id = 4,
                             Name = "builtIn_Follow_Up",
-                            PromptTemplate = "Write a short follow-up email to {{ContactPerson}} regarding my application for the {{Position}} position at {{Company}}."
+                            PromptTemplate = "Write a short follow-up email to {ContactPerson} regarding my application for the {Position} position at {Company}."
                         });
                 });
 

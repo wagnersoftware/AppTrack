@@ -21,14 +21,14 @@ public class BuiltInPromptConfiguration : IEntityTypeConfiguration<BuiltInPrompt
             .IsUnique();
 
         builder.HasData(
-            Seed(1, "builtIn_Cover_Letter",
-                "Write a professional cover letter for the {Position} position at {Company}. Job description: {JobDescription}"),
+            Seed(1, "builtIn_Application",
+                "Here is my resume. Using the information you gather from it, please write a brief and professional application for the following job posting that explains why I am the perfect freelancer for this position.\n\nMy personal data:\nMy CV: {{builtIn_CvText}}\nMy Name: {{builtIn_FirstName}} {{builtIn_LastName}}\nMy Hourly Rate: {{builtIn_HourlyRate}}\nMy Daily Rate: {{builtIn_DailyRate}}\nMy Skills: {{builtIn_Skills}}\nMy Work Mode: {{builtIn_WorkMode}}\nAvailable From: {{builtIn_AvailableFrom}}\n\nJob posting:\nJob Description: {{JobDescription}}\nContact Person: {{ContactPerson}}\nPosition: {{Position}}"),
             Seed(2, "builtIn_LinkedIn_Message",
-                "Write a short LinkedIn message to {ContactPerson} regarding the {Position} position at {Company}."),
+                "Write a short LinkedIn message to {{ContactPerson}} regarding the {{Position}} position at {{Company}}."),
             Seed(3, "builtIn_Introduction",
-                "Introduce me in a few sentences as an applicant for the {Position} position at {Company}."),
+                "Introduce me in a few sentences as an applicant for the {{Position}} position at {{Company}}."),
             Seed(4, "builtIn_Follow_Up",
-                "Write a short follow-up email to {ContactPerson} regarding my application for the {Position} position at {Company}.")
+                "Write a short follow-up email to {{ContactPerson}} regarding my application for the {{Position}} position at {{Company}}.")
         );
     }
 

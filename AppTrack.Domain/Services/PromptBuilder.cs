@@ -11,7 +11,7 @@ public class PromptBuilder : IPromptBuilder
 
         foreach (var parameter in promptParameter)
         {
-            var key = $"{{{parameter.Key.Trim()}}}";
+            var key = "{{" + parameter.Key.Trim() + "}}";
             _ = replacements.TryAdd(key, parameter.Value);
         }
 

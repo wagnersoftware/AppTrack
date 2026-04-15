@@ -48,7 +48,7 @@ public class GeneratePromptQueryHandlerTests
         {
             Id = 1,
             UserId = UserId,
-            Prompts = new List<Prompt> { Prompt.Create(PromptName, "Hello {Name}") },
+            Prompts = new List<Prompt> { Prompt.Create(PromptName, "Hello {{Name}}") },
             PromptParameter = new List<PromptParameter>()
         };
 
@@ -86,14 +86,14 @@ public class GeneratePromptQueryHandlerTests
         result.ShouldNotBeNull();
         result.ShouldBeOfType<GeneratedPromptDto>();
         result.Prompt.ShouldBe("Hello Test Company");
-        _mockPromptBuilder.Verify(b => b.BuildPrompt(It.IsAny<IEnumerable<PromptParameter>>(), "Hello {Name}"), Times.Once);
+        _mockPromptBuilder.Verify(b => b.BuildPrompt(It.IsAny<IEnumerable<PromptParameter>>(), "Hello {{Name}}"), Times.Once);
     }
 
     [Fact]
     public async Task Handle_ShouldBuildPromptFromNamedTemplate()
     {
         const string secondPromptName = "LinkedIn";
-        const string secondTemplate = "LinkedIn template for {Name}";
+        const string secondTemplate = "LinkedIn template for {{Name}}";
 
         _mockAiSettingsRepo
             .Setup(r => r.GetByUserIdWithPromptsReadOnlyAsync(UserId))
@@ -103,7 +103,7 @@ public class GeneratePromptQueryHandlerTests
                 UserId = UserId,
                 Prompts = new List<Prompt>
                 {
-                    Prompt.Create(PromptName, "Hello {Name}"),
+                    Prompt.Create(PromptName, "Hello {{Name}}"),
                     Prompt.Create(secondPromptName, secondTemplate)
                 },
                 PromptParameter = new List<PromptParameter>()
@@ -155,7 +155,7 @@ public class GeneratePromptQueryHandlerTests
     public async Task Handle_ShouldBuildPromptFromBuiltInRepository_WhenPromptNameHasBuiltInPrefix()
     {
         const string builtInPromptName = "builtIn_Cover_Letter";
-        const string builtInTemplate = "Write a cover letter for {Position}.";
+        const string builtInTemplate = "Write a cover letter for {{Position}}.";
 
         _mockBuiltInPromptRepo
             .Setup(r => r.GetAsync())
@@ -175,7 +175,7 @@ public class GeneratePromptQueryHandlerTests
     {
         const string builtInPromptName = "builtIn_Cover_Letter";
         const string userTemplate = "User's own template";
-        const string builtInTemplate = "Write a cover letter for {Position}.";
+        const string builtInTemplate = "Write a cover letter for {{Position}}.";
 
         // User also has a prompt with the same name — must be ignored
         _mockAiSettingsRepo
