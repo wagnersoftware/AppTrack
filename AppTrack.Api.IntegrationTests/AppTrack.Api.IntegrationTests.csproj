@@ -30,4 +30,25 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!--
+      System.Security.Cryptography.Xml 9.0.0 is pulled in transitively via:
+        Microsoft.Identity.Web → Microsoft.Identity.Web.TokenCache
+          → Microsoft.AspNetCore.DataProtection 9.0.0
+            → System.Security.Cryptography.Xml 9.0.0
+
+      Both advisories (GHSA-37gx-xxp4-5rgx, GHSA-w3x6-4m5h-cxqf) are low severity.
+      No fixed version is available yet for the .NET 10 dependency chain —
+      even System.Security.Cryptography.Xml 10.0.3 is still affected.
+
+      This suppression is intentional and limited to this test project (not production code).
+      The vulnerable code path is not exercised by the test setup.
+
+      Remove this suppression once Microsoft.Identity.Web ships with
+      Microsoft.AspNetCore.DataProtection 10.x as a dependency.
+    -->
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-37gx-xxp4-5rgx" />
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-w3x6-4m5h-cxqf" />
+  </ItemGroup>
+
 </Project>
