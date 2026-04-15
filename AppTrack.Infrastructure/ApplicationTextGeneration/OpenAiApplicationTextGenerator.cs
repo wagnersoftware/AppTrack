@@ -13,6 +13,7 @@ public class OpenAiApplicationTextGenerator : IApplicationTextGenerator
     private readonly HttpClient _httpClient;
     private readonly string _apiKey;
     private readonly string _openAiUrl;
+    private readonly int _maxTokens;
 
     public OpenAiApplicationTextGenerator(HttpClient httpClient, IOptions<OpenAiOptions> openAiOptions)
     {
@@ -20,6 +21,7 @@ public class OpenAiApplicationTextGenerator : IApplicationTextGenerator
         _httpClient.Timeout = TimeSpan.FromSeconds(openAiOptions.Value.TimeoutInSeconds);
         _openAiUrl = openAiOptions.Value.ApiUrl ?? throw new InvalidOperationException("OpenAI API URL is not configured.");
         _apiKey = openAiOptions.Value.ApiKey ?? throw new InvalidOperationException("OpenAI API key is not configured.");
+        _maxTokens = openAiOptions.Value.MaxTokens;
     }
 
     public async Task<string> GenerateApplicationTextAsync(string prompt, string modelName, CancellationToken cancellationToken = default)
@@ -32,10 +34,10 @@ public class OpenAiApplicationTextGenerator : IApplicationTextGenerator
             model = modelName,
             messages = new[]
             {
-                new { role = "system", content = "You are an assistant that writes professional job applications." },
+                new { role = "system", content = "You are a professional assistant helping with job applications and related communication. Only use information explicitly provided in the prompt. Do not invent, assume or add any skills, experience or qualifications that are not mentioned in the applicant's data." },
                 new { role = "user", content = prompt }
             },
-            max_tokens = 400
+            max_tokens = _maxTokens
         });
 
         HttpResponseMessage response;

@@ -44,7 +44,8 @@ public class GenerateApplicationTextCommandHandler : IRequestHandler<GenerateApp
         var chatModelName = chatModel!.ApiModelName;
 
         //generate application text
-        var generatedApplicationText = await _applicationTextGenerator.GenerateApplicationTextAsync(request.Prompt, chatModelName, cancellationToken);
+        var prompt = $"{request.Prompt}\n\nPlease respond in {aiSettings.Language}.";
+        var generatedApplicationText = await _applicationTextGenerator.GenerateApplicationTextAsync(prompt, chatModelName, cancellationToken);
 
         //update the job application with generated text
         var jobApplication = await _jobApplicationRepository.GetByIdAsync(request.JobApplicationId);
