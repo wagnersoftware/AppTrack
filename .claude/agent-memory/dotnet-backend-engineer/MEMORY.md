@@ -69,12 +69,12 @@
 - Private helper methods in handlers must not carry `CancellationToken` unless they actually pass it to an async call — SonarAnalyzer (S1172) treats unused method parameters as errors
 
 ## BuiltIn Prompt Prefix Convention (as of Apr 2026 - branch: feature/builtinprompt-parameters)
-- Reserved prefix for built-in prompts is `builtIn_` (was `Default_`, renamed Apr 2026)
-- `BuiltInPrompt.Create()` guard: `name.StartsWith("builtIn_", StringComparison.Ordinal)`
-- `PromptBaseValidator<T>`: blocks `builtIn_` prefix (OrdinalIgnoreCase) — user prompts may not use it
-- `PromptParameterBaseValidator<T>`: blocks `builtIn_` key prefix (OrdinalIgnoreCase) — user parameters may not use it
-- `GeneratePromptQueryHandler` + `GeneratePromptQueryValidator`: route by `builtIn_` prefix to `IBuiltInPromptRepository`
-- Seed data in `BuiltInPromptConfiguration.HasData`: ids 1–4 now named `builtIn_Cover_Letter` etc.
+- Reserved prefix for built-in prompts is `builtIn_` — centralised in `BuiltInParameterKeys.Prefix` (was magic string before Apr 2026 refactor)
+- `BuiltInParameterKeys` static class at `AppTrack.Domain/BuiltInParameterKeys.cs` — `Prefix` + 8 named key constants (FirstName, LastName, HourlyRate, DailyRate, AvailableFrom, WorkMode, Skills, CvText)
+- `BuiltInPrompt.Create()` guard: uses `BuiltInParameterKeys.Prefix`
+- `PromptBaseValidator<T>` and `PromptParameterBaseValidator<T>`: use `BuiltInParameterKeys.Prefix` (OrdinalIgnoreCase) — `AppTrack.Shared.Validation` now references `AppTrack.Domain`
+- `GeneratePromptQueryHandler` + `GeneratePromptQueryValidator`: route by `BuiltInParameterKeys.Prefix` (Ordinal) to `IBuiltInPromptRepository`
+- Seed data in `BuiltInPromptConfiguration.HasData`: ids 1–4 named `builtIn_Cover_Letter` etc. — full prompt name strings are data values, not replaced by constants
 - Migration `20260414193220_RenameDefaultPrefixToBuiltIn` renames ids 1–8 in `DefaultPrompts` table
   - Ids 5–8 (English variants from `AddEnglishDefaultPrompts` raw InsertData) renamed with `_en` suffix to avoid unique index collision
 

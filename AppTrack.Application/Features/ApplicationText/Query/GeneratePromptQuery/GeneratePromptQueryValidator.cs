@@ -1,4 +1,5 @@
 using AppTrack.Application.Contracts.Persistance;
+using AppTrack.Domain;
 using FluentValidation;
 
 namespace AppTrack.Application.Features.ApplicationText.Query.GeneratePromptQuery;
@@ -53,7 +54,7 @@ public class GeneratePromptQueryValidator : AbstractValidator<GeneratePromptQuer
             return;
         }
 
-        if (query.PromptName.StartsWith("builtIn_", StringComparison.Ordinal))
+        if (query.PromptName.StartsWith(BuiltInParameterKeys.Prefix, StringComparison.Ordinal))
         {
             var defaults = await _builtInPromptRepository.GetAsync();
             var builtInPrompt = defaults.FirstOrDefault(

@@ -16,8 +16,8 @@ public class BuiltInPrompt : BaseEntity
 
         // Seeder code runs outside the FluentValidation pipeline, so guards are the
         // only domain-level enforcement for these invariants.
-        if (!name.StartsWith("builtIn_", StringComparison.Ordinal))
-            throw new ArgumentException("Default prompt names must start with 'builtIn_'.", nameof(name));
+        if (!name.StartsWith(BuiltInParameterKeys.Prefix, StringComparison.Ordinal))
+            throw new ArgumentException($"Default prompt names must start with '{BuiltInParameterKeys.Prefix}'.", nameof(name));
 
         if (name.Contains(' '))
             throw new ArgumentException("Default prompt names must not contain spaces.", nameof(name));

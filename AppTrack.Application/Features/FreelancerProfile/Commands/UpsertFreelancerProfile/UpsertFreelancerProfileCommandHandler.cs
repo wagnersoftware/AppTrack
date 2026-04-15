@@ -3,13 +3,12 @@ using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Exceptions;
 using AppTrack.Application.Features.FreelancerProfile.Dto;
 using AppTrack.Application.Mappings;
+using AppTrack.Domain;
 
 namespace AppTrack.Application.Features.FreelancerProfile.Commands.UpsertFreelancerProfile;
 
 public class UpsertFreelancerProfileCommandHandler : IRequestHandler<UpsertFreelancerProfileCommand, FreelancerProfileDto>
 {
-    private const string BuiltInPrefix = "builtIn_";
-
     private readonly IFreelancerProfileRepository _repository;
     private readonly IAiSettingsRepository _aiSettingsRepository;
     private readonly IUnitOfWork _unitOfWork;
@@ -71,14 +70,14 @@ public class UpsertFreelancerProfileCommandHandler : IRequestHandler<UpsertFreel
 
         var parameters = new Dictionary<string, string?>
         {
-            [$"{BuiltInPrefix}FirstName"] = profile.FirstName,
-            [$"{BuiltInPrefix}LastName"] = profile.LastName,
-            [$"{BuiltInPrefix}HourlyRate"] = profile.HourlyRate?.ToString(),
-            [$"{BuiltInPrefix}DailyRate"] = profile.DailyRate?.ToString(),
-            [$"{BuiltInPrefix}AvailableFrom"] = profile.AvailableFrom?.ToString("yyyy-MM-dd"),
-            [$"{BuiltInPrefix}WorkMode"] = profile.WorkMode?.ToString(),
-            [$"{BuiltInPrefix}Skills"] = profile.Skills,
-            [$"{BuiltInPrefix}CvText"] = profile.CvText,
+            [BuiltInParameterKeys.FirstName]     = profile.FirstName,
+            [BuiltInParameterKeys.LastName]      = profile.LastName,
+            [BuiltInParameterKeys.HourlyRate]    = profile.HourlyRate?.ToString(),
+            [BuiltInParameterKeys.DailyRate]     = profile.DailyRate?.ToString(),
+            [BuiltInParameterKeys.AvailableFrom] = profile.AvailableFrom?.ToString("yyyy-MM-dd"),
+            [BuiltInParameterKeys.WorkMode]      = profile.WorkMode?.ToString(),
+            [BuiltInParameterKeys.Skills]        = profile.Skills,
+            [BuiltInParameterKeys.CvText]        = profile.CvText,
         };
 
         foreach (var (key, value) in parameters)

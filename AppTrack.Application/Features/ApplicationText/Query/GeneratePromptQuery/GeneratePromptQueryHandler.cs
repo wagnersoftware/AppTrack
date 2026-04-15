@@ -47,7 +47,7 @@ public class GeneratePromptQueryHandler : IRequestHandler<GeneratePromptQuery, G
         var promptParameter = jobApplicationParameter.Union(applicantParameter).ToList();
 
         string promptTemplate;
-        if (request.PromptName.StartsWith("builtIn_", StringComparison.Ordinal))
+        if (request.PromptName.StartsWith(BuiltInParameterKeys.Prefix, StringComparison.Ordinal))
         {
             var defaults = await _builtInPromptRepository.GetAsync();
             promptTemplate = defaults
