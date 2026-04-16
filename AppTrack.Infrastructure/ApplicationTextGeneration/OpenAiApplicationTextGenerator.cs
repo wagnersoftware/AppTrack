@@ -1,4 +1,5 @@
 using AppTrack.Application.Contracts.ApplicationTextGenerator;
+using AppTrack.Domain.Enums;
 using AppTrack.Application.Exceptions;
 using AppTrack.Infrastructure.ApplicationTextGeneration.OpAiModels;
 using Microsoft.Extensions.Options;
@@ -24,17 +25,20 @@ public class OpenAiApplicationTextGenerator : IApplicationTextGenerator
         _maxTokens = openAiOptions.Value.MaxTokens;
     }
 
-    public async Task<string> GenerateApplicationTextAsync(string prompt, string modelName, CancellationToken cancellationToken = default)
+    public async Task<string> GenerateApplicationTextAsync(string prompt, string modelName, AiResponseLanguage language, CancellationToken cancellationToken = default)
     {
         var request = new HttpRequestMessage(HttpMethod.Post, _openAiUrl);
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
+
+        const string baseSystemPrompt = "You are a professional assistant helping with job applications and related communication. Only use information explicitly provided in the prompt. Do not invent, assume or add any skills, experience or qualifications that are not mentioned in the applicant's data.";
+        var fullSystemPrompt = $"Respond in {language}.\n\n{baseSystemPrompt}";
 
         request.Content = JsonContent.Create(new
         {
             model = modelName,
             messages = new[]
             {
-                new { role = "system", content = "You are a professional assistant helping with job applications and related communication. Only use information explicitly provided in the prompt. Do not invent, assume or add any skills, experience or qualifications that are not mentioned in the applicant's data." },
+                new { role = "system", content = fullSystemPrompt },
                 new { role = "user", content = prompt }
             },
             max_tokens = _maxTokens,
