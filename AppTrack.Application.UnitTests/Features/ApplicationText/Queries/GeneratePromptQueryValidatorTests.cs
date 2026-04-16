@@ -37,7 +37,7 @@ public class GeneratePromptQueryValidatorTests
             .ReturnsAsync((DomainJobApplication?)null);
 
         var aiSettings = new DomainAiSettings { Id = 1, UserId = UserId };
-        aiSettings.Prompts.Add(DomainPrompt.Create(PromptName, "Write a cover letter for {position}"));
+        aiSettings.Prompts.Add(DomainPrompt.Create(PromptName, "Write a cover letter for {{position}}"));
 
         _aiSettingsRepo
             .Setup(r => r.GetByUserIdWithPromptsReadOnlyAsync(UserId))
@@ -161,7 +161,7 @@ public class GeneratePromptQueryValidatorTests
             .Setup(r => r.GetAsync())
             .ReturnsAsync(new List<BuiltInPrompt>
             {
-                BuiltInPrompt.Create(builtInPromptName, "Write a cover letter for {Position}."),
+                BuiltInPrompt.Create(builtInPromptName, "Write a cover letter for {{Position}}."),
             });
 
         var result = await _validator.TestValidateAsync(BuildValidQuery(promptName: builtInPromptName));
