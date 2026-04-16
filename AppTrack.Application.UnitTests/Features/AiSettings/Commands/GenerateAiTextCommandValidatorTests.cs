@@ -1,5 +1,5 @@
 using AppTrack.Application.Contracts.Persistance;
-using AppTrack.Application.Features.AiSettings.Commands.GenerateApplicationText;
+using AppTrack.Application.Features.AiSettings.Commands.GenerateAiText;
 using FluentValidation.TestHelper;
 using Moq;
 using Shouldly;
@@ -10,7 +10,7 @@ using DomainPrompt = AppTrack.Domain.Prompt;
 
 namespace AppTrack.Application.UnitTests.Features.AiSettings.Commands;
 
-public class GenerateApplicationTextCommandValidatorTests
+public class GenerateAiTextCommandValidatorTests
 {
     private const string UserId = "user-1";
     private const int ExistingJobApplicationId = 42;
@@ -20,9 +20,9 @@ public class GenerateApplicationTextCommandValidatorTests
     private readonly Mock<IJobApplicationRepository> _jobAppRepo;
     private readonly Mock<IAiSettingsRepository> _aiSettingsRepo;
     private readonly Mock<IChatModelRepository> _chatModelRepo;
-    private readonly GenerateApplicationTextCommandValidator _validator;
+    private readonly GenerateAiTextCommandValidator _validator;
 
-    public GenerateApplicationTextCommandValidatorTests()
+    public GenerateAiTextCommandValidatorTests()
     {
         _jobAppRepo = new Mock<IJobApplicationRepository>();
         _aiSettingsRepo = new Mock<IAiSettingsRepository>();
@@ -59,13 +59,13 @@ public class GenerateApplicationTextCommandValidatorTests
             .Setup(r => r.GetByIdAsync(It.Is<int>(id => id != ExistingChatModelId)))
             .ReturnsAsync((DomainChatModel?)null);
 
-        _validator = new GenerateApplicationTextCommandValidator(
+        _validator = new GenerateAiTextCommandValidator(
             _jobAppRepo.Object,
             _aiSettingsRepo.Object,
             _chatModelRepo.Object);
     }
 
-    private static GenerateApplicationTextCommand BuildValidCommand(
+    private static GenerateAiTextCommand BuildValidCommand(
         string userId = UserId,
         int jobApplicationId = ExistingJobApplicationId,
         string prompt = "My custom prompt") => new()

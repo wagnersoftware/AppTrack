@@ -1,22 +1,22 @@
-using AppTrack.Application.Contracts.ApplicationTextGenerator;
+using AppTrack.Application.Contracts.AiTextGenerator;
 using AppTrack.Domain.Enums;
 using AppTrack.Application.Exceptions;
-using AppTrack.Infrastructure.ApplicationTextGeneration.OpAiModels;
+using AppTrack.Infrastructure.AiTextGeneration.OpAiModels;
 using Microsoft.Extensions.Options;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
-namespace AppTrack.Infrastructure.ApplicationTextGeneration;
+namespace AppTrack.Infrastructure.AiTextGeneration;
 
-public class OpenAiApplicationTextGenerator : IApplicationTextGenerator
+public class OpenAiAiTextGenerator : IAiTextGenerator
 {
     private readonly HttpClient _httpClient;
     private readonly string _apiKey;
     private readonly string _openAiUrl;
     private readonly int _maxTokens;
 
-    public OpenAiApplicationTextGenerator(HttpClient httpClient, IOptions<OpenAiOptions> openAiOptions)
+    public OpenAiAiTextGenerator(HttpClient httpClient, IOptions<OpenAiOptions> openAiOptions)
     {
         _httpClient = httpClient;
         _httpClient.Timeout = TimeSpan.FromSeconds(openAiOptions.Value.TimeoutInSeconds);
@@ -25,7 +25,7 @@ public class OpenAiApplicationTextGenerator : IApplicationTextGenerator
         _maxTokens = openAiOptions.Value.MaxTokens;
     }
 
-    public async Task<string> GenerateApplicationTextAsync(string prompt, string modelName, AiResponseLanguage language, CancellationToken cancellationToken = default)
+    public async Task<string> GenerateAiTextAsync(string prompt, string modelName, AiResponseLanguage language, CancellationToken cancellationToken = default)
     {
         var request = new HttpRequestMessage(HttpMethod.Post, _openAiUrl);
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);

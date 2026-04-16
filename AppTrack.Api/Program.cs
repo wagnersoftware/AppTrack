@@ -2,7 +2,7 @@ using AppTrack.Api.Helper;
 using AppTrack.Api.Middleware;
 using AppTrack.Application;
 using AppTrack.Infrastructure;
-using AppTrack.Infrastructure.ApplicationTextGeneration;
+using AppTrack.Infrastructure.AiTextGeneration;
 using AppTrack.Persistance;
 using Azure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace AppTrack.Infrastructure.ApplicationTextGeneration;
+namespace AppTrack.Infrastructure.AiTextGeneration;
 
 public class OpenAiOptions
 {

@@ -2,7 +2,7 @@
     <TitleContent>
         <MudText Typo="Typo.h6">
             <MudIcon Icon="@Icons.Material.Filled.AutoFixHigh" Class="mr-2" />
-            Generate Application Text
+            Generate AI Text
         </MudText>
     </TitleContent>
     <DialogContent>
@@ -46,7 +46,7 @@
         {
             <MudStack AlignItems="AlignItems.Center" Class="py-8" Spacing="3">
                 <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
-                <MudText Typo="Typo.body2" Color="Color.Secondary">Generating application text…</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">Generating AI text…</MudText>
                 <MudButton Variant="Variant.Text"
                            Color="Color.Warning"
                            StartIcon="@Icons.Material.Filled.Stop"
@@ -58,7 +58,7 @@
         else if (_phase == Phase.TextReady)
         {
             <MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">
-                <MudText Typo="Typo.subtitle2" Color="Color.Secondary">Generated text</MudText>
+                <MudText Typo="Typo.subtitle2" Color="Color.Secondary">Generated AI text</MudText>
                 <MudSpacer />
                 <MudTooltip Text="Copy to clipboard">
                     <MudIconButton Icon="@Icons.Material.Outlined.ContentCopy"

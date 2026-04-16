@@ -1,15 +1,15 @@
 using AppTrack.Application.Contracts.Persistance;
 using FluentValidation;
 
-namespace AppTrack.Application.Features.AiSettings.Commands.GenerateApplicationText;
+namespace AppTrack.Application.Features.AiSettings.Commands.GenerateAiText;
 
-public class GenerateApplicationTextCommandValidator : AbstractValidator<GenerateApplicationTextCommand>
+public class GenerateAiTextCommandValidator : AbstractValidator<GenerateAiTextCommand>
 {
     private readonly IJobApplicationRepository _jobApplicationRepository;
     private readonly IAiSettingsRepository _aiSettingsRepository;
     private readonly IChatModelRepository _chatModelRepository;
 
-    public GenerateApplicationTextCommandValidator(
+    public GenerateAiTextCommandValidator(
         IJobApplicationRepository jobApplicationRepository,
         IAiSettingsRepository aiSettingsRepository,
         IChatModelRepository chatModelRepository)
@@ -34,15 +34,15 @@ public class GenerateApplicationTextCommandValidator : AbstractValidator<Generat
             .CustomAsync(ValidateAiSettings);
     }
 
-    private async Task<bool> JobApplicationExists(GenerateApplicationTextCommand command, CancellationToken token)
+    private async Task<bool> JobApplicationExists(GenerateAiTextCommand command, CancellationToken token)
     {
         var jobApplication = await _jobApplicationRepository.GetByIdAsync(command.JobApplicationId);
         return jobApplication != null;
     }
 
     private async Task ValidateAiSettings(
-        GenerateApplicationTextCommand command,
-        ValidationContext<GenerateApplicationTextCommand> context,
+        GenerateAiTextCommand command,
+        ValidationContext<GenerateAiTextCommand> context,
         CancellationToken token)
     {
         var aiSettings = await _aiSettingsRepository

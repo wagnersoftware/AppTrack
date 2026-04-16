@@ -1,11 +1,11 @@
 using AppTrack.Application.Contracts;
-using AppTrack.Application.Contracts.ApplicationTextGenerator;
+using AppTrack.Application.Contracts.AiTextGenerator;
 using AppTrack.Application.Contracts.CvStorage;
 using AppTrack.Application.Contracts.Email;
 using AppTrack.Application.Contracts.Logging;
 using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Models.Email;
-using AppTrack.Infrastructure.ApplicationTextGeneration;
+using AppTrack.Infrastructure.AiTextGeneration;
 using AppTrack.Infrastructure.CvStorage;
 using AppTrack.Infrastructure.EmailService;
 using AppTrack.Infrastructure.Identity;
@@ -29,7 +29,7 @@ namespace AppTrack.Infrastructure
             services.AddScoped<IUserContext, HttpContextUserContext>();
             services.AddScoped<IMediator, Mediator.Mediator>();
 
-            services.AddHttpClient<IApplicationTextGenerator, OpenAiApplicationTextGenerator>();
+            services.AddHttpClient<IAiTextGenerator, OpenAiAiTextGenerator>();
 
             services.Configure<AzureStorageSettings>(configuration.GetSection(nameof(AzureStorageSettings)));
             services.AddScoped<ICvStorageService, AzureBlobStorageService>();

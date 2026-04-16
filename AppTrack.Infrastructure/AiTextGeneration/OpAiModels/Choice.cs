@@ -1,4 +1,4 @@
-﻿namespace AppTrack.Infrastructure.ApplicationTextGeneration.OpAiModels
+namespace AppTrack.Infrastructure.AiTextGeneration.OpAiModels
 {
     public class Choice
     {
