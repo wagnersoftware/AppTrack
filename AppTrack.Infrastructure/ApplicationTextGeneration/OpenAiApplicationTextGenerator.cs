@@ -31,7 +31,7 @@ public class OpenAiApplicationTextGenerator : IApplicationTextGenerator
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
 
         const string baseSystemPrompt = "You are a professional assistant helping with job applications and related communication. Only use information explicitly provided in the prompt. Do not invent, assume or add any skills, experience or qualifications that are not mentioned in the applicant's data.";
-        var fullSystemPrompt = $"Respond in {language}.\n\n{baseSystemPrompt}";
+        var fullSystemPrompt = $"You MUST respond entirely in {language}. Every part of your response — including all headings, labels, and content — must be in {language}. Do not use any other language regardless of the language used in the instructions.\n\n{baseSystemPrompt}";
 
         request.Content = JsonContent.Create(new
         {
