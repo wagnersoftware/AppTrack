@@ -3,5 +3,11 @@ namespace AppTrack.Frontend.Models;
 public enum AiResponseLanguage
 {
     German,
-    English
+    English,
+    French,
+    Italian,
+    Spanish,
+    Portuguese,
+    Dutch,
+    Polish
 }
