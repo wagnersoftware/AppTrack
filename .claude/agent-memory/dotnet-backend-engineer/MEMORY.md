@@ -91,6 +91,16 @@
 - `MockAiSettingsRepository.ExistingUserId = "user1"` — constant added to facilitate test setup
 - Rule: null/empty field → remove existing param if present; non-empty → add or update in-place
 
+## AI Text Generation Feature (renamed Apr 2026 - branch: feature/update-builtin-application-prompt)
+- `IAiTextGenerator` at `AppTrack.Application/Contracts/AiTextGenerator/IAiTextGenerator.cs` — method: `GenerateAiTextAsync`
+- `OpenAiAiTextGenerator` at `AppTrack.Infrastructure/AiTextGeneration/OpenAiAiTextGenerator.cs` — implements `IAiTextGenerator`
+- `GenerateAiTextCommand` / `GenerateAiTextCommandHandler` / `GenerateAiTextCommandValidator` at `AppTrack.Application/Features/AiSettings/Commands/GenerateAiText/`
+- `GeneratedAiTextDto` at `AppTrack.Application/Features/JobApplications/Dto/GeneratedAiTextDto.cs` — property: `GeneratedText`
+- DI registration: `services.AddHttpClient<IAiTextGenerator, OpenAiAiTextGenerator>()` in `InfrastructureServicesRegistration`
+- `OpenAiOptions` (settings class) moved to `AppTrack.Infrastructure/AiTextGeneration/Settings/OpenAiOptions.cs` — namespace `AppTrack.Infrastructure.AiTextGeneration`
+- NOTE: `JobApplication.ApplicationText` domain property was NOT renamed — only the DTO property changed
+- NOTE: NSwag-generated `ServiceClient.cs` and frontend `ApplicationTextService.cs` still use old generated names — updated on next NSwag regeneration
+
 ## CV Storage Feature (Infrastructure layer, branch: feature/profile-setup-wizard)
 - `AzureStorageSettings` at `AppTrack.Infrastructure/CvStorage/AzureStorageSettings.cs` — ConnectionString + ContainerName
 - `AzureBlobStorageService` implements `ICvStorageService` — creates `BlobServiceClient` per call (stateless, scoped DI)

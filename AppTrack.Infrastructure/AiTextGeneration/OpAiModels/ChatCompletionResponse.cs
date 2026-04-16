@@ -1,5 +1,5 @@
-﻿// DTOs für OpenAI-Response
-namespace AppTrack.Infrastructure.ApplicationTextGeneration.OpAiModels
+// DTOs für OpenAI-Response
+namespace AppTrack.Infrastructure.AiTextGeneration.OpAiModels
 {
     public class ChatCompletionResponse
     {
