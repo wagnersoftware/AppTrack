@@ -279,10 +279,6 @@ namespace AppTrack.Persistance.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ApplicationText")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("ContactPerson")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -336,6 +332,36 @@ namespace AppTrack.Persistance.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("JobApplications");
+                });
+
+            modelBuilder.Entity("AppTrack.Domain.JobApplicationAiText", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("GeneratedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("GeneratedText")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("JobApplicationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PromptKey")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("JobApplicationId", "PromptKey");
+
+                    b.ToTable("JobApplicationAiTexts", (string)null);
                 });
 
             modelBuilder.Entity("AppTrack.Domain.JobApplicationDefaults", b =>
@@ -455,6 +481,17 @@ namespace AppTrack.Persistance.Migrations
                     b.Navigation("AiSettings");
                 });
 
+            modelBuilder.Entity("AppTrack.Domain.JobApplicationAiText", b =>
+                {
+                    b.HasOne("AppTrack.Domain.JobApplication", "JobApplication")
+                        .WithMany("AiTextHistory")
+                        .HasForeignKey("JobApplicationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("JobApplication");
+                });
+
             modelBuilder.Entity("AppTrack.Domain.Prompt", b =>
                 {
                     b.HasOne("AppTrack.Domain.AiSettings", "AiSettings")
@@ -484,6 +521,11 @@ namespace AppTrack.Persistance.Migrations
                     b.Navigation("PromptParameter");
 
                     b.Navigation("Prompts");
+                });
+
+            modelBuilder.Entity("AppTrack.Domain.JobApplication", b =>
+                {
+                    b.Navigation("AiTextHistory");
                 });
 #pragma warning restore 612, 618
         }

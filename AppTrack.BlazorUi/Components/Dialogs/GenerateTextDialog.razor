@@ -17,12 +17,12 @@
         {
             <MudSelect T="string"
                        Label="Prompt"
-                       Value="_selectedPromptName"
-                       ValueChanged="OnPromptNameChangedAsync"
+                       Value="_selectedPromptKey"
+                       ValueChanged="OnPromptKeyChangedAsync"
                        Variant="Variant.Outlined"
                        Disabled="@_isReloadingPrompt"
                        Class="mb-3">
-                @foreach (var name in PromptNames)
+                @foreach (var name in PromptKeys)
                 {
                     <MudSelectItem Value="@name">@name</MudSelectItem>
                 }
@@ -79,7 +79,7 @@
         <MudButton Variant="Variant.Text"
                    OnClick="Cancel"
                    Disabled="_phase is Phase.LoadingPrompt or Phase.GeneratingText">
-            @(_phase == Phase.TextReady ? "Close" : "Cancel")
+            @(_phase == Phase.TextReady ? "Close without saving" : "Cancel")
         </MudButton>
         <MudSpacer />
         @if (_phase == Phase.PromptReady)
@@ -96,9 +96,9 @@
         {
             <MudButton Variant="Variant.Filled"
                        Color="Color.Primary"
-                       StartIcon="@Icons.Material.Outlined.ContentCopy"
-                       OnClick="CopyAndCloseAsync">
-                Copy and Close
+                       StartIcon="@Icons.Material.Filled.Save"
+                       OnClick="SaveAndCloseAsync">
+                Save and close
             </MudButton>
         }
     </DialogActions>

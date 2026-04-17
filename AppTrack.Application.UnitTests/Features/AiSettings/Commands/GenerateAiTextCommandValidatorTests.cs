@@ -68,11 +68,13 @@ public class GenerateAiTextCommandValidatorTests
     private static GenerateAiTextCommand BuildValidCommand(
         string userId = UserId,
         int jobApplicationId = ExistingJobApplicationId,
-        string prompt = "My custom prompt") => new()
+        string prompt = "My custom prompt",
+        string promptKey = "my-prompt-key") => new()
     {
         UserId = userId,
         JobApplicationId = jobApplicationId,
-        Prompt = prompt
+        Prompt = prompt,
+        PromptKey = promptKey
     };
 
     [Fact]

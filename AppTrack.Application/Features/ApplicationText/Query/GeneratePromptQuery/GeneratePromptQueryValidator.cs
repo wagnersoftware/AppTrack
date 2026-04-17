@@ -23,7 +23,7 @@ public class GeneratePromptQueryValidator : AbstractValidator<GeneratePromptQuer
             .NotEmpty().WithMessage("{PropertyName} is required")
             .NotNull().WithMessage("{PropertyName} is required");
 
-        RuleFor(x => x.PromptName)
+        RuleFor(x => x.PromptKey)
             .NotEmpty().WithMessage("{PropertyName} is required");
 
         RuleFor(x => x)
@@ -54,11 +54,11 @@ public class GeneratePromptQueryValidator : AbstractValidator<GeneratePromptQuer
             return;
         }
 
-        if (query.PromptName.StartsWith(BuiltInParameterKeys.Prefix, StringComparison.Ordinal))
+        if (query.PromptKey.StartsWith(BuiltInParameterKeys.Prefix, StringComparison.Ordinal))
         {
             var defaults = await _builtInPromptRepository.GetAsync();
             var builtInPrompt = defaults.FirstOrDefault(
-                p => string.Equals(p.Name, query.PromptName, StringComparison.OrdinalIgnoreCase));
+                p => string.Equals(p.Name, query.PromptKey, StringComparison.OrdinalIgnoreCase));
 
             if (builtInPrompt == null)
             {
@@ -72,7 +72,7 @@ public class GeneratePromptQueryValidator : AbstractValidator<GeneratePromptQuer
         else
         {
             var userPrompt = aiSettings.Prompts.FirstOrDefault(
-                p => string.Equals(p.Name, query.PromptName, StringComparison.OrdinalIgnoreCase));
+                p => string.Equals(p.Name, query.PromptKey, StringComparison.OrdinalIgnoreCase));
 
             if (userPrompt == null)
             {

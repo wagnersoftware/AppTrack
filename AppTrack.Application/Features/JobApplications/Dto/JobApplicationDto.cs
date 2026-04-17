@@ -9,7 +9,7 @@ public class JobApplicationDto
     public string Name { get; set; } = string.Empty;
     public string Position { get; set; } = string.Empty;
     public string URL { get; set; } = string.Empty;
-    public string ApplicationText { get; set; } = string.Empty;
+    public List<JobApplicationAiTextDto> AiTextHistory { get; set; } = [];
     public DateTime CreationDate { get; set; }
     public DateTime ModifiedDate { get; set; }
     public JobApplicationStatus Status { get; set; } = JobApplicationStatus.New;

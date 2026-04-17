@@ -162,6 +162,13 @@
                                                        Size="Size.Small"
                                                        OnClick="@(() => GenerateTextAsync(app))" />
                                     </MudTooltip>
+                                    <MudTooltip Text="@(app.AiTextHistory.Count == 0 ? "No AI text history available" : "AI Text History")">
+                                        <MudIconButton Icon="@Icons.Material.Outlined.History"
+                                                       Size="Size.Small"
+                                                       Color="Color.Default"
+                                                       Disabled="@(app.AiTextHistory.Count == 0)"
+                                                       OnClick="@(() => OpenAiTextHistoryAsync(app))" />
+                                    </MudTooltip>
                                     @if (!string.IsNullOrWhiteSpace(app.URL))
                                     {
                                         <MudTooltip Text="@app.URL">

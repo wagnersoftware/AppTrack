@@ -12,7 +12,6 @@ internal static class JobApplicationMappings
         Name = command.Name,
         Position = command.Position,
         URL = command.URL,
-        ApplicationText = command.ApplicationText,
         Status = command.Status,
         UserId = command.UserId,
         JobDescription = command.JobDescription,
@@ -27,7 +26,6 @@ internal static class JobApplicationMappings
         entity.Name = command.Name;
         entity.Position = command.Position;
         entity.URL = command.URL;
-        entity.ApplicationText = command.ApplicationText;
         entity.Status = command.Status;
         entity.UserId = command.UserId;
         entity.JobDescription = command.JobDescription;
@@ -44,7 +42,13 @@ internal static class JobApplicationMappings
         Name = entity.Name,
         Position = entity.Position,
         URL = entity.URL,
-        ApplicationText = entity.ApplicationText,
+        AiTextHistory = entity.AiTextHistory.Select(x => new JobApplicationAiTextDto
+        {
+            Id = x.Id,
+            PromptKey = x.PromptKey,
+            GeneratedText = x.GeneratedText,
+            GeneratedAt = x.GeneratedAt,
+        }).ToList(),
         CreationDate = entity.CreationDate ?? default,
         ModifiedDate = entity.ModifiedDate ?? default,
         Status = entity.Status,

@@ -2,6 +2,8 @@ using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Exceptions;
 using AppTrack.Application.Features.JobApplicationDefaults.Commands.UpdateApplicationDefaults;
 using AppTrack.Application.Features.JobApplicationDefaults.Dto;
+using FluentValidation;
+using FluentValidation.Results;
 using Moq;
 using Shouldly;
 using DomainJobApplicationDefaults = AppTrack.Domain.JobApplicationDefaults;
@@ -15,10 +17,16 @@ public class UpdateJobApplicationDefaultsCommandHandlerTests
     private const int ExistingId = 1;
 
     private readonly Mock<IJobApplicationDefaultsRepository> _mockRepo;
+    private readonly Mock<IValidator<UpdateJobApplicationDefaultsCommand>> _mockValidator;
 
     public UpdateJobApplicationDefaultsCommandHandlerTests()
     {
         _mockRepo = new Mock<IJobApplicationDefaultsRepository>();
+        _mockValidator = new Mock<IValidator<UpdateJobApplicationDefaultsCommand>>();
+
+        _mockValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<UpdateJobApplicationDefaultsCommand>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult());
 
         var existingDefaults = new DomainJobApplicationDefaults
         {
@@ -51,13 +59,15 @@ public class UpdateJobApplicationDefaultsCommandHandlerTests
         Location = "New Location"
     };
 
+    private UpdateJobApplicationDefaultsCommandHandler CreateHandler() =>
+        new(_mockRepo.Object, _mockValidator.Object);
+
     [Fact]
     public async Task Handle_ShouldReturnUpdatedDto_WhenCommandIsValid()
     {
         var command = BuildValidCommand();
-        var handler = new UpdateJobApplicationDefaultsCommandHandler(_mockRepo.Object);
 
-        var result = await handler.Handle(command, CancellationToken.None);
+        var result = await CreateHandler().Handle(command, CancellationToken.None);
 
         result.ShouldNotBeNull();
         result.ShouldBeOfType<JobApplicationDefaultsDto>();
@@ -67,37 +77,49 @@ public class UpdateJobApplicationDefaultsCommandHandlerTests
     [Fact]
     public async Task Handle_ShouldThrowBadRequestException_WhenEntityDoesNotExist()
     {
-        var command = BuildValidCommand(id: 9999);
-        var handler = new UpdateJobApplicationDefaultsCommandHandler(_mockRepo.Object);
+        _mockValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<UpdateJobApplicationDefaultsCommand>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult([new ValidationFailure("Id", "Job application defaults not found.")]));
 
-        await Should.ThrowAsync<BadRequestException>(() => handler.Handle(command, CancellationToken.None));
+        var command = BuildValidCommand(id: 9999);
+
+        await Should.ThrowAsync<BadRequestException>(() => CreateHandler().Handle(command, CancellationToken.None));
     }
 
     [Fact]
     public async Task Handle_ShouldThrowBadRequestException_WhenEntityBelongsToAnotherUser()
     {
-        var command = BuildValidCommand(id: ExistingId, userId: OtherId);
-        var handler = new UpdateJobApplicationDefaultsCommandHandler(_mockRepo.Object);
+        _mockValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<UpdateJobApplicationDefaultsCommand>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult([new ValidationFailure("UserId", "Job application defaults not assigned to this user.")]));
 
-        await Should.ThrowAsync<BadRequestException>(() => handler.Handle(command, CancellationToken.None));
+        var command = BuildValidCommand(id: ExistingId, userId: OtherId);
+
+        await Should.ThrowAsync<BadRequestException>(() => CreateHandler().Handle(command, CancellationToken.None));
     }
 
     [Fact]
     public async Task Handle_ShouldThrowBadRequestException_WhenIdIsZero()
     {
-        var command = BuildValidCommand(id: 0);
-        var handler = new UpdateJobApplicationDefaultsCommandHandler(_mockRepo.Object);
+        _mockValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<UpdateJobApplicationDefaultsCommand>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult([new ValidationFailure("Id", "Id is required")]));
 
-        await Should.ThrowAsync<BadRequestException>(() => handler.Handle(command, CancellationToken.None));
+        var command = BuildValidCommand(id: 0);
+
+        await Should.ThrowAsync<BadRequestException>(() => CreateHandler().Handle(command, CancellationToken.None));
     }
 
     [Fact]
     public async Task Handle_ShouldNotCallUpdateAsync_WhenValidationFails()
     {
-        var command = BuildValidCommand(id: 9999);
-        var handler = new UpdateJobApplicationDefaultsCommandHandler(_mockRepo.Object);
+        _mockValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<UpdateJobApplicationDefaultsCommand>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult([new ValidationFailure("Id", "Job application defaults not found.")]));
 
-        await Should.ThrowAsync<BadRequestException>(() => handler.Handle(command, CancellationToken.None));
+        var command = BuildValidCommand(id: 9999);
+
+        await Should.ThrowAsync<BadRequestException>(() => CreateHandler().Handle(command, CancellationToken.None));
 
         _mockRepo.Verify(r => r.UpdateAsync(It.IsAny<DomainJobApplicationDefaults>()), Times.Never);
     }

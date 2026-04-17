@@ -4,6 +4,8 @@ using AppTrack.Application.Exceptions;
 using AppTrack.Application.Features.JobApplications.Commands.DeleteJobApplication;
 using AppTrack.Application.Shared;
 using AppTrack.Domain;
+using FluentValidation;
+using FluentValidation.Results;
 using Moq;
 using Shouldly;
 
@@ -17,11 +19,17 @@ public class DeleteJobApplicationCommandHandlerTests
 
     private readonly Mock<IJobApplicationRepository> _mockRepo;
     private readonly Mock<IAppLogger<DeleteJobApplicationCommandHandler>> _mockLogger;
+    private readonly Mock<IValidator<DeleteJobApplicationCommand>> _mockValidator;
 
     public DeleteJobApplicationCommandHandlerTests()
     {
         _mockRepo = new Mock<IJobApplicationRepository>();
         _mockLogger = new Mock<IAppLogger<DeleteJobApplicationCommandHandler>>();
+        _mockValidator = new Mock<IValidator<DeleteJobApplicationCommand>>();
+
+        _mockValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<DeleteJobApplicationCommand>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult());
 
         var existingEntity = new JobApplication
         {
@@ -44,7 +52,7 @@ public class DeleteJobApplicationCommandHandlerTests
     }
 
     private DeleteJobApplicationCommandHandler CreateHandler() =>
-        new(_mockRepo.Object, _mockLogger.Object);
+        new(_mockRepo.Object, _mockLogger.Object, _mockValidator.Object);
 
     [Fact]
     public async Task Handle_ShouldReturnUnitValue_WhenCommandIsValid()
@@ -78,6 +86,10 @@ public class DeleteJobApplicationCommandHandlerTests
     public async Task Handle_ShouldThrowBadRequestException_WhenJobApplicationDoesNotExist()
     {
         // Arrange
+        _mockValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<DeleteJobApplicationCommand>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult([new ValidationFailure("Id", "Job application doesn't exist for user")]));
+
         var command = new DeleteJobApplicationCommand { Id = 999, UserId = OwnerId };
         var handler = CreateHandler();
 
@@ -90,6 +102,10 @@ public class DeleteJobApplicationCommandHandlerTests
     public async Task Handle_ShouldThrowBadRequestException_WhenJobApplicationBelongsToAnotherUser()
     {
         // Arrange
+        _mockValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<DeleteJobApplicationCommand>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult([new ValidationFailure("Id", "Job application doesn't exist for user")]));
+
         var command = new DeleteJobApplicationCommand { Id = ExistingId, UserId = OtherId };
         var handler = CreateHandler();
 
@@ -102,6 +118,10 @@ public class DeleteJobApplicationCommandHandlerTests
     public async Task Handle_ShouldNotCallDeleteAsync_WhenValidationFails()
     {
         // Arrange
+        _mockValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<DeleteJobApplicationCommand>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult([new ValidationFailure("Id", "Job application doesn't exist for user")]));
+
         var command = new DeleteJobApplicationCommand { Id = ExistingId, UserId = OtherId };
         var handler = CreateHandler();
 

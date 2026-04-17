@@ -3,22 +3,24 @@ using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Exceptions;
 using AppTrack.Application.Features.JobApplications.Dto;
 using AppTrack.Application.Mappings;
+using FluentValidation;
 
 namespace AppTrack.Application.Features.JobApplications.Commands.UpdateJobApplication;
 
 public class UpdateJobApplicationCommandHandler : IRequestHandler<UpdateJobApplicationCommand, JobApplicationDto>
 {
     private readonly IJobApplicationRepository _jobApplicationRepository;
+    private readonly IValidator<UpdateJobApplicationCommand> _validator;
 
-    public UpdateJobApplicationCommandHandler(IJobApplicationRepository jobApplicationRepository)
+    public UpdateJobApplicationCommandHandler(IJobApplicationRepository jobApplicationRepository, IValidator<UpdateJobApplicationCommand> validator)
     {
         _jobApplicationRepository = jobApplicationRepository;
+        _validator = validator;
     }
 
     public async Task<JobApplicationDto> Handle(UpdateJobApplicationCommand request, CancellationToken cancellationToken)
     {
-        var validator = new UpdateJobApplicationCommandValidator(_jobApplicationRepository);
-        var validationResult = await validator.ValidateAsync(request);
+        var validationResult = await _validator.ValidateAsync(request);
 
         if (validationResult.Errors.Any())
         {

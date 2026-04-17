@@ -113,6 +113,7 @@ public partial class Home
         if (result is { Canceled: true }) return;
         if (result?.Data is not JobApplicationModel updatedModel) return;
 
+        updatedModel.AiTextHistory = model.AiTextHistory;
         var index = _jobApplications.IndexOf(model);
         if (index >= 0)
             _jobApplications[index] = updatedModel;
@@ -136,16 +137,38 @@ public partial class Home
         var parameters = new DialogParameters<GenerateTextDialog>
         {
             { x => x.JobApplication, model },
-            { x => x.PromptNames, namesResponse.Data }
+            { x => x.PromptKeys, namesResponse.Data }
         };
 
         var dialog = await DialogService.ShowAsync<GenerateTextDialog>("", parameters, _generateTextDialogOptions);
         var result = await dialog.Result;
 
         if (result is { Canceled: true }) return;
-        if (result?.Data is not string generatedText) return;
+        if (result?.Data is not (string promptKey, string generatedText)) return;
 
-        model.ApplicationText = generatedText;
+        model.AiTextHistory.Insert(0, new JobApplicationAiTextModel
+        {
+            PromptKey = promptKey,
+            GeneratedText = generatedText,
+            GeneratedAt = DateTime.Now,
+        });
+        model.AiTextHistory = model.AiTextHistory
+            .GroupBy(x => x.PromptKey)
+            .SelectMany(g => g.OrderByDescending(x => x.GeneratedAt).Take(5))
+            .OrderByDescending(x => x.GeneratedAt)
+            .ToList();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task OpenAiTextHistoryAsync(JobApplicationModel model)
+    {
+        var parameters = new DialogParameters<AiTextHistoryDialog>
+        {
+            { x => x.JobApplication, model }
+        };
+
+        var dialog = await DialogService.ShowAsync<AiTextHistoryDialog>("", parameters, _generateTextDialogOptions);
+        await dialog.Result;
         await InvokeAsync(StateHasChanged);
     }
 

@@ -126,20 +126,6 @@
                               Lines="5"
                               Class="mb-1" />
             </MudItem>
-            <!-- Application Text -->
-            <MudItem xs="12">
-                <MudTextField T="string"
-                              Label="Application Text"
-                              Value="_model.ApplicationText"
-                              ValueChanged="@((string v) => OnApplicationTextChanged(v))"
-                              Variant="Variant.Outlined"
-                              Lines="5"
-                              Adornment="Adornment.End"
-                              AdornmentIcon="@Icons.Material.Outlined.ContentCopy"
-                              AdornmentAriaLabel="Copy application text"
-                              OnAdornmentClick="CopyApplicationTextAsync"
-                              Class="mb-1" />
-            </MudItem>
         </MudGrid>
     </DialogContent>
     <DialogActions>

@@ -5,6 +5,7 @@ using AppTrack.Application.Features.ApplicationText.Dto;
 using AppTrack.Domain;
 using AppTrack.Domain.Contracts;
 using AppTrack.Domain.Extensions;
+using FluentValidation;
 
 namespace AppTrack.Application.Features.ApplicationText.Query.GeneratePromptQuery;
 
@@ -14,23 +15,25 @@ public class GeneratePromptQueryHandler : IRequestHandler<GeneratePromptQuery, G
     private readonly IJobApplicationRepository _jobApplicationRepository;
     private readonly IPromptBuilder _promptBuilder;
     private readonly IBuiltInPromptRepository _builtInPromptRepository;
+    private readonly IValidator<GeneratePromptQuery> _validator;
 
     public GeneratePromptQueryHandler(
         IAiSettingsRepository aiSettingsRepository,
         IJobApplicationRepository jobApplicationRepository,
         IPromptBuilder promptBuilder,
-        IBuiltInPromptRepository builtInPromptRepository)
+        IBuiltInPromptRepository builtInPromptRepository,
+        IValidator<GeneratePromptQuery> validator)
     {
         _aiSettingsRepository = aiSettingsRepository;
         _jobApplicationRepository = jobApplicationRepository;
         _promptBuilder = promptBuilder;
         _builtInPromptRepository = builtInPromptRepository;
+        _validator = validator;
     }
 
     public async Task<GeneratedPromptDto> Handle(GeneratePromptQuery request, CancellationToken cancellationToken)
     {
-        var validator = new GeneratePromptQueryValidator(_jobApplicationRepository, _aiSettingsRepository, _builtInPromptRepository);
-        var validationResult = await validator.ValidateAsync(request);
+        var validationResult = await _validator.ValidateAsync(request);
 
         if (validationResult.Errors.Any())
             throw new BadRequestException("Invalid generate prompt request.", validationResult);
@@ -47,17 +50,17 @@ public class GeneratePromptQueryHandler : IRequestHandler<GeneratePromptQuery, G
         var promptParameter = jobApplicationParameter.Union(applicantParameter).ToList();
 
         string promptTemplate;
-        if (request.PromptName.StartsWith(BuiltInParameterKeys.Prefix, StringComparison.Ordinal))
+        if (request.PromptKey.StartsWith(BuiltInParameterKeys.Prefix, StringComparison.Ordinal))
         {
             var defaults = await _builtInPromptRepository.GetAsync();
             promptTemplate = defaults
-                .First(p => string.Equals(p.Name, request.PromptName, StringComparison.OrdinalIgnoreCase))
+                .First(p => string.Equals(p.Name, request.PromptKey, StringComparison.OrdinalIgnoreCase))
                 .PromptTemplate;
         }
         else
         {
             promptTemplate = aiSettings!.Prompts
-                .First(p => string.Equals(p.Name, request.PromptName, StringComparison.OrdinalIgnoreCase))
+                .First(p => string.Equals(p.Name, request.PromptKey, StringComparison.OrdinalIgnoreCase))
                 .PromptTemplate;
         }
 

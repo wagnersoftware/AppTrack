@@ -3,6 +3,8 @@ using AppTrack.Application.Exceptions;
 using AppTrack.Application.Features.FreelancerProfile.Dto;
 using AppTrack.Application.Features.FreelancerProfile.Queries.GetFreelancerProfile;
 using AppTrack.Application.UnitTests.Mocks;
+using FluentValidation;
+using FluentValidation.Results;
 using Moq;
 using Shouldly;
 
@@ -11,12 +13,19 @@ namespace AppTrack.Application.UnitTests.Features.FreelancerProfile.Queries;
 public class GetFreelancerProfileQueryHandlerTests
 {
     private readonly Mock<IFreelancerProfileRepository> _mockRepo;
+    private readonly Mock<IValidator<GetFreelancerProfileQuery>> _mockValidator;
     private readonly GetFreelancerProfileQueryHandler _handler;
 
     public GetFreelancerProfileQueryHandlerTests()
     {
         _mockRepo = MockFreelancerProfileRepository.GetMock();
-        _handler = new GetFreelancerProfileQueryHandler(_mockRepo.Object);
+        _mockValidator = new Mock<IValidator<GetFreelancerProfileQuery>>();
+
+        _mockValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<GetFreelancerProfileQuery>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult());
+
+        _handler = new GetFreelancerProfileQueryHandler(_mockRepo.Object, _mockValidator.Object);
     }
 
     [Fact]

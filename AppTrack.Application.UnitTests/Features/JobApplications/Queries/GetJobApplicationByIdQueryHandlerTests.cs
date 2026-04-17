@@ -4,6 +4,8 @@ using AppTrack.Application.Features.JobApplications.Dto;
 using AppTrack.Application.Features.JobApplications.Queries.GetJobApplicationById;
 using AppTrack.Domain;
 using AppTrack.Domain.Enums;
+using FluentValidation;
+using FluentValidation.Results;
 using Moq;
 using Shouldly;
 
@@ -16,10 +18,16 @@ public class GetJobApplicationByIdQueryHandlerTests
     private const int ExistingId = 7;
 
     private readonly Mock<IJobApplicationRepository> _mockRepo;
+    private readonly Mock<IValidator<GetJobApplicationByIdQuery>> _mockValidator;
 
     public GetJobApplicationByIdQueryHandlerTests()
     {
         _mockRepo = new Mock<IJobApplicationRepository>();
+        _mockValidator = new Mock<IValidator<GetJobApplicationByIdQuery>>();
+
+        _mockValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<GetJobApplicationByIdQuery>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult());
 
         var existingEntity = new JobApplication
         {
@@ -42,15 +50,25 @@ public class GetJobApplicationByIdQueryHandlerTests
         _mockRepo
             .Setup(r => r.GetByIdAsync(It.Is<int>(id => id != ExistingId)))
             .ReturnsAsync((JobApplication?)null);
+
+        _mockRepo
+            .Setup(r => r.GetByIdWithAiTextHistoryAsync(ExistingId))
+            .ReturnsAsync(existingEntity);
+
+        _mockRepo
+            .Setup(r => r.GetByIdWithAiTextHistoryAsync(It.Is<int>(id => id != ExistingId)))
+            .ReturnsAsync((JobApplication?)null);
     }
+
+    private GetJobApplicationByIdQueryHandler CreateHandler() =>
+        new(_mockRepo.Object, _mockValidator.Object);
 
     [Fact]
     public async Task Handle_ShouldReturnJobApplicationDto_WhenEntityExistsAndBelongsToUser()
     {
         var query = new GetJobApplicationByIdQuery { Id = ExistingId, UserId = OwnerId };
-        var handler = new GetJobApplicationByIdQueryHandler(_mockRepo.Object);
 
-        var result = await handler.Handle(query, CancellationToken.None);
+        var result = await CreateHandler().Handle(query, CancellationToken.None);
 
         result.ShouldNotBeNull();
         result.ShouldBeOfType<JobApplicationDto>();
@@ -61,27 +79,36 @@ public class GetJobApplicationByIdQueryHandlerTests
     [Fact]
     public async Task Handle_ShouldThrowBadRequestException_WhenIdIsZero()
     {
-        var query = new GetJobApplicationByIdQuery { Id = 0, UserId = OwnerId };
-        var handler = new GetJobApplicationByIdQueryHandler(_mockRepo.Object);
+        _mockValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<GetJobApplicationByIdQuery>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult([new ValidationFailure("Id", "Id is required")]));
 
-        await Should.ThrowAsync<BadRequestException>(() => handler.Handle(query, CancellationToken.None));
+        var query = new GetJobApplicationByIdQuery { Id = 0, UserId = OwnerId };
+
+        await Should.ThrowAsync<BadRequestException>(() => CreateHandler().Handle(query, CancellationToken.None));
     }
 
     [Fact]
     public async Task Handle_ShouldThrowBadRequestException_WhenJobApplicationDoesNotExist()
     {
-        var query = new GetJobApplicationByIdQuery { Id = 9999, UserId = OwnerId };
-        var handler = new GetJobApplicationByIdQueryHandler(_mockRepo.Object);
+        _mockValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<GetJobApplicationByIdQuery>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult([new ValidationFailure("Id", "Job application not found.")]));
 
-        await Should.ThrowAsync<BadRequestException>(() => handler.Handle(query, CancellationToken.None));
+        var query = new GetJobApplicationByIdQuery { Id = 9999, UserId = OwnerId };
+
+        await Should.ThrowAsync<BadRequestException>(() => CreateHandler().Handle(query, CancellationToken.None));
     }
 
     [Fact]
     public async Task Handle_ShouldThrowBadRequestException_WhenJobApplicationBelongsToAnotherUser()
     {
-        var query = new GetJobApplicationByIdQuery { Id = ExistingId, UserId = OtherId };
-        var handler = new GetJobApplicationByIdQueryHandler(_mockRepo.Object);
+        _mockValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<GetJobApplicationByIdQuery>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult([new ValidationFailure("UserId", "Job application doesn't belong to this user.")]));
 
-        await Should.ThrowAsync<BadRequestException>(() => handler.Handle(query, CancellationToken.None));
+        var query = new GetJobApplicationByIdQuery { Id = ExistingId, UserId = OtherId };
+
+        await Should.ThrowAsync<BadRequestException>(() => CreateHandler().Handle(query, CancellationToken.None));
     }
 }

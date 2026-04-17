@@ -4,6 +4,8 @@ using AppTrack.Application.Features.JobApplications.Commands.CreateJobApplicatio
 using AppTrack.Application.Features.JobApplications.Dto;
 using AppTrack.Domain;
 using AppTrack.Domain.Enums;
+using FluentValidation;
+using FluentValidation.Results;
 using Moq;
 using Shouldly;
 
@@ -12,10 +14,17 @@ namespace AppTrack.Application.UnitTests.Features.JobApplications.Commands;
 public class CreateJobApplicationCommandHandlerTests
 {
     private readonly Mock<IJobApplicationRepository> _mockRepo;
+    private readonly Mock<IValidator<CreateJobApplicationCommand>> _mockValidator;
 
     public CreateJobApplicationCommandHandlerTests()
     {
         _mockRepo = new Mock<IJobApplicationRepository>();
+        _mockValidator = new Mock<IValidator<CreateJobApplicationCommand>>();
+
+        _mockValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<CreateJobApplicationCommand>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult());
+
         _mockRepo
             .Setup(r => r.CreateAsync(It.IsAny<JobApplication>()))
             .Returns(Task.CompletedTask);
@@ -35,13 +44,15 @@ public class CreateJobApplicationCommandHandlerTests
         DurationInMonths = "6"
     };
 
+    private CreateJobApplicationCommandHandler CreateHandler() =>
+        new(_mockRepo.Object, _mockValidator.Object);
+
     [Fact]
     public async Task Handle_ShouldReturnJobApplicationDto_WhenCommandIsValid()
     {
         var command = BuildValidCommand();
-        var handler = new CreateJobApplicationCommandHandler(_mockRepo.Object);
 
-        var result = await handler.Handle(command, CancellationToken.None);
+        var result = await CreateHandler().Handle(command, CancellationToken.None);
 
         result.ShouldNotBeNull();
         result.ShouldBeOfType<JobApplicationDto>();
@@ -54,9 +65,8 @@ public class CreateJobApplicationCommandHandlerTests
     public async Task Handle_ShouldCallCreateAsync_WhenCommandIsValid()
     {
         var command = BuildValidCommand();
-        var handler = new CreateJobApplicationCommandHandler(_mockRepo.Object);
 
-        await handler.Handle(command, CancellationToken.None);
+        await CreateHandler().Handle(command, CancellationToken.None);
 
         _mockRepo.Verify(r => r.CreateAsync(It.IsAny<JobApplication>()), Times.Once);
     }
@@ -64,61 +74,79 @@ public class CreateJobApplicationCommandHandlerTests
     [Fact]
     public async Task Handle_ShouldThrowBadRequestException_WhenNameIsEmpty()
     {
+        _mockValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<CreateJobApplicationCommand>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult([new ValidationFailure("Name", "Name is required")]));
+
         var command = BuildValidCommand();
         command.Name = string.Empty;
-        var handler = new CreateJobApplicationCommandHandler(_mockRepo.Object);
 
-        await Should.ThrowAsync<BadRequestException>(() => handler.Handle(command, CancellationToken.None));
+        await Should.ThrowAsync<BadRequestException>(() => CreateHandler().Handle(command, CancellationToken.None));
     }
 
     [Fact]
     public async Task Handle_ShouldThrowBadRequestException_WhenPositionIsEmpty()
     {
+        _mockValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<CreateJobApplicationCommand>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult([new ValidationFailure("Position", "Position is required")]));
+
         var command = BuildValidCommand();
         command.Position = string.Empty;
-        var handler = new CreateJobApplicationCommandHandler(_mockRepo.Object);
 
-        await Should.ThrowAsync<BadRequestException>(() => handler.Handle(command, CancellationToken.None));
+        await Should.ThrowAsync<BadRequestException>(() => CreateHandler().Handle(command, CancellationToken.None));
     }
 
     [Fact]
     public async Task Handle_ShouldThrowBadRequestException_WhenUrlIsInvalid()
     {
+        _mockValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<CreateJobApplicationCommand>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult([new ValidationFailure("URL", "URL is not valid")]));
+
         var command = BuildValidCommand();
         command.URL = "not-a-valid-url";
-        var handler = new CreateJobApplicationCommandHandler(_mockRepo.Object);
 
-        await Should.ThrowAsync<BadRequestException>(() => handler.Handle(command, CancellationToken.None));
+        await Should.ThrowAsync<BadRequestException>(() => CreateHandler().Handle(command, CancellationToken.None));
     }
 
     [Fact]
     public async Task Handle_ShouldThrowBadRequestException_WhenStartDateIsDefault()
     {
+        _mockValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<CreateJobApplicationCommand>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult([new ValidationFailure("StartDate", "StartDate is required")]));
+
         var command = BuildValidCommand();
         command.StartDate = default;
-        var handler = new CreateJobApplicationCommandHandler(_mockRepo.Object);
 
-        await Should.ThrowAsync<BadRequestException>(() => handler.Handle(command, CancellationToken.None));
+        await Should.ThrowAsync<BadRequestException>(() => CreateHandler().Handle(command, CancellationToken.None));
     }
 
     [Fact]
     public async Task Handle_ShouldThrowBadRequestException_WhenDurationInMonthsIsNotNumeric()
     {
+        _mockValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<CreateJobApplicationCommand>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult([new ValidationFailure("DurationInMonths", "DurationInMonths must be numeric")]));
+
         var command = BuildValidCommand();
         command.DurationInMonths = "abc";
-        var handler = new CreateJobApplicationCommandHandler(_mockRepo.Object);
 
-        await Should.ThrowAsync<BadRequestException>(() => handler.Handle(command, CancellationToken.None));
+        await Should.ThrowAsync<BadRequestException>(() => CreateHandler().Handle(command, CancellationToken.None));
     }
 
     [Fact]
     public async Task Handle_ShouldNotCallCreateAsync_WhenValidationFails()
     {
+        _mockValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<CreateJobApplicationCommand>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult([new ValidationFailure("Name", "Name is required")]));
+
         var command = BuildValidCommand();
         command.Name = string.Empty;
-        var handler = new CreateJobApplicationCommandHandler(_mockRepo.Object);
 
-        await Should.ThrowAsync<BadRequestException>(() => handler.Handle(command, CancellationToken.None));
+        await Should.ThrowAsync<BadRequestException>(() => CreateHandler().Handle(command, CancellationToken.None));
 
         _mockRepo.Verify(r => r.CreateAsync(It.IsAny<JobApplication>()), Times.Never);
     }

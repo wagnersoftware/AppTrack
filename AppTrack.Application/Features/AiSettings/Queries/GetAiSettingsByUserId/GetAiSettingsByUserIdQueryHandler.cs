@@ -3,6 +3,7 @@ using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Exceptions;
 using AppTrack.Application.Features.AiSettings.Dto;
 using AppTrack.Application.Mappings;
+using FluentValidation;
 
 namespace AppTrack.Application.Features.AiSettings.Queries.GetAiSettingsByUserId;
 
@@ -10,11 +11,13 @@ public class GetAiSettingsByUserIdQueryHandler : IRequestHandler<GetAiSettingsBy
 {
     private readonly IAiSettingsRepository _aiSettingsRepository;
     private readonly IBuiltInPromptRepository _builtInPromptRepository;
+    private readonly IValidator<GetAiSettingsByUserIdQuery> _validator;
 
-    public GetAiSettingsByUserIdQueryHandler(IAiSettingsRepository aiSettingsRepository, IBuiltInPromptRepository builtInPromptRepository)
+    public GetAiSettingsByUserIdQueryHandler(IAiSettingsRepository aiSettingsRepository, IBuiltInPromptRepository builtInPromptRepository, IValidator<GetAiSettingsByUserIdQuery> validator)
     {
         _aiSettingsRepository = aiSettingsRepository;
         _builtInPromptRepository = builtInPromptRepository;
+        _validator = validator;
     }
 
     /// <summary>
@@ -22,8 +25,7 @@ public class GetAiSettingsByUserIdQueryHandler : IRequestHandler<GetAiSettingsBy
     /// </summary>
     public async Task<AiSettingsDto> Handle(GetAiSettingsByUserIdQuery request, CancellationToken cancellationToken)
     {
-        var validator = new GetAiSettingsByUserIdQueryValidator();
-        var validationResult = await validator.ValidateAsync(request);
+        var validationResult = await _validator.ValidateAsync(request);
 
         if (validationResult.Errors.Any())
             throw new BadRequestException($"Invalid request", validationResult);

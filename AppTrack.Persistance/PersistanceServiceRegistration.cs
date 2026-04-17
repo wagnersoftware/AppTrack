@@ -26,6 +26,7 @@ public static class PersistanceServiceRegistration
 
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
         services.AddScoped<IJobApplicationRepository, JobApplicationRepository>();
+        services.AddScoped<IJobApplicationAiTextRepository, JobApplicationAiTextRepository>();
         services.AddScoped<IJobApplicationDefaultsRepository, JobApplicationDefaultsRepository>();
         services.AddScoped<IAiSettingsRepository, AiSettingsRepository>();
         services.AddScoped<IChatModelRepository, ChatModelRepository>();

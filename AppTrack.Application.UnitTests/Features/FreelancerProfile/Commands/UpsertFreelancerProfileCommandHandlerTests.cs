@@ -4,6 +4,8 @@ using AppTrack.Application.Features.FreelancerProfile.Commands.UpsertFreelancerP
 using AppTrack.Application.Features.FreelancerProfile.Dto;
 using AppTrack.Application.UnitTests.Mocks;
 using AppTrack.Domain.Enums;
+using FluentValidation;
+using FluentValidation.Results;
 using Moq;
 using Shouldly;
 
@@ -14,19 +16,25 @@ public class UpsertFreelancerProfileCommandHandlerTests
     private readonly Mock<IFreelancerProfileRepository> _mockRepo;
     private readonly Mock<IAiSettingsRepository> _mockAiSettingsRepo;
     private readonly Mock<IUnitOfWork> _mockUnitOfWork;
+    private readonly Mock<IValidator<UpsertFreelancerProfileCommand>> _mockValidator;
     private readonly UpsertFreelancerProfileCommandHandler _handler;
 
     public UpsertFreelancerProfileCommandHandlerTests()
     {
         _mockRepo = MockFreelancerProfileRepository.GetMock();
         _mockAiSettingsRepo = MockAiSettingsRepository.GetMock();
+        _mockValidator = new Mock<IValidator<UpsertFreelancerProfileCommand>>();
+
+        _mockValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<UpsertFreelancerProfileCommand>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult());
 
         _mockUnitOfWork = new Mock<IUnitOfWork>();
         _mockUnitOfWork
             .Setup(u => u.ExecuteInTransactionAsync(It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()))
             .Returns<Func<CancellationToken, Task>, CancellationToken>((action, ct) => action(ct));
 
-        _handler = new UpsertFreelancerProfileCommandHandler(_mockRepo.Object, _mockAiSettingsRepo.Object, _mockUnitOfWork.Object);
+        _handler = new UpsertFreelancerProfileCommandHandler(_mockRepo.Object, _mockAiSettingsRepo.Object, _mockUnitOfWork.Object, _mockValidator.Object);
     }
 
     private static UpsertFreelancerProfileCommand ValidCommand(string userId = MockFreelancerProfileRepository.ExistingUserId) => new()
@@ -85,6 +93,10 @@ public class UpsertFreelancerProfileCommandHandlerTests
     public async Task Handle_ShouldThrowBadRequestException_WhenHourlyRateIsNegative()
     {
         // Arrange
+        _mockValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<UpsertFreelancerProfileCommand>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult([new ValidationFailure("HourlyRate", "HourlyRate must be greater than or equal to 0.")]));
+
         var command = ValidCommand();
         command.HourlyRate = -10;
 
@@ -98,6 +110,10 @@ public class UpsertFreelancerProfileCommandHandlerTests
     public async Task Handle_ShouldNotCallUpsertAsync_WhenValidationFails()
     {
         // Arrange
+        _mockValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<UpsertFreelancerProfileCommand>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult([new ValidationFailure("HourlyRate", "HourlyRate must be greater than or equal to 0.")]));
+
         var command = ValidCommand();
         command.HourlyRate = -10;
 

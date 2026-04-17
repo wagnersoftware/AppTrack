@@ -10,22 +10,22 @@ public class ApplicationTextService : BaseHttpService, IApplicationTextService
     {
     }
 
-    public Task<Response<ApplicationTextModel>> GenerateApplicationText(string prompt, int jobApplicationId, CancellationToken token) =>
+    public Task<Response<ApplicationTextModel>> GenerateApplicationText(string prompt, int jobApplicationId, string promptKey, CancellationToken token) =>
         TryExecuteAsync(async () =>
         {
-            var command = new GenerateApplicationTextCommand() { Prompt = prompt, JobApplicationId = jobApplicationId };
+            var command = new GenerateAiTextCommand() { Prompt = prompt, JobApplicationId = jobApplicationId, PromptKey = promptKey };
             var generatedTextDto = await _client.GenerateApplicationTextAsync(command, token);
             return new ApplicationTextModel()
             {
-                Text = generatedTextDto.ApplicationText,
+                Text = generatedTextDto.GeneratedText,
                 WindowTitle = "Generated application text",
             };
         });
 
-    public Task<Response<GeneratedPromptModel>> GeneratePrompt(int jobApplicationId, string promptName) =>
+    public Task<Response<GeneratedPromptModel>> GeneratePrompt(int jobApplicationId, string promptKey) =>
         TryExecuteAsync(async () =>
         {
-            var query = new GeneratePromptQuery() { JobApplicationId = jobApplicationId, PromptName = promptName };
+            var query = new GeneratePromptQuery() { JobApplicationId = jobApplicationId, PromptKey = promptKey };
             var generatedPromptDto = await _client.GeneratePromptAsync(query);
             return new GeneratedPromptModel()
             {
@@ -40,5 +40,12 @@ public class ApplicationTextService : BaseHttpService, IApplicationTextService
         {
             var dto = await _client.PromptNamesAsync();
             return dto.Names.ToList();
+        });
+
+    public Task<Response<bool>> DeleteAiTextAsync(int id) =>
+        TryExecuteAsync(async () =>
+        {
+            await _client.AiTextAsync(id);
+            return true;
         });
 }

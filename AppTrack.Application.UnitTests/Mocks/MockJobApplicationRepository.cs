@@ -27,6 +27,7 @@ public static class MockJobApplicationRepository
         var mockRepo = new Mock<IJobApplicationRepository>();
 
         mockRepo.Setup(r => r.GetAllForUserAsync(It.IsAny<string>())).ReturnsAsync(jobApplications);
+        mockRepo.Setup(r => r.GetAllForUserWithAiTextHistoryAsync(It.IsAny<string>())).ReturnsAsync(jobApplications);
 
         mockRepo.Setup(r => r.CreateAsync(It.IsAny<JobApplication>())).Returns((JobApplication jobApplication) =>
         {

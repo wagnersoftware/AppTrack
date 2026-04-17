@@ -38,10 +38,14 @@
 - `AppTrack.Infrastructure/Identity/HttpContextUserContext.cs` — reads oid/sub claims
 - `AppTrack.Infrastructure/Mediator/Mediator.cs` — custom mediator; injects UserId before dispatch
 
-## Handler Validation Pattern
-- Handlers instantiate their own validator inline: `var validator = new XyzValidator(); var result = await validator.ValidateAsync(request, cancellationToken);`
+## Handler Validation Pattern (updated Apr 2026)
+- Validators are injected via `IValidator<TRequest>` constructor parameter, stored as `private readonly IValidator<TRequest> _validator`
+- `ApplicationServiceRegistration` registers all validators: `services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly(), includeInternalTypes: true)`
+- In handlers: `var validationResult = await _validator.ValidateAsync(request, cancellationToken);`
 - Check `validationResult.Errors.Count > 0` (not `.Any()`) to avoid LINQ allocation — consistent with TreatWarningsAsErrors style
 - `UpsertFreelancerProfileCommandHandler` uses optimistic upsert: `GetByUserIdAsync` → create if null, else `ApplyTo` + update
+- `GenerateAiTextCommandHandler` constructor: `IJobApplicationRepository` removed — it was only needed by the old inline validator; injected `IValidator<GenerateAiTextCommand>` handles that now. Sonar S4487 fires on unread private fields (build error).
+- Unit tests: use `Mock<IValidator<TRequest>>` with default `.ReturnsAsync(new ValidationResult())`, override per-test for failure paths with `new ValidationResult([new ValidationFailure(...)])`
 
 ## FreelancerProfile Feature (Application layer, branch: feature/profile-setup-wizard)
 - `IFreelancerProfileRepository` at `AppTrack.Application/Contracts/Persistance/IFreelancerProfileRepository.cs`

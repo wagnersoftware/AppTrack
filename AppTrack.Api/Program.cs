@@ -68,6 +68,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+    c.UseAllOfToExtendReferenceSchemas();
+    c.SchemaFilter<AppTrack.Api.Swagger.NullableEnumSchemaFilter>();
 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
