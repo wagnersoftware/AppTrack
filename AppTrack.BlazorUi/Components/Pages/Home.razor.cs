@@ -113,6 +113,7 @@ public partial class Home
         if (result is { Canceled: true }) return;
         if (result?.Data is not JobApplicationModel updatedModel) return;
 
+        updatedModel.AiTextHistory = model.AiTextHistory;
         var index = _jobApplications.IndexOf(model);
         if (index >= 0)
             _jobApplications[index] = updatedModel;

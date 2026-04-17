@@ -25,7 +25,7 @@ public class UpdateJobApplicationCommandHandler : IRequestHandler<UpdateJobAppli
             throw new BadRequestException($"Invalid JobApplication", validationResult);
         }
 
-        var jobApplicationToUpdate = await _jobApplicationRepository.GetByIdWithAiTextHistoryAsync(request.Id);
+        var jobApplicationToUpdate = await _jobApplicationRepository.GetByIdAsync(request.Id);
 
         if (jobApplicationToUpdate == null)
         {

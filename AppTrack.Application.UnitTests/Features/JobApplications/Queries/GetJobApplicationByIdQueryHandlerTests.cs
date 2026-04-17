@@ -42,6 +42,14 @@ public class GetJobApplicationByIdQueryHandlerTests
         _mockRepo
             .Setup(r => r.GetByIdAsync(It.Is<int>(id => id != ExistingId)))
             .ReturnsAsync((JobApplication?)null);
+
+        _mockRepo
+            .Setup(r => r.GetByIdWithAiTextHistoryAsync(ExistingId))
+            .ReturnsAsync(existingEntity);
+
+        _mockRepo
+            .Setup(r => r.GetByIdWithAiTextHistoryAsync(It.Is<int>(id => id != ExistingId)))
+            .ReturnsAsync((JobApplication?)null);
     }
 
     [Fact]
