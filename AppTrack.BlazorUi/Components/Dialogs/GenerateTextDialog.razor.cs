@@ -91,9 +91,8 @@ public partial class GenerateTextDialog : IDisposable
         ErrorHandlingService.ShowSuccess("Copied to clipboard.");
     }
 
-    private async Task CopyAndCloseAsync()
+    private void SaveAndCloseAsync()
     {
-        await JS.InvokeVoidAsync("navigator.clipboard.writeText", _generatedText);
         MudDialog.Close(DialogResult.Ok((_selectedPromptName, _generatedText)));
     }
 
