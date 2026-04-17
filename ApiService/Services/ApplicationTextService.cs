@@ -41,4 +41,11 @@ public class ApplicationTextService : BaseHttpService, IApplicationTextService
             var dto = await _client.PromptNamesAsync();
             return dto.Names.ToList();
         });
+
+    public Task<Response<bool>> DeleteAiTextAsync(int id) =>
+        TryExecuteAsync(async () =>
+        {
+            await _client.AiTextAsync(id);
+            return true;
+        });
 }

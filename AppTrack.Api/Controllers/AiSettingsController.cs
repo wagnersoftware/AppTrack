@@ -1,5 +1,6 @@
 using AppTrack.Api.Models;
 using AppTrack.Application.Contracts.Mediator;
+using AppTrack.Application.Features.AiSettings.Commands.DeleteAiText;
 using AppTrack.Application.Features.AiSettings.Commands.GenerateAiText;
 using AppTrack.Application.Features.AiSettings.Commands.UpdateAiSettings;
 using AppTrack.Application.Features.AiSettings.Dto;
@@ -59,5 +60,16 @@ public class AiSettingsController : ControllerBase
     {
         var result = await _mediator.Send(new GetChatModelsQuery());
         return Ok(result);
+    }
+
+    // DELETE /api/ai-settings/ai-text/{id}
+    [HttpDelete("ai-text/{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult> DeleteAiText([FromRoute] int id)
+    {
+        await _mediator.Send(new DeleteAiTextCommand { Id = id });
+        return NoContent();
     }
 }

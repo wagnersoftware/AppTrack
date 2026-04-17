@@ -13,6 +13,7 @@ internal static class JobApplicationMappings
         URL = dto.Url ?? string.Empty,
         AiTextHistory = dto.AiTextHistory?.Select(x => new JobApplicationAiTextModel
         {
+            Id = x.Id,
             PromptKey = x.PromptKey ?? string.Empty,
             GeneratedText = x.GeneratedText ?? string.Empty,
             GeneratedAt = x.GeneratedAt,

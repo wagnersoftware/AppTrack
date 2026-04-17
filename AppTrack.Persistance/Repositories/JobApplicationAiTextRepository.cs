@@ -14,6 +14,11 @@ public class JobApplicationAiTextRepository : IJobApplicationAiTextRepository
         _context = context;
     }
 
+    public Task<JobApplicationAiText?> GetByIdAsync(int id) =>
+        _context.JobApplicationAiTexts
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Id == id);
+
     public Task<int> CountByJobApplicationAndPromptAsync(int jobApplicationId, string promptKey) =>
         _context.JobApplicationAiTexts
             .CountAsync(x => x.JobApplicationId == jobApplicationId && x.PromptKey == promptKey);

@@ -44,6 +44,7 @@ internal static class JobApplicationMappings
         URL = entity.URL,
         AiTextHistory = entity.AiTextHistory.Select(x => new JobApplicationAiTextDto
         {
+            Id = x.Id,
             PromptKey = x.PromptKey,
             GeneratedText = x.GeneratedText,
             GeneratedAt = x.GeneratedAt,

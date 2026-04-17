@@ -10,4 +10,6 @@ public interface IApplicationTextService
     Task<Response<GeneratedPromptModel>> GeneratePrompt(int jobApplicationId, string promptKey);
 
     Task<Response<List<string>>> GetPromptNames();
+
+    Task<Response<bool>> DeleteAiTextAsync(int id);
 }

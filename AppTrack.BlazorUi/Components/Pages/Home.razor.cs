@@ -167,7 +167,9 @@ public partial class Home
             { x => x.JobApplication, model }
         };
 
-        await DialogService.ShowAsync<AiTextHistoryDialog>("", parameters, _generateTextDialogOptions);
+        var dialog = await DialogService.ShowAsync<AiTextHistoryDialog>("", parameters, _generateTextDialogOptions);
+        await dialog.Result;
+        await InvokeAsync(StateHasChanged);
     }
 
     private async Task DeleteJobApplicationAsync(JobApplicationModel model)
