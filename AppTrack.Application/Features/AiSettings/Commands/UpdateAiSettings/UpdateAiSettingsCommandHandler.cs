@@ -3,22 +3,24 @@ using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Exceptions;
 using AppTrack.Application.Features.AiSettings.Dto;
 using AppTrack.Application.Mappings;
+using FluentValidation;
 
 namespace AppTrack.Application.Features.AiSettings.Commands.UpdateAiSettings;
 
 public class UpdateAiSettingsCommandHandler : IRequestHandler<UpdateAiSettingsCommand, AiSettingsDto>
 {
     private readonly IAiSettingsRepository _aiSettingsRepository;
+    private readonly IValidator<UpdateAiSettingsCommand> _validator;
 
-    public UpdateAiSettingsCommandHandler(IAiSettingsRepository aiSettingsRepository)
+    public UpdateAiSettingsCommandHandler(IAiSettingsRepository aiSettingsRepository, IValidator<UpdateAiSettingsCommand> validator)
     {
         _aiSettingsRepository = aiSettingsRepository;
+        _validator = validator;
     }
 
     public async Task<AiSettingsDto> Handle(UpdateAiSettingsCommand request, CancellationToken cancellationToken)
     {
-        var validator = new UpdateAiSettingsCommandValidator(_aiSettingsRepository);
-        var validationResult = await validator.ValidateAsync(request);
+        var validationResult = await _validator.ValidateAsync(request);
 
         if (validationResult.Errors.Any())
         {

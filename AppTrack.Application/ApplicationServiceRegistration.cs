@@ -1,6 +1,7 @@
 ﻿using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Domain.Contracts;
 using AppTrack.Domain.Services;
+using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
@@ -16,6 +17,8 @@ namespace AppTrack.Application
                 .AddClasses(c => c.AssignableTo(typeof(IRequestHandler<,>)))
                 .AsImplementedInterfaces()
                 .WithTransientLifetime());
+
+            services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly(), includeInternalTypes: true);
 
             services.AddSingleton<IPromptBuilder, PromptBuilder>();
 

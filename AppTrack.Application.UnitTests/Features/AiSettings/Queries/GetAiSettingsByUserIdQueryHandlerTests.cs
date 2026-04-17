@@ -2,6 +2,8 @@ using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Features.AiSettings.Dto;
 using AppTrack.Application.Features.AiSettings.Queries.GetAiSettingsByUserId;
 using AppTrack.Domain;
+using FluentValidation;
+using FluentValidation.Results;
 using Moq;
 using Shouldly;
 using DomainAiSettings = AppTrack.Domain.AiSettings;
@@ -12,16 +14,21 @@ public class GetAiSettingsByUserIdQueryHandlerTests
 {
     private readonly Mock<IAiSettingsRepository> _mockRepo = new();
     private readonly Mock<IBuiltInPromptRepository> _mockBuiltInPromptRepo = new();
+    private readonly Mock<IValidator<GetAiSettingsByUserIdQuery>> _mockValidator = new();
 
     public GetAiSettingsByUserIdQueryHandlerTests()
     {
         _mockBuiltInPromptRepo
             .Setup(r => r.GetAsync())
             .ReturnsAsync(new List<BuiltInPrompt>());
+
+        _mockValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<GetAiSettingsByUserIdQuery>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult());
     }
 
     private GetAiSettingsByUserIdQueryHandler CreateHandler() =>
-        new(_mockRepo.Object, _mockBuiltInPromptRepo.Object);
+        new(_mockRepo.Object, _mockBuiltInPromptRepo.Object, _mockValidator.Object);
 
     [Fact]
     public async Task Handle_ShouldReturnExistingAiSettings_WhenAiSettingsExistForUser()

@@ -4,6 +4,8 @@ using AppTrack.Application.Exceptions;
 using AppTrack.Application.Features.FreelancerProfile.Commands.UploadCv;
 using AppTrack.Application.Features.FreelancerProfile.Dto;
 using AppTrack.Application.UnitTests.Mocks;
+using FluentValidation;
+using FluentValidation.Results;
 using Moq;
 using Shouldly;
 
@@ -14,6 +16,7 @@ public class UploadCvCommandHandlerTests
     private readonly Mock<IFreelancerProfileRepository> _mockRepo;
     private readonly Mock<ICvStorageService> _mockStorage;
     private readonly Mock<IPdfTextExtractor> _mockExtractor;
+    private readonly Mock<IValidator<UploadCvCommand>> _mockValidator;
     private readonly UploadCvCommandHandler _handler;
 
     public UploadCvCommandHandlerTests()
@@ -21,7 +24,13 @@ public class UploadCvCommandHandlerTests
         _mockRepo = MockFreelancerProfileRepository.GetMock();
         _mockStorage = MockCvStorageService.GetMock();
         _mockExtractor = MockPdfTextExtractor.GetMock();
-        _handler = new UploadCvCommandHandler(_mockRepo.Object, _mockStorage.Object, _mockExtractor.Object);
+        _mockValidator = new Mock<IValidator<UploadCvCommand>>();
+
+        _mockValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<UploadCvCommand>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult());
+
+        _handler = new UploadCvCommandHandler(_mockRepo.Object, _mockStorage.Object, _mockExtractor.Object, _mockValidator.Object);
     }
 
     private static UploadCvCommand ValidCommand(string userId = MockFreelancerProfileRepository.ExistingUserId) => new()
@@ -76,6 +85,10 @@ public class UploadCvCommandHandlerTests
     [Fact]
     public async Task Handle_ShouldThrowBadRequestException_WhenValidationFails()
     {
+        _mockValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<UploadCvCommand>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult([new ValidationFailure("FileName", "File name is required.")]));
+
         var command = ValidCommand();
         command.FileName = string.Empty;
 
@@ -85,6 +98,10 @@ public class UploadCvCommandHandlerTests
     [Fact]
     public async Task Handle_ShouldNotCallStorage_WhenValidationFails()
     {
+        _mockValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<UploadCvCommand>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult([new ValidationFailure("ContentType", "Only PDF files are allowed.")]));
+
         var command = ValidCommand();
         command.ContentType = "image/png";
         command.FileName = "photo.png";

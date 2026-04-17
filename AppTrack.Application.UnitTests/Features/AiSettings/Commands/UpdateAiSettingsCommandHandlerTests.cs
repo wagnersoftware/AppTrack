@@ -4,6 +4,8 @@ using AppTrack.Application.Features.AiSettings.Commands.UpdateAiSettings;
 using AppTrack.Application.Features.AiSettings.Dto;
 using AppTrack.Application.UnitTests.Mocks;
 using AppTrack.Domain.Enums;
+using FluentValidation;
+using FluentValidation.Results;
 using Moq;
 using Shouldly;
 using DomainAiSettings = AppTrack.Domain.AiSettings;
@@ -17,12 +19,19 @@ public class UpdateAiSettingsCommandHandlerTests
     private const int ExistingId = 1;
 
     private readonly Mock<IAiSettingsRepository> _mockRepo;
+    private readonly Mock<IValidator<UpdateAiSettingsCommand>> _mockValidator;
     private readonly UpdateAiSettingsCommandHandler _handler;
 
     public UpdateAiSettingsCommandHandlerTests()
     {
         _mockRepo = MockAiSettingsRepository.GetMock();
-        _handler = new UpdateAiSettingsCommandHandler(_mockRepo.Object);
+        _mockValidator = new Mock<IValidator<UpdateAiSettingsCommand>>();
+
+        _mockValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<UpdateAiSettingsCommand>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult());
+
+        _handler = new UpdateAiSettingsCommandHandler(_mockRepo.Object, _mockValidator.Object);
     }
 
     private static UpdateAiSettingsCommand BuildValidCommand(int id = ExistingId, string userId = OwnerId) => new()
@@ -79,6 +88,10 @@ public class UpdateAiSettingsCommandHandlerTests
     [Fact]
     public async Task Handle_ShouldThrowBadRequestException_WhenIdIsZero()
     {
+        _mockValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<UpdateAiSettingsCommand>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult([new ValidationFailure("Id", "Id is required")]));
+
         var command = BuildValidCommand(id: 0);
 
         var ex = await Should.ThrowAsync<BadRequestException>(() => _handler.Handle(command, CancellationToken.None));
@@ -89,6 +102,10 @@ public class UpdateAiSettingsCommandHandlerTests
     [Fact]
     public async Task Handle_ShouldThrowBadRequestException_WhenAiSettingsDoesNotExist()
     {
+        _mockValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<UpdateAiSettingsCommand>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult([new ValidationFailure("Id", "Ai settings not found.")]));
+
         var command = BuildValidCommand(id: 9999);
 
         var ex = await Should.ThrowAsync<BadRequestException>(() => _handler.Handle(command, CancellationToken.None));
@@ -100,6 +117,10 @@ public class UpdateAiSettingsCommandHandlerTests
     [Fact]
     public async Task Handle_ShouldThrowBadRequestException_WhenAiSettingsBelongsToAnotherUser()
     {
+        _mockValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<UpdateAiSettingsCommand>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult([new ValidationFailure("UserId", "Ai settings not assigned to this user.")]));
+
         var command = BuildValidCommand(id: ExistingId, userId: OtherId);
 
         var ex = await Should.ThrowAsync<BadRequestException>(() => _handler.Handle(command, CancellationToken.None));
@@ -111,6 +132,10 @@ public class UpdateAiSettingsCommandHandlerTests
     [Fact]
     public async Task Handle_ShouldNotCallUpdateAsync_WhenValidationFails()
     {
+        _mockValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<UpdateAiSettingsCommand>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult([new ValidationFailure("Id", "Ai settings not found.")]));
+
         var command = BuildValidCommand(id: 9999);
 
         await Should.ThrowAsync<BadRequestException>(() => _handler.Handle(command, CancellationToken.None));

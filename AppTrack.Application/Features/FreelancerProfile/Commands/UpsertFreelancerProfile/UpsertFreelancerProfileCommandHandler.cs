@@ -4,6 +4,7 @@ using AppTrack.Application.Exceptions;
 using AppTrack.Application.Features.FreelancerProfile.Dto;
 using AppTrack.Application.Mappings;
 using AppTrack.Domain;
+using FluentValidation;
 
 namespace AppTrack.Application.Features.FreelancerProfile.Commands.UpsertFreelancerProfile;
 
@@ -12,21 +13,23 @@ public class UpsertFreelancerProfileCommandHandler : IRequestHandler<UpsertFreel
     private readonly IFreelancerProfileRepository _repository;
     private readonly IAiSettingsRepository _aiSettingsRepository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IValidator<UpsertFreelancerProfileCommand> _validator;
 
     public UpsertFreelancerProfileCommandHandler(
         IFreelancerProfileRepository repository,
         IAiSettingsRepository aiSettingsRepository,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        IValidator<UpsertFreelancerProfileCommand> validator)
     {
         _repository = repository;
         _aiSettingsRepository = aiSettingsRepository;
         _unitOfWork = unitOfWork;
+        _validator = validator;
     }
 
     public async Task<FreelancerProfileDto> Handle(UpsertFreelancerProfileCommand request, CancellationToken cancellationToken)
     {
-        var validator = new UpsertFreelancerProfileCommandValidator();
-        var validationResult = await validator.ValidateAsync(request, cancellationToken);
+        var validationResult = await _validator.ValidateAsync(request, cancellationToken);
 
         if (validationResult.Errors.Count > 0)
         {

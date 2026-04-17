@@ -1,6 +1,8 @@
 using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Features.JobApplicationDefaults.Dto;
 using AppTrack.Application.Features.JobApplicationDefaults.Queries.GetJobApplicationDefaultsByUserId;
+using FluentValidation;
+using FluentValidation.Results;
 using Moq;
 using Shouldly;
 using DomainJobApplicationDefaults = AppTrack.Domain.JobApplicationDefaults;
@@ -10,11 +12,20 @@ namespace AppTrack.Application.UnitTests.Features.JobApplicationDefaults.Queries
 public class GetJobApplicationDefaultsByUserIdQueryHandlerTests
 {
     private readonly Mock<IJobApplicationDefaultsRepository> _mockRepo;
+    private readonly Mock<IValidator<GetJobApplicationDefaultsByUserIdQuery>> _mockValidator;
 
     public GetJobApplicationDefaultsByUserIdQueryHandlerTests()
     {
         _mockRepo = new Mock<IJobApplicationDefaultsRepository>();
+        _mockValidator = new Mock<IValidator<GetJobApplicationDefaultsByUserIdQuery>>();
+
+        _mockValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<GetJobApplicationDefaultsByUserIdQuery>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult());
     }
+
+    private GetJobApplicationDefaultsByUserIdQueryHandler CreateHandler() =>
+        new(_mockRepo.Object, _mockValidator.Object);
 
     [Fact]
     public async Task Handle_ShouldReturnExistingDefaults_WhenDefaultsExistForUser()
@@ -34,9 +45,8 @@ public class GetJobApplicationDefaultsByUserIdQueryHandlerTests
             .ReturnsAsync(existingDefaults);
 
         var query = new GetJobApplicationDefaultsByUserIdQuery { UserId = userId };
-        var handler = new GetJobApplicationDefaultsByUserIdQueryHandler(_mockRepo.Object);
 
-        var result = await handler.Handle(query, CancellationToken.None);
+        var result = await CreateHandler().Handle(query, CancellationToken.None);
 
         result.ShouldNotBeNull();
         result.ShouldBeOfType<JobApplicationDefaultsDto>();
@@ -68,9 +78,8 @@ public class GetJobApplicationDefaultsByUserIdQueryHandlerTests
             .ReturnsAsync(newDefaults);
 
         var query = new GetJobApplicationDefaultsByUserIdQuery { UserId = userId };
-        var handler = new GetJobApplicationDefaultsByUserIdQueryHandler(_mockRepo.Object);
 
-        var result = await handler.Handle(query, CancellationToken.None);
+        var result = await CreateHandler().Handle(query, CancellationToken.None);
 
         result.ShouldNotBeNull();
         result.ShouldBeOfType<JobApplicationDefaultsDto>();

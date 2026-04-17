@@ -3,16 +3,19 @@ using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Exceptions;
 using AppTrack.Application.Features.JobApplicationDefaults.Dto;
 using AppTrack.Application.Mappings;
+using FluentValidation;
 
 namespace AppTrack.Application.Features.JobApplicationDefaults.Queries.GetJobApplicationDefaultsByUserId
 {
     public class GetJobApplicationDefaultsByUserIdQueryHandler : IRequestHandler<GetJobApplicationDefaultsByUserIdQuery, JobApplicationDefaultsDto>
     {
         private readonly IJobApplicationDefaultsRepository _jobApplicationDefaultsRepository;
+        private readonly IValidator<GetJobApplicationDefaultsByUserIdQuery> _validator;
 
-        public GetJobApplicationDefaultsByUserIdQueryHandler(IJobApplicationDefaultsRepository jobApplicationRepository)
+        public GetJobApplicationDefaultsByUserIdQueryHandler(IJobApplicationDefaultsRepository jobApplicationRepository, IValidator<GetJobApplicationDefaultsByUserIdQuery> validator)
         {
             this._jobApplicationDefaultsRepository = jobApplicationRepository;
+            _validator = validator;
         }
 
         /// <summary>
@@ -24,8 +27,7 @@ namespace AppTrack.Application.Features.JobApplicationDefaults.Queries.GetJobApp
         /// <exception cref="BadRequestException"></exception>
         public async Task<JobApplicationDefaultsDto> Handle(GetJobApplicationDefaultsByUserIdQuery request, CancellationToken cancellationToken)
         {
-            var validator = new GetJobApplicationDefaultsByUserIdQueryValidator();
-            var validationResult = await validator.ValidateAsync(request);
+            var validationResult = await _validator.ValidateAsync(request);
 
             if (validationResult.Errors.Any())
             {

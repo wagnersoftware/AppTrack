@@ -4,6 +4,7 @@ using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Exceptions;
 using AppTrack.Application.Features.JobApplications.Dto;
 using AppTrack.Domain;
+using FluentValidation;
 
 namespace AppTrack.Application.Features.AiSettings.Commands.GenerateAiText;
 
@@ -11,28 +12,27 @@ public class GenerateAiTextCommandHandler : IRequestHandler<GenerateAiTextComman
 {
     private readonly IAiTextGenerator _aiTextGenerator;
     private readonly IAiSettingsRepository _aiSettingsRepository;
-    private readonly IJobApplicationRepository _jobApplicationRepository;
     private readonly IChatModelRepository _chatModelRepository;
     private readonly IJobApplicationAiTextRepository _aiTextRepository;
+    private readonly IValidator<GenerateAiTextCommand> _validator;
 
     public GenerateAiTextCommandHandler(IAiTextGenerator aiTextGenerator,
                                         IAiSettingsRepository aiSettingsRepository,
-                                        IJobApplicationRepository jobApplicationRepository,
                                         IChatModelRepository chatModelRepository,
-                                        IJobApplicationAiTextRepository aiTextRepository)
+                                        IJobApplicationAiTextRepository aiTextRepository,
+                                        IValidator<GenerateAiTextCommand> validator)
     {
         _aiTextGenerator = aiTextGenerator;
         _aiSettingsRepository = aiSettingsRepository;
-        _jobApplicationRepository = jobApplicationRepository;
         _chatModelRepository = chatModelRepository;
         _aiTextRepository = aiTextRepository;
+        _validator = validator;
     }
 
     public async Task<GeneratedAiTextDto> Handle(GenerateAiTextCommand request, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        var validator = new GenerateAiTextCommandValidator(_jobApplicationRepository, _aiSettingsRepository, _chatModelRepository);
-        var validationResult = await validator.ValidateAsync(request);
+        var validationResult = await _validator.ValidateAsync(request);
 
         if (validationResult.Errors.Count > 0)
         {

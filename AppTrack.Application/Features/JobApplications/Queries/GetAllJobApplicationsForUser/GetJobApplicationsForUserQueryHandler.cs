@@ -4,6 +4,7 @@ using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Exceptions;
 using AppTrack.Application.Features.JobApplications.Dto;
 using AppTrack.Application.Mappings;
+using FluentValidation;
 
 namespace AppTrack.Application.Features.JobApplications.Queries.GetAllJobApplicationsForUser;
 
@@ -11,17 +12,18 @@ public class GetJobApplicationsForUserQueryHandler : IRequestHandler<GetJobAppli
 {
     private readonly IJobApplicationRepository _jobApplicationRepository;
     private readonly IAppLogger<GetJobApplicationsForUserQueryHandler> _logger;
+    private readonly IValidator<GetJobApplicationsForUserQuery> _validator;
 
-    public GetJobApplicationsForUserQueryHandler(IJobApplicationRepository jobApplicationRepository, IAppLogger<GetJobApplicationsForUserQueryHandler> logger)
+    public GetJobApplicationsForUserQueryHandler(IJobApplicationRepository jobApplicationRepository, IAppLogger<GetJobApplicationsForUserQueryHandler> logger, IValidator<GetJobApplicationsForUserQuery> validator)
     {
         _jobApplicationRepository = jobApplicationRepository;
         _logger = logger;
+        _validator = validator;
     }
 
     public async Task<List<JobApplicationDto>> Handle(GetJobApplicationsForUserQuery request, CancellationToken cancellationToken)
     {
-        var validator = new GetJobApplicationsForUserQueryValidator();
-        var validationResult = await validator.ValidateAsync(request);
+        var validationResult = await _validator.ValidateAsync(request);
 
         if (validationResult.Errors.Any())
         {

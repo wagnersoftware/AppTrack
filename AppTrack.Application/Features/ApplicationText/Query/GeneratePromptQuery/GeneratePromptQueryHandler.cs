@@ -5,6 +5,7 @@ using AppTrack.Application.Features.ApplicationText.Dto;
 using AppTrack.Domain;
 using AppTrack.Domain.Contracts;
 using AppTrack.Domain.Extensions;
+using FluentValidation;
 
 namespace AppTrack.Application.Features.ApplicationText.Query.GeneratePromptQuery;
 
@@ -14,23 +15,25 @@ public class GeneratePromptQueryHandler : IRequestHandler<GeneratePromptQuery, G
     private readonly IJobApplicationRepository _jobApplicationRepository;
     private readonly IPromptBuilder _promptBuilder;
     private readonly IBuiltInPromptRepository _builtInPromptRepository;
+    private readonly IValidator<GeneratePromptQuery> _validator;
 
     public GeneratePromptQueryHandler(
         IAiSettingsRepository aiSettingsRepository,
         IJobApplicationRepository jobApplicationRepository,
         IPromptBuilder promptBuilder,
-        IBuiltInPromptRepository builtInPromptRepository)
+        IBuiltInPromptRepository builtInPromptRepository,
+        IValidator<GeneratePromptQuery> validator)
     {
         _aiSettingsRepository = aiSettingsRepository;
         _jobApplicationRepository = jobApplicationRepository;
         _promptBuilder = promptBuilder;
         _builtInPromptRepository = builtInPromptRepository;
+        _validator = validator;
     }
 
     public async Task<GeneratedPromptDto> Handle(GeneratePromptQuery request, CancellationToken cancellationToken)
     {
-        var validator = new GeneratePromptQueryValidator(_jobApplicationRepository, _aiSettingsRepository, _builtInPromptRepository);
-        var validationResult = await validator.ValidateAsync(request);
+        var validationResult = await _validator.ValidateAsync(request);
 
         if (validationResult.Errors.Any())
             throw new BadRequestException("Invalid generate prompt request.", validationResult);

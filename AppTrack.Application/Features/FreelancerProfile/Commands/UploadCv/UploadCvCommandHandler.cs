@@ -4,6 +4,7 @@ using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Exceptions;
 using AppTrack.Application.Features.FreelancerProfile.Dto;
 using AppTrack.Application.Mappings;
+using FluentValidation;
 
 namespace AppTrack.Application.Features.FreelancerProfile.Commands.UploadCv;
 
@@ -12,21 +13,23 @@ public class UploadCvCommandHandler : IRequestHandler<UploadCvCommand, Freelance
     private readonly IFreelancerProfileRepository _repository;
     private readonly ICvStorageService _cvStorageService;
     private readonly IPdfTextExtractor _pdfTextExtractor;
+    private readonly IValidator<UploadCvCommand> _validator;
 
     public UploadCvCommandHandler(
         IFreelancerProfileRepository repository,
         ICvStorageService cvStorageService,
-        IPdfTextExtractor pdfTextExtractor)
+        IPdfTextExtractor pdfTextExtractor,
+        IValidator<UploadCvCommand> validator)
     {
         _repository = repository;
         _cvStorageService = cvStorageService;
         _pdfTextExtractor = pdfTextExtractor;
+        _validator = validator;
     }
 
     public async Task<FreelancerProfileDto> Handle(UploadCvCommand request, CancellationToken cancellationToken)
     {
-        var validator = new UploadCvCommandValidator();
-        var validationResult = await validator.ValidateAsync(request, cancellationToken);
+        var validationResult = await _validator.ValidateAsync(request, cancellationToken);
 
         if (validationResult.Errors.Count > 0)
         {

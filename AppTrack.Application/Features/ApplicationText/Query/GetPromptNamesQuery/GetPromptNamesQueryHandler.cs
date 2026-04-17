@@ -2,6 +2,7 @@ using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Exceptions;
 using AppTrack.Application.Features.ApplicationText.Dto;
+using FluentValidation;
 
 namespace AppTrack.Application.Features.ApplicationText.Query.GetPromptNamesQuery;
 
@@ -9,17 +10,18 @@ public class GetPromptNamesQueryHandler : IRequestHandler<GetPromptNamesQuery, G
 {
     private readonly IAiSettingsRepository _aiSettingsRepository;
     private readonly IBuiltInPromptRepository _builtInPromptRepository;
+    private readonly IValidator<GetPromptNamesQuery> _validator;
 
-    public GetPromptNamesQueryHandler(IAiSettingsRepository aiSettingsRepository, IBuiltInPromptRepository builtInPromptRepository)
+    public GetPromptNamesQueryHandler(IAiSettingsRepository aiSettingsRepository, IBuiltInPromptRepository builtInPromptRepository, IValidator<GetPromptNamesQuery> validator)
     {
         _aiSettingsRepository = aiSettingsRepository;
         _builtInPromptRepository = builtInPromptRepository;
+        _validator = validator;
     }
 
     public async Task<GetPromptNamesDto> Handle(GetPromptNamesQuery request, CancellationToken cancellationToken)
     {
-        var validator = new GetPromptNamesQueryValidator(_aiSettingsRepository);
-        var validationResult = await validator.ValidateAsync(request);
+        var validationResult = await _validator.ValidateAsync(request);
 
         if (validationResult.Errors.Any())
             throw new BadRequestException("Invalid request.", validationResult);

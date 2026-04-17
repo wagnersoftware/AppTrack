@@ -6,6 +6,8 @@ using AppTrack.Application.Features.ApplicationText.Query.GeneratePromptQuery;
 using AppTrack.Domain;
 using AppTrack.Domain.Contracts;
 using AppTrack.Domain.Enums;
+using FluentValidation;
+using FluentValidation.Results;
 using Moq;
 using Shouldly;
 using DomainAiSettings = AppTrack.Domain.AiSettings;
@@ -22,6 +24,7 @@ public class GeneratePromptQueryHandlerTests
     private readonly Mock<IJobApplicationRepository> _mockJobApplicationRepo;
     private readonly Mock<IPromptBuilder> _mockPromptBuilder;
     private readonly Mock<IBuiltInPromptRepository> _mockBuiltInPromptRepo;
+    private readonly Mock<IValidator<GeneratePromptQuery>> _mockValidator;
 
     public GeneratePromptQueryHandlerTests()
     {
@@ -29,6 +32,11 @@ public class GeneratePromptQueryHandlerTests
         _mockJobApplicationRepo = new Mock<IJobApplicationRepository>();
         _mockPromptBuilder = new Mock<IPromptBuilder>();
         _mockBuiltInPromptRepo = new Mock<IBuiltInPromptRepository>();
+        _mockValidator = new Mock<IValidator<GeneratePromptQuery>>();
+
+        _mockValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<GeneratePromptQuery>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult());
 
         var existingJobApplication = new JobApplication
         {
@@ -74,7 +82,7 @@ public class GeneratePromptQueryHandlerTests
     }
 
     private GeneratePromptQueryHandler CreateHandler() =>
-        new(_mockAiSettingsRepo.Object, _mockJobApplicationRepo.Object, _mockPromptBuilder.Object, _mockBuiltInPromptRepo.Object);
+        new(_mockAiSettingsRepo.Object, _mockJobApplicationRepo.Object, _mockPromptBuilder.Object, _mockBuiltInPromptRepo.Object, _mockValidator.Object);
 
     [Fact]
     public async Task Handle_ShouldReturnGeneratedPromptDto_WhenQueryIsValid()
@@ -118,6 +126,10 @@ public class GeneratePromptQueryHandlerTests
     [Fact]
     public async Task Handle_ShouldThrowBadRequestException_WhenJobApplicationDoesNotExist()
     {
+        _mockValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<GeneratePromptQuery>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult([new ValidationFailure("JobApplicationId", "Job application doesn't exist")]));
+
         var query = new GeneratePromptQuery { JobApplicationId = 9999, UserId = UserId, PromptKey = PromptKey };
         await Should.ThrowAsync<BadRequestException>(() => CreateHandler().Handle(query, CancellationToken.None));
     }
@@ -125,6 +137,10 @@ public class GeneratePromptQueryHandlerTests
     [Fact]
     public async Task Handle_ShouldThrowBadRequestException_WhenJobApplicationBelongsToAnotherUser()
     {
+        _mockValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<GeneratePromptQuery>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult([new ValidationFailure("JobApplicationId", "Job application doesn't exist")]));
+
         const string otherUserId = "user-other";
         _mockJobApplicationRepo
             .Setup(r => r.GetByIdAsync(JobApplicationId))
@@ -137,6 +153,10 @@ public class GeneratePromptQueryHandlerTests
     [Fact]
     public async Task Handle_ShouldThrowBadRequestException_WhenAiSettingsDoNotExistForUser()
     {
+        _mockValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<GeneratePromptQuery>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult([new ValidationFailure("UserId", "AI settings not found for this user.")]));
+
         const string noSettingsUser = "user-no-settings";
 
         _mockAiSettingsRepo
