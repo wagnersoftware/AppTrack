@@ -1,0 +1,38 @@
+<MudDialog Class="apptrack-dialog">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Outlined.History" Class="mr-2" />
+            AI Text History
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        @if (JobApplication.AiTextHistory.Count == 0)
+        {
+            <MudText Typo="Typo.body2" Color="Color.Secondary">No AI text history available.</MudText>
+        }
+        else
+        {
+            <MudExpansionPanels MultiExpansion="true">
+                @foreach (var group in JobApplication.AiTextHistory.GroupBy(x => x.PromptKey))
+                {
+                    <MudExpansionPanel Text="@($"{group.Key} ({group.Count()})")">
+                        @foreach (var entry in group.OrderByDescending(x => x.GeneratedAt))
+                        {
+                            <MudPaper Class="pa-3 mb-2" Elevation="0" Outlined="true">
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">@entry.GeneratedAt.ToString("g")</MudText>
+                                <MudText Typo="Typo.body2" Class="mt-1" Style="white-space: pre-wrap;">@entry.GeneratedText</MudText>
+                                <MudButton Size="Size.Small"
+                                           StartIcon="@Icons.Material.Outlined.ContentCopy"
+                                           OnClick="@(() => CopyTextAsync(entry.GeneratedText))"
+                                           Class="mt-1">Copy</MudButton>
+                            </MudPaper>
+                        }
+                    </MudExpansionPanel>
+                }
+            </MudExpansionPanels>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Text" OnClick="Close">Close</MudButton>
+    </DialogActions>
+</MudDialog>

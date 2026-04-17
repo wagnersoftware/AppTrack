@@ -3,7 +3,6 @@ using AppTrack.Frontend.ApiService.Contracts;
 using AppTrack.Frontend.Models;
 using AppTrack.Frontend.Models.ModelValidator;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 using MudBlazor;
 namespace AppTrack.BlazorUi.Components.Dialogs;
 
@@ -12,8 +11,6 @@ public partial class EditJobApplicationDialog
     [Inject] private IJobApplicationService JobApplicationService { get; set; } = null!;
     [Inject] private IModelValidator<JobApplicationModel> ModelValidator { get; set; } = null!;
     [Inject] private IErrorHandlingService ErrorHandlingService { get; set; } = null!;
-    [Inject] private IJSRuntime JSRuntime { get; set; } = null!;
-    [Inject] private ISnackbar Snackbar { get; set; } = null!;
 
     [CascadingParameter] private IMudDialogInstance MudDialog { get; set; } = null!;
 
@@ -117,13 +114,6 @@ public partial class EditJobApplicationDialog
         if (response.Data is null) return;
 
         MudDialog.Close(DialogResult.Ok(response.Data));
-    }
-
-    private async Task CopyTextAsync(string text)
-    {
-        if (string.IsNullOrEmpty(text)) return;
-        await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", text);
-        Snackbar.Add("Copied to clipboard", Severity.Success);
     }
 
     private void Cancel() => MudDialog.Cancel();

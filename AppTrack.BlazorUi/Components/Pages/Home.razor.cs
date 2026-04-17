@@ -160,6 +160,16 @@ public partial class Home
         await InvokeAsync(StateHasChanged);
     }
 
+    private async Task OpenAiTextHistoryAsync(JobApplicationModel model)
+    {
+        var parameters = new DialogParameters<AiTextHistoryDialog>
+        {
+            { x => x.JobApplication, model }
+        };
+
+        await DialogService.ShowAsync<AiTextHistoryDialog>("", parameters, _generateTextDialogOptions);
+    }
+
     private async Task DeleteJobApplicationAsync(JobApplicationModel model)
     {
         _deleteConfirmMessage = $"Are you sure you want to delete '{model.Name}'?";
