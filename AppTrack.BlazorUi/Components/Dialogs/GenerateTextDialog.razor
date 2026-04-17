@@ -17,12 +17,12 @@
         {
             <MudSelect T="string"
                        Label="Prompt"
-                       Value="_selectedPromptName"
-                       ValueChanged="OnPromptNameChangedAsync"
+                       Value="_selectedPromptKey"
+                       ValueChanged="OnPromptKeyChangedAsync"
                        Variant="Variant.Outlined"
                        Disabled="@_isReloadingPrompt"
                        Class="mb-3">
-                @foreach (var name in PromptNames)
+                @foreach (var name in PromptKeys)
                 {
                     <MudSelectItem Value="@name">@name</MudSelectItem>
                 }

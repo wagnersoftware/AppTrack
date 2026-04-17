@@ -14,16 +14,15 @@ public class JobApplicationAiTextRepository : IJobApplicationAiTextRepository
         _context = context;
     }
 
-    public Task<int> CountByJobApplicationAndPromptAsync(int jobApplicationId, string promptName) =>
+    public Task<int> CountByJobApplicationAndPromptAsync(int jobApplicationId, string promptKey) =>
         _context.JobApplicationAiTexts
-            .CountAsync(x => x.JobApplicationId == jobApplicationId && x.PromptName == promptName);
+            .CountAsync(x => x.JobApplicationId == jobApplicationId && x.PromptKey == promptKey);
 
-    public Task<List<JobApplicationAiText>> GetOldestByJobApplicationAndPromptAsync(int jobApplicationId, string promptName, int keepNewest) =>
+    public Task<JobApplicationAiText?> GetOldestByJobApplicationAndPromptAsync(int jobApplicationId, string promptKey) =>
         _context.JobApplicationAiTexts
-            .Where(x => x.JobApplicationId == jobApplicationId && x.PromptName == promptName)
-            .OrderByDescending(x => x.GeneratedAt)
-            .Skip(keepNewest)
-            .ToListAsync();
+            .Where(x => x.JobApplicationId == jobApplicationId && x.PromptKey == promptKey)
+            .OrderBy(x => x.GeneratedAt)
+            .FirstOrDefaultAsync();
 
     public async Task AddAsync(JobApplicationAiText aiText)
     {

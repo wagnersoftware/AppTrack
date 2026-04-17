@@ -10,7 +10,7 @@ public class JobApplicationAiTextConfiguration : IEntityTypeConfiguration<JobApp
     {
         builder.ToTable("JobApplicationAiTexts");
 
-        builder.Property(x => x.PromptName)
+        builder.Property(x => x.PromptKey)
             .IsRequired()
             .HasMaxLength(200);
 
@@ -26,6 +26,6 @@ public class JobApplicationAiTextConfiguration : IEntityTypeConfiguration<JobApp
             .HasForeignKey(x => x.JobApplicationId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasIndex(x => new { x.JobApplicationId, x.PromptName });
+        builder.HasIndex(x => new { x.JobApplicationId, x.PromptKey });
     }
 }

@@ -46,21 +46,19 @@ public class GenerateAiTextCommandHandler : IRequestHandler<GenerateAiTextComman
 
         var generatedText = await _aiTextGenerator.GenerateAiTextAsync(request.Prompt, chatModelName, aiSettings.Language, cancellationToken);
 
-        // Enforce max 5 history entries per (JobApplicationId, PromptName)
+        // Enforce max 5 history entries per (JobApplicationId, PromptKey)
         var count = await _aiTextRepository.CountByJobApplicationAndPromptAsync(request.JobApplicationId, request.PromptKey);
         if (count >= 5)
         {
-            var toDelete = await _aiTextRepository.GetOldestByJobApplicationAndPromptAsync(request.JobApplicationId, request.PromptKey, 4);
-            foreach (var old in toDelete)
-            {
-                await _aiTextRepository.DeleteAsync(old);
-            }
+            var oldest = await _aiTextRepository.GetOldestByJobApplicationAndPromptAsync(request.JobApplicationId, request.PromptKey);
+            if (oldest != null)
+                await _aiTextRepository.DeleteAsync(oldest);
         }
 
         await _aiTextRepository.AddAsync(new JobApplicationAiText
         {
             JobApplicationId = request.JobApplicationId,
-            PromptName = request.PromptKey,
+            PromptKey = request.PromptKey,
             GeneratedText = generatedText,
             GeneratedAt = DateTime.UtcNow,
         });

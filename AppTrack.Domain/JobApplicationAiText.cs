@@ -4,7 +4,7 @@ public class JobApplicationAiText
 {
     public int Id { get; set; }
     public int JobApplicationId { get; set; }
-    public string PromptName { get; set; } = string.Empty;
+    public string PromptKey { get; set; } = string.Empty;
     public string GeneratedText { get; set; } = string.Empty;
     public DateTime GeneratedAt { get; set; }
 

@@ -4,8 +4,8 @@ namespace AppTrack.Application.Contracts.Persistance;
 
 public interface IJobApplicationAiTextRepository
 {
-    Task<int> CountByJobApplicationAndPromptAsync(int jobApplicationId, string promptName);
-    Task<List<JobApplicationAiText>> GetOldestByJobApplicationAndPromptAsync(int jobApplicationId, string promptName, int keepNewest);
+    Task<int> CountByJobApplicationAndPromptAsync(int jobApplicationId, string promptKey);
+    Task<JobApplicationAiText?> GetOldestByJobApplicationAndPromptAsync(int jobApplicationId, string promptKey);
     Task AddAsync(JobApplicationAiText aiText);
     Task DeleteAsync(JobApplicationAiText aiText);
 }

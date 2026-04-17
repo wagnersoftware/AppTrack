@@ -137,23 +137,23 @@ public partial class Home
         var parameters = new DialogParameters<GenerateTextDialog>
         {
             { x => x.JobApplication, model },
-            { x => x.PromptNames, namesResponse.Data }
+            { x => x.PromptKeys, namesResponse.Data }
         };
 
         var dialog = await DialogService.ShowAsync<GenerateTextDialog>("", parameters, _generateTextDialogOptions);
         var result = await dialog.Result;
 
         if (result is { Canceled: true }) return;
-        if (result?.Data is not (string promptName, string generatedText)) return;
+        if (result?.Data is not (string promptKey, string generatedText)) return;
 
         model.AiTextHistory.Insert(0, new JobApplicationAiTextModel
         {
-            PromptName = promptName,
+            PromptKey = promptKey,
             GeneratedText = generatedText,
             GeneratedAt = DateTime.Now,
         });
         model.AiTextHistory = model.AiTextHistory
-            .GroupBy(x => x.PromptName)
+            .GroupBy(x => x.PromptKey)
             .SelectMany(g => g.OrderByDescending(x => x.GeneratedAt).Take(5))
             .OrderByDescending(x => x.GeneratedAt)
             .ToList();

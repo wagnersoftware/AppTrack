@@ -7,7 +7,7 @@ namespace AppTrack.Application.Features.ApplicationText.Query.GeneratePromptQuer
 public class GeneratePromptQuery : IRequest<GeneratedPromptDto>, IUserScopedRequest
 {
     public int JobApplicationId { get; set; }
-    public string PromptName { get; set; } = string.Empty;
+    public string PromptKey { get; set; } = string.Empty;
     [JsonIgnore]
     public string UserId { get; set; } = string.Empty;
 }

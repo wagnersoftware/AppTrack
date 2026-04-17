@@ -30,9 +30,7 @@ internal static class FreelancerProfileMappings
         AvailableFrom = dto.AvailableFrom.HasValue
             ? DateOnly.FromDateTime(dto.AvailableFrom.Value)
             : (DateOnly?)null,
-        WorkMode = dto.WorkMode.HasValue
-            ? (AppTrack.Frontend.Models.RemotePreference)(int)dto.WorkMode.Value
-            : (AppTrack.Frontend.Models.RemotePreference?)null,
+        WorkMode = (AppTrack.Frontend.Models.RemotePreference)(int)dto.WorkMode,
         Skills = dto.Skills,
         CreationDate = dto.CreationDate,
         ModifiedDate = dto.ModifiedDate,

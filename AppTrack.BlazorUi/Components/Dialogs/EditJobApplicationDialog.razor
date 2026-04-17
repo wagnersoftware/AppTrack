@@ -136,7 +136,7 @@
                 else
                 {
                     <MudExpansionPanels MultiExpansion="true">
-                        @foreach (var group in _model.AiTextHistory.GroupBy(x => x.PromptName))
+                        @foreach (var group in _model.AiTextHistory.GroupBy(x => x.PromptKey))
                         {
                             <MudExpansionPanel Text="@($"{group.Key} ({group.Count()})")">
                                 @foreach (var entry in group.OrderByDescending(x => x.GeneratedAt))

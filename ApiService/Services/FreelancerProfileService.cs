@@ -35,7 +35,7 @@ public class FreelancerProfileService : BaseHttpService, IFreelancerProfileServi
             await using var stream = file.OpenReadStream(maxAllowedSize: maxSize);
 #pragma warning restore S5693
             var fileParameter = new FileParameter(stream, file.Name, file.ContentType);
-            var dto = await _client.CvAsync(fileParameter);
+            var dto = await _client.CvPOSTAsync(fileParameter);
             return dto.ToModel();
         });
 
