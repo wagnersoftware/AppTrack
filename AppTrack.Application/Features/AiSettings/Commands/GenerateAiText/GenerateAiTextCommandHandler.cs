@@ -3,7 +3,7 @@ using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Exceptions;
 using AppTrack.Application.Features.JobApplications.Dto;
-using AppTrack.Domain.Contracts;
+using AppTrack.Domain;
 
 namespace AppTrack.Application.Features.AiSettings.Commands.GenerateAiText;
 
@@ -13,17 +13,19 @@ public class GenerateAiTextCommandHandler : IRequestHandler<GenerateAiTextComman
     private readonly IAiSettingsRepository _aiSettingsRepository;
     private readonly IJobApplicationRepository _jobApplicationRepository;
     private readonly IChatModelRepository _chatModelRepository;
+    private readonly IJobApplicationAiTextRepository _aiTextRepository;
 
     public GenerateAiTextCommandHandler(IAiTextGenerator aiTextGenerator,
                                         IAiSettingsRepository aiSettingsRepository,
                                         IJobApplicationRepository jobApplicationRepository,
                                         IChatModelRepository chatModelRepository,
-                                        IPromptBuilder promptBuilder)
+                                        IJobApplicationAiTextRepository aiTextRepository)
     {
-        this._aiTextGenerator = aiTextGenerator;
-        this._aiSettingsRepository = aiSettingsRepository;
-        this._jobApplicationRepository = jobApplicationRepository;
-        this._chatModelRepository = chatModelRepository;
+        _aiTextGenerator = aiTextGenerator;
+        _aiSettingsRepository = aiSettingsRepository;
+        _jobApplicationRepository = jobApplicationRepository;
+        _chatModelRepository = chatModelRepository;
+        _aiTextRepository = aiTextRepository;
     }
 
     public async Task<GeneratedAiTextDto> Handle(GenerateAiTextCommand request, CancellationToken cancellationToken)
@@ -37,20 +39,32 @@ public class GenerateAiTextCommandHandler : IRequestHandler<GenerateAiTextComman
             throw new BadRequestException($"Invalid Ai setting.", validationResult);
         }
 
-        //get Ai settings
         cancellationToken.ThrowIfCancellationRequested();
         var aiSettings = await _aiSettingsRepository.GetByUserIdWithPromptsReadOnlyAsync(request.UserId);
-        var chatModel= await _chatModelRepository.GetByIdAsync(aiSettings!.SelectedChatModelId);
+        var chatModel = await _chatModelRepository.GetByIdAsync(aiSettings!.SelectedChatModelId);
         var chatModelName = chatModel!.ApiModelName;
 
-        //generate ai text
         var generatedText = await _aiTextGenerator.GenerateAiTextAsync(request.Prompt, chatModelName, aiSettings.Language, cancellationToken);
 
-        //update the job application with generated text
-        var jobApplication = await _jobApplicationRepository.GetByIdAsync(request.JobApplicationId);
-        jobApplication!.ApplicationText = generatedText;
-        await _jobApplicationRepository.UpdateAsync(jobApplication);
+        // Enforce max 5 history entries per (JobApplicationId, PromptName)
+        var count = await _aiTextRepository.CountByJobApplicationAndPromptAsync(request.JobApplicationId, request.PromptKey);
+        if (count >= 5)
+        {
+            var toDelete = await _aiTextRepository.GetOldestByJobApplicationAndPromptAsync(request.JobApplicationId, request.PromptKey, 4);
+            foreach (var old in toDelete)
+            {
+                await _aiTextRepository.DeleteAsync(old);
+            }
+        }
 
-        return new GeneratedAiTextDto() { GeneratedText = generatedText };
+        await _aiTextRepository.AddAsync(new JobApplicationAiText
+        {
+            JobApplicationId = request.JobApplicationId,
+            PromptName = request.PromptKey,
+            GeneratedText = generatedText,
+            GeneratedAt = DateTime.UtcNow,
+        });
+
+        return new GeneratedAiTextDto { GeneratedText = generatedText };
     }
 }

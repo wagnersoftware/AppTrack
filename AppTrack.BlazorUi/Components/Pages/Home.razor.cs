@@ -143,9 +143,19 @@ public partial class Home
         var result = await dialog.Result;
 
         if (result is { Canceled: true }) return;
-        if (result?.Data is not string generatedText) return;
+        if (result?.Data is not (string promptName, string generatedText)) return;
 
-        model.ApplicationText = generatedText;
+        model.AiTextHistory.Insert(0, new JobApplicationAiTextModel
+        {
+            PromptName = promptName,
+            GeneratedText = generatedText,
+            GeneratedAt = DateTime.Now,
+        });
+        model.AiTextHistory = model.AiTextHistory
+            .GroupBy(x => x.PromptName)
+            .SelectMany(g => g.OrderByDescending(x => x.GeneratedAt).Take(5))
+            .OrderByDescending(x => x.GeneratedAt)
+            .ToList();
         await InvokeAsync(StateHasChanged);
     }
 

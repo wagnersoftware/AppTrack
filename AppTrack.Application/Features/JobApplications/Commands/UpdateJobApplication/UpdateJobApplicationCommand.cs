@@ -12,7 +12,6 @@ public class UpdateJobApplicationCommand : IRequest<JobApplicationDto>, IJobAppl
     public string Name { get; set; } = string.Empty;
     public string Position { get; set; } = string.Empty;
     public string URL { get; set; } = string.Empty;
-    public string ApplicationText { get; set; } = string.Empty;
     public JobApplicationStatus Status { get; set; } = JobApplicationStatus.New;
     [JsonIgnore]
     public string UserId { get; set; } = string.Empty;

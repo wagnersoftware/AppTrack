@@ -2291,9 +2291,6 @@ namespace AppTrack.Frontend.ApiService.Base
         [System.Text.Json.Serialization.JsonPropertyName("url")]
         public string Url { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("applicationText")]
-        public string ApplicationText { get; set; }
-
         [System.Text.Json.Serialization.JsonPropertyName("status")]
         public JobApplicationStatus Status { get; set; }
 
@@ -2409,6 +2406,9 @@ namespace AppTrack.Frontend.ApiService.Base
         [System.Text.Json.Serialization.JsonPropertyName("prompt")]
         public string Prompt { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("promptKey")]
+        public string PromptKey { get; set; }
+
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.6.3.0 (NJsonSchema v11.5.2.0 (Newtonsoft.Json v13.0.0.0))")]
@@ -2427,8 +2427,8 @@ namespace AppTrack.Frontend.ApiService.Base
     public partial class GeneratedApplicationTextDto
     {
 
-        [System.Text.Json.Serialization.JsonPropertyName("applicationText")]
-        public string ApplicationText { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("generatedText")]
+        public string GeneratedText { get; set; }
 
     }
 
@@ -2475,6 +2475,21 @@ namespace AppTrack.Frontend.ApiService.Base
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.6.3.0 (NJsonSchema v11.5.2.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class JobApplicationAiTextDto
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("promptName")]
+        public string PromptName { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("generatedText")]
+        public string GeneratedText { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("generatedAt")]
+        public System.DateTime GeneratedAt { get; set; }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.6.3.0 (NJsonSchema v11.5.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class JobApplicationDto
     {
 
@@ -2493,8 +2508,8 @@ namespace AppTrack.Frontend.ApiService.Base
         [System.Text.Json.Serialization.JsonPropertyName("url")]
         public string Url { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("applicationText")]
-        public string ApplicationText { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("aiTextHistory")]
+        public System.Collections.Generic.ICollection<JobApplicationAiTextDto> AiTextHistory { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("creationDate")]
         public System.DateTime CreationDate { get; set; }
@@ -2642,9 +2657,6 @@ namespace AppTrack.Frontend.ApiService.Base
 
         [System.Text.Json.Serialization.JsonPropertyName("url")]
         public string Url { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("applicationText")]
-        public string ApplicationText { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("status")]
         public JobApplicationStatus Status { get; set; }

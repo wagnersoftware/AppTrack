@@ -126,19 +126,34 @@
                               Lines="5"
                               Class="mb-1" />
             </MudItem>
-            <!-- Application Text -->
+            <!-- AI Text History -->
             <MudItem xs="12">
-                <MudTextField T="string"
-                              Label="Application Text"
-                              Value="_model.ApplicationText"
-                              ValueChanged="@((string v) => OnApplicationTextChanged(v))"
-                              Variant="Variant.Outlined"
-                              Lines="5"
-                              Adornment="Adornment.End"
-                              AdornmentIcon="@Icons.Material.Outlined.ContentCopy"
-                              AdornmentAriaLabel="Copy application text"
-                              OnAdornmentClick="CopyApplicationTextAsync"
-                              Class="mb-1" />
+                <MudText Typo="Typo.subtitle1" Class="mb-2">AI Generated Texts</MudText>
+                @if (_model.AiTextHistory.Count == 0)
+                {
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">No AI-generated texts yet.</MudText>
+                }
+                else
+                {
+                    <MudExpansionPanels MultiExpansion="true">
+                        @foreach (var group in _model.AiTextHistory.GroupBy(x => x.PromptName))
+                        {
+                            <MudExpansionPanel Text="@group.Key">
+                                @foreach (var entry in group.OrderByDescending(x => x.GeneratedAt))
+                                {
+                                    <MudPaper Class="pa-3 mb-2" Elevation="0" Outlined="true">
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">@entry.GeneratedAt.ToString("g")</MudText>
+                                        <MudText Typo="Typo.body2" Class="mt-1" Style="white-space: pre-wrap;">@entry.GeneratedText</MudText>
+                                        <MudButton Size="Size.Small"
+                                                   StartIcon="@Icons.Material.Outlined.ContentCopy"
+                                                   OnClick="@(() => CopyTextAsync(entry.GeneratedText))"
+                                                   Class="mt-1">Copy</MudButton>
+                                    </MudPaper>
+                                }
+                            </MudExpansionPanel>
+                        }
+                    </MudExpansionPanels>
+                }
             </MudItem>
         </MudGrid>
     </DialogContent>

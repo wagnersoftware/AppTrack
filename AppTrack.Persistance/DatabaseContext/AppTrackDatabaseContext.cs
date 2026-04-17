@@ -12,6 +12,8 @@ public class AppTrackDatabaseContext : DbContext
 
     public DbSet<JobApplication> JobApplications { get; set; }
 
+    public DbSet<JobApplicationAiText> JobApplicationAiTexts { get; set; }
+
     public DbSet<JobApplicationDefaults> JobApplicationDefaults { get; set; }
 
     public DbSet<AiSettings> AiSettings { get; set; }

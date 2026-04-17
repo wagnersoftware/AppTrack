@@ -8,6 +8,7 @@ public class GenerateAiTextCommand : IRequest<GeneratedAiTextDto>, IUserScopedRe
 {
     public int JobApplicationId { get; set; }
     public string Prompt { get; set; } = string.Empty;
+    public string PromptKey { get; set; } = string.Empty;
     [JsonIgnore]
     public string UserId { get; set; } = string.Empty;
 }

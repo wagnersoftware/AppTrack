@@ -1,11 +1,10 @@
 using AppTrack.Frontend.Models.Base;
 using AppTrack.Shared.Validation.Interfaces;
-using CommunityToolkit.Mvvm.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace AppTrack.Frontend.Models;
 
-public partial class JobApplicationModel : ModelBase, IJobApplicationValidatable
+public class JobApplicationModel : ModelBase, IJobApplicationValidatable
 {
     public string Name { get; set; } = string.Empty;
 
@@ -25,8 +24,7 @@ public partial class JobApplicationModel : ModelBase, IJobApplicationValidatable
     [DataType(DataType.Date)]
     public DateOnly StartDate { get; set; }
 
-    [ObservableProperty]
-    private string applicationText = string.Empty;
+    public List<JobApplicationAiTextModel> AiTextHistory { get; set; } = [];
 
     public string DurationInMonths { get; set; } = string.Empty;
 

@@ -65,7 +65,7 @@ public partial class GenerateTextDialog : IDisposable
         _phase = Phase.GeneratingText;
         _cts = new CancellationTokenSource();
 
-        var response = await ApplicationTextService.GenerateApplicationText(_prompt, JobApplication.Id, _cts.Token);
+        var response = await ApplicationTextService.GenerateApplicationText(_prompt, JobApplication.Id, _selectedPromptName, _cts.Token);
 
         if (_cts.IsCancellationRequested)
         {
@@ -94,7 +94,7 @@ public partial class GenerateTextDialog : IDisposable
     private async Task CopyAndCloseAsync()
     {
         await JS.InvokeVoidAsync("navigator.clipboard.writeText", _generatedText);
-        MudDialog.Close(DialogResult.Ok(_generatedText));
+        MudDialog.Close(DialogResult.Ok((_selectedPromptName, _generatedText)));
     }
 
     private void Cancel() => MudDialog.Cancel();

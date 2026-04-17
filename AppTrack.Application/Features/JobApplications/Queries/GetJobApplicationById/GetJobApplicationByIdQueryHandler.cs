@@ -25,7 +25,7 @@ public class GetJobApplicationByIdQueryHandler : IRequestHandler<GetJobApplicati
             throw new BadRequestException($"Invalid get job application request", validationResult);
         }
 
-        var jobApplication = await _jobApplicationRepository.GetByIdAsync(request.Id);
+        var jobApplication = await _jobApplicationRepository.GetByIdWithAiTextHistoryAsync(request.Id);
 
         if (jobApplication == null)
         {

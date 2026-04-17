@@ -22,6 +22,10 @@ public class GenerateAiTextCommandValidator : AbstractValidator<GenerateAiTextCo
             .NotEmpty().WithMessage("{PropertyName} is required")
             .NotNull().WithMessage("{PropertyName} is required");
 
+        RuleFor(x => x.PromptKey)
+            .NotEmpty().WithMessage("{PropertyName} is required")
+            .NotNull().WithMessage("{PropertyName} is required");
+
         RuleFor(x => x.JobApplicationId)
             .NotEmpty().WithMessage("{PropertyName} is required")
             .NotNull().WithMessage("{PropertyName} is required");

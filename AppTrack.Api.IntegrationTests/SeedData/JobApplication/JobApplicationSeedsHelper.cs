@@ -24,7 +24,6 @@ public static class JobApplicationSeedsHelper
             Position = "Default Position",
             Location = "Default Location",
             URL = "https://default.url",
-            ApplicationText = "Default application text",
             Status = JobApplicationStatus.New,
             JobDescription = "Default job description",
             ContactPerson = "Default Contact Person",

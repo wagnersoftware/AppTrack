@@ -38,7 +38,7 @@ public partial class EditJobApplicationDialog
             Status = JobApplication.Status,
             StartDate = JobApplication.StartDate,
             DurationInMonths = JobApplication.DurationInMonths,
-            ApplicationText = JobApplication.ApplicationText,
+            AiTextHistory = [..JobApplication.AiTextHistory],
             CreationDate = JobApplication.CreationDate,
             ModifiedDate = JobApplication.ModifiedDate,
         };
@@ -102,11 +102,6 @@ public partial class EditJobApplicationDialog
         _model.Status = value;
     }
 
-    private void OnApplicationTextChanged(string value)
-    {
-        _model.ApplicationText = value;
-    }
-
     private string GetFirstError(string propertyName)
         => ModelValidator.Errors.GetValueOrDefault(propertyName)?.FirstOrDefault() ?? string.Empty;
 
@@ -124,10 +119,10 @@ public partial class EditJobApplicationDialog
         MudDialog.Close(DialogResult.Ok(response.Data));
     }
 
-    private async Task CopyApplicationTextAsync()
+    private async Task CopyTextAsync(string text)
     {
-        if (string.IsNullOrEmpty(_model.ApplicationText)) return;
-        await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", _model.ApplicationText);
+        if (string.IsNullOrEmpty(text)) return;
+        await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", text);
         Snackbar.Add("Copied to clipboard", Severity.Success);
     }
 

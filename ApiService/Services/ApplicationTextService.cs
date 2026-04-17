@@ -10,14 +10,14 @@ public class ApplicationTextService : BaseHttpService, IApplicationTextService
     {
     }
 
-    public Task<Response<ApplicationTextModel>> GenerateApplicationText(string prompt, int jobApplicationId, CancellationToken token) =>
+    public Task<Response<ApplicationTextModel>> GenerateApplicationText(string prompt, int jobApplicationId, string promptKey, CancellationToken token) =>
         TryExecuteAsync(async () =>
         {
-            var command = new GenerateApplicationTextCommand() { Prompt = prompt, JobApplicationId = jobApplicationId };
+            var command = new GenerateApplicationTextCommand() { Prompt = prompt, JobApplicationId = jobApplicationId, PromptKey = promptKey };
             var generatedTextDto = await _client.GenerateApplicationTextAsync(command, token);
             return new ApplicationTextModel()
             {
-                Text = generatedTextDto.ApplicationText,
+                Text = generatedTextDto.GeneratedText,
                 WindowTitle = "Generated application text",
             };
         });

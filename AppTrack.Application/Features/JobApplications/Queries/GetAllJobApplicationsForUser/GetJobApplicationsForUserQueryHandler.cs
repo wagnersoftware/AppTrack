@@ -28,7 +28,7 @@ public class GetJobApplicationsForUserQueryHandler : IRequestHandler<GetJobAppli
             throw new BadRequestException($"Invalid Request", validationResult);
         }
 
-        var jobApplications = await _jobApplicationRepository.GetAllForUserAsync(request.UserId);
+        var jobApplications = await _jobApplicationRepository.GetAllForUserWithAiTextHistoryAsync(request.UserId);
         var jobApplicationDtos = jobApplications.Select(j => j.ToDto()).ToList();
         _logger.LogInformation("JobApplications were retieved successfully.");
         return jobApplicationDtos;
