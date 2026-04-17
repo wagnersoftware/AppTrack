@@ -138,7 +138,7 @@
                     <MudExpansionPanels MultiExpansion="true">
                         @foreach (var group in _model.AiTextHistory.GroupBy(x => x.PromptName))
                         {
-                            <MudExpansionPanel Text="@group.Key">
+                            <MudExpansionPanel Text="@($"{group.Key} ({group.Count()})")">
                                 @foreach (var entry in group.OrderByDescending(x => x.GeneratedAt))
                                 {
                                     <MudPaper Class="pa-3 mb-2" Elevation="0" Outlined="true">
