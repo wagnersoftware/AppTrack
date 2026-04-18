@@ -1,15 +1,21 @@
 using AppTrack.Api.IntegrationTests.Seeddata;
+using AppTrack.Api.IntegrationTests.WebApplicationFactory;
 using Shouldly;
 using System.Net;
 
 namespace AppTrack.Api.IntegrationTests.ProfileControllerTests;
 
-public class DeleteProfileTests : IClassFixture<FakeAuthWebApplicationFactory>
+/// <summary>
+/// DeleteFreelancerProfileCommandHandler depends on ICvStorageService (deletes CV blob if present).
+/// FakeCvStorageWebApplicationFactory is required so DI resolves ICvStorageService
+/// without needing real Azure configuration.
+/// </summary>
+public class DeleteProfileTests : IClassFixture<FakeCvStorageWebApplicationFactory>
 {
-    private readonly FakeAuthWebApplicationFactory _factory;
+    private readonly FakeCvStorageWebApplicationFactory _factory;
     private readonly HttpClient _client;
 
-    public DeleteProfileTests(FakeAuthWebApplicationFactory factory)
+    public DeleteProfileTests(FakeCvStorageWebApplicationFactory factory)
     {
         _factory = factory;
         _client = factory.CreateAuthenticatedClient();
