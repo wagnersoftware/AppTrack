@@ -21,8 +21,8 @@ public abstract class AiSettingsBaseValidator<T> : AbstractValidator<T>
             .SetValidator(new PromptItemValidator());
 
         RuleFor(x => x.Prompts)
-            .Must(HaveUniqueNames)
-            .WithMessage("Each prompt name must be unique.");
+            .Must(HaveUniqueKeys)
+            .WithMessage("Each prompt key must be unique.");
     }
 
     private static bool HaveUniqueKeys(IEnumerable<IPromptParameterValidatable> parameters)
@@ -36,14 +36,14 @@ public abstract class AiSettingsBaseValidator<T> : AbstractValidator<T>
                    .All(g => g.Count() == 1);
     }
 
-    private static bool HaveUniqueNames(IEnumerable<IPromptValidatable> prompts)
+    private static bool HaveUniqueKeys(IEnumerable<IPromptValidatable> prompts)
     {
         var list = prompts?.ToList();
         if (list is null || list.Count == 0)
             return true;
 
-        return list.Select(p => p.Name)
-                   .GroupBy(n => n, StringComparer.OrdinalIgnoreCase)
+        return list.Select(p => p.Key)
+                   .GroupBy(k => k, StringComparer.OrdinalIgnoreCase)
                    .All(g => g.Count() == 1);
     }
 

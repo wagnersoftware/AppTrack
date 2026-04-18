@@ -1,6 +1,6 @@
 using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Exceptions;
-using AppTrack.Application.Features.ApplicationText.Query.GetPromptNamesQuery;
+using AppTrack.Application.Features.ApplicationText.Query.GetPromptKeysQuery;
 using AppTrack.Domain;
 using FluentValidation;
 using FluentValidation.Results;
@@ -10,14 +10,14 @@ using DomainAiSettings = AppTrack.Domain.AiSettings;
 
 namespace AppTrack.Application.UnitTests.Features.ApplicationText.Queries;
 
-public class GetPromptNamesQueryHandlerTests
+public class GetPromptKeysQueryHandlerTests
 {
     private const string UserId = "user-1";
     private readonly Mock<IAiSettingsRepository> _mockAiSettingsRepo = new();
     private readonly Mock<IBuiltInPromptRepository> _mockBuiltInPromptRepo = new();
-    private readonly Mock<IValidator<GetPromptNamesQuery>> _mockValidator = new();
+    private readonly Mock<IValidator<GetPromptKeysQuery>> _mockValidator = new();
 
-    public GetPromptNamesQueryHandlerTests()
+    public GetPromptKeysQueryHandlerTests()
     {
         // Default: no built-in prompts (keeps existing tests unaffected)
         _mockBuiltInPromptRepo
@@ -25,15 +25,15 @@ public class GetPromptNamesQueryHandlerTests
             .ReturnsAsync(new List<BuiltInPrompt>());
 
         _mockValidator
-            .Setup(v => v.ValidateAsync(It.IsAny<GetPromptNamesQuery>(), It.IsAny<CancellationToken>()))
+            .Setup(v => v.ValidateAsync(It.IsAny<GetPromptKeysQuery>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new ValidationResult());
     }
 
-    private GetPromptNamesQueryHandler CreateHandler() =>
+    private GetPromptKeysQueryHandler CreateHandler() =>
         new(_mockAiSettingsRepo.Object, _mockBuiltInPromptRepo.Object, _mockValidator.Object);
 
     [Fact]
-    public async Task Handle_ShouldReturnNamesInInsertionOrder_WhenAiSettingsHaveMultiplePrompts()
+    public async Task Handle_ShouldReturnKeysInInsertionOrder_WhenAiSettingsHaveMultiplePrompts()
     {
         var aiSettings = new DomainAiSettings { Id = 1, UserId = UserId };
         aiSettings.Prompts.Add(Prompt.Create("Cover_Letter", "template A"));
@@ -42,9 +42,9 @@ public class GetPromptNamesQueryHandlerTests
             .Setup(r => r.GetByUserIdWithPromptsReadOnlyAsync(UserId))
             .ReturnsAsync(aiSettings);
 
-        var result = await CreateHandler().Handle(new GetPromptNamesQuery { UserId = UserId }, CancellationToken.None);
+        var result = await CreateHandler().Handle(new GetPromptKeysQuery { UserId = UserId }, CancellationToken.None);
 
-        result.Names.ShouldBe(["Cover_Letter", "LinkedIn_Message"]);
+        result.Keys.ShouldBe(["Cover_Letter", "LinkedIn_Message"]);
     }
 
     [Fact]
@@ -54,16 +54,16 @@ public class GetPromptNamesQueryHandlerTests
             .Setup(r => r.GetByUserIdWithPromptsReadOnlyAsync(UserId))
             .ReturnsAsync(new DomainAiSettings { Id = 1, UserId = UserId });
 
-        var result = await CreateHandler().Handle(new GetPromptNamesQuery { UserId = UserId }, CancellationToken.None);
+        var result = await CreateHandler().Handle(new GetPromptKeysQuery { UserId = UserId }, CancellationToken.None);
 
-        result.Names.ShouldBeEmpty();
+        result.Keys.ShouldBeEmpty();
     }
 
     [Fact]
     public async Task Handle_ShouldThrowBadRequestException_WhenAiSettingsNotFound()
     {
         _mockValidator
-            .Setup(v => v.ValidateAsync(It.IsAny<GetPromptNamesQuery>(), It.IsAny<CancellationToken>()))
+            .Setup(v => v.ValidateAsync(It.IsAny<GetPromptKeysQuery>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new ValidationResult([new ValidationFailure("UserId", "AI settings not found for this user.")]));
 
         _mockAiSettingsRepo
@@ -71,11 +71,11 @@ public class GetPromptNamesQueryHandlerTests
             .ReturnsAsync((DomainAiSettings?)null);
 
         await Should.ThrowAsync<BadRequestException>(() =>
-            CreateHandler().Handle(new GetPromptNamesQuery { UserId = UserId }, CancellationToken.None));
+            CreateHandler().Handle(new GetPromptKeysQuery { UserId = UserId }, CancellationToken.None));
     }
 
     [Fact]
-    public async Task Handle_ShouldReturnBuiltInPromptNames_WhenUserHasNoPrompts()
+    public async Task Handle_ShouldReturnBuiltInPromptKeys_WhenUserHasNoPrompts()
     {
         _mockAiSettingsRepo
             .Setup(r => r.GetByUserIdWithPromptsReadOnlyAsync(UserId))
@@ -88,13 +88,13 @@ public class GetPromptNamesQueryHandlerTests
         };
         _mockBuiltInPromptRepo.Setup(r => r.GetAsync()).ReturnsAsync(builtIns);
 
-        var result = await CreateHandler().Handle(new GetPromptNamesQuery { UserId = UserId }, CancellationToken.None);
+        var result = await CreateHandler().Handle(new GetPromptKeysQuery { UserId = UserId }, CancellationToken.None);
 
-        result.Names.ShouldBe(["builtIn_Anschreiben", "builtIn_Vorstellung"]);
+        result.Keys.ShouldBe(["builtIn_Anschreiben", "builtIn_Vorstellung"]);
     }
 
     [Fact]
-    public async Task Handle_ShouldReturnUserNamesThenBuiltInNames_WithUserNamesFirst()
+    public async Task Handle_ShouldReturnUserKeysThenBuiltInKeys_WithUserKeysFirst()
     {
         var aiSettings = new DomainAiSettings { Id = 1, UserId = UserId };
         aiSettings.Prompts.Add(Prompt.Create("My_Custom_Prompt", "template"));
@@ -108,9 +108,9 @@ public class GetPromptNamesQueryHandlerTests
         };
         _mockBuiltInPromptRepo.Setup(r => r.GetAsync()).ReturnsAsync(builtIns);
 
-        var result = await CreateHandler().Handle(new GetPromptNamesQuery { UserId = UserId }, CancellationToken.None);
+        var result = await CreateHandler().Handle(new GetPromptKeysQuery { UserId = UserId }, CancellationToken.None);
 
-        result.Names[0].ShouldBe("My_Custom_Prompt");
-        result.Names[^1].ShouldBe("builtIn_Anschreiben");
+        result.Keys[0].ShouldBe("My_Custom_Prompt");
+        result.Keys[^1].ShouldBe("builtIn_Anschreiben");
     }
 }

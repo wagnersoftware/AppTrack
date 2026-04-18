@@ -27,7 +27,7 @@ internal static class AiSettingsMappings
         entity.Prompts.Clear();
         foreach (var dto in command.Prompts)
         {
-            entity.Prompts.Add(Prompt.Create(dto.Name, dto.PromptTemplate));
+            entity.Prompts.Add(Prompt.Create(dto.Key, dto.PromptTemplate));
         }
     }
 
@@ -52,14 +52,14 @@ internal static class AiSettingsMappings
     internal static PromptDto ToDto(this Prompt entity) => new()
     {
         Id = entity.Id,
-        Name = entity.Name,
+        Key = entity.Name,
         PromptTemplate = entity.PromptTemplate,
     };
 
     internal static PromptDto ToDto(this BuiltInPrompt entity) => new()
     {
         Id = entity.Id,
-        Name = entity.Name,
+        Key = entity.Name,
         PromptTemplate = entity.PromptTemplate,
     };
 }

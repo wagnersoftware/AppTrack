@@ -1,13 +1,13 @@
 using AppTrack.Application.Contracts.Persistance;
 using FluentValidation;
 
-namespace AppTrack.Application.Features.ApplicationText.Query.GetPromptNamesQuery;
+namespace AppTrack.Application.Features.ApplicationText.Query.GetPromptKeysQuery;
 
-public class GetPromptNamesQueryValidator : AbstractValidator<GetPromptNamesQuery>
+public class GetPromptKeysQueryValidator : AbstractValidator<GetPromptKeysQuery>
 {
     private readonly IAiSettingsRepository _aiSettingsRepository;
 
-    public GetPromptNamesQueryValidator(IAiSettingsRepository aiSettingsRepository)
+    public GetPromptKeysQueryValidator(IAiSettingsRepository aiSettingsRepository)
     {
         _aiSettingsRepository = aiSettingsRepository;
 
@@ -15,7 +15,7 @@ public class GetPromptNamesQueryValidator : AbstractValidator<GetPromptNamesQuer
             .CustomAsync(ValidateAiSettings);
     }
 
-    private async Task ValidateAiSettings(GetPromptNamesQuery query, ValidationContext<GetPromptNamesQuery> context, CancellationToken token)
+    private async Task ValidateAiSettings(GetPromptKeysQuery query, ValidationContext<GetPromptKeysQuery> context, CancellationToken token)
     {
         var aiSettings = await _aiSettingsRepository.GetByUserIdWithPromptsReadOnlyAsync(query.UserId);
 

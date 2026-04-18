@@ -34,7 +34,7 @@ public partial class PromptDialog
             _model = new PromptModel
             {
                 Id = ExistingPrompt!.Id,
-                Name = ExistingPrompt.Name,
+                Key = ExistingPrompt.Key,
                 PromptTemplate = ExistingPrompt.PromptTemplate,
                 TempId = ExistingPrompt.TempId,
                 CreationDate = ExistingPrompt.CreationDate,
@@ -52,8 +52,8 @@ public partial class PromptDialog
 
     private void OnNameChanged(string value)
     {
-        _model.Name = value;
-        ModelValidator.ResetErrors(nameof(PromptModel.Name));
+        _model.Key = value;
+        ModelValidator.ResetErrors(nameof(PromptModel.Key));
     }
 
     private void OnPromptTemplateChanged(string value)

@@ -14,7 +14,7 @@ internal sealed class TestAiSettings : IAiSettingsValidatable
 
 internal sealed class TestPromptItem : IPromptValidatable
 {
-    public string Name { get; init; } = string.Empty;
+    public string Key { get; init; } = string.Empty;
     public string PromptTemplate { get; init; } = string.Empty;
 }
 
@@ -42,8 +42,8 @@ public class AiSettingsBaseValidatorTests
         {
             Prompts =
             [
-                new TestPromptItem { Name = "Prompt_A", PromptTemplate = "Hello" },
-                new TestPromptItem { Name = "Prompt_B", PromptTemplate = "World" },
+                new TestPromptItem { Key ="Prompt_A", PromptTemplate = "Hello" },
+                new TestPromptItem { Key ="Prompt_B", PromptTemplate = "World" },
             ]
         };
         var result = await _validator.ValidateAsync(settings);
@@ -51,14 +51,14 @@ public class AiSettingsBaseValidatorTests
     }
 
     [Fact]
-    public async Task DuplicatePromptNames_ShouldFail()
+    public async Task DuplicatePromptKeys_ShouldFail()
     {
         var settings = new TestAiSettings
         {
             Prompts =
             [
-                new TestPromptItem { Name = "Same", PromptTemplate = "Hello" },
-                new TestPromptItem { Name = "same", PromptTemplate = "World" }, // case-insensitive duplicate
+                new TestPromptItem { Key ="Same", PromptTemplate = "Hello" },
+                new TestPromptItem { Key ="same", PromptTemplate = "World" }, // case-insensitive duplicate
             ]
         };
         var result = await _validator.ValidateAsync(settings);
@@ -67,11 +67,11 @@ public class AiSettingsBaseValidatorTests
     }
 
     [Fact]
-    public async Task PromptWithEmptyName_ShouldFail()
+    public async Task PromptWithEmptyKey_ShouldFail()
     {
         var settings = new TestAiSettings
         {
-            Prompts = [new TestPromptItem { Name = "", PromptTemplate = "Hello" }]
+            Prompts = [new TestPromptItem { Key ="", PromptTemplate = "Hello" }]
         };
         var result = await _validator.ValidateAsync(settings);
         result.IsValid.ShouldBeFalse();
@@ -83,7 +83,7 @@ public class AiSettingsBaseValidatorTests
         // Verifies RuleForEach -> PromptItemValidator -> PromptTemplate rule is wired correctly
         var settings = new TestAiSettings
         {
-            Prompts = [new TestPromptItem { Name = "Valid", PromptTemplate = "" }]
+            Prompts = [new TestPromptItem { Key ="Valid", PromptTemplate = "" }]
         };
         var result = await _validator.ValidateAsync(settings);
         result.IsValid.ShouldBeFalse();

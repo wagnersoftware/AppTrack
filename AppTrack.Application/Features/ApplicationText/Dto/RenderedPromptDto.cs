@@ -1,6 +1,6 @@
-﻿namespace AppTrack.Application.Features.ApplicationText.Dto
+namespace AppTrack.Application.Features.ApplicationText.Dto
 {
-    public class GeneratedPromptDto
+    public class RenderedPromptDto
     {
         public string Prompt { get; set; } = string.Empty;
 

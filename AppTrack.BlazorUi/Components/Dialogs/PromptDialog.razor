@@ -11,10 +11,10 @@
             <MudItem xs="12">
                 <MudTextField T="string"
                               Label="Name"
-                              Value="_model.Name"
+                              Value="_model.Key"
                               ValueChanged="@((string v) => OnNameChanged(v))"
-                              Error="@ModelValidator.Errors.ContainsKey(nameof(PromptModel.Name))"
-                              ErrorText="@GetFirstError(nameof(PromptModel.Name))"
+                              Error="@ModelValidator.Errors.ContainsKey(nameof(PromptModel.Key))"
+                              ErrorText="@GetFirstError(nameof(PromptModel.Key))"
                               Variant="Variant.Outlined"
                               Adornment="Adornment.Start"
                               AdornmentIcon="@Icons.Material.Outlined.Label"

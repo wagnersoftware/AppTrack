@@ -31,7 +31,7 @@ public partial class GenerateTextDialog : IDisposable
     protected override async Task OnInitializedAsync()
     {
         _selectedPromptKey = PromptKeys[0];
-        var response = await ApplicationTextService.GeneratePrompt(JobApplication.Id, _selectedPromptKey);
+        var response = await ApplicationTextService.RenderPrompt(JobApplication.Id, _selectedPromptKey);
 
         if (!ErrorHandlingService.HandleResponse(response) || response.Data is null)
         {
@@ -50,7 +50,7 @@ public partial class GenerateTextDialog : IDisposable
         _isReloadingPrompt = true;
         StateHasChanged();
 
-        var response = await ApplicationTextService.GeneratePrompt(JobApplication.Id, newName);
+        var response = await ApplicationTextService.RenderPrompt(JobApplication.Id, newName);
         _isReloadingPrompt = false;
 
         if (!ErrorHandlingService.HandleResponse(response) || response.Data is null)
@@ -65,7 +65,7 @@ public partial class GenerateTextDialog : IDisposable
         _phase = Phase.GeneratingText;
         _cts = new CancellationTokenSource();
 
-        var response = await ApplicationTextService.GenerateApplicationText(_prompt, JobApplication.Id, _selectedPromptKey, _cts.Token);
+        var response = await ApplicationTextService.GenerateAiText(_prompt, JobApplication.Id, _selectedPromptKey, _cts.Token);
 
         if (_cts.IsCancellationRequested)
         {

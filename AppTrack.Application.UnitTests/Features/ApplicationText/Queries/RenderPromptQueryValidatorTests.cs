@@ -1,6 +1,5 @@
-// test/AppTrack.Application.UnitTests/Features/ApplicationText/Queries/GeneratePromptQueryValidatorTests.cs
 using AppTrack.Application.Contracts.Persistance;
-using AppTrack.Application.Features.ApplicationText.Query.GeneratePromptQuery;
+using AppTrack.Application.Features.ApplicationText.Query.RenderPromptQuery;
 using AppTrack.Domain;
 using FluentValidation.TestHelper;
 using Moq;
@@ -11,7 +10,7 @@ using DomainPrompt = AppTrack.Domain.Prompt;
 
 namespace AppTrack.Application.UnitTests.Features.ApplicationText.Queries;
 
-public class GeneratePromptQueryValidatorTests
+public class RenderPromptQueryValidatorTests
 {
     private const string UserId = "user-1";
     private const string PromptKey = "Default";
@@ -20,9 +19,9 @@ public class GeneratePromptQueryValidatorTests
     private readonly Mock<IJobApplicationRepository> _jobAppRepo;
     private readonly Mock<IAiSettingsRepository> _aiSettingsRepo;
     private readonly Mock<IBuiltInPromptRepository> _builtInPromptRepo;
-    private readonly GeneratePromptQueryValidator _validator;
+    private readonly RenderPromptQueryValidator _validator;
 
-    public GeneratePromptQueryValidatorTests()
+    public RenderPromptQueryValidatorTests()
     {
         _jobAppRepo = new Mock<IJobApplicationRepository>();
         _aiSettingsRepo = new Mock<IAiSettingsRepository>();
@@ -51,10 +50,10 @@ public class GeneratePromptQueryValidatorTests
             .Setup(r => r.GetAsync())
             .ReturnsAsync(new List<BuiltInPrompt>());
 
-        _validator = new GeneratePromptQueryValidator(_jobAppRepo.Object, _aiSettingsRepo.Object, _builtInPromptRepo.Object);
+        _validator = new RenderPromptQueryValidator(_jobAppRepo.Object, _aiSettingsRepo.Object, _builtInPromptRepo.Object);
     }
 
-    private static GeneratePromptQuery BuildValidQuery(
+    private static RenderPromptQuery BuildValidQuery(
         string userId = UserId,
         int jobApplicationId = ExistingJobApplicationId,
         string promptKey = PromptKey) => new()
@@ -187,7 +186,7 @@ public class GeneratePromptQueryValidatorTests
             .Setup(r => r.GetByIdAsync(ExistingJobApplicationId))
             .ReturnsAsync(new DomainJobApplication { Id = ExistingJobApplicationId, UserId = UserId });
 
-        var localValidator = new GeneratePromptQueryValidator(
+        var localValidator = new RenderPromptQueryValidator(
             _jobAppRepo.Object, _aiSettingsRepo.Object, _builtInPromptRepo.Object);
         var result = await localValidator.TestValidateAsync(BuildValidQuery(promptKey: builtInOnlyPromptKey));
 

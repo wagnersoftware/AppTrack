@@ -9,12 +9,12 @@ public abstract class PromptBaseValidator<T> : AbstractValidator<T>
 {
     protected PromptBaseValidator()
     {
-        RuleFor(x => x.Name)
-            .NotEmpty().WithMessage("Name is required.")
-            .MaximumLength(100).WithMessage("Name must not exceed 100 characters.")
-            .Must(n => !n.Contains(' ')).WithMessage("A prompt name must not contain spaces.")
+        RuleFor(x => x.Key)
+            .NotEmpty().WithMessage("Key is required.")
+            .MaximumLength(100).WithMessage("Key must not exceed 100 characters.")
+            .Must(n => !n.Contains(' ')).WithMessage("A prompt key must not contain spaces.")
             .Must(n => !n.StartsWith(BuiltInParameterKeys.Prefix, StringComparison.OrdinalIgnoreCase))
-                .WithMessage($"A prompt name must not start with '{BuiltInParameterKeys.Prefix}'.");
+                .WithMessage($"A prompt key must not start with '{BuiltInParameterKeys.Prefix}'.");
 
         RuleFor(x => x.PromptTemplate)
             .NotEmpty().WithMessage("Prompt template is required.");

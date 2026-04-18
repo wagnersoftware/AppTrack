@@ -29,21 +29,21 @@ namespace AppTrack.Frontend.ApiService.Base
     {
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<GeneratedPromptDto> GeneratePromptAsync(GeneratePromptQuery body);
+        System.Threading.Tasks.Task<RenderedPromptDto> RenderPromptAsync(RenderPromptQuery body);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<GeneratedPromptDto> GeneratePromptAsync(GeneratePromptQuery body, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<RenderedPromptDto> RenderPromptAsync(RenderPromptQuery body, System.Threading.CancellationToken cancellationToken);
 
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<GetPromptNamesDto> PromptNamesAsync();
+        System.Threading.Tasks.Task<GetPromptKeysDto> PromptKeysAsync();
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<GetPromptNamesDto> PromptNamesAsync(System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<GetPromptKeysDto> PromptKeysAsync(System.Threading.CancellationToken cancellationToken);
 
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
@@ -56,12 +56,12 @@ namespace AppTrack.Frontend.ApiService.Base
 
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<GeneratedAiTextDto> GenerateApplicationTextAsync(GenerateAiTextCommand body);
+        System.Threading.Tasks.Task<GeneratedAiTextDto> GenerateAsync(GenerateAiTextCommand body);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<GeneratedAiTextDto> GenerateApplicationTextAsync(GenerateAiTextCommand body, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<GeneratedAiTextDto> GenerateAsync(GenerateAiTextCommand body, System.Threading.CancellationToken cancellationToken);
 
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
@@ -234,15 +234,15 @@ namespace AppTrack.Frontend.ApiService.Base
 
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<GeneratedPromptDto> GeneratePromptAsync(GeneratePromptQuery body)
+        public virtual System.Threading.Tasks.Task<RenderedPromptDto> RenderPromptAsync(RenderPromptQuery body)
         {
-            return GeneratePromptAsync(body, System.Threading.CancellationToken.None);
+            return RenderPromptAsync(body, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<GeneratedPromptDto> GeneratePromptAsync(GeneratePromptQuery body, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<RenderedPromptDto> RenderPromptAsync(RenderPromptQuery body, System.Threading.CancellationToken cancellationToken)
         {
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -259,8 +259,8 @@ namespace AppTrack.Frontend.ApiService.Base
 
                     var urlBuilder_ = new System.Text.StringBuilder();
                 
-                    // Operation Path: "api/ai/generate-prompt"
-                    urlBuilder_.Append("api/ai/generate-prompt");
+                    // Operation Path: "api/ai/render-prompt"
+                    urlBuilder_.Append("api/ai/render-prompt");
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -287,7 +287,7 @@ namespace AppTrack.Frontend.ApiService.Base
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<GeneratedPromptDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<RenderedPromptDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -336,15 +336,15 @@ namespace AppTrack.Frontend.ApiService.Base
 
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<GetPromptNamesDto> PromptNamesAsync()
+        public virtual System.Threading.Tasks.Task<GetPromptKeysDto> PromptKeysAsync()
         {
-            return PromptNamesAsync(System.Threading.CancellationToken.None);
+            return PromptKeysAsync(System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<GetPromptNamesDto> PromptNamesAsync(System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<GetPromptKeysDto> PromptKeysAsync(System.Threading.CancellationToken cancellationToken)
         {
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -357,8 +357,8 @@ namespace AppTrack.Frontend.ApiService.Base
 
                     var urlBuilder_ = new System.Text.StringBuilder();
                 
-                    // Operation Path: "api/ai/prompt-names"
-                    urlBuilder_.Append("api/ai/prompt-names");
+                    // Operation Path: "api/ai/prompt-keys"
+                    urlBuilder_.Append("api/ai/prompt-keys");
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -385,7 +385,7 @@ namespace AppTrack.Frontend.ApiService.Base
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<GetPromptNamesDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<GetPromptKeysDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -550,15 +550,15 @@ namespace AppTrack.Frontend.ApiService.Base
 
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<GeneratedAiTextDto> GenerateApplicationTextAsync(GenerateAiTextCommand body)
+        public virtual System.Threading.Tasks.Task<GeneratedAiTextDto> GenerateAsync(GenerateAiTextCommand body)
         {
-            return GenerateApplicationTextAsync(body, System.Threading.CancellationToken.None);
+            return GenerateAsync(body, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<GeneratedAiTextDto> GenerateApplicationTextAsync(GenerateAiTextCommand body, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<GeneratedAiTextDto> GenerateAsync(GenerateAiTextCommand body, System.Threading.CancellationToken cancellationToken)
         {
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -575,8 +575,8 @@ namespace AppTrack.Frontend.ApiService.Base
 
                     var urlBuilder_ = new System.Text.StringBuilder();
                 
-                    // Operation Path: "api/ai-settings/generate-application-text"
-                    urlBuilder_.Append("api/ai-settings/generate-application-text");
+                    // Operation Path: "api/ai/generate"
+                    urlBuilder_.Append("api/ai/generate");
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -753,8 +753,8 @@ namespace AppTrack.Frontend.ApiService.Base
 
                     var urlBuilder_ = new System.Text.StringBuilder();
                 
-                    // Operation Path: "api/ai-settings/ai-text/{id}"
-                    urlBuilder_.Append("api/ai-settings/ai-text/");
+                    // Operation Path: "api/ai/text/{id}"
+                    urlBuilder_.Append("api/ai/text/");
                     urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
                     PrepareRequest(client_, request_, urlBuilder_);
@@ -2532,7 +2532,7 @@ namespace AppTrack.Frontend.ApiService.Base
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.0.0 (NJsonSchema v11.6.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class GeneratePromptQuery
+    public partial class RenderPromptQuery
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("jobApplicationId")]
@@ -2553,7 +2553,7 @@ namespace AppTrack.Frontend.ApiService.Base
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.0.0 (NJsonSchema v11.6.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class GeneratedPromptDto
+    public partial class RenderedPromptDto
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("prompt")]
@@ -2565,11 +2565,11 @@ namespace AppTrack.Frontend.ApiService.Base
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.0.0 (NJsonSchema v11.6.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class GetPromptNamesDto
+    public partial class GetPromptKeysDto
     {
 
-        [System.Text.Json.Serialization.JsonPropertyName("names")]
-        public System.Collections.Generic.ICollection<string> Names { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("keys")]
+        public System.Collections.Generic.ICollection<string> Keys { get; set; }
 
     }
 
@@ -2709,8 +2709,8 @@ namespace AppTrack.Frontend.ApiService.Base
         [System.Text.Json.Serialization.JsonPropertyName("id")]
         public int Id { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("name")]
-        public string Name { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("key")]
+        public string Key { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("promptTemplate")]
         public string PromptTemplate { get; set; }

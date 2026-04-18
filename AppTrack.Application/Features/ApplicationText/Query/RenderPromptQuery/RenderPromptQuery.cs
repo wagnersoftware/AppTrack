@@ -2,9 +2,9 @@ using System.Text.Json.Serialization;
 using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Features.ApplicationText.Dto;
 
-namespace AppTrack.Application.Features.ApplicationText.Query.GeneratePromptQuery;
+namespace AppTrack.Application.Features.ApplicationText.Query.RenderPromptQuery;
 
-public class GeneratePromptQuery : IRequest<GeneratedPromptDto>, IUserScopedRequest
+public class RenderPromptQuery : IRequest<RenderedPromptDto>, IUserScopedRequest
 {
     public int JobApplicationId { get; set; }
     public string PromptKey { get; set; } = string.Empty;

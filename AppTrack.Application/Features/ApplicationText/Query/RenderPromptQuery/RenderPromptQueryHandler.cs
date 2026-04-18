@@ -7,22 +7,22 @@ using AppTrack.Domain.Contracts;
 using AppTrack.Domain.Extensions;
 using FluentValidation;
 
-namespace AppTrack.Application.Features.ApplicationText.Query.GeneratePromptQuery;
+namespace AppTrack.Application.Features.ApplicationText.Query.RenderPromptQuery;
 
-public class GeneratePromptQueryHandler : IRequestHandler<GeneratePromptQuery, GeneratedPromptDto>
+public class RenderPromptQueryHandler : IRequestHandler<RenderPromptQuery, RenderedPromptDto>
 {
     private readonly IAiSettingsRepository _aiSettingsRepository;
     private readonly IJobApplicationRepository _jobApplicationRepository;
     private readonly IPromptBuilder _promptBuilder;
     private readonly IBuiltInPromptRepository _builtInPromptRepository;
-    private readonly IValidator<GeneratePromptQuery> _validator;
+    private readonly IValidator<RenderPromptQuery> _validator;
 
-    public GeneratePromptQueryHandler(
+    public RenderPromptQueryHandler(
         IAiSettingsRepository aiSettingsRepository,
         IJobApplicationRepository jobApplicationRepository,
         IPromptBuilder promptBuilder,
         IBuiltInPromptRepository builtInPromptRepository,
-        IValidator<GeneratePromptQuery> validator)
+        IValidator<RenderPromptQuery> validator)
     {
         _aiSettingsRepository = aiSettingsRepository;
         _jobApplicationRepository = jobApplicationRepository;
@@ -31,12 +31,12 @@ public class GeneratePromptQueryHandler : IRequestHandler<GeneratePromptQuery, G
         _validator = validator;
     }
 
-    public async Task<GeneratedPromptDto> Handle(GeneratePromptQuery request, CancellationToken cancellationToken)
+    public async Task<RenderedPromptDto> Handle(RenderPromptQuery request, CancellationToken cancellationToken)
     {
         var validationResult = await _validator.ValidateAsync(request);
 
         if (validationResult.Errors.Any())
-            throw new BadRequestException("Invalid generate prompt request.", validationResult);
+            throw new BadRequestException("Invalid render prompt request.", validationResult);
 
         var aiSettings = await _aiSettingsRepository.GetByUserIdWithPromptsReadOnlyAsync(request.UserId);
         var jobApplication = await _jobApplicationRepository.GetByIdAsync(request.JobApplicationId);
@@ -65,6 +65,6 @@ public class GeneratePromptQueryHandler : IRequestHandler<GeneratePromptQuery, G
         }
 
         var (prompt, unusedKeys) = _promptBuilder.BuildPrompt(promptParameter, promptTemplate);
-        return new GeneratedPromptDto() { Prompt = prompt, UnusedKeys = unusedKeys };
+        return new RenderedPromptDto() { Prompt = prompt, UnusedKeys = unusedKeys };
     }
 }

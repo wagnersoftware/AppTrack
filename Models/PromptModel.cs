@@ -7,7 +7,7 @@ namespace AppTrack.Frontend.Models;
 public partial class PromptModel : ModelBase, IPromptValidatable
 {
     [ObservableProperty]
-    private string name = string.Empty;
+    private string key = string.Empty;
 
     [ObservableProperty]
     private string promptTemplate = string.Empty;
@@ -21,7 +21,7 @@ public partial class PromptModel : ModelBase, IPromptValidatable
         return new PromptModel
         {
             Id = Id,
-            Name = Name,
+            Key = Key,
             PromptTemplate = PromptTemplate,
             CreationDate = CreationDate,
             ModifiedDate = ModifiedDate,

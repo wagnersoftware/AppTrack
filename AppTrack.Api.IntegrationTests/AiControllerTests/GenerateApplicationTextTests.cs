@@ -6,24 +6,24 @@ using Shouldly;
 using System.Net;
 using System.Net.Http.Json;
 
-namespace AppTrack.Api.IntegrationTests.AiSettingsControllerTests;
+namespace AppTrack.Api.IntegrationTests.AiControllerTests;
 
 /// <summary>
 /// Tests validation failure paths — no AI text generator stub required.
 /// </summary>
-public class GenerateApplicationTextValidationTests : IClassFixture<FakeAuthWebApplicationFactory>
+public class GenerateAiTextValidationTests : IClassFixture<FakeAuthWebApplicationFactory>
 {
     private readonly FakeAuthWebApplicationFactory _factory;
     private readonly HttpClient _client;
 
-    public GenerateApplicationTextValidationTests(FakeAuthWebApplicationFactory factory)
+    public GenerateAiTextValidationTests(FakeAuthWebApplicationFactory factory)
     {
         _factory = factory;
         _client = factory.CreateAuthenticatedClient();
     }
 
     [Fact]
-    public async Task GenerateApplicationText_ShouldReturn400_WhenPromptIsEmpty()
+    public async Task GenerateAiText_ShouldReturn400_WhenPromptIsEmpty()
     {
         var jobApplicationId = await SeedHelper.CreateJobApplicationForTestUserAsync(_factory.Services);
 
@@ -34,13 +34,13 @@ public class GenerateApplicationTextValidationTests : IClassFixture<FakeAuthWebA
             PromptKey = "cover-letter",
         };
 
-        var response = await _client.PostAsJsonAsync("/api/ai-settings/generate-application-text", request);
+        var response = await _client.PostAsJsonAsync("/api/ai/generate", request);
 
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
     }
 
     [Fact]
-    public async Task GenerateApplicationText_ShouldReturn400_WhenJobApplicationDoesNotExist()
+    public async Task GenerateAiText_ShouldReturn400_WhenJobApplicationDoesNotExist()
     {
         var request = new GenerateAiTextCommand
         {
@@ -49,7 +49,7 @@ public class GenerateApplicationTextValidationTests : IClassFixture<FakeAuthWebA
             PromptKey = "cover-letter",
         };
 
-        var response = await _client.PostAsJsonAsync("/api/ai-settings/generate-application-text", request);
+        var response = await _client.PostAsJsonAsync("/api/ai/generate", request);
 
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
     }
@@ -58,19 +58,19 @@ public class GenerateApplicationTextValidationTests : IClassFixture<FakeAuthWebA
 /// <summary>
 /// Tests the happy path with a stubbed AI text generator to avoid real OpenAI calls.
 /// </summary>
-public class GenerateApplicationTextHappyPathTests : IClassFixture<FakeAiTextWebApplicationFactory>
+public class GenerateAiTextHappyPathTests : IClassFixture<FakeAiTextWebApplicationFactory>
 {
     private readonly FakeAiTextWebApplicationFactory _factory;
     private readonly HttpClient _client;
 
-    public GenerateApplicationTextHappyPathTests(FakeAiTextWebApplicationFactory factory)
+    public GenerateAiTextHappyPathTests(FakeAiTextWebApplicationFactory factory)
     {
         _factory = factory;
         _client = factory.CreateAuthenticatedClient();
     }
 
     [Fact]
-    public async Task GenerateApplicationText_ShouldReturn200_WhenRequestIsValid()
+    public async Task GenerateAiText_ShouldReturn200_WhenRequestIsValid()
     {
         var jobApplicationId = await SeedHelper.CreateJobApplicationForTestUserAsync(_factory.Services);
         await SeedHelper.CreateAiSettingsWithChatModelForTestUserAsync(_factory.Services);
@@ -82,7 +82,7 @@ public class GenerateApplicationTextHappyPathTests : IClassFixture<FakeAiTextWeb
             PromptKey = "cover-letter",
         };
 
-        var response = await _client.PostAsJsonAsync("/api/ai-settings/generate-application-text", request);
+        var response = await _client.PostAsJsonAsync("/api/ai/generate", request);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
         var result = await response.Content.ReadFromJsonAsync<GeneratedAiTextDto>();
@@ -91,7 +91,7 @@ public class GenerateApplicationTextHappyPathTests : IClassFixture<FakeAiTextWeb
     }
 
     [Fact]
-    public async Task GenerateApplicationText_ShouldStoreEntryInAiTextHistory_WhenRequestIsValid()
+    public async Task GenerateAiText_ShouldStoreEntryInAiTextHistory_WhenRequestIsValid()
     {
         var jobApplicationId = await SeedHelper.CreateJobApplicationForTestUserAsync(_factory.Services);
         await SeedHelper.CreateAiSettingsWithChatModelForTestUserAsync(_factory.Services);
@@ -103,7 +103,7 @@ public class GenerateApplicationTextHappyPathTests : IClassFixture<FakeAiTextWeb
             PromptKey = "history-test-key",
         };
 
-        await _client.PostAsJsonAsync("/api/ai-settings/generate-application-text", request);
+        await _client.PostAsJsonAsync("/api/ai/generate", request);
 
         // Verify the history entry was persisted by fetching the job application
         var jobApplicationResponse = await _client.GetAsync($"/api/job-applications/{jobApplicationId}");

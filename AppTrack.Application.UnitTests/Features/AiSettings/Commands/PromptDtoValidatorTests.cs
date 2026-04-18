@@ -11,7 +11,7 @@ public class PromptDtoValidatorTests
 
     private static PromptDto BuildValidDto() => new()
     {
-        Name = "Cover_Letter",
+        Key = "Cover_Letter",
         PromptTemplate = "Write a cover letter for {position} at {company}."
     };
 
@@ -23,29 +23,29 @@ public class PromptDtoValidatorTests
     }
 
     [Fact]
-    public void Validate_ShouldHaveError_WhenNameIsEmpty()
+    public void Validate_ShouldHaveError_WhenKeyIsEmpty()
     {
         var dto = BuildValidDto();
-        dto.Name = string.Empty;
-        _validator.TestValidate(dto).ShouldHaveValidationErrorFor(x => x.Name)
-            .WithErrorMessage("Name is required.");
+        dto.Key =string.Empty;
+        _validator.TestValidate(dto).ShouldHaveValidationErrorFor(x => x.Key)
+            .WithErrorMessage("Key is required.");
     }
 
     [Fact]
-    public void Validate_ShouldHaveError_WhenNameExceeds100Characters()
+    public void Validate_ShouldHaveError_WhenKeyExceeds100Characters()
     {
         var dto = BuildValidDto();
-        dto.Name = new string('x', 101);
-        _validator.TestValidate(dto).ShouldHaveValidationErrorFor(x => x.Name)
-            .WithErrorMessage("Name must not exceed 100 characters.");
+        dto.Key =new string('x', 101);
+        _validator.TestValidate(dto).ShouldHaveValidationErrorFor(x => x.Key)
+            .WithErrorMessage("Key must not exceed 100 characters.");
     }
 
     [Fact]
-    public void Validate_ShouldNotHaveError_WhenNameIsExactly100Characters()
+    public void Validate_ShouldNotHaveError_WhenKeyIsExactly100Characters()
     {
         var dto = BuildValidDto();
-        dto.Name = new string('x', 100);
-        _validator.TestValidate(dto).ShouldNotHaveValidationErrorFor(x => x.Name);
+        dto.Key =new string('x', 100);
+        _validator.TestValidate(dto).ShouldNotHaveValidationErrorFor(x => x.Key);
     }
 
     [Fact]
@@ -67,20 +67,20 @@ public class PromptDtoValidatorTests
     }
 
     [Fact]
-    public void Validate_ShouldHaveError_WhenNameContainsSpace()
+    public void Validate_ShouldHaveError_WhenKeyContainsSpace()
     {
         var dto = BuildValidDto();
-        dto.Name = "Cover Letter";
-        _validator.TestValidate(dto).ShouldHaveValidationErrorFor(x => x.Name)
-            .WithErrorMessage("A prompt name must not contain spaces.");
+        dto.Key ="Cover Letter";
+        _validator.TestValidate(dto).ShouldHaveValidationErrorFor(x => x.Key)
+            .WithErrorMessage("A prompt key must not contain spaces.");
     }
 
     [Fact]
-    public void Validate_ShouldHaveError_WhenNameStartsWithBuiltInPrefix()
+    public void Validate_ShouldHaveError_WhenKeyStartsWithBuiltInPrefix()
     {
         var dto = BuildValidDto();
-        dto.Name = "builtIn_Cover_Letter";
-        _validator.TestValidate(dto).ShouldHaveValidationErrorFor(x => x.Name)
-            .WithErrorMessage("A prompt name must not start with 'builtIn_'.");
+        dto.Key ="builtIn_Cover_Letter";
+        _validator.TestValidate(dto).ShouldHaveValidationErrorFor(x => x.Key)
+            .WithErrorMessage("A prompt key must not start with 'builtIn_'.");
     }
 }

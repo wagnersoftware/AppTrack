@@ -2,7 +2,7 @@ using AppTrack.Api.IntegrationTests.Seeddata;
 using Shouldly;
 using System.Net;
 
-namespace AppTrack.Api.IntegrationTests.AiSettingsControllerTests;
+namespace AppTrack.Api.IntegrationTests.AiControllerTests;
 
 public class DeleteAiTextTests : IClassFixture<FakeAuthWebApplicationFactory>
 {
@@ -21,7 +21,7 @@ public class DeleteAiTextTests : IClassFixture<FakeAuthWebApplicationFactory>
         var jobApplicationId = await SeedHelper.CreateJobApplicationForTestUserAsync(_factory.Services);
         var aiTextId = await SeedHelper.CreateAiTextForJobApplicationAsync(_factory.Services, jobApplicationId);
 
-        var response = await _client.DeleteAsync($"/api/ai-settings/ai-text/{aiTextId}");
+        var response = await _client.DeleteAsync($"/api/ai/text/{aiTextId}");
 
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
     }
@@ -29,7 +29,7 @@ public class DeleteAiTextTests : IClassFixture<FakeAuthWebApplicationFactory>
     [Fact]
     public async Task DeleteAiText_ShouldReturn400_WhenEntryDoesNotExist()
     {
-        var response = await _client.DeleteAsync("/api/ai-settings/ai-text/999999");
+        var response = await _client.DeleteAsync("/api/ai/text/999999");
 
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
     }
