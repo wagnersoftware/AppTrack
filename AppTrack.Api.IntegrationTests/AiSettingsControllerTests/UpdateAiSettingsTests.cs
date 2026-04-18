@@ -28,8 +28,6 @@ public class UpdateAiSettingsTests : IClassFixture<FakeAuthWebApplicationFactory
         var aiSettingsId = await SeedHelper.CreateAiSettingsForTestUserAsync(_factory.Services);
         var validRequest = new UpdateAiSettingsCommand
         {
-            Id = aiSettingsId,
-            UserId = TestAuthHandler.TestUserId,
             PromptParameter = new List<PromptParameterDto>
                 {
                     new() { Key = "Temperature", Value = "0.8" },
@@ -38,7 +36,7 @@ public class UpdateAiSettingsTests : IClassFixture<FakeAuthWebApplicationFactory
         };
 
         // Act
-        var response = await _client.PutAsJsonAsync($"/api/ai-settings/{validRequest.Id}", validRequest);
+        var response = await _client.PutAsJsonAsync($"/api/ai-settings/{aiSettingsId}", validRequest);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);

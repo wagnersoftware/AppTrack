@@ -29,11 +29,7 @@ public class AiSettingsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<AiSettingsDto>> UpdateAiSettings([FromRoute] int id, [FromBody] UpdateAiSettingsCommand updateAiSettingsCommand)
     {
-        if (id != updateAiSettingsCommand.Id)
-        {
-            return BadRequest("Route ID and body ID do not match.");
-        }
-
+        updateAiSettingsCommand.Id = id;
         var result = await _mediator.Send(updateAiSettingsCommand);
         return Ok(result);
     }

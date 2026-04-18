@@ -2754,9 +2754,6 @@ namespace AppTrack.Frontend.ApiService.Base
         [System.Text.Json.Serialization.JsonPropertyName("language")]
         public AiResponseLanguage Language { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        public int Id { get; set; }
-
         [System.Text.Json.Serialization.JsonPropertyName("promptParameter")]
         public System.Collections.Generic.ICollection<PromptParameterDto> PromptParameter { get; set; }
 
