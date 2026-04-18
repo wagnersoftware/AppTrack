@@ -1,7 +1,9 @@
 ﻿using AppTrack.Api.IntegrationTests.Auth;
 using AppTrack.Api.IntegrationTests.Seeddata.JobApplicationDefaults;
 using AppTrack.Api.IntegrationTests.SeedData.AiSettings;
+using AppTrack.Api.IntegrationTests.SeedData.FreelancerProfile;
 using AppTrack.Api.IntegrationTests.SeedData.JobApplication;
+using AppTrack.Api.IntegrationTests.SeedData.JobApplicationAiText;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AppTrack.Api.IntegrationTests.Seeddata;
@@ -78,4 +80,13 @@ internal static class SeedHelper
         using var scope = services.CreateScope();
         await AiSettingsSeedsHelper.CreateChatModelsAsync(services);
     }
+
+    internal static Task<int> CreateFreelancerProfileForTestUserAsync(IServiceProvider services) =>
+        FreelancerProfileSeedsHelper.CreateProfileForUserAsync(services, TestAuthHandler.TestUserId);
+
+    internal static Task<int> CreateAiTextForJobApplicationAsync(IServiceProvider services, int jobApplicationId, string promptKey = "cover-letter") =>
+        JobApplicationAiTextSeedsHelper.CreateAiTextForJobApplicationAsync(services, jobApplicationId, promptKey);
+
+    internal static Task<(int chatModelId, int aiSettingsId)> CreateAiSettingsWithChatModelForTestUserAsync(IServiceProvider services) =>
+        JobApplicationAiTextSeedsHelper.CreateAiSettingsWithChatModelAsync(services, TestAuthHandler.TestUserId);
 }
