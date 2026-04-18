@@ -10,6 +10,7 @@ public class UpdateAiSettingsCommand : IRequest<AiSettingsDto>, IAiSettingsValid
 {
     public int SelectedChatModelId { get; set; }
     public AiResponseLanguage Language { get; set; }
+    [JsonIgnore]
     public int Id { get; set; }
     [JsonIgnore]
     public string UserId { get; set; } = string.Empty;

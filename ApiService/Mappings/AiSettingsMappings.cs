@@ -35,7 +35,6 @@ internal static class AiSettingsMappings
 
     internal static UpdateAiSettingsCommand ToUpdateCommand(this AiSettingsModel model) => new()
     {
-        Id = model.Id,
         SelectedChatModelId = model.SelectedChatModelId,
         Language = (AppTrack.Frontend.ApiService.Base.AiResponseLanguage)(int)model.Language,
         PromptParameter = model.PromptParameter.Select(p => p.ToDto()).ToList(),
