@@ -91,7 +91,7 @@ public class GetAiSettingsByUserIdQueryHandlerTests
 
         result.BuiltInPrompts.ShouldNotBeNull();
         result.BuiltInPrompts.Count.ShouldBe(2);
-        result.BuiltInPrompts[0].Name.ShouldBe("builtIn_Cover_Letter");
-        result.BuiltInPrompts[1].Name.ShouldBe("builtIn_Introduction");
+        result.BuiltInPrompts[0].Key.ShouldBe("builtIn_Cover_Letter");
+        result.BuiltInPrompts[1].Key.ShouldBe("builtIn_Introduction");
     }
 }

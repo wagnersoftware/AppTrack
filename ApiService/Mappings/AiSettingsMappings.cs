@@ -29,7 +29,7 @@ internal static class AiSettingsMappings
     internal static PromptModel ToModel(this PromptDto dto) => new()
     {
         Id = dto.Id,
-        Name = dto.Name ?? string.Empty,
+        Key = dto.Key ?? string.Empty,
         PromptTemplate = dto.PromptTemplate ?? string.Empty,
     };
 
@@ -52,7 +52,7 @@ internal static class AiSettingsMappings
     internal static PromptDto ToDto(this PromptModel model) => new()
     {
         Id = model.Id,
-        Name = model.Name,
+        Key = model.Key,
         PromptTemplate = model.PromptTemplate,
     };
 }

@@ -2709,8 +2709,8 @@ namespace AppTrack.Frontend.ApiService.Base
         [System.Text.Json.Serialization.JsonPropertyName("id")]
         public int Id { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("name")]
-        public string Name { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("key")]
+        public string Key { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("promptTemplate")]
         public string PromptTemplate { get; set; }

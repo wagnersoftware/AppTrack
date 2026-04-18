@@ -2,6 +2,6 @@ namespace AppTrack.Shared.Validation.Interfaces;
 
 public interface IPromptValidatable
 {
-    string Name { get; }
+    string Key { get; }
     string PromptTemplate { get; }
 }

@@ -137,7 +137,7 @@ public partial class AiSettings
         if (result is { Canceled: true }) return;
         if (result?.Data is not PromptModel updatedPrompt) return;
 
-        prompt.Name = updatedPrompt.Name;
+        prompt.Key = updatedPrompt.Key;
         prompt.PromptTemplate = updatedPrompt.PromptTemplate;
 
         await InvokeAsync(StateHasChanged);
