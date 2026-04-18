@@ -84,6 +84,9 @@ internal static class SeedHelper
     internal static Task<int> CreateFreelancerProfileForTestUserAsync(IServiceProvider services) =>
         FreelancerProfileSeedsHelper.CreateProfileForUserAsync(services, TestAuthHandler.TestUserId);
 
+    internal static Task<int> CreateFreelancerProfileWithCvForTestUserAsync(IServiceProvider services) =>
+        FreelancerProfileSeedsHelper.CreateProfileWithCvForUserAsync(services, TestAuthHandler.TestUserId);
+
     internal static Task<int> CreateAiTextForJobApplicationAsync(IServiceProvider services, int jobApplicationId, string promptKey = "cover-letter") =>
         JobApplicationAiTextSeedsHelper.CreateAiTextForJobApplicationAsync(services, jobApplicationId, promptKey);
 
