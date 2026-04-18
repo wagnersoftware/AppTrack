@@ -2,15 +2,15 @@ using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Domain;
 using FluentValidation;
 
-namespace AppTrack.Application.Features.ApplicationText.Query.GeneratePromptQuery;
+namespace AppTrack.Application.Features.ApplicationText.Query.RenderPromptQuery;
 
-public class GeneratePromptQueryValidator : AbstractValidator<GeneratePromptQuery>
+public class RenderPromptQueryValidator : AbstractValidator<RenderPromptQuery>
 {
     private readonly IJobApplicationRepository _jobApplicationRepository;
     private readonly IAiSettingsRepository _aiSettingsRepository;
     private readonly IBuiltInPromptRepository _builtInPromptRepository;
 
-    public GeneratePromptQueryValidator(
+    public RenderPromptQueryValidator(
         IJobApplicationRepository jobApplicationRepository,
         IAiSettingsRepository aiSettingsRepository,
         IBuiltInPromptRepository builtInPromptRepository)
@@ -44,7 +44,7 @@ public class GeneratePromptQueryValidator : AbstractValidator<GeneratePromptQuer
             .CustomAsync(ValidateAiSettings);
     }
 
-    private async Task ValidateAiSettings(GeneratePromptQuery query, ValidationContext<GeneratePromptQuery> context, CancellationToken token)
+    private async Task ValidateAiSettings(RenderPromptQuery query, ValidationContext<RenderPromptQuery> context, CancellationToken token)
     {
         var aiSettings = await _aiSettingsRepository.GetByUserIdWithPromptsReadOnlyAsync(query.UserId);
 

@@ -1,4 +1,4 @@
-﻿using AppTrack.Frontend.ApiService.Base;
+using AppTrack.Frontend.ApiService.Base;
 using AppTrack.Frontend.ApiService.Contracts;
 using AppTrack.Frontend.Models;
 
@@ -10,11 +10,11 @@ public class ApplicationTextService : BaseHttpService, IApplicationTextService
     {
     }
 
-    public Task<Response<ApplicationTextModel>> GenerateApplicationText(string prompt, int jobApplicationId, string promptKey, CancellationToken token) =>
+    public Task<Response<ApplicationTextModel>> GenerateAiText(string prompt, int jobApplicationId, string promptKey, CancellationToken token) =>
         TryExecuteAsync(async () =>
         {
             var command = new GenerateAiTextCommand() { Prompt = prompt, JobApplicationId = jobApplicationId, PromptKey = promptKey };
-            var generatedTextDto = await _client.GenerateApplicationTextAsync(command, token);
+            var generatedTextDto = await _client.GenerateAsync(command, token);
             return new ApplicationTextModel()
             {
                 Text = generatedTextDto.GeneratedText,
@@ -22,16 +22,16 @@ public class ApplicationTextService : BaseHttpService, IApplicationTextService
             };
         });
 
-    public Task<Response<GeneratedPromptModel>> GeneratePrompt(int jobApplicationId, string promptKey) =>
+    public Task<Response<RenderedPromptModel>> RenderPrompt(int jobApplicationId, string promptKey) =>
         TryExecuteAsync(async () =>
         {
-            var query = new GeneratePromptQuery() { JobApplicationId = jobApplicationId, PromptKey = promptKey };
-            var generatedPromptDto = await _client.GeneratePromptAsync(query);
-            return new GeneratedPromptModel()
+            var query = new RenderPromptQuery() { JobApplicationId = jobApplicationId, PromptKey = promptKey };
+            var renderedPromptDto = await _client.RenderPromptAsync(query);
+            return new RenderedPromptModel()
             {
-                Text = generatedPromptDto.Prompt,
-                WindowTitle = "Generated prompt",
-                UnusedKeys = generatedPromptDto.UnusedKeys.ToList()
+                Text = renderedPromptDto.Prompt,
+                WindowTitle = "Rendered prompt",
+                UnusedKeys = renderedPromptDto.UnusedKeys.ToList()
             };
         });
 
