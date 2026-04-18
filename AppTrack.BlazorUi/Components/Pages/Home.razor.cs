@@ -123,7 +123,7 @@ public partial class Home
 
     private async Task GenerateTextAsync(JobApplicationModel model)
     {
-        var namesResponse = await ApplicationTextService.GetPromptNames();
+        var namesResponse = await ApplicationTextService.GetPromptKeys();
 
         if (!ErrorHandlingService.HandleResponse(namesResponse))
             return;

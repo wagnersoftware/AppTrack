@@ -9,7 +9,7 @@ public interface IApplicationTextService
 
     Task<Response<RenderedPromptModel>> RenderPrompt(int jobApplicationId, string promptKey);
 
-    Task<Response<List<string>>> GetPromptNames();
+    Task<Response<List<string>>> GetPromptKeys();
 
     Task<Response<bool>> DeleteAiTextAsync(int id);
 }

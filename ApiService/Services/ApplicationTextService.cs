@@ -35,11 +35,11 @@ public class ApplicationTextService : BaseHttpService, IApplicationTextService
             };
         });
 
-    public Task<Response<List<string>>> GetPromptNames() =>
+    public Task<Response<List<string>>> GetPromptKeys() =>
         TryExecuteAsync(async () =>
         {
-            var dto = await _client.PromptNamesAsync();
-            return dto.Names.ToList();
+            var dto = await _client.PromptKeysAsync();
+            return dto.Keys.ToList();
         });
 
     public Task<Response<bool>> DeleteAiTextAsync(int id) =>

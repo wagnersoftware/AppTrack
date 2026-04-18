@@ -5,7 +5,7 @@ using AppTrack.Application.Features.AiSettings.Commands.GenerateAiText;
 using AppTrack.Application.Features.AiSettings.Dto;
 using AppTrack.Application.Features.ApplicationText.Dto;
 using AppTrack.Application.Features.ApplicationText.Query.RenderPromptQuery;
-using AppTrack.Application.Features.ApplicationText.Query.GetPromptNamesQuery;
+using AppTrack.Application.Features.ApplicationText.Query.GetPromptKeysQuery;
 using AppTrack.Application.Features.JobApplications.Dto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,14 +24,14 @@ public class AiController : ControllerBase
         this._mediator = mediator;
     }
 
-    // GET /api/ai/prompt-names
-    [HttpGet("prompt-names")]
-    [ProducesResponseType(typeof(GetPromptNamesDto), StatusCodes.Status200OK)]
+    // GET /api/ai/prompt-keys
+    [HttpGet("prompt-keys")]
+    [ProducesResponseType(typeof(GetPromptKeysDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(CustomProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult<GetPromptNamesDto>> GetPromptNames()
+    public async Task<ActionResult<GetPromptKeysDto>> GetPromptKeys()
     {
-        var result = await _mediator.Send(new GetPromptNamesQuery());
+        var result = await _mediator.Send(new GetPromptKeysQuery());
         return Ok(result);
     }
 
