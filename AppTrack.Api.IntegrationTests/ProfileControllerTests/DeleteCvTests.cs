@@ -8,14 +8,16 @@ using System.Net.Http.Json;
 namespace AppTrack.Api.IntegrationTests.ProfileControllerTests;
 
 /// <summary>
-/// Profile has no CV — ICvStorageService is never called, plain factory is sufficient.
+/// Profile has no CV — ICvStorageService is injected but never called.
+/// FakeCvStorageWebApplicationFactory is required so DI resolves ICvStorageService
+/// without needing real Azure configuration.
 /// </summary>
-public class DeleteCvNoCvTests : IClassFixture<FakeAuthWebApplicationFactory>
+public class DeleteCvNoCvTests : IClassFixture<FakeCvStorageWebApplicationFactory>
 {
-    private readonly FakeAuthWebApplicationFactory _factory;
+    private readonly FakeCvStorageWebApplicationFactory _factory;
     private readonly HttpClient _client;
 
-    public DeleteCvNoCvTests(FakeAuthWebApplicationFactory factory)
+    public DeleteCvNoCvTests(FakeCvStorageWebApplicationFactory factory)
     {
         _factory = factory;
         _client = factory.CreateAuthenticatedClient();
