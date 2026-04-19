@@ -24,6 +24,7 @@ public class FakeAuthWebApplicationFactory : WebApplicationFactory<Program>, IAs
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        builder.UseEnvironment("Test");
         builder.UseSetting("OpenAiSettings:ApiKey", "test-api-key-integration");
 
         builder.ConfigureTestServices(services =>
