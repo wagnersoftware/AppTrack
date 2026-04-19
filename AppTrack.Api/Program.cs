@@ -78,8 +78,11 @@ try
         .AddMicrosoftIdentityWebApi(
             jwtBearerOptions =>
             {
+                // Prevent ASP.NET Core from remapping claim names (e.g. "sub" → ClaimTypes.NameIdentifier).
                 jwtBearerOptions.MapInboundClaims = false;
 
+                // Explicitly set the CIAM metadata endpoint — required because ciamlogin.com
+                // uses a different discovery path than standard AAD.
                 var instance = builder.Configuration["AzureAd:Instance"]?.TrimEnd('/');
                 var tenantId = builder.Configuration["AzureAd:TenantId"];
                 jwtBearerOptions.MetadataAddress =
