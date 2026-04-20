@@ -49,13 +49,19 @@ try
                     new CompactJsonFormatter(),
                     "logs/apptrack-.log",
                     rollingInterval: RollingInterval.Day,
-                    retainedFileCountLimit: 7))
-            // Application Insights: prod only, only when connection string is present
-            .WriteTo.Conditional(
-                _ => env == "Production" && appInsightsConnStr is not null,
+                    retainedFileCountLimit: 7));
+
+        // Application Insights: prod only, only when connection string is present.
+        // Guard here prevents TelemetryConfiguration.CreateDefault() from running on
+        // non-Windows hosts where some Application Insights modules throw PlatformNotSupportedException.
+        if (appInsightsConnStr is not null)
+        {
+            loggerConfig.WriteTo.Conditional(
+                _ => env == "Production",
                 wt => wt.ApplicationInsights(
-                    appInsightsConnStr!,
+                    appInsightsConnStr,
                     TelemetryConverter.Traces));
+        }
     });
     // ─────────────────────────────────────────────────────────────────────
 
