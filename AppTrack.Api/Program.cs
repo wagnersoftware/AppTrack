@@ -13,7 +13,6 @@ using Microsoft.Identity.Web;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Formatting.Compact;
-using Serilog.Sinks.ApplicationInsights.TelemetryConverters;
 
 // Early startup logger — active only until the host is built.
 // Replaced by the full Serilog configuration below via UseSerilog().
@@ -43,8 +42,8 @@ try
             .Enrich.FromLogContext()
             .Enrich.With<CorrelationIdEnricher>()
             .Destructure.With<PiiDestructuringPolicy>()
-            // Console: all environments except Test (suppressed in Test to keep test output clean)
-            .WriteTo.Conditional(_ => env != "Test",
+            // Console: dev only
+            .WriteTo.Conditional(_ => env == "Development",
                 wt => wt.Console())
             // File: dev only, rolling daily JSON, 7-day retention
             .WriteTo.Conditional(_ => env == "Development",
