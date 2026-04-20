@@ -15,11 +15,14 @@ using Serilog;
 using Serilog.Formatting.Compact;
 using Serilog.Sinks.ApplicationInsights.TelemetryConverters;
 
-// Bootstrap logger — active only until the host is built.
+// Early startup logger — active only until the host is built.
 // Replaced by the full Serilog configuration below via UseSerilog().
+// Note: CreateLogger() is used instead of CreateBootstrapLogger() to avoid
+// interference with WebApplicationFactory (HostFactoryResolver cannot capture
+// the IHost when a ReloadableLogger intercepts HostAbortedException).
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
-    .CreateBootstrapLogger();
+    .CreateLogger();
 
 try
 {
