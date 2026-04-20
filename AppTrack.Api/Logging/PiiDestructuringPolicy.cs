@@ -3,6 +3,14 @@ using Serilog.Events;
 
 namespace AppTrack.Api.Logging;
 
+/// <summary>
+/// Serilog destructuring policy that redacts personally identifiable information (PII)
+/// from logged objects. When Serilog destructures an object whose type contains at least
+/// one property listed in <see cref="SensitiveFields"/>, every sensitive property is
+/// replaced with the literal string <c>[REDACTED]</c> while all other properties are
+/// logged normally. Objects without any sensitive properties are left to Serilog's
+/// default destructuring.
+/// </summary>
 public class PiiDestructuringPolicy : IDestructuringPolicy
 {
     private static readonly HashSet<string> SensitiveFields = new(StringComparer.OrdinalIgnoreCase)
