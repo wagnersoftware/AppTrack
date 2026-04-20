@@ -200,7 +200,9 @@ try
 
     await app.RunAsync();
 }
-catch (Exception ex)
+// HostAbortedException must not be caught — WebApplicationFactory throws it deliberately
+// to stop Program.cs after capturing the built IHost for integration tests.
+catch (Exception ex) when (ex is not HostAbortedException)
 {
     Log.Fatal(ex, "Application terminated unexpectedly");
     return 1;
