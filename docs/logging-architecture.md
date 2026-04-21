@@ -193,6 +193,50 @@ The effective level matrix at runtime:
 
 ---
 
+## Runtime Configuration via Azure App Service
+
+The log level can be changed in production **without redeployment** by setting Application Settings in the Azure portal. ASP.NET Core maps environment variables to configuration keys using `__` (double underscore) as the hierarchy separator, so they override values from `appsettings.Production.json` automatically.
+
+### How to set it
+
+In the Azure portal, navigate to **App Service → Configuration → Application Settings** and add the desired key/value pair. A restart of the app service applies the new value.
+
+### Configurable keys
+
+| Application Setting name | Example value | Effect |
+|---|---|---|
+| `Serilog__MinimumLevel__Default` | `Information` | Raises the default floor from `Warning` to `Information` |
+| `Serilog__MinimumLevel__Override__Microsoft` | `Information` | Lowers the `Microsoft.*` floor (default: `Warning`) |
+| `Serilog__MinimumLevel__Override__System` | `Information` | Lowers the `System.*` floor (default: `Warning`) |
+| `Serilog__MinimumLevel__Override__Microsoft.EntityFrameworkCore` | `Warning` | Silences EF Core query logs even when `Default` is `Information` |
+
+### Valid log level values
+
+`Verbose`, `Debug`, `Information`, `Warning`, `Error`, `Fatal`
+
+### Precedence
+
+```
+Azure App Setting (env var)   ← highest priority
+  ↓ overrides
+appsettings.Production.json
+  ↓ overrides
+appsettings.json              ← base / lowest priority
+```
+
+### Example: temporary Information logging in production
+
+To capture `Information`-level logs temporarily (e.g., for diagnosing a production issue):
+
+1. Set `Serilog__MinimumLevel__Default` = `Information` in Application Settings.
+2. Restart the app service.
+3. Reproduce and investigate via Application Insights.
+4. Remove the setting (or set it back to `Warning`) and restart again.
+
+No code change or redeployment is needed at any step.
+
+---
+
 ## Bootstrap Logger
 
 A minimal bootstrap logger is created before `WebApplication.CreateBuilder` runs, so that fatal errors during host construction (configuration loading, service registration) are captured:
