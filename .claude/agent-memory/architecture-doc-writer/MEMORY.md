@@ -30,7 +30,21 @@
 - Handlers instantiate validator with `new`, call ValidateAsync, throw BadRequestException(message, validationResult) on errors
 - No pipeline behavior for validation — validation is explicit in each handler
 
+## Logging Architecture (verified Apr 2026)
+- Serilog wired as backend of Microsoft.ILogger<T> via builder.Host.UseSerilog()
+- IAppLogger<T> (Application) + LoggingAdapter<T> (Infrastructure) are unchanged
+- Bootstrap logger: Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateBootstrapLogger() before host build
+- Enrichers: CorrelationIdEnricher (W3C TraceId, "none" if null), WithProperty("Environment") globally, UserId via EnrichDiagnosticContext (sub claim, HTTP only)
+- Environment is set GLOBALLY via .Enrich.WithProperty — NOT via EnrichDiagnosticContext (do not repeat in EnrichDiagnosticContext)
+- Sinks: Console (non-Test), File rolling daily JSON (Development only), ApplicationInsights (Production + conn string set)
+- Test env: builder.UseEnvironment("Test") in FakeAuthWebApplicationFactory — all sink predicates false
+- PiiDestructuringPolicy: masks Password/ApiKey/Token/Email/Name/GivenName/FamilyName → [REDACTED]; getter throws → [ERROR_READING_PROPERTY]; indexers filtered before reflection
+- Middleware order: UseSerilogRequestLogging (outermost) → ExceptionMiddleware → rest
+- NuGet (inline versions in AppTrack.Api.csproj): Serilog.AspNetCore 8.0.3, Serilog.Sinks.File 6.0.0, Serilog.Sinks.ApplicationInsights 5.0.1
+- Key files: AppTrack.Api/Logging/CorrelationIdEnricher.cs, AppTrack.Api/Logging/PiiDestructuringPolicy.cs
+
 ## Docs Already Written
-- `docs/error-handling-architecture.md` — full error handling, all layers, DE language
+- `docs/error-handling-architecture.md` — full error handling, all layers, EN language
 - `docs/mapping-architecture.md` — AutoMapper profiles
 - `docs/validation-architecture.md` — shared validation, FluentValidation
+- `docs/logging-architecture.md` — Serilog structured logging, enrichment, PII policy, sinks

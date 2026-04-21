@@ -2,14 +2,12 @@ using AppTrack.Application.Contracts;
 using AppTrack.Application.Contracts.AiTextGenerator;
 using AppTrack.Application.Contracts.CvStorage;
 using AppTrack.Application.Contracts.Email;
-using AppTrack.Application.Contracts.Logging;
 using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Models.Email;
 using AppTrack.Infrastructure.AiTextGeneration;
 using AppTrack.Infrastructure.CvStorage;
 using AppTrack.Infrastructure.EmailService;
 using AppTrack.Infrastructure.Identity;
-using AppTrack.Infrastructure.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -21,7 +19,6 @@ namespace AppTrack.Infrastructure
         {
             services.Configure<EmailSettings>(configuration.GetSection(nameof(EmailSettings)));
             services.AddTransient<IEmailSender, EmailSender>();
-            services.AddScoped(typeof(IAppLogger<>), typeof(LoggingAdapter<>));
 
             // IHttpContextAccessor is required by HttpContextUserContext to resolve the current user.
             services.AddHttpContextAccessor();

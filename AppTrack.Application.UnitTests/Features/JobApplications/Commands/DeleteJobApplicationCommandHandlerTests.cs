@@ -1,5 +1,5 @@
-using AppTrack.Application.Contracts.Logging;
 using AppTrack.Application.Contracts.Persistance;
+using Microsoft.Extensions.Logging;
 using AppTrack.Application.Exceptions;
 using AppTrack.Application.Features.JobApplications.Commands.DeleteJobApplication;
 using AppTrack.Application.Shared;
@@ -18,13 +18,13 @@ public class DeleteJobApplicationCommandHandlerTests
     private const int ExistingId = 42;
 
     private readonly Mock<IJobApplicationRepository> _mockRepo;
-    private readonly Mock<IAppLogger<DeleteJobApplicationCommandHandler>> _mockLogger;
+    private readonly Mock<ILogger<DeleteJobApplicationCommandHandler>> _mockLogger;
     private readonly Mock<IValidator<DeleteJobApplicationCommand>> _mockValidator;
 
     public DeleteJobApplicationCommandHandlerTests()
     {
         _mockRepo = new Mock<IJobApplicationRepository>();
-        _mockLogger = new Mock<IAppLogger<DeleteJobApplicationCommandHandler>>();
+        _mockLogger = new Mock<ILogger<DeleteJobApplicationCommandHandler>>();
         _mockValidator = new Mock<IValidator<DeleteJobApplicationCommand>>();
 
         _mockValidator
