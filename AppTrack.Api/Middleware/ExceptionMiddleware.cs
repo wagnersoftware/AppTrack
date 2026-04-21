@@ -1,6 +1,6 @@
 ﻿using AppTrack.Api.Models;
-using AppTrack.Application.Contracts.Logging;
 using AppTrack.Application.Exceptions;
+using Microsoft.Extensions.Logging;
 using System.Net;
 using BadRequestException = AppTrack.Application.Exceptions.BadRequestException;
 using NotFoundException = AppTrack.Application.Exceptions.NotFoundException;
@@ -10,9 +10,9 @@ namespace AppTrack.Api.Middleware;
 public class ExceptionMiddleware
 {
     private readonly RequestDelegate _next;
-    private readonly IAppLogger<ExceptionMiddleware> _logger;
+    private readonly ILogger<ExceptionMiddleware> _logger;
 
-    public ExceptionMiddleware(RequestDelegate next, IAppLogger<ExceptionMiddleware> logger)
+    public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
     {
         this._next = next;
         this._logger = logger;
