@@ -22,7 +22,7 @@ public static class MigrationsHelper
 
             Console.WriteLine("Starting database-migrations");
             await mainDb.Database.MigrateAsync();
-            Console.WriteLine("Databsse migration successful");
+            Console.WriteLine("Database migration successful");
         }
         catch (Exception ex)
         {
