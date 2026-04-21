@@ -36,17 +36,32 @@ The feature is designed for **cloud portability**: the background polling can ru
 
 ### New Entities (all inherit `BaseEntity`)
 
+#### `RssParserType` — enum (defined in Domain)
+```csharp
+public enum RssParserType
+{
+    Default,
+    Stepstone
+}
+```
+Stored as string in the database via `HasConversion<string>()`. Adding a new portal parser requires a new enum value and a corresponding implementation in Infrastructure.
+
 #### `RssPortal` — system-managed
 ```csharp
 public class RssPortal : BaseEntity
 {
-    public string Name { get; set; }       // e.g. "Stepstone"
-    public string Url { get; set; }        // RSS feed URL
-    public string ParserType { get; set; } // e.g. "Stepstone", "Default"
-    public bool IsActive { get; set; }     // system-level kill switch
+    public string Name { get; set; }           // e.g. "Stepstone"
+    public string Url { get; set; }            // RSS feed URL
+    public RssParserType ParserType { get; set; } // type-safe parser selector
+    public bool IsActive { get; set; }         // system-level kill switch
 }
 ```
 Populated via EF Core seed migration. Not exposed for user editing.
+
+**EF Core mapping for `ParserType`:** stored as string for DB readability:
+```csharp
+builder.Property(x => x.ParserType).HasConversion<string>();
+```
 
 #### `UserRssSubscription` — user activation of a portal
 ```csharp
@@ -140,7 +155,7 @@ public interface IRssFeedReader
 
 public interface IRssFeedItemParser
 {
-    RssJobApplicationData Parse(RawFeedItem item, string parserType, string portalName);
+    RssJobApplicationData Parse(RawFeedItem item, RssParserType parserType, string portalName);
 }
 
 public interface IRssMatchNotifier
@@ -173,7 +188,7 @@ Activates or deactivates a set of portals for the authenticated user (`IUserScop
    a. Load `RssMonitoringSettings` (keywords, interval).
    b. For each active subscription:
       - Read feed via `IRssFeedReader`.
-      - Parse each item via `IRssFeedItemParser.Parse(item, portal.ParserType, portal.Name)`.
+      - Parse each item via `IRssFeedItemParser.Parse(item, portal.ParserType, portal.Name)` — `ParserType` is `RssParserType` enum.
       - Filter out URLs already present in `ProcessedFeedItem` for this user.
       - Apply keyword matching: case-insensitive, OR logic, on `RawFeedItem.Title + Description`.
    c. **Within a single transaction** (via `IUnitOfWork.ExecuteInTransactionAsync`):
@@ -210,7 +225,7 @@ AppTrack.Infrastructure/
 │   ├── RssFeedItemParser.cs          — implements IRssFeedItemParser; delegates to internal parsers
 │   ├── Parsers/                       — Infrastructure-internal, not visible to Application
 │   │   ├── IRssFeedParser.cs         — internal interface: Parse(RawFeedItem, portalName) → RssJobApplicationData
-│   │   ├── RssFeedParserFactory.cs   — selects parser by parserType string
+│   │   ├── RssFeedParserFactory.cs   — selects parser by RssParserType enum (switch expression)
 │   │   ├── DefaultFeedParser.cs
 │   │   └── StepstoneFeedParser.cs
 ├── Notifications/
