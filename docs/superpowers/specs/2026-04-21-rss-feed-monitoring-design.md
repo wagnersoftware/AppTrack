@@ -360,10 +360,106 @@ builder.Services.AddHostedService<RssFeedBackgroundService>();
 
 ## Testing Strategy
 
-- **Unit tests** for `PollRssFeedsCommandHandler`: mock all repositories, `IRssFeedReader`, `IRssFeedItemParser`, `IRssMatchNotifier`, `IUnitOfWork`. Verify correct `JobApplication` creation, deduplication, transaction usage, notification dispatch only on matches.
-- **Unit tests** for `DefaultFeedParser` and `StepstoneFeedParser`: fixed `RawFeedItem` input → expected `RssJobApplicationData` output.
-- **Unit tests** for `UpdateRssMonitoringSettingsCommand` and `SetRssSubscriptionsCommand` validators.
-- **Persistence integration tests** for unique index enforcement on `ProcessedFeedItem(UserId, FeedItemUrl)` and `UserRssSubscription(UserId, RssPortalId)`.
+### Unit Tests (`AppTrack.Application.UnitTests`)
+
+- **`PollRssFeedsCommandHandlerTests`**: mock all repositories, `IRssFeedReader`, `IRssFeedItemParser`, `IRssMatchNotifier`, `IUnitOfWork`. Verify correct `JobApplication` creation, deduplication, transaction usage, notification dispatch only on matches.
+- **`DefaultFeedParserTests`** / **`StepstoneFeedParserTests`**: fixed `RawFeedItem` input → expected `RssJobApplicationData` output.
+- **`UpdateRssMonitoringSettingsCommandValidatorTests`** / **`SetRssSubscriptionsCommandValidatorTests`**: FluentValidation rules.
+
+### Persistence Integration Tests (`AppTrack.Persistance.IntegrationTests`)
+
+- Unique index enforcement on `ProcessedFeedItem(UserId, FeedItemUrl)` and `UserRssSubscription(UserId, RssPortalId)`.
+
+### API Integration Tests (`AppTrack.Api.IntegrationTests`)
+
+Tests follow the existing pattern: `IClassFixture<T>` + `SeedHelper` + `Shouldly`.
+
+#### New infrastructure required
+
+**`StubRssFeedReader`** — replaces `IRssFeedReader` in tests:
+```csharp
+public class StubRssFeedReader : IRssFeedReader
+{
+    public static readonly List<RawFeedItem> FakeItems = [
+        new("Senior .NET Developer - Berlin", "https://example.com/job/1", ".NET Core, Azure", DateTime.UtcNow),
+        new("Marketing Manager", "https://example.com/job/2", "Brand strategy", DateTime.UtcNow)
+    ];
+    public Task<List<RawFeedItem>> ReadAsync(string feedUrl, CancellationToken ct)
+        => Task.FromResult(FakeItems);
+}
+```
+
+**`StubRssMatchNotifier`** — replaces `IRssMatchNotifier` to suppress emails:
+```csharp
+public class StubRssMatchNotifier : IRssMatchNotifier
+{
+    public Task NotifyAsync(string userId, List<RssJobApplicationData> matches, CancellationToken ct)
+        => Task.CompletedTask;
+}
+```
+
+**`FakeRssFeedWebApplicationFactory`** — extends `FakeAuthWebApplicationFactory`:
+```csharp
+public class FakeRssFeedWebApplicationFactory : FakeAuthWebApplicationFactory
+{
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    {
+        base.ConfigureWebHost(builder);
+        builder.ConfigureTestServices(services =>
+        {
+            services.RemoveAll<IRssFeedReader>();
+            services.AddScoped<IRssFeedReader, StubRssFeedReader>();
+            services.RemoveAll<IRssMatchNotifier>();
+            services.AddScoped<IRssMatchNotifier, StubRssMatchNotifier>();
+        });
+    }
+}
+```
+
+**New seed helpers:**
+- `RssMonitoringSettingsSeedsHelper.CreateForTestUserAsync(services, keywords, intervalMinutes)` → `int id`
+- `RssSubscriptionSeedsHelper.CreateForTestUserAsync(services, portalId, isActive)` → `int id`
+
+`RssPortal` entries are already in the DB after migration (seeded via `HasData`). Tests retrieve existing portal IDs via the `GET /api/rssfeeds/portals` response or directly from the DB context.
+
+---
+
+#### Test classes
+
+**`RssFeedPortalsTests`** — `IClassFixture<FakeAuthWebApplicationFactory>`
+
+| Test | Setup | Expected |
+|------|-------|----------|
+| `GetPortals_ShouldReturn200_WithAllSystemPortals` | no seed required | 200, list contains at least the seeded Stepstone portal |
+| `GetPortals_ShouldReturn200_WithIsSubscribedFalse_WhenNoSubscription` | no subscription seeded | 200, `IsSubscribed = false` for all portals |
+| `GetPortals_ShouldReturn200_WithIsSubscribedTrue_WhenSubscriptionExists` | seed active subscription for test user | 200, matching portal has `IsSubscribed = true` |
+| `GetPortals_ShouldReturn401_WhenUnauthenticated` | no auth header | 401 |
+
+---
+
+**`RssFeedSubscriptionsTests`** — `IClassFixture<FakeAuthWebApplicationFactory>`
+
+| Test | Setup | Expected |
+|------|-------|----------|
+| `SetSubscriptions_ShouldReturn204_WhenPortalIdIsValid` | existing portal id from DB | 204 |
+| `SetSubscriptions_ShouldReturn400_WhenPortalIdDoesNotExist` | non-existent portal id | 400 |
+| `SetSubscriptions_ShouldPersistActivation_WhenCalledWithIsActiveTrue` | — | subsequent GET portals shows `IsSubscribed = true` |
+| `SetSubscriptions_ShouldReturn401_WhenUnauthenticated` | no auth header | 401 |
+
+---
+
+**`RssFeedSettingsTests`** — `IClassFixture<FakeAuthWebApplicationFactory>`
+
+| Test | Setup | Expected |
+|------|-------|----------|
+| `GetSettings_ShouldReturn200_WithDefaults_WhenNoSettingsExist` | no settings seeded | 200, empty keywords, default interval |
+| `GetSettings_ShouldReturn200_WithPersistedSettings_WhenSettingsExist` | seed settings with keywords + interval | 200, values match seeded data |
+| `UpdateSettings_ShouldReturn204_WhenRequestIsValid` | — | 204 |
+| `UpdateSettings_ShouldReturn400_WhenKeywordsIsNull` | — | 400 |
+| `UpdateSettings_ShouldReturn400_WhenIntervalIsBelowMinimum` | — | 400 |
+| `UpdateSettings_ShouldPersistSettings_WhenCalledWithValidData` | — | subsequent GET returns same values |
+| `GetSettings_ShouldReturn401_WhenUnauthenticated` | no auth header | 401 |
+| `UpdateSettings_ShouldReturn401_WhenUnauthenticated` | no auth header | 401 |
 
 ---
 
