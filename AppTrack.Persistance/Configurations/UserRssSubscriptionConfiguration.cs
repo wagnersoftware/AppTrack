@@ -10,6 +10,9 @@ public class UserRssSubscriptionConfiguration : IEntityTypeConfiguration<UserRss
     {
         builder.Property(x => x.UserId).IsRequired().HasMaxLength(200);
         builder.HasIndex(x => new { x.UserId, x.RssPortalId }).IsUnique();
-        builder.HasOne(x => x.RssPortal).WithMany().HasForeignKey(x => x.RssPortalId);
+        builder.HasOne(x => x.RssPortal)
+            .WithMany()
+            .HasForeignKey(x => x.RssPortalId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

@@ -11,6 +11,7 @@ public class UserRssSubscriptionRepository : GenericRepository<UserRssSubscripti
 
     public async Task<List<UserRssSubscription>> GetActiveSubscriptionsWithPortalsAsync()
         => await _context.UserRssSubscriptions
+            .AsNoTracking()
             .Include(s => s.RssPortal)
             .Where(s => s.IsActive && s.RssPortal.IsActive)
             .ToListAsync();
@@ -35,7 +36,6 @@ public class UserRssSubscriptionRepository : GenericRepository<UserRssSubscripti
         else
         {
             existing.IsActive = isActive;
-            _context.UserRssSubscriptions.Update(existing);
         }
         await _context.SaveChangesAsync();
     }

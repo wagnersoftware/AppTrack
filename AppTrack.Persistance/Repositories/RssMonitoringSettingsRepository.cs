@@ -26,7 +26,6 @@ public class RssMonitoringSettingsRepository : GenericRepository<RssMonitoringSe
             existing.Keywords = settings.Keywords;
             existing.PollIntervalMinutes = settings.PollIntervalMinutes;
             existing.NotificationEmail = settings.NotificationEmail;
-            _context.RssMonitoringSettings.Update(existing);
         }
         await _context.SaveChangesAsync();
     }
