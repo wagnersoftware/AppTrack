@@ -26,6 +26,11 @@ public class AppTrackDatabaseContext : DbContext
 
     public DbSet<BuiltInPromptParameter> BuiltInPromptParameter { get; set; }
 
+    public DbSet<RssPortal> RssPortals { get; set; }
+    public DbSet<UserRssSubscription> UserRssSubscriptions { get; set; }
+    public DbSet<RssMonitoringSettings> RssMonitoringSettings { get; set; }
+    public DbSet<ProcessedFeedItem> ProcessedFeedItems { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppTrackDatabaseContext).Assembly);
