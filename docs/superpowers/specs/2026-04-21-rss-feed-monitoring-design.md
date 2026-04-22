@@ -83,6 +83,7 @@ public class RssMonitoringSettings : BaseEntity
     public string UserId { get; set; }
     public List<string> Keywords { get; set; } = [];
     public int PollIntervalMinutes { get; set; } // e.g. 60
+    public string NotificationEmail { get; set; } // email from Entra JWT claim, stored on first settings save
 }
 ```
 One record per user. Created on first save.
@@ -94,6 +95,7 @@ builder.Property(x => x.Keywords)
     .HasConversion(
         v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
         v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions?)null) ?? []);
+builder.Property(x => x.NotificationEmail).IsRequired().HasMaxLength(500);
 ```
 
 #### `ProcessedFeedItem` — deduplication log
@@ -132,7 +134,7 @@ AppTrack.Application/Contracts/RssFeed/
 ├── IProcessedFeedItemRepository.cs
 ├── IRssFeedReader.cs          — ReadAsync(url) → List<RawFeedItem>
 ├── IRssFeedItemParser.cs      — Parse(item, parserType, portalName) → RssJobApplicationData
-└── IRssMatchNotifier.cs       — NotifyAsync(userId, matches)
+└── IRssMatchNotifier.cs       — NotifyAsync(userId, userEmail, matches)
 ```
 
 **Note on parser architecture:** `IRssFeedItemParser` is the only parser-related interface visible to Application. The internal `IRssFeedParser` strategy and `RssFeedParserFactory` are Infrastructure-internal details — Application only calls the single `IRssFeedItemParser.Parse(...)` method and receives `RssJobApplicationData`. This keeps the parser strategy pattern fully contained in Infrastructure.
@@ -160,7 +162,7 @@ public interface IRssFeedItemParser
 
 public interface IRssMatchNotifier
 {
-    Task NotifyAsync(string userId, List<RssJobApplicationData> matches, CancellationToken ct);
+    Task NotifyAsync(string userId, string userEmail, List<RssJobApplicationData> matches, CancellationToken ct);
 }
 ```
 
@@ -174,10 +176,10 @@ This satisfies the required/max-length constraint while remaining honest about t
 ### Commands
 
 #### `UpdateRssMonitoringSettingsCommand`
-Updates keywords and poll interval for the authenticated user (`IUserScopedRequest`).
+Updates keywords and poll interval for the authenticated user (`IUserScopedRequest`). `NotificationEmail` is decorated with `[JsonIgnore]` — it is not accepted from the request body. The controller sets it from the authenticated user's Entra JWT `email` claim before dispatching the command.
 
 #### `SetRssSubscriptionsCommand`
-Activates or deactivates a set of portals for the authenticated user (`IUserScopedRequest`).
+Activates or deactivates a set of portals for the authenticated user (`IUserScopedRequest`). The handler wraps all portal upsert operations in `IUnitOfWork.ExecuteInTransactionAsync` to ensure atomicity — either all portal activations/deactivations succeed or none are persisted.
 
 #### `PollRssFeedsCommand` *(internal — not exposed via API, no `IUserScopedRequest`)*
 
@@ -186,16 +188,20 @@ Activates or deactivates a set of portals for the authenticated user (`IUserScop
 2. Group by user.
 3. For each user:
    a. Load `RssMonitoringSettings` (keywords, interval).
-   b. For each active subscription:
+   b. Skip user if `settings.NotificationEmail` is empty (email was never saved — user has not yet called the settings endpoint).
+   c. For each active subscription:
       - Read feed via `IRssFeedReader`.
       - Parse each item via `IRssFeedItemParser.Parse(item, portal.ParserType, portal.Name)` — `ParserType` is `RssParserType` enum.
       - Filter out URLs already present in `ProcessedFeedItem` for this user.
       - Apply keyword matching: case-insensitive, OR logic, on `RawFeedItem.Title + Description`.
-   c. **Within a single transaction** (via `IUnitOfWork.ExecuteInTransactionAsync`):
+   d. **Within a single transaction** (via `IUnitOfWork.ExecuteInTransactionAsync`):
       - Create `JobApplication` for each match (Status = `Discovered`, Name = company or portal name).
       - Insert corresponding `ProcessedFeedItem` records.
+
+        **Note:** `ProcessedFeedItem` records are created for **all new feed items**, not only matching ones. This prevents re-evaluation of previously seen items on subsequent polls, regardless of keyword changes. Old `ProcessedFeedItem` records will be cleaned up by a future background job (out of scope for v1 — see Out of Scope section).
+
       - Update `UserRssSubscription.LastPolledAt = DateTime.UtcNow`.
-   d. After the transaction commits: if matches were found, call `IRssMatchNotifier.NotifyAsync`.
+   e. After the transaction commits: if matches were found, call `IRssMatchNotifier.NotifyAsync`.
 
 Keeping the notification call outside the transaction ensures a DB failure does not silently suppress the notification, and a notification failure does not roll back persisted data.
 
@@ -268,6 +274,8 @@ if (provider == "ServiceBus")
 else
     services.AddScoped<IRssMatchNotifier, DirectEmailNotifier>();
 ```
+
+**Email address resolution:** When the user saves their RSS monitoring settings via `PUT /api/rssfeeds/settings`, the controller reads the `email` claim from the Entra External ID JWT (`User.FindFirst("email")`) and stores it as `RssMonitoringSettings.NotificationEmail`. The `PollRssFeedsCommandHandler` reads this stored value directly from the DB — no HTTP context or external identity lookup required at poll time. Users who have never saved their settings are skipped.
 
 ### New NuGet packages required
 
@@ -393,7 +401,7 @@ public class StubRssFeedReader : IRssFeedReader
 ```csharp
 public class StubRssMatchNotifier : IRssMatchNotifier
 {
-    public Task NotifyAsync(string userId, List<RssJobApplicationData> matches, CancellationToken ct)
+    public Task NotifyAsync(string userId, string userEmail, List<RssJobApplicationData> matches, CancellationToken ct)
         => Task.CompletedTask;
 }
 ```

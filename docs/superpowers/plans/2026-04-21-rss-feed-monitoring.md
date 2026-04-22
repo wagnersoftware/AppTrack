@@ -119,6 +119,7 @@ public class RssMonitoringSettings : BaseEntity
     public string UserId { get; set; } = string.Empty;
     public List<string> Keywords { get; set; } = [];
     public int PollIntervalMinutes { get; set; } = 60;
+    public string NotificationEmail { get; set; } = string.Empty;
 }
 ```
 
@@ -282,7 +283,7 @@ namespace AppTrack.Application.Contracts.RssFeed;
 
 public interface IRssMatchNotifier
 {
-    Task NotifyAsync(string userId, List<RssJobApplicationData> matches, CancellationToken ct);
+    Task NotifyAsync(string userId, string userEmail, List<RssJobApplicationData> matches, CancellationToken ct);
 }
 ```
 
@@ -412,6 +413,7 @@ public class RssMonitoringSettingsConfiguration : IEntityTypeConfiguration<RssMo
             .HasConversion(
                 v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
                 v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions?)null) ?? []);
+        builder.Property(x => x.NotificationEmail).IsRequired().HasMaxLength(500);
     }
 }
 ```
@@ -675,6 +677,7 @@ public class UpdateRssMonitoringSettingsCommandHandlerTests
         var command = new UpdateRssMonitoringSettingsCommand
         {
             UserId = "user-1",
+            NotificationEmail = "user@example.com",
             Keywords = ["dotnet", "azure"],
             PollIntervalMinutes = 60
         };
@@ -683,6 +686,7 @@ public class UpdateRssMonitoringSettingsCommandHandlerTests
 
         _mockRepo.Verify(r => r.UpsertAsync(It.Is<RssMonitoringSettings>(
             s => s.UserId == "user-1" &&
+                 s.NotificationEmail == "user@example.com" &&
                  s.Keywords.SequenceEqual(["dotnet", "azure"]) &&
                  s.PollIntervalMinutes == 60)), Times.Once);
     }
@@ -781,6 +785,8 @@ public class UpdateRssMonitoringSettingsCommand : IRequest<Unit>, IUserScopedReq
 {
     [JsonIgnore]
     public string UserId { get; set; } = string.Empty;
+    [JsonIgnore]
+    public string NotificationEmail { get; set; } = string.Empty;
     public List<string> Keywords { get; set; } = [];
     public int PollIntervalMinutes { get; set; }
 }
@@ -820,6 +826,7 @@ public class UpdateRssMonitoringSettingsCommandHandler
         await _repository.UpsertAsync(new RssMonitoringSettings
         {
             UserId = request.UserId,
+            NotificationEmail = request.NotificationEmail,
             Keywords = request.Keywords,
             PollIntervalMinutes = request.PollIntervalMinutes
         });
@@ -876,6 +883,7 @@ git commit -m "feat: add UpdateRssMonitoringSettingsCommand with handler, valida
 
 ```csharp
 // AppTrack.Application.UnitTests/Features/RssFeeds/Commands/SetRssSubscriptionsCommandHandlerTests.cs
+using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Contracts.RssFeed;
 using AppTrack.Application.Features.RssFeeds.Commands.SetRssSubscriptions;
 using AppTrack.Application.Features.RssFeeds.Dto;
@@ -891,6 +899,7 @@ public class SetRssSubscriptionsCommandHandlerTests
 {
     private readonly Mock<IUserRssSubscriptionRepository> _mockRepo;
     private readonly Mock<IValidator<SetRssSubscriptionsCommand>> _mockValidator;
+    private readonly Mock<IUnitOfWork> _mockUow;
 
     public SetRssSubscriptionsCommandHandlerTests()
     {
@@ -899,10 +908,14 @@ public class SetRssSubscriptionsCommandHandlerTests
         _mockValidator
             .Setup(v => v.ValidateAsync(It.IsAny<SetRssSubscriptionsCommand>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new ValidationResult());
+        _mockUow = new Mock<IUnitOfWork>();
+        _mockUow
+            .Setup(u => u.ExecuteInTransactionAsync(It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()))
+            .Returns<Func<CancellationToken, Task>, CancellationToken>(async (action, ct) => await action(ct));
     }
 
     private SetRssSubscriptionsCommandHandler CreateHandler() =>
-        new(_mockRepo.Object, _mockValidator.Object);
+        new(_mockRepo.Object, _mockValidator.Object, _mockUow.Object);
 
     [Fact]
     public async Task Handle_ShouldCallUpsert_ForEachSubscription()
@@ -931,6 +944,22 @@ public class SetRssSubscriptionsCommandHandlerTests
         var result = await CreateHandler().Handle(command, CancellationToken.None);
 
         result.ShouldBe(Unit.Value);
+    }
+
+    [Fact]
+    public async Task Handle_ShouldUseTransaction_ForAllSubscriptions()
+    {
+        var command = new SetRssSubscriptionsCommand
+        {
+            UserId = "user-1",
+            Subscriptions = [new(1, true), new(2, false)]
+        };
+
+        await CreateHandler().Handle(command, CancellationToken.None);
+
+        _mockUow.Verify(u => u.ExecuteInTransactionAsync(
+            It.IsAny<Func<CancellationToken, Task>>(),
+            It.IsAny<CancellationToken>()), Times.Once);
     }
 }
 ```
@@ -1007,6 +1036,7 @@ public class SetRssSubscriptionsCommand : IRequest<Unit>, IUserScopedRequest
 ```csharp
 // AppTrack.Application/Features/RssFeeds/Commands/SetRssSubscriptions/SetRssSubscriptionsCommandHandler.cs
 using AppTrack.Application.Contracts.Mediator;
+using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Contracts.RssFeed;
 using AppTrack.Application.Exceptions;
 using AppTrack.Application.Shared;
@@ -1018,13 +1048,16 @@ public class SetRssSubscriptionsCommandHandler : IRequestHandler<SetRssSubscript
 {
     private readonly IUserRssSubscriptionRepository _repository;
     private readonly IValidator<SetRssSubscriptionsCommand> _validator;
+    private readonly IUnitOfWork _unitOfWork;
 
     public SetRssSubscriptionsCommandHandler(
         IUserRssSubscriptionRepository repository,
-        IValidator<SetRssSubscriptionsCommand> validator)
+        IValidator<SetRssSubscriptionsCommand> validator,
+        IUnitOfWork unitOfWork)
     {
         _repository = repository;
         _validator = validator;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Unit> Handle(SetRssSubscriptionsCommand request, CancellationToken cancellationToken)
@@ -1033,8 +1066,11 @@ public class SetRssSubscriptionsCommandHandler : IRequestHandler<SetRssSubscript
         if (validationResult.Errors.Any())
             throw new BadRequestException("Invalid request", validationResult);
 
-        foreach (var subscription in request.Subscriptions)
-            await _repository.UpsertAsync(request.UserId, subscription.PortalId, subscription.IsActive);
+        await _unitOfWork.ExecuteInTransactionAsync(async ct =>
+        {
+            foreach (var subscription in request.Subscriptions)
+                await _repository.UpsertAsync(request.UserId, subscription.PortalId, subscription.IsActive);
+        }, cancellationToken);
 
         return Unit.Value;
     }
@@ -1366,7 +1402,8 @@ public class PollRssFeedsCommandHandlerTests
 
     private static readonly RssMonitoringSettings Settings = new()
     {
-        UserId = UserId, Keywords = ["dotnet"], PollIntervalMinutes = 60
+        UserId = UserId, Keywords = ["dotnet"], PollIntervalMinutes = 60,
+        NotificationEmail = "user@example.com"
     };
 
     private static readonly RawFeedItem MatchingItem = new(
@@ -1459,6 +1496,7 @@ public class PollRssFeedsCommandHandlerTests
 
         _mockNotifier.Verify(n => n.NotifyAsync(
             UserId,
+            "user@example.com",
             It.Is<List<RssJobApplicationData>>(m => m.Count == 1),
             It.IsAny<CancellationToken>()), Times.Once);
     }
@@ -1472,7 +1510,7 @@ public class PollRssFeedsCommandHandlerTests
         await CreateHandler().Handle(new PollRssFeedsCommand(), CancellationToken.None);
 
         _mockNotifier.Verify(n => n.NotifyAsync(
-            It.IsAny<string>(), It.IsAny<List<RssJobApplicationData>>(), It.IsAny<CancellationToken>()),
+            It.IsAny<string>(), It.IsAny<string>(), It.IsAny<List<RssJobApplicationData>>(), It.IsAny<CancellationToken>()),
             Times.Never);
     }
 
@@ -1564,6 +1602,21 @@ public class PollRssFeedsCommandHandlerTests
         _mockJobAppRepo.Verify(r => r.CreateAsync(It.Is<JobApplication>(
             j => j.Name == "Acme GmbH")), Times.Once);
     }
+
+    [Fact]
+    public async Task Handle_ShouldSkipUser_WhenNotificationEmailIsEmpty()
+    {
+        _mockSettingsRepo.Setup(r => r.GetByUserIdAsync(UserId))
+            .ReturnsAsync(new RssMonitoringSettings
+            {
+                UserId = UserId, Keywords = ["dotnet"], PollIntervalMinutes = 60,
+                NotificationEmail = string.Empty
+            });
+
+        await CreateHandler().Handle(new PollRssFeedsCommand(), CancellationToken.None);
+
+        _mockFeedReader.Verify(r => r.ReadAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
 }
 ```
 
@@ -1641,6 +1694,9 @@ public class PollRssFeedsCommandHandler : IRequestHandler<PollRssFeedsCommand, U
             if (settings is null || settings.Keywords.Count == 0)
                 continue;
 
+            if (string.IsNullOrEmpty(settings.NotificationEmail))
+                continue;
+
             var now = DateTime.UtcNow;
             var dueSubscriptions = userGroup
                 .Where(s => s.LastPolledAt is null ||
@@ -1699,7 +1755,7 @@ public class PollRssFeedsCommandHandler : IRequestHandler<PollRssFeedsCommand, U
             }
 
             if (allMatches.Count > 0)
-                await _notifier.NotifyAsync(userId, allMatches, cancellationToken);
+                await _notifier.NotifyAsync(userId, settings.NotificationEmail, allMatches, cancellationToken);
         }
 
         return Unit.Value;
@@ -1740,7 +1796,6 @@ git commit -m "feat: add PollRssFeedsCommandHandler with comprehensive unit test
 - Create: `AppTrack.Infrastructure/RssFeed/Parsers/StepstoneFeedParser.cs`
 - Create: `AppTrack.Infrastructure/RssFeed/Parsers/RssFeedParserFactory.cs`
 - Create: `AppTrack.Infrastructure/RssFeed/RssFeedItemParser.cs`
-- Create: `AppTrack.Application.UnitTests/Features/RssFeeds/Parsers/DefaultFeedParserTests.cs`
 
 - [ ] **Add NuGet packages to Infrastructure**
 
@@ -1751,75 +1806,7 @@ In `AppTrack.Infrastructure/AppTrack.Infrastructure.csproj`, add inside the exis
 <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.18.4" />
 ```
 
-- [ ] **Add `AppTrack.Infrastructure` reference to unit test project**
-
-In `AppTrack.Application.UnitTests/AppTrack.Application.UnitTests.csproj`, add:
-
-```xml
-<ProjectReference Include="..\AppTrack.Infrastructure\AppTrack.Infrastructure.csproj" />
-```
-
-- [ ] **Write failing parser unit tests**
-
-```csharp
-// AppTrack.Application.UnitTests/Features/RssFeeds/Parsers/DefaultFeedParserTests.cs
-using AppTrack.Application.Features.RssFeeds.Models;
-using AppTrack.Infrastructure.RssFeed.Parsers;
-using Shouldly;
-
-namespace AppTrack.Application.UnitTests.Features.RssFeeds.Parsers;
-
-public class DefaultFeedParserTests
-{
-    private readonly DefaultFeedParser _sut = new();
-
-    [Fact]
-    public void Parse_ShouldMapTitleToPosition()
-    {
-        var item = new RawFeedItem("Senior .NET Developer", "https://example.com/1", "Great job", DateTime.UtcNow);
-        var result = _sut.Parse(item, "Stepstone");
-        result.Position.ShouldBe("Senior .NET Developer");
-    }
-
-    [Fact]
-    public void Parse_ShouldMapUrlToUrl()
-    {
-        var item = new RawFeedItem("Title", "https://example.com/1", "Desc", DateTime.UtcNow);
-        var result = _sut.Parse(item, "Stepstone");
-        result.Url.ShouldBe("https://example.com/1");
-    }
-
-    [Fact]
-    public void Parse_ShouldStripHtmlFromDescription()
-    {
-        var item = new RawFeedItem("Title", "https://example.com/1", "<p>Great <b>job</b></p>", DateTime.UtcNow);
-        var result = _sut.Parse(item, "Stepstone");
-        result.JobDescription.ShouldBe("Great job");
-    }
-
-    [Fact]
-    public void Parse_ShouldSetCompanyNameToEmpty()
-    {
-        var item = new RawFeedItem("Title", "https://example.com/1", "Desc", DateTime.UtcNow);
-        var result = _sut.Parse(item, "Stepstone");
-        result.CompanyName.ShouldBeEmpty();
-    }
-
-    [Fact]
-    public void Parse_ShouldSetPortalName()
-    {
-        var item = new RawFeedItem("Title", "https://example.com/1", "Desc", DateTime.UtcNow);
-        var result = _sut.Parse(item, "Stepstone");
-        result.PortalName.ShouldBe("Stepstone");
-    }
-}
-```
-
-- [ ] **Run tests — expect compile failure (types don't exist yet)**
-
-```bash
-dotnet build AppTrack.Application.UnitTests/AppTrack.Application.UnitTests.csproj --configuration Release
-```
+> **Note:** `DefaultFeedParser` and `StepstoneFeedParser` are Infrastructure-internal classes. Their unit tests belong in a dedicated `AppTrack.Infrastructure.UnitTests` project which is out of scope for this plan. Parser behaviour is covered indirectly by the API integration tests.
 
 - [ ] **Implement parser infrastructure**
 
@@ -1925,7 +1912,7 @@ dotnet test AppTrack.Application.UnitTests/AppTrack.Application.UnitTests.csproj
 - [ ] **Commit**
 
 ```bash
-git add AppTrack.Infrastructure/RssFeed/Parsers/ AppTrack.Infrastructure/RssFeed/RssFeedItemParser.cs AppTrack.Infrastructure/AppTrack.Infrastructure.csproj AppTrack.Application.UnitTests/Features/RssFeeds/Parsers/ AppTrack.Application.UnitTests/AppTrack.Application.UnitTests.csproj
+git add AppTrack.Infrastructure/RssFeed/Parsers/ AppTrack.Infrastructure/RssFeed/RssFeedItemParser.cs AppTrack.Infrastructure/AppTrack.Infrastructure.csproj
 git commit -m "feat: add RSS parser infrastructure (DefaultFeedParser, StepstoneFeedParser, factory)"
 ```
 
@@ -1988,12 +1975,12 @@ public class DirectEmailNotifier : IRssMatchNotifier
         _logger = logger;
     }
 
-    public async Task NotifyAsync(string userId, List<RssJobApplicationData> matches, CancellationToken ct)
+    public async Task NotifyAsync(string userId, string userEmail, List<RssJobApplicationData> matches, CancellationToken ct)
     {
         var body = string.Join("\n", matches.Select(m => $"- {m.Position} ({m.PortalName}): {m.Url}"));
         var email = new EmailMessage
         {
-            To = userId,
+            To = userEmail,
             Subject = $"{matches.Count} new job(s) discovered",
             Body = $"The following jobs matched your keywords:\n\n{body}"
         };
@@ -2029,7 +2016,7 @@ public class ServiceBusNotifier : IRssMatchNotifier
         _logger = logger;
     }
 
-    public async Task NotifyAsync(string userId, List<RssJobApplicationData> matches, CancellationToken ct)
+    public async Task NotifyAsync(string userId, string userEmail, List<RssJobApplicationData> matches, CancellationToken ct)
     {
         var connectionString = _configuration["ServiceBus:ConnectionString"];
         var queueName = _configuration["RssNotification:QueueName"] ?? "rss-matches";
@@ -2045,6 +2032,14 @@ public class ServiceBusNotifier : IRssMatchNotifier
     }
 }
 ```
+
+> **Configuration note:** `ServiceBus:ConnectionString` must be provided via environment variable or Azure Key Vault in production. Add a placeholder to `appsettings.Production.json`:
+> ```json
+> "ServiceBus": {
+>   "ConnectionString": ""
+> }
+> ```
+> The actual value is injected via Azure Key Vault (`ServiceBus--ConnectionString` secret) and must never be committed to source control.
 
 - [ ] **Build and verify 0 errors**
 
@@ -2105,18 +2100,11 @@ Add to `AppTrack.Api/appsettings.json` (before `"AllowedHosts"`):
 },
 ```
 
-Add to `AppTrack.Api/appsettings.Development.json`:
+Add the following section to `AppTrack.Api/appsettings.Development.json` (do not replace the existing content — merge this into the existing JSON object):
 
 ```json
-{
-  "Serilog": {
-    "MinimumLevel": {
-      "Default": "Debug"
-    }
-  },
-  "RssNotification": {
-    "Provider": "Direct"
-  }
+"RssNotification": {
+  "Provider": "Direct"
 }
 ```
 
@@ -2171,6 +2159,7 @@ public class RssFeedController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult> UpdateSettings([FromBody] UpdateRssMonitoringSettingsCommand command)
     {
+        command.NotificationEmail = User.FindFirst("email")?.Value ?? string.Empty;
         await _mediator.Send(command);
         return NoContent();
     }
@@ -2282,7 +2271,7 @@ namespace AppTrack.Api.IntegrationTests.WebApplicationFactory;
 
 public class StubRssMatchNotifier : IRssMatchNotifier
 {
-    public Task NotifyAsync(string userId, List<RssJobApplicationData> matches, CancellationToken ct)
+    public Task NotifyAsync(string userId, string userEmail, List<RssJobApplicationData> matches, CancellationToken ct)
         => Task.CompletedTask;
 }
 ```
@@ -2337,7 +2326,8 @@ internal static class RssMonitoringSettingsSeedsHelper
         {
             UserId = Auth.TestAuthHandler.TestUserId,
             Keywords = keywords,
-            PollIntervalMinutes = intervalMinutes
+            PollIntervalMinutes = intervalMinutes,
+            NotificationEmail = "testuser@example.com"
         };
         db.RssMonitoringSettings.Add(settings);
         await db.SaveChangesAsync();

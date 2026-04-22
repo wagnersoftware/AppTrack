@@ -105,6 +105,25 @@
 - NOTE: `JobApplication.ApplicationText` domain property was NOT renamed — only the DTO property changed
 - NOTE: NSwag-generated `ServiceClient.cs` and frontend `ApplicationTextService.cs` still use old generated names — updated on next NSwag regeneration
 
+## CS9175: Collection Expression Not Allowed in Expression Trees (recurring)
+- CS9175: `An expression tree may not contain a collection expression` — affects any code that compiles to expression trees
+- Contexts: EF Core `HasConversion` lambdas, Moq `It.Is<T>()` predicate lambdas, any LINQ expression tree
+- Fix: replace `[]` or `["a", "b"]` with `new List<string>()` or `new List<string> { "a", "b" }`
+- EF example: `v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions?)null) ?? new List<string>()`
+- Moq example: `It.Is<T>(s => s.Items.SequenceEqual(new List<string> { "a", "b" }))` (not `["a", "b"]`)
+
+## RSS Feed Monitoring Persistence (as of Apr 2026 - branch: feature/rss-feed-monitoring)
+- 4 new entities: `RssPortal`, `UserRssSubscription`, `RssMonitoringSettings`, `ProcessedFeedItem`
+- EF configurations at `AppTrack.Persistance/Configurations/Rss*.cs` and `ProcessedFeedItemConfiguration.cs`
+- `RssPortalConfiguration` seeds one Stepstone portal (Id=1, ParserType stored as string via `HasConversion<string>()`)
+- `RssMonitoringSettings.Keywords` stored as JSON (`nvarchar(max)`) via `JsonSerializer` value converter
+- `UserRssSubscription`: unique index on (UserId, RssPortalId); FK to RssPortal with cascade delete
+- `ProcessedFeedItem`: unique index on (UserId, FeedItemUrl) — prevents duplicate processing
+- Repositories at `AppTrack.Persistance/Repositories/Rss*.cs` and `ProcessedFeedItemRepository.cs`
+- `UserRssSubscriptionRepository.GetActiveSubscriptionsWithPortalsAsync`: no `.AsNoTracking()` — entity may be updated by background service
+- `RssMonitoringSettingsRepository.UpsertAsync` updates Keywords, PollIntervalMinutes, AND NotificationEmail on existing record
+- Migration: `20260422091653_AddRssFeedMonitoring`
+
 ## CV Storage Feature (Infrastructure layer, branch: feature/profile-setup-wizard)
 - `AzureStorageSettings` at `AppTrack.Infrastructure/CvStorage/AzureStorageSettings.cs` — ConnectionString + ContainerName
 - `AzureBlobStorageService` implements `ICvStorageService` — creates `BlobServiceClient` per call (stateless, scoped DI)
