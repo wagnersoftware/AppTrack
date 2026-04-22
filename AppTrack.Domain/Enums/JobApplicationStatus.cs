@@ -4,5 +4,6 @@ public enum JobApplicationStatus
 {
     New,
     WaitingForFeedback,
-    Rejected
+    Rejected,
+    Discovered
 }
