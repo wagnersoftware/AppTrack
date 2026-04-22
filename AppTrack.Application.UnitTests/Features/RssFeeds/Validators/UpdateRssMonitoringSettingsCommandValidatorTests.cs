@@ -13,6 +13,7 @@ public class UpdateRssMonitoringSettingsCommandValidatorTests
         var command = new UpdateRssMonitoringSettingsCommand
         {
             UserId = "user-1",
+            NotificationEmail = "user@example.com",
             Keywords = ["dotnet"],
             PollIntervalMinutes = 60
         };
@@ -26,6 +27,7 @@ public class UpdateRssMonitoringSettingsCommandValidatorTests
         var command = new UpdateRssMonitoringSettingsCommand
         {
             UserId = "user-1",
+            NotificationEmail = "user@example.com",
             Keywords = null!,
             PollIntervalMinutes = 60
         };
@@ -42,8 +44,23 @@ public class UpdateRssMonitoringSettingsCommandValidatorTests
         var command = new UpdateRssMonitoringSettingsCommand
         {
             UserId = "user-1",
+            NotificationEmail = "user@example.com",
             Keywords = [],
             PollIntervalMinutes = interval
+        };
+        var result = await _sut.ValidateAsync(command);
+        result.IsValid.ShouldBeFalse();
+    }
+
+    [Fact]
+    public async Task Validate_ShouldFail_WhenNotificationEmailIsEmpty()
+    {
+        var command = new UpdateRssMonitoringSettingsCommand
+        {
+            UserId = "user-1",
+            NotificationEmail = string.Empty,
+            Keywords = [],
+            PollIntervalMinutes = 60
         };
         var result = await _sut.ValidateAsync(command);
         result.IsValid.ShouldBeFalse();

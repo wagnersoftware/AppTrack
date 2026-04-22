@@ -23,9 +23,9 @@ public sealed class UpdateRssMonitoringSettingsCommandHandler
 
     public async Task<Unit> Handle(UpdateRssMonitoringSettingsCommand request, CancellationToken cancellationToken)
     {
-        var validationResult = await _validator.ValidateAsync(request, cancellationToken);
+        var validationResult = await _validator.ValidateAsync(request);
 
-        if (validationResult.Errors.Count > 0)
+        if (validationResult.Errors.Any())
             throw new BadRequestException("Invalid update RSS monitoring settings request", validationResult);
 
         await _repository.UpsertAsync(new RssMonitoringSettings

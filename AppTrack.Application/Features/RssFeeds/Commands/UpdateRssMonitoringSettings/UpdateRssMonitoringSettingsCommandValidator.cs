@@ -7,6 +7,7 @@ public sealed class UpdateRssMonitoringSettingsCommandValidator
 {
     public UpdateRssMonitoringSettingsCommandValidator()
     {
+        RuleFor(x => x.NotificationEmail).NotEmpty();
         RuleFor(x => x.Keywords).NotNull();
         RuleFor(x => x.PollIntervalMinutes).InclusiveBetween(5, 1440);
     }

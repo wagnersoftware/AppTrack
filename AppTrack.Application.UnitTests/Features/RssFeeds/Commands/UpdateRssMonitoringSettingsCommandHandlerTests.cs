@@ -1,4 +1,5 @@
 using AppTrack.Application.Contracts.RssFeed;
+using AppTrack.Application.Exceptions;
 using AppTrack.Application.Features.RssFeeds.Commands.UpdateRssMonitoringSettings;
 using AppTrack.Application.Shared;
 using AppTrack.Domain;
@@ -59,5 +60,31 @@ public class UpdateRssMonitoringSettingsCommandHandlerTests
         var result = await CreateHandler().Handle(command, CancellationToken.None);
 
         result.ShouldBe(Unit.Value);
+    }
+
+    [Fact]
+    public async Task Handle_ShouldThrowBadRequestException_WhenValidationFails()
+    {
+        _mockValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<UpdateRssMonitoringSettingsCommand>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult([new ValidationFailure("PollIntervalMinutes", "Out of range")]));
+
+        await Should.ThrowAsync<BadRequestException>(() =>
+            CreateHandler().Handle(new UpdateRssMonitoringSettingsCommand(), CancellationToken.None));
+
+        _mockRepo.Verify(r => r.UpsertAsync(It.IsAny<RssMonitoringSettings>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task Handle_ShouldNotCallUpsert_WhenValidationFails()
+    {
+        _mockValidator
+            .Setup(v => v.ValidateAsync(It.IsAny<UpdateRssMonitoringSettingsCommand>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult([new ValidationFailure("Keywords", "Required")]));
+
+        await Should.ThrowAsync<BadRequestException>(() =>
+            CreateHandler().Handle(new UpdateRssMonitoringSettingsCommand(), CancellationToken.None));
+
+        _mockRepo.Verify(r => r.UpsertAsync(It.IsAny<RssMonitoringSettings>()), Times.Never);
     }
 }
