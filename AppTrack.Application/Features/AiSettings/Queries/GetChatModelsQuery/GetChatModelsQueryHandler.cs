@@ -17,6 +17,6 @@ public class GetChatModelsQueryHandler : IRequestHandler<GetChatModelsQuery, Lis
     public async Task<List<ChatModelDto>> Handle(GetChatModelsQuery request, CancellationToken cancellationToken)
     {
         var chatModels = await _chatModelRepository.GetAsync();
-        return chatModels.Select(m => m.ToDto()).ToList();
+        return chatModels.Where(m => m.IsActive).Select(m => m.ToDto()).ToList();
     }
 }
