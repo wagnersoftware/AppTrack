@@ -51,10 +51,11 @@ public partial class AiSettings
         _model = settingsResponse.Data ?? new AiSettingsModel();
         _chatModels = chatModelsResponse.Data ?? [];
 
-        if (_model.SelectedChatModelId == 0 && _chatModels.Count > 0)
-            _model.SelectedChatModelId = _chatModels[0].Id;
+        _selectedChatModel = _chatModels.FirstOrDefault(m => m.Id == _model.SelectedChatModelId)
+            ?? _chatModels.FirstOrDefault();
 
-        _selectedChatModel = _chatModels.FirstOrDefault(m => m.Id == _model.SelectedChatModelId);
+        if (_selectedChatModel is not null)
+            _model.SelectedChatModelId = _selectedChatModel.Id;
 
         _isLoading = false;
     }
