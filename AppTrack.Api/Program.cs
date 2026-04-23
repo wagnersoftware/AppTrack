@@ -75,6 +75,7 @@ try
     builder.Services.AddApplicationServices();
     builder.Services.AddInfrastructureServices(builder.Configuration);
     builder.Services.AddPersistanceServices(builder.Configuration);
+    builder.Services.AddHostedService<AppTrack.Api.BackgroundServices.RssFeedBackgroundService>();
 
     builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         .AddMicrosoftIdentityWebApi(
