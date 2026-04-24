@@ -66,7 +66,13 @@ public class GenerateAiTextCommandValidator : AbstractValidator<GenerateAiTextCo
             return;
         }
 
-        if (chatModel!.ApiModelName == null)
+        if (!chatModel.IsActive)
+        {
+            context.AddFailure("The configured chat model is deprecated. Please select an active model in your AI settings.");
+            return;
+        }
+
+        if (chatModel.ApiModelName == null)
         {
             context.AddFailure("No model name for chat api set.");
         }
