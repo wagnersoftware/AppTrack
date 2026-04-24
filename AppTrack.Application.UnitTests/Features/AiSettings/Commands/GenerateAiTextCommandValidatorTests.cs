@@ -36,7 +36,7 @@ public class GenerateAiTextCommandValidatorTests
             .Setup(r => r.GetByIdAsync(It.Is<int>(id => id != ExistingJobApplicationId)))
             .ReturnsAsync((DomainJobApplication?)null);
 
-        var chatModel = new DomainChatModel { Id = ExistingChatModelId, ApiModelName = "gpt-4o" };
+        var chatModel = new DomainChatModel { Id = ExistingChatModelId, ApiModelName = "gpt-4o", IsActive = true };
         var aiSettings = new DomainAiSettings
         {
             Id = ExistingAiSettingsId,
@@ -141,7 +141,7 @@ public class GenerateAiTextCommandValidatorTests
     public async Task Validate_ShouldHaveError_WhenChatModelApiModelNameIsNull()
     {
         const string userWithNullApiModel = "user-null-apimodel";
-        var chatModelWithNullName = new DomainChatModel { Id = 20, ApiModelName = null! };
+        var chatModelWithNullName = new DomainChatModel { Id = 20, ApiModelName = null!, IsActive = true };
         var aiSettingsForUser = new DomainAiSettings
         {
             Id = 3,
@@ -160,5 +160,30 @@ public class GenerateAiTextCommandValidatorTests
         var result = await _validator.TestValidateAsync(command);
         result.IsValid.ShouldBeFalse();
         result.Errors.ShouldContain(e => e.ErrorMessage == "No model name for chat api set.");
+    }
+
+    [Fact]
+    public async Task Validate_ShouldHaveError_WhenSelectedChatModelIsInactive()
+    {
+        const string userWithInactiveModel = "user-inactive-model";
+        var inactiveChatModel = new DomainChatModel { Id = 30, ApiModelName = "gpt-3.5-turbo", IsActive = false };
+        var aiSettingsWithInactiveModel = new DomainAiSettings
+        {
+            Id = 5,
+            UserId = userWithInactiveModel,
+            SelectedChatModelId = 30
+        };
+
+        _aiSettingsRepo
+            .Setup(r => r.GetByUserIdWithPromptsReadOnlyAsync(userWithInactiveModel))
+            .ReturnsAsync(aiSettingsWithInactiveModel);
+        _chatModelRepo
+            .Setup(r => r.GetByIdAsync(30))
+            .ReturnsAsync(inactiveChatModel);
+
+        var command = BuildValidCommand(userId: userWithInactiveModel);
+        var result = await _validator.TestValidateAsync(command);
+        result.IsValid.ShouldBeFalse();
+        result.Errors.ShouldContain(e => e.ErrorMessage.Contains("deprecated", StringComparison.OrdinalIgnoreCase));
     }
 }
