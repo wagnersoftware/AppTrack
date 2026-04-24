@@ -15,4 +15,6 @@ public class UpdateRssMonitoringSettingsCommand : IRequest<Unit>, IUserScopedReq
     public List<string> Keywords { get; set; } = [];
 
     public int PollIntervalMinutes { get; set; }
+
+    public bool NotifyByEmail { get; set; }
 }

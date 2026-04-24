@@ -7,7 +7,7 @@ internal static class RssFeedParserFactory
     public static IRssFeedParser GetParser(RssParserType parserType) =>
         parserType switch
         {
-            RssParserType.Stepstone => new StepstoneFeedParser(),
+            RssParserType.FreelancerMap => new FreelancerMapFeedParser(),
             _ => new DefaultFeedParser()
         };
 }

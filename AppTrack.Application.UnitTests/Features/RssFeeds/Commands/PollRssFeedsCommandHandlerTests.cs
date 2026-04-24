@@ -40,8 +40,8 @@ public class PollRssFeedsCommandHandlerTests
     {
         _portal = new RssPortal
         {
-            Id = 1, Name = "Stepstone", Url = "https://stepstone.de/rss",
-            ParserType = RssParserType.Stepstone, IsActive = true
+            Id = 1, Name = "Freelancermap", Url = "https://freelancermap.de",
+            ParserType = RssParserType.FreelancerMap, IsActive = true
         };
 
         _settings = new RssMonitoringSettings
@@ -51,13 +51,13 @@ public class PollRssFeedsCommandHandlerTests
         };
 
         _matchingItem = new RawFeedItem(
-            "Senior .NET Developer", "https://stepstone.de/job/1", "dotnet azure", DateTime.UtcNow);
+            "Senior .NET Developer", "https://freelancermap.de/job/1", "dotnet azure", DateTime.UtcNow);
 
         _nonMatchingItem = new RawFeedItem(
-            "Marketing Manager", "https://stepstone.de/job/2", "brand strategy", DateTime.UtcNow);
+            "Marketing Manager", "https://freelancermap.de/job/2", "brand strategy", DateTime.UtcNow);
 
         _parsedData = new RssJobApplicationData(
-            "Senior .NET Developer", "https://stepstone.de/job/1", "dotnet azure", "", "Stepstone");
+            "Senior .NET Developer", "https://freelancermap.de/job/1", "dotnet azure", "", "Freelancermap");
 
         _mockSubRepo = new Mock<IUserRssSubscriptionRepository>();
         _mockSettingsRepo = new Mock<IRssMonitoringSettingsRepository>();
@@ -76,10 +76,10 @@ public class PollRssFeedsCommandHandlerTests
             .ReturnsAsync([_matchingItem, _nonMatchingItem]);
         _mockProcessedRepo.Setup(r => r.GetProcessedUrlsAsync(UserId, It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync([]);
-        _mockParser.Setup(p => p.Parse(_matchingItem, RssParserType.Stepstone, "Stepstone"))
+        _mockParser.Setup(p => p.Parse(_matchingItem, RssParserType.FreelancerMap, "Freelancermap"))
             .Returns(_parsedData);
-        _mockParser.Setup(p => p.Parse(_nonMatchingItem, RssParserType.Stepstone, "Stepstone"))
-            .Returns(new RssJobApplicationData("Marketing Manager", "https://stepstone.de/job/2", "brand strategy", "", "Stepstone"));
+        _mockParser.Setup(p => p.Parse(_nonMatchingItem, RssParserType.FreelancerMap, "Freelancermap"))
+            .Returns(new RssJobApplicationData("Marketing Manager", "https://freelancermap.de/job/2", "brand strategy", "", "Freelancermap"));
         _mockUow.Setup(u => u.ExecuteInTransactionAsync(It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()))
             .Returns<Func<CancellationToken, Task>, CancellationToken>(async (action, ct) => await action(ct));
         _mockJobAppRepo.Setup(r => r.CreateAsync(It.IsAny<JobApplication>()))
@@ -124,7 +124,7 @@ public class PollRssFeedsCommandHandlerTests
     public async Task Handle_ShouldSkipAlreadyProcessedItems()
     {
         _mockProcessedRepo.Setup(r => r.GetProcessedUrlsAsync(UserId, It.IsAny<IEnumerable<string>>()))
-            .ReturnsAsync(["https://stepstone.de/job/1"]);
+            .ReturnsAsync(["https://freelancermap.de/job/1"]);
 
         await CreateHandler().Handle(new PollRssFeedsCommand(), CancellationToken.None);
 
@@ -201,7 +201,7 @@ public class PollRssFeedsCommandHandlerTests
 
         _mockProcessedRepo.Verify(r => r.AddRangeAsync(
             It.Is<IEnumerable<ProcessedFeedItem>>(items =>
-                items.Any(i => i.FeedItemUrl == "https://stepstone.de/job/1" && i.UserId == UserId)),
+                items.Any(i => i.FeedItemUrl == "https://freelancermap.de/job/1" && i.UserId == UserId)),
             It.IsAny<CancellationToken>()), Times.Once);
     }
 
@@ -230,13 +230,13 @@ public class PollRssFeedsCommandHandlerTests
         await CreateHandler().Handle(new PollRssFeedsCommand(), CancellationToken.None);
 
         _mockJobAppRepo.Verify(r => r.CreateAsync(It.Is<JobApplication>(
-            j => j.Name == "Stepstone")), Times.Once);
+            j => j.Name == "Freelancermap")), Times.Once);
     }
 
     [Fact]
     public async Task Handle_ShouldSetJobApplicationName_ToCompanyName_WhenAvailable()
     {
-        _mockParser.Setup(p => p.Parse(_matchingItem, RssParserType.Stepstone, "Stepstone"))
+        _mockParser.Setup(p => p.Parse(_matchingItem, RssParserType.FreelancerMap, "Freelancermap"))
             .Returns(_parsedData with { CompanyName = "Acme GmbH" });
 
         await CreateHandler().Handle(new PollRssFeedsCommand(), CancellationToken.None);

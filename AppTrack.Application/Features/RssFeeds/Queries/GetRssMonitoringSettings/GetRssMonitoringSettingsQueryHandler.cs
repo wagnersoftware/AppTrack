@@ -17,7 +17,7 @@ public class GetRssMonitoringSettingsQueryHandler
     {
         var settings = await _repository.GetByUserIdAsync(request.UserId);
         return settings is null
-            ? new RssMonitoringSettingsDto([], 60)
-            : new RssMonitoringSettingsDto(settings.Keywords, settings.PollIntervalMinutes);
+            ? new RssMonitoringSettingsDto([], 60, false)
+            : new RssMonitoringSettingsDto(settings.Keywords, settings.PollIntervalMinutes, settings.NotifyByEmail);
     }
 }

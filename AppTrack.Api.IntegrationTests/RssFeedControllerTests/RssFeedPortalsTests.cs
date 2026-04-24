@@ -26,7 +26,7 @@ public class RssFeedPortalsTests : IClassFixture<FakeAuthWebApplicationFactory>
         var portals = await response.Content.ReadFromJsonAsync<List<RssPortalDto>>();
         portals.ShouldNotBeNull();
         portals.ShouldNotBeEmpty();
-        portals.ShouldContain(p => p.Name == "Stepstone");
+        portals.ShouldContain(p => p.Name == "Freelancermap");
     }
 
     [Fact]

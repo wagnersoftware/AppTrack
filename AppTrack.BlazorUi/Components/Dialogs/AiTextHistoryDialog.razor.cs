@@ -11,7 +11,7 @@ public partial class AiTextHistoryDialog
 {
     [Inject] private IApplicationTextService ApplicationTextService { get; set; } = null!;
     [Inject] private IJobApplicationService JobApplicationService { get; set; } = null!;
-    [Inject] private IErrorHandlingService ErrorHandlingService { get; set; } = null!;
+    [Inject] private ISnackbarService SnackbarService { get; set; } = null!;
     [Inject] private IJSRuntime JSRuntime { get; set; } = null!;
 
     [CascadingParameter] private IMudDialogInstance MudDialog { get; set; } = null!;
@@ -25,7 +25,7 @@ public partial class AiTextHistoryDialog
         var response = await JobApplicationService.GetJobApplicationByIdAsync(JobApplication.Id);
         _isLoading = false;
 
-        if (!ErrorHandlingService.HandleResponse(response) || response.Data is null)
+        if (!SnackbarService.HandleResponse(response) || response.Data is null)
         {
             MudDialog.Cancel();
             return;
@@ -38,13 +38,13 @@ public partial class AiTextHistoryDialog
     {
         if (string.IsNullOrEmpty(text)) return;
         await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", text);
-        ErrorHandlingService.ShowSuccess("Copied to clipboard.");
+        SnackbarService.ShowSuccess("Copied to clipboard.");
     }
 
     private async Task DeleteEntryAsync(JobApplicationAiTextModel entry)
     {
         var response = await ApplicationTextService.DeleteAiTextAsync(entry.Id);
-        if (!ErrorHandlingService.HandleResponse(response)) return;
+        if (!SnackbarService.HandleResponse(response)) return;
 
         JobApplication.AiTextHistory.Remove(entry);
         StateHasChanged();

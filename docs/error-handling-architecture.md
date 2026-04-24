@@ -10,7 +10,7 @@ AppTrack uses a consistent, cross-layer error handling strategy. The core princi
 | `AppTrack.Infrastructure` | Maps external HTTP errors to `ExternalServiceException` |
 | `AppTrack.Api` | `ExceptionMiddleware` converts all exceptions to `CustomProblemDetails` JSON |
 | `AppTrack.Frontend.ApiService` | `BaseHttpService.TryExecuteAsync` converts HTTP errors to `Response<T>` |
-| `AppTrack.BlazorUi` | `IErrorHandlingService.HandleResponse` displays errors as MudBlazor snackbar |
+| `AppTrack.BlazorUi` | `ISnackbarService.HandleResponse` displays errors as MudBlazor snackbar |
 | `AppTrack.WpfUi` | `IMessageBoxService.ShowErrorMessageBox` displays errors as WPF message box |
 
 This pattern ensures that UI components never contain try/catch blocks or direct HTTP status code evaluation.
@@ -47,7 +47,7 @@ sequenceDiagram
     SVC->>SVC: ConvertApiException() + ApiErrorHelper.ExtractErrors()
     SVC-->>UI: Response[T] - Success=false
     Note right of SVC: ErrorMessage="Invalid data was submitted"<br/>ErrorDetails="Status: 400 / Message: Invalid Request / Name: ..."
-    UI->>UI: ErrorHandlingService.HandleResponse(response)
+    UI->>UI: SnackbarService.HandleResponse(response)
     Note over UI: HandleResponse returns false
     UI->>UI: Snackbar shows response.DisplayMessage
 ```
@@ -355,7 +355,7 @@ This string is stored in `Response<T>.ErrorDetails` and delivered to the UI via 
 
 ---
 
-### 8. Blazor Frontend: `IErrorHandlingService` (`AppTrack.BlazorUi/Services/ErrorHandlingService.cs`)
+### 8. Blazor Frontend: `ISnackbarService` (`AppTrack.BlazorUi/Services/SnackbarService.cs`)
 
 ```csharp
 public bool HandleResponse<T>(Response<T> response)
@@ -412,7 +412,7 @@ private async Task SubmitAsync()
     _isBusy = false;
 
     // 3. Error check: HandleResponse shows snackbar and returns false on failure
-    if (!ErrorHandlingService.HandleResponse(response)) return;
+    if (!SnackbarService.HandleResponse(response)) return;
 
     // 4. Here response.Success is guaranteed to be true
     //    Access Data only after explicit null check
@@ -479,7 +479,7 @@ if (response.Success == false)
 
 ```csharp
 // Correct: HandleResponse first, then null check
-if (!ErrorHandlingService.HandleResponse(response)) return;
+if (!SnackbarService.HandleResponse(response)) return;
 if (response.Data is null) return;
 // Here response.Data is guaranteed non-null
 var item = response.Data;
@@ -507,4 +507,4 @@ var item = response.Data;
 - Do not access `response.Data` without checking `Success` first — `Data` is `null` on failure.
 - Do not return raw HTTP status codes from the Infrastructure layer — use `ExternalServiceException` as the abstraction.
 - Do not treat the middleware's default case (HTTP 500 + StackTrace) as normal error handling — it signals an unexpected programming error.
-- Do not use `IErrorHandlingService.ShowError(string)` when a `Response<T>` is already available — use `HandleResponse(response)` instead.
+- Do not use `ISnackbarService.ShowError(string)` when a `Response<T>` is already available — use `HandleResponse(response)` instead.

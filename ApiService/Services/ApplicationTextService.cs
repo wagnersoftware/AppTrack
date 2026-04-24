@@ -45,7 +45,7 @@ public class ApplicationTextService : BaseHttpService, IApplicationTextService
     public Task<Response<bool>> DeleteAiTextAsync(int id) =>
         TryExecuteAsync(async () =>
         {
-            await _client.AiTextAsync(id);
+            await _client.TextAsync(id);
             return true;
         });
 }

@@ -1,0 +1,123 @@
+@page "/rss-options"
+<PageTitle>RSS Options - AppTrack</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-6">
+    <MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-4">
+        <MudTooltip Text="Back to Job Applications">
+            <MudIconButton Icon="@Icons.Material.Filled.ArrowBack" Href="/" Color="Color.Default" Class="mr-1" />
+        </MudTooltip>
+        <MudIcon Icon="@Icons.Material.Filled.RssFeed" Class="mr-2" Color="Color.Primary" />
+        <MudText Typo="Typo.h5">RSS Options</MudText>
+    </MudStack>
+
+    @if (_isLoading)
+    {
+        <MudStack AlignItems="AlignItems.Center" Class="py-8">
+            <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+            <MudText Typo="Typo.body2" Color="Color.Secondary">Loading settings…</MudText>
+        </MudStack>
+    }
+    else
+    {
+        <MudGrid Spacing="2">
+            <!-- Portals -->
+            <MudItem xs="12">
+                <MudText Typo="Typo.subtitle1" Class="mb-2">Portals</MudText>
+                @if (_portals.Count == 0)
+                {
+                    <MudText Typo="Typo.body2" Color="Color.Secondary" Class="ml-1">No portals available.</MudText>
+                }
+                else
+                {
+                    @foreach (var portal in _portals)
+                    {
+                        var captured = portal;
+                        <MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-1">
+                            <MudSwitch T="bool"
+                                       Value="@captured.IsSubscribed"
+                                       ValueChanged="@((bool v) => captured.IsSubscribed = v)"
+                                       Color="Color.Primary" />
+                            <MudText Style="color: var(--mud-palette-text-primary);">@captured.Name</MudText>
+                        </MudStack>
+                    }
+                }
+            </MudItem>
+
+            <!-- Keywords -->
+            <MudItem xs="12" sm="6">
+                <MudText Typo="Typo.subtitle1" Class="mb-2">Keywords</MudText>
+                <MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">
+                    <MudTextField T="string"
+                                  @bind-Value="_newKeyword"
+                                  Label="Add keyword"
+                                  Variant="Variant.Outlined"
+                                  Adornment="Adornment.End"
+                                  AdornmentIcon="@Icons.Material.Filled.Add"
+                                  OnAdornmentClick="AddKeyword"
+                                  OnKeyUp="@OnKeywordKeyUp"
+                                  Style="flex: 1;" />
+                </MudStack>
+                @if (_settings.Keywords.Count == 0)
+                {
+                    <MudText Typo="Typo.body2" Color="Color.Secondary" Class="ml-1">No keywords defined.</MudText>
+                }
+                else
+                {
+                    <MudStack Row="true" Wrap="Wrap.Wrap" Spacing="1">
+                        @foreach (var keyword in _settings.Keywords.ToList())
+                        {
+                            var captured = keyword;
+                            <MudChip T="string"
+                                     Text="@captured"
+                                     Color="Color.Primary"
+                                     Variant="Variant.Filled"
+                                     OnClose="@(() => RemoveKeyword(captured))" />
+                        }
+                    </MudStack>
+                }
+            </MudItem>
+
+            <!-- Poll Interval -->
+            <MudItem xs="12" sm="6">
+                <MudText Typo="Typo.subtitle1" Class="mb-2">Poll Interval</MudText>
+                <MudSelect T="int"
+                           @bind-Value="_settings.PollIntervalMinutes"
+                           Label="Poll Interval"
+                           Variant="Variant.Outlined"
+                           AdornmentIcon="@Icons.Material.Outlined.Schedule">
+                    <MudSelectItem T="int" Value="10">10 minutes</MudSelectItem>
+                    <MudSelectItem T="int" Value="30">30 minutes</MudSelectItem>
+                    <MudSelectItem T="int" Value="60">1 hour</MudSelectItem>
+                    <MudSelectItem T="int" Value="720">12 hours</MudSelectItem>
+                    <MudSelectItem T="int" Value="1440">24 hours</MudSelectItem>
+                </MudSelect>
+            </MudItem>
+        </MudGrid>
+
+        <!-- Email Notifications -->
+        <MudItem xs="12">
+            <MudCheckBox T="bool"
+                         @bind-Value="_settings.NotifyByEmail"
+                         Label="Email notifications"
+                         Color="Color.Primary" />
+        </MudItem>
+
+        <MudStack Row="true" Justify="Justify.FlexEnd" Class="mt-4">
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Save"
+                       OnClick="SubmitAsync"
+                       Disabled="_isBusy">
+                @if (_isBusy)
+                {
+                    <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+                    <span>Saving…</span>
+                }
+                else
+                {
+                    <span>Save</span>
+                }
+            </MudButton>
+        </MudStack>
+    }
+</MudContainer>

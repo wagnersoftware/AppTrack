@@ -20,9 +20,9 @@ public class RssPortalConfiguration : IEntityTypeConfiguration<RssPortal>
             new RssPortal
             {
                 Id = 1,
-                Name = "Stepstone",
-                Url = "https://www.stepstone.de/rss/stellenangebote.html",
-                ParserType = RssParserType.Stepstone,
+                Name = "Freelancermap",
+                Url = "https://freelancermap.de",
+                ParserType = RssParserType.FreelancerMap,
                 IsActive = true
             });
     }

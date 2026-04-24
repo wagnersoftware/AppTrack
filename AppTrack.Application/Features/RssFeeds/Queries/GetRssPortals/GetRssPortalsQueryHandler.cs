@@ -27,7 +27,7 @@ public class GetRssPortalsQueryHandler : IRequestHandler<GetRssPortalsQuery, Lis
             .ToHashSet();
 
         return portals
-            .Select(p => new RssPortalDto(p.Id, p.Name, activePortalIds.Contains(p.Id)))
+            .Select(p => new RssPortalDto(p.Id, p.Name, p.Url, activePortalIds.Contains(p.Id)))
             .ToList();
     }
 }

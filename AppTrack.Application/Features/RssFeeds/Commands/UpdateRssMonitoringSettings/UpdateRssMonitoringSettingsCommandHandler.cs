@@ -33,7 +33,8 @@ public sealed class UpdateRssMonitoringSettingsCommandHandler
             UserId = request.UserId,
             NotificationEmail = request.NotificationEmail,
             Keywords = request.Keywords,
-            PollIntervalMinutes = request.PollIntervalMinutes
+            PollIntervalMinutes = request.PollIntervalMinutes,
+            NotifyByEmail = request.NotifyByEmail
         });
 
         return Unit.Value;

@@ -13,7 +13,7 @@ public partial class AiSettings
     [Inject] private IAiSettingsService AiSettingsService { get; set; } = null!;
     [Inject] private IChatModelsService ChatModelsService { get; set; } = null!;
     [Inject] private IModelValidator<AiSettingsModel> ModelValidator { get; set; } = null!;
-    [Inject] private IErrorHandlingService ErrorHandlingService { get; set; } = null!;
+    [Inject] private ISnackbarService SnackbarService { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
 
     private static readonly DialogOptions _paramDialogOptions = new()
@@ -41,8 +41,8 @@ public partial class AiSettings
         var settingsResponse = settingsTask.Result;
         var chatModelsResponse = chatModelsTask.Result;
 
-        if (!ErrorHandlingService.HandleResponse(settingsResponse) ||
-            !ErrorHandlingService.HandleResponse(chatModelsResponse))
+        if (!SnackbarService.HandleResponse(settingsResponse) ||
+            !SnackbarService.HandleResponse(chatModelsResponse))
         {
             _isLoading = false;
             return;
@@ -160,8 +160,8 @@ public partial class AiSettings
         _isBusy = false;
         await InvokeAsync(StateHasChanged);
 
-        if (!ErrorHandlingService.HandleResponse(response)) return;
+        if (!SnackbarService.HandleResponse(response)) return;
 
-        ErrorHandlingService.ShowSuccess("AI settings saved successfully.");
+        SnackbarService.ShowSuccess("AI settings saved successfully.");
     }
 }

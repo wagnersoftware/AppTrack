@@ -18,7 +18,7 @@ public class GetRssPortalsQueryHandlerTests
         _mockSubRepo = new Mock<IUserRssSubscriptionRepository>();
 
         _mockPortalRepo.Setup(r => r.GetAllActiveAsync()).ReturnsAsync([
-            new RssPortal { Id = 1, Name = "Stepstone", Url = "https://stepstone.de/rss", ParserType = RssParserType.Stepstone, IsActive = true }
+            new RssPortal { Id = 1, Name = "Freelancermap", Url = "https://freelancermap.de", ParserType = RssParserType.FreelancerMap, IsActive = true }
         ]);
     }
 
@@ -34,7 +34,7 @@ public class GetRssPortalsQueryHandlerTests
             new GetRssPortalsQuery { UserId = "user-1" }, CancellationToken.None);
 
         result.ShouldNotBeEmpty();
-        result.ShouldContain(p => p.Name == "Stepstone");
+        result.ShouldContain(p => p.Name == "Freelancermap");
     }
 
     [Fact]

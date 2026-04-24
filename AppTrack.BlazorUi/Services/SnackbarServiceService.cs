@@ -3,7 +3,7 @@ using MudBlazor;
 
 namespace AppTrack.BlazorUi.Services;
 
-public class ErrorHandlingService(ISnackbar snackbar) : IErrorHandlingService
+public class SnackbarServiceService(ISnackbar snackbar) : ISnackbarService
 {
     public void ShowError(string message) =>
         snackbar.Add(message, Severity.Error);
