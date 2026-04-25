@@ -26,10 +26,11 @@ public class AppTrackDatabaseContext : DbContext
 
     public DbSet<BuiltInPromptParameter> BuiltInPromptParameter { get; set; }
 
-    public DbSet<RssPortal> RssPortals { get; set; }
-    public DbSet<UserRssSubscription> UserRssSubscriptions { get; set; }
-    public DbSet<RssMonitoringSettings> RssMonitoringSettings { get; set; }
-    public DbSet<ProcessedFeedItem> ProcessedFeedItems { get; set; }
+    public DbSet<ProjectPortal> ProjectPortals { get; set; }
+    public DbSet<UserPortalSubscription> UserPortalSubscriptions { get; set; }
+    public DbSet<ProjectMonitoringSettings> ProjectMonitoringSettings { get; set; }
+    public DbSet<ProcessedProjectItem> ProcessedProjectItems { get; set; }
+    public DbSet<ScrapedProject> ScrapedProjects { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

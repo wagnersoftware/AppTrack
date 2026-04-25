@@ -8,11 +8,11 @@ namespace AppTrack.BlazorUi.Components.Pages;
 
 public partial class RssOptions
 {
-    [Inject] private IRssSettingsService RssSettingsService { get; set; } = null!;
+    [Inject] private IProjectMonitoringService ProjectMonitoringService { get; set; } = null!;
     [Inject] private ISnackbarService SnackbarService { get; set; } = null!;
 
-    private List<RssPortalModel> _portals = [];
-    private RssMonitoringSettingsModel _settings = new();
+    private List<ProjectPortalModel> _portals = [];
+    private ProjectMonitoringSettingsModel _settings = new();
     private string _newKeyword = string.Empty;
     private bool _isLoading;
     private bool _isBusy;
@@ -21,8 +21,8 @@ public partial class RssOptions
     {
         _isLoading = true;
 
-        var portalsTask = RssSettingsService.GetPortalsAsync();
-        var settingsTask = RssSettingsService.GetSettingsAsync();
+        var portalsTask = ProjectMonitoringService.GetPortalsAsync();
+        var settingsTask = ProjectMonitoringService.GetSettingsAsync();
 
         await Task.WhenAll(portalsTask, settingsTask);
 
@@ -37,7 +37,7 @@ public partial class RssOptions
         }
 
         _portals = portalsResponse.Data ?? [];
-        _settings = settingsResponse.Data ?? new RssMonitoringSettingsModel();
+        _settings = settingsResponse.Data ?? new ProjectMonitoringSettingsModel();
 
         _isLoading = false;
     }
@@ -63,8 +63,8 @@ public partial class RssOptions
     {
         _isBusy = true;
 
-        var subscriptionsTask = RssSettingsService.SetSubscriptionsAsync(_portals);
-        var settingsTask = RssSettingsService.UpdateSettingsAsync(_settings);
+        var subscriptionsTask = ProjectMonitoringService.SetSubscriptionsAsync(_portals);
+        var settingsTask = ProjectMonitoringService.UpdateSettingsAsync(_settings);
 
         await Task.WhenAll(subscriptionsTask, settingsTask);
 
@@ -75,6 +75,6 @@ public partial class RssOptions
             !SnackbarService.HandleResponse(settingsTask.Result))
             return;
 
-        SnackbarService.ShowSuccess("RSS options saved successfully.");
+        SnackbarService.ShowSuccess("Project monitoring options saved successfully.");
     }
 }

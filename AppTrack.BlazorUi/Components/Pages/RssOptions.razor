@@ -77,12 +77,12 @@
                 }
             </MudItem>
 
-            <!-- Poll Interval -->
+            <!-- Notification Interval -->
             <MudItem xs="12" sm="6">
-                <MudText Typo="Typo.subtitle1" Class="mb-2">Poll Interval</MudText>
+                <MudText Typo="Typo.subtitle1" Class="mb-2">Email Notification Interval</MudText>
                 <MudSelect T="int"
-                           @bind-Value="_settings.PollIntervalMinutes"
-                           Label="Poll Interval"
+                           @bind-Value="_settings.NotificationIntervalMinutes"
+                           Label="Notification Interval"
                            Variant="Variant.Outlined"
                            AdornmentIcon="@Icons.Material.Outlined.Schedule">
                     <MudSelectItem T="int" Value="10">10 minutes</MudSelectItem>

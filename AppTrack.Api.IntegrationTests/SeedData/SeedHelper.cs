@@ -4,7 +4,7 @@ using AppTrack.Api.IntegrationTests.SeedData.AiSettings;
 using AppTrack.Api.IntegrationTests.SeedData.FreelancerProfile;
 using AppTrack.Api.IntegrationTests.SeedData.JobApplication;
 using AppTrack.Api.IntegrationTests.SeedData.JobApplicationAiText;
-using AppTrack.Api.IntegrationTests.SeedData.RssFeed;
+using AppTrack.Api.IntegrationTests.SeedData.ProjectMonitoring;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AppTrack.Api.IntegrationTests.Seeddata;
@@ -94,14 +94,14 @@ internal static class SeedHelper
     internal static Task<(int chatModelId, int aiSettingsId)> CreateAiSettingsWithChatModelForTestUserAsync(IServiceProvider services) =>
         JobApplicationAiTextSeedsHelper.CreateAiSettingsWithChatModelAsync(services, TestAuthHandler.TestUserId);
 
-    internal static Task<int> CreateRssMonitoringSettingsForTestUserAsync(
+    internal static Task<int> CreateProjectMonitoringSettingsForTestUserAsync(
         IServiceProvider services, List<string> keywords, int intervalMinutes = 60) =>
-        RssMonitoringSettingsSeedsHelper.CreateForTestUserAsync(services, keywords, intervalMinutes);
+        ProjectMonitoringSettingsSeedsHelper.CreateForTestUserAsync(services, keywords, intervalMinutes);
 
-    internal static Task<int> CreateRssSubscriptionForTestUserAsync(
+    internal static Task<int> CreatePortalSubscriptionForTestUserAsync(
         IServiceProvider services, int portalId, bool isActive = true) =>
-        RssSubscriptionSeedsHelper.CreateForTestUserAsync(services, portalId, isActive);
+        PortalSubscriptionSeedsHelper.CreateForTestUserAsync(services, portalId, isActive);
 
-    internal static Task<int> GetFirstRssPortalIdAsync(IServiceProvider services) =>
-        RssSubscriptionSeedsHelper.GetFirstPortalIdAsync(services);
+    internal static Task<int> GetFirstProjectPortalIdAsync(IServiceProvider services) =>
+        PortalSubscriptionSeedsHelper.GetFirstPortalIdAsync(services);
 }
