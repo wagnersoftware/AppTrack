@@ -30,31 +30,6 @@ public class ProjectMonitoringPortalsTests : IClassFixture<FakeAuthWebApplicatio
     }
 
     [Fact]
-    public async Task GetPortals_ShouldReturn200_WithIsSubscribedFalse_WhenNoSubscription()
-    {
-        var response = await _client.GetAsync("api/projectmonitoring/portals");
-
-        response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        var portals = await response.Content.ReadFromJsonAsync<List<ProjectPortalDto>>();
-        portals.ShouldNotBeNull();
-        portals.ShouldAllBe(p => !p.IsSubscribed);
-    }
-
-    [Fact]
-    public async Task GetPortals_ShouldReturn200_WithIsSubscribedTrue_WhenSubscriptionExists()
-    {
-        var portalId = await SeedHelper.GetFirstProjectPortalIdAsync(_factory.Services);
-        await SeedHelper.CreatePortalSubscriptionForTestUserAsync(_factory.Services, portalId, isActive: true);
-
-        var response = await _client.GetAsync("api/projectmonitoring/portals");
-
-        response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        var portals = await response.Content.ReadFromJsonAsync<List<ProjectPortalDto>>();
-        portals.ShouldNotBeNull();
-        portals.ShouldContain(p => p.Id == portalId && p.IsSubscribed);
-    }
-
-    [Fact]
     public async Task GetPortals_ShouldReturn401_WhenUnauthenticated()
     {
         var unauthClient = _factory.CreateClient();

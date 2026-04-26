@@ -1,5 +1,4 @@
 using AppTrack.Application.Contracts.Mediator;
-using AppTrack.Application.Features.ProjectMonitoring.Commands.PollProjects;
 using AppTrack.Application.Features.ProjectMonitoring.Commands.ScrapePortals;
 
 namespace AppTrack.Api.BackgroundServices;
@@ -17,7 +16,6 @@ public class ProjectMonitoringBackgroundService(
                 await using var scope = scopeFactory.CreateAsyncScope();
                 var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
                 await mediator.Send(new ScrapePortalsCommand(), stoppingToken);
-                await mediator.Send(new PollProjectsCommand(), stoppingToken);
             }
             catch (Exception ex) when (ex is not OperationCanceledException)
             {

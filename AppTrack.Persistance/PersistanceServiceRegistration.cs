@@ -34,9 +34,6 @@ public static class PersistanceServiceRegistration
         services.AddScoped<IBuiltInPromptRepository, BuiltInPromptRepository>();
         services.AddScoped<IFreelancerProfileRepository, FreelancerProfileRepository>();
         services.AddScoped<IProjectPortalRepository, ProjectPortalRepository>();
-        services.AddScoped<IUserPortalSubscriptionRepository, UserPortalSubscriptionRepository>();
-        services.AddScoped<IProjectMonitoringSettingsRepository, ProjectMonitoringSettingsRepository>();
-        services.AddScoped<IProcessedProjectItemRepository, ProcessedProjectItemRepository>();
         services.AddScoped<IScrapedProjectRepository, ScrapedProjectRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 

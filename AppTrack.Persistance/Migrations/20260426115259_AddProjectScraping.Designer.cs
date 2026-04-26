@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AppTrack.Persistance.Migrations
 {
     [DbContext(typeof(AppTrackDatabaseContext))]
-    [Migration("20260424090029_ReplaceStepstoneWithFreelancerMap")]
-    partial class ReplaceStepstoneWithFreelancerMap
+    [Migration("20260426115259_AddProjectScraping")]
+    partial class AddProjectScraping
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -421,7 +421,7 @@ namespace AppTrack.Persistance.Migrations
                     b.ToTable("JobApplicationDefaults");
                 });
 
-            modelBuilder.Entity("AppTrack.Domain.ProcessedFeedItem", b =>
+            modelBuilder.Entity("AppTrack.Domain.ProjectPortal", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -432,28 +432,40 @@ namespace AppTrack.Persistance.Migrations
                     b.Property<DateTime?>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("FeedItemUrl")
-                        .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime?>("ModifiedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("ProcessedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UserId")
+                    b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("ScraperType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId", "FeedItemUrl")
-                        .IsUnique();
+                    b.ToTable("ProjectPortals", (string)null);
 
-                    b.ToTable("ProcessedFeedItems");
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            IsActive = true,
+                            Name = "Freelancermap",
+                            ScraperType = "FreelancerMap",
+                            Url = "https://www.freelancermap.de/projekte"
+                        });
                 });
 
             modelBuilder.Entity("AppTrack.Domain.Prompt", b =>
@@ -524,7 +536,7 @@ namespace AppTrack.Persistance.Migrations
                     b.ToTable("PromptParameter");
                 });
 
-            modelBuilder.Entity("AppTrack.Domain.RssMonitoringSettings", b =>
+            modelBuilder.Entity("AppTrack.Domain.ScrapedProject", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -532,120 +544,39 @@ namespace AppTrack.Persistance.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("CompanyName")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
                     b.Property<DateTime?>("CreationDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("Keywords")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("ModifiedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("NotificationEmail")
+                    b.Property<int>("ProjectPortalId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ScrapedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<int>("PollIntervalMinutes")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
-
-                    b.ToTable("RssMonitoringSettings");
-                });
-
-            modelBuilder.Entity("AppTrack.Domain.RssPortal", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime?>("CreationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("ParserType")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
                     b.Property<string>("Url")
                         .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("RssPortals");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            IsActive = true,
-                            Name = "Freelancermap",
-                            ParserType = "FreelancerMap",
-                            Url = "https://freelancermap.de"
-                        });
-                });
-
-            modelBuilder.Entity("AppTrack.Domain.UserRssSubscription", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime?>("CreationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("LastPolledAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("RssPortalId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RssPortalId");
-
-                    b.HasIndex("UserId", "RssPortalId")
+                    b.HasIndex("ProjectPortalId", "Url")
                         .IsUnique();
 
-                    b.ToTable("UserRssSubscriptions");
+                    b.ToTable("ScrapedProjects", (string)null);
                 });
 
             modelBuilder.Entity("AppTrack.Domain.BuiltInPromptParameter", b =>
@@ -692,15 +623,15 @@ namespace AppTrack.Persistance.Migrations
                     b.Navigation("AISettings");
                 });
 
-            modelBuilder.Entity("AppTrack.Domain.UserRssSubscription", b =>
+            modelBuilder.Entity("AppTrack.Domain.ScrapedProject", b =>
                 {
-                    b.HasOne("AppTrack.Domain.RssPortal", "RssPortal")
+                    b.HasOne("AppTrack.Domain.ProjectPortal", "ProjectPortal")
                         .WithMany()
-                        .HasForeignKey("RssPortalId")
+                        .HasForeignKey("ProjectPortalId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("RssPortal");
+                    b.Navigation("ProjectPortal");
                 });
 
             modelBuilder.Entity("AppTrack.Domain.AiSettings", b =>
