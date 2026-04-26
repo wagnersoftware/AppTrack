@@ -11,6 +11,47 @@ namespace AppTrack.Persistance.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.Sql("""
+                IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = 'ProjectPortals')
+                BEGIN
+                    CREATE TABLE [ProjectPortals] (
+                        [Id]           int           NOT NULL IDENTITY,
+                        [CreationDate] datetime2     NULL,
+                        [IsActive]     bit           NOT NULL,
+                        [ModifiedDate] datetime2     NULL,
+                        [Name]         nvarchar(100) NOT NULL,
+                        [ScraperType]  nvarchar(50)  NOT NULL,
+                        [Url]          nvarchar(1000) NOT NULL,
+                        CONSTRAINT [PK_ProjectPortals] PRIMARY KEY ([Id])
+                    );
+                    SET IDENTITY_INSERT [ProjectPortals] ON;
+                    INSERT INTO [ProjectPortals] ([Id], [IsActive], [Name], [ScraperType], [Url])
+                    VALUES (1, 1, N'Freelancermap', N'FreelancerMap', N'https://www.freelancermap.de/projekte');
+                    SET IDENTITY_INSERT [ProjectPortals] OFF;
+                END
+                """);
+
+            migrationBuilder.Sql("""
+                IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = 'ScrapedProjects')
+                BEGIN
+                    CREATE TABLE [ScrapedProjects] (
+                        [Id]              int            NOT NULL IDENTITY,
+                        [CompanyName]     nvarchar(300)  NOT NULL,
+                        [CreationDate]    datetime2      NULL,
+                        [ModifiedDate]    datetime2      NULL,
+                        [ProjectPortalId] int            NOT NULL,
+                        [ScrapedAt]       datetime2      NOT NULL,
+                        [Title]           nvarchar(500)  NOT NULL,
+                        [Url]             nvarchar(2000) NOT NULL,
+                        CONSTRAINT [PK_ScrapedProjects] PRIMARY KEY ([Id]),
+                        CONSTRAINT [FK_ScrapedProjects_ProjectPortals_ProjectPortalId]
+                            FOREIGN KEY ([ProjectPortalId]) REFERENCES [ProjectPortals] ([Id]) ON DELETE CASCADE
+                    );
+                    CREATE UNIQUE INDEX [IX_ScrapedProjects_ProjectPortalId_Url]
+                        ON [ScrapedProjects] ([ProjectPortalId], [Url]);
+                END
+                """);
+
             migrationBuilder.Sql("IF OBJECT_ID('ProcessedProjectItems', 'U') IS NOT NULL DROP TABLE [ProcessedProjectItems]");
             migrationBuilder.Sql("IF OBJECT_ID('ProjectMonitoringSettings', 'U') IS NOT NULL DROP TABLE [ProjectMonitoringSettings]");
             migrationBuilder.Sql("IF OBJECT_ID('UserPortalSubscriptions', 'U') IS NOT NULL DROP TABLE [UserPortalSubscriptions]");
