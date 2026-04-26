@@ -1,5 +1,4 @@
 using AngleSharp;
-using AngleSharp.Dom;
 using AppTrack.Application.Contracts.ProjectMonitoring;
 using AppTrack.Application.Features.ProjectMonitoring.Models;
 using Microsoft.Extensions.Logging;
@@ -22,14 +21,12 @@ public class FreelancermapScraper : IProjectScraper
         try
         {
             var html = await _httpClient.GetStringAsync(portalUrl, ct);
-            var config = Configuration.Default;
-            using var context = BrowsingContext.New(config);
+            using var context = BrowsingContext.New(Configuration.Default);
             using var document = await context.OpenAsync(req => req.Content(html), ct);
 
-            var cards = document.QuerySelectorAll(".project-card");
-            var results = new List<ScrapedProjectData>();
+            var items = new List<(string Title, string Url, string Company)>();
 
-            foreach (var card in cards)
+            foreach (var card in document.QuerySelectorAll(".project-card"))
             {
                 var titleLink = card.QuerySelector("a[data-testid=\"title\"]");
                 if (titleLink is null) continue;
@@ -43,20 +40,38 @@ public class FreelancermapScraper : IProjectScraper
                 var companyElement = card.QuerySelector(".project-info > .mg-b-display-m");
                 var company = companyElement?.TextContent.Trim() ?? string.Empty;
 
-                results.Add(new ScrapedProjectData(
-                    Position: title,
-                    Url: url,
-                    JobDescription: string.Empty,
-                    CompanyName: company,
-                    PortalName: "Freelancermap"));
+                items.Add((title, url, company));
             }
 
-            return results;
+            var descriptions = await Task.WhenAll(items.Select(item => FetchDescriptionAsync(item.Url, ct)));
+
+            return items.Select((item, i) => new ScrapedProjectData(
+                Position: item.Title,
+                Url: item.Url,
+                JobDescription: descriptions[i],
+                CompanyName: item.Company,
+                PortalName: "Freelancermap")).ToList();
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
             _logger.LogError(ex, "Error scraping Freelancermap at {Url}", portalUrl);
             return [];
+        }
+    }
+
+    private async Task<string> FetchDescriptionAsync(string projectUrl, CancellationToken ct)
+    {
+        try
+        {
+            var html = await _httpClient.GetStringAsync(projectUrl, ct);
+            using var ctx = BrowsingContext.New(Configuration.Default);
+            using var doc = await ctx.OpenAsync(req => req.Content(html), ct);
+            return doc.QuerySelector(".ql-editor")?.TextContent.Trim() ?? string.Empty;
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            _logger.LogWarning(ex, "Failed to fetch description from {Url}", projectUrl);
+            return string.Empty;
         }
     }
 }

@@ -16,14 +16,19 @@ public class ScrapedProjectRepository : GenericRepository<ScrapedProject>, IScra
             .Where(p => portalIds.Contains(p.ProjectPortalId))
             .ToListAsync();
 
-    public async Task ReplaceForPortalAsync(int portalId, IEnumerable<ScrapedProject> projects, CancellationToken ct)
+    public async Task AddNewForPortalAsync(int portalId, IEnumerable<ScrapedProject> projects, CancellationToken ct)
     {
-        var existing = await _context.ScrapedProjects
+        var existingUrls = (await _context.ScrapedProjects
             .Where(p => p.ProjectPortalId == portalId)
-            .ToListAsync(ct);
+            .Select(p => p.Url)
+            .ToListAsync(ct))
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-        _context.ScrapedProjects.RemoveRange(existing);
-        await _context.ScrapedProjects.AddRangeAsync(projects, ct);
+        var newProjects = projects.Where(p => !existingUrls.Contains(p.Url)).ToList();
+
+        if (newProjects.Count == 0) return;
+
+        await _context.ScrapedProjects.AddRangeAsync(newProjects, ct);
         await _context.SaveChangesAsync(ct);
     }
 }

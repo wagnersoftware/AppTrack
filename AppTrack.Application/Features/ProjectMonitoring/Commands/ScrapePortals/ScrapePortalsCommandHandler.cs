@@ -36,10 +36,11 @@ public class ScrapePortalsCommandHandler : IRequestHandler<ScrapePortalsCommand,
                 Title = item.Position,
                 Url = item.Url,
                 CompanyName = item.CompanyName,
+                Description = item.JobDescription,
                 ScrapedAt = DateTime.UtcNow
             });
 
-            await _scrapedProjectRepository.ReplaceForPortalAsync(portal.Id, projects, cancellationToken);
+            await _scrapedProjectRepository.AddNewForPortalAsync(portal.Id, projects, cancellationToken);
         }
 
         return Unit.Value;
