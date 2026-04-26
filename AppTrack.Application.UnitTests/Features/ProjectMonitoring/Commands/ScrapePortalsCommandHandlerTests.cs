@@ -3,6 +3,7 @@ using AppTrack.Application.Features.ProjectMonitoring.Commands.ScrapePortals;
 using AppTrack.Application.Features.ProjectMonitoring.Models;
 using AppTrack.Domain;
 using AppTrack.Domain.Enums;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Shouldly;
 
@@ -32,7 +33,7 @@ public class ScrapePortalsCommandHandlerTests
     }
 
     private ScrapePortalsCommandHandler CreateHandler() =>
-        new(_mockPortalRepo.Object, _mockScraperFactory.Object, _mockScrapedProjectRepo.Object);
+        new(_mockPortalRepo.Object, _mockScraperFactory.Object, _mockScrapedProjectRepo.Object, NullLogger<ScrapePortalsCommandHandler>.Instance);
 
     [Fact]
     public async Task Handle_ShouldMapDescriptionFromJobDescription()
@@ -160,6 +161,59 @@ public class ScrapePortalsCommandHandlerTests
         await CreateHandler().Handle(new ScrapePortalsCommand(), CancellationToken.None);
 
         // Assert — repository is still called (handler does not short-circuit), but with an empty sequence
+        capturedProjects.ShouldNotBeNull();
+        capturedProjects.ShouldBeEmpty();
+    }
+
+    [Theory]
+    [InlineData("", "https://x.de/p", "desc", "Acme")]           // empty title
+    [InlineData("Dev", "", "desc", "Acme")]                       // empty URL
+    [InlineData("Dev", "https://x.de/p", "desc", "")]            // empty company
+    public async Task Handle_ShouldFilterOut_ItemsWithMissingRequiredFields(
+        string title, string url, string description, string company)
+    {
+        var portal = new ProjectPortal { Id = 1, Url = "https://freelancermap.de", ScraperType = ScraperType.FreelancerMap, IsActive = true };
+        _mockPortalRepo.Setup(r => r.GetAllActiveAsync()).ReturnsAsync([portal]);
+        _mockScraper.Setup(s => s.ScrapeAsync(portal.Url, It.IsAny<CancellationToken>()))
+            .ReturnsAsync([new ScrapedProjectData(title, url, description, company, "Freelancermap")]);
+
+        IEnumerable<ScrapedProject>? capturedProjects = null;
+        _mockScrapedProjectRepo
+            .Setup(r => r.AddNewForPortalAsync(portal.Id, It.IsAny<IEnumerable<ScrapedProject>>(), It.IsAny<CancellationToken>()))
+            .Callback<int, IEnumerable<ScrapedProject>, CancellationToken>((_, projects, _) => capturedProjects = projects.ToList())
+            .Returns(Task.CompletedTask);
+
+        await CreateHandler().Handle(new ScrapePortalsCommand(), CancellationToken.None);
+
+        capturedProjects.ShouldNotBeNull();
+        capturedProjects.ShouldBeEmpty();
+    }
+
+    [Theory]
+    [InlineData(501, 100, 100)]   // title too long
+    [InlineData(100, 2001, 100)]  // URL too long
+    [InlineData(100, 100, 301)]   // company too long
+    public async Task Handle_ShouldFilterOut_ItemsExceedingColumnLengths(
+        int titleLength, int urlLength, int companyLength)
+    {
+        var portal = new ProjectPortal { Id = 1, Url = "https://freelancermap.de", ScraperType = ScraperType.FreelancerMap, IsActive = true };
+        _mockPortalRepo.Setup(r => r.GetAllActiveAsync()).ReturnsAsync([portal]);
+        _mockScraper.Setup(s => s.ScrapeAsync(portal.Url, It.IsAny<CancellationToken>()))
+            .ReturnsAsync([new ScrapedProjectData(
+                new string('A', titleLength),
+                "https://x.de/" + new string('p', urlLength),
+                "valid description",
+                new string('C', companyLength),
+                "Freelancermap")]);
+
+        IEnumerable<ScrapedProject>? capturedProjects = null;
+        _mockScrapedProjectRepo
+            .Setup(r => r.AddNewForPortalAsync(portal.Id, It.IsAny<IEnumerable<ScrapedProject>>(), It.IsAny<CancellationToken>()))
+            .Callback<int, IEnumerable<ScrapedProject>, CancellationToken>((_, projects, _) => capturedProjects = projects.ToList())
+            .Returns(Task.CompletedTask);
+
+        await CreateHandler().Handle(new ScrapePortalsCommand(), CancellationToken.None);
+
         capturedProjects.ShouldNotBeNull();
         capturedProjects.ShouldBeEmpty();
     }

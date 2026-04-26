@@ -1,7 +1,9 @@
 using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Contracts.ProjectMonitoring;
+using AppTrack.Application.Features.ProjectMonitoring.Models;
 using AppTrack.Application.Shared;
 using AppTrack.Domain;
+using Microsoft.Extensions.Logging;
 
 namespace AppTrack.Application.Features.ProjectMonitoring.Commands.ScrapePortals;
 
@@ -10,15 +12,18 @@ public class ScrapePortalsCommandHandler : IRequestHandler<ScrapePortalsCommand,
     private readonly IProjectPortalRepository _portalRepository;
     private readonly IProjectScraperFactory _scraperFactory;
     private readonly IScrapedProjectRepository _scrapedProjectRepository;
+    private readonly ILogger<ScrapePortalsCommandHandler> _logger;
 
     public ScrapePortalsCommandHandler(
         IProjectPortalRepository portalRepository,
         IProjectScraperFactory scraperFactory,
-        IScrapedProjectRepository scrapedProjectRepository)
+        IScrapedProjectRepository scrapedProjectRepository,
+        ILogger<ScrapePortalsCommandHandler> logger)
     {
         _portalRepository = portalRepository;
         _scraperFactory = scraperFactory;
         _scrapedProjectRepository = scrapedProjectRepository;
+        _logger = logger;
     }
 
     public async Task<Unit> Handle(ScrapePortalsCommand request, CancellationToken cancellationToken)
@@ -30,20 +35,32 @@ public class ScrapePortalsCommandHandler : IRequestHandler<ScrapePortalsCommand,
             var scraper = _scraperFactory.GetScraper(portal.ScraperType);
             var scraped = await scraper.ScrapeAsync(portal.Url, cancellationToken);
 
-            //do not save scraped projects with empty descriptions, as they will never be matched to a user and will block a re-read with possible available descriptions for that project
-            var projects = scraped.Where(item => !string.IsNullOrEmpty(item.JobDescription)).Select(item => new ScrapedProject
+            var projects = new List<ScrapedProject>();
+            foreach (var item in scraped)
             {
-                ProjectPortalId = portal.Id,
-                Title = item.Position,
-                Url = item.Url,
-                CompanyName = item.CompanyName,
-                Description = item.JobDescription,
-                ScrapedAt = DateTime.UtcNow
-            });
+                var reason = ScrapedProjectDataValidator.Validate(item);
+                if (reason is not null)
+                {
+                    _logger.LogWarning("Skipping scraped project from {Portal}: {Reason}. Url={Url}", portal.Name, reason, item.Url);
+                    continue;
+                }
+
+                projects.Add(new ScrapedProject
+                {
+                    ProjectPortalId = portal.Id,
+                    Title = item.Position,
+                    Url = item.Url,
+                    CompanyName = item.CompanyName,
+                    Description = item.JobDescription,
+                    ScrapedAt = DateTime.UtcNow
+                });
+            }
 
             await _scrapedProjectRepository.AddNewForPortalAsync(portal.Id, projects, cancellationToken);
         }
 
         return Unit.Value;
     }
+
+
 }
