@@ -54,7 +54,32 @@ public async Task Validate_ShouldHaveError_WhenXIsY()
 - Affected test files: `GeneratePromptQueryHandlerTests.cs`, `GeneratePromptQueryValidatorTests.cs`, `GetAiSettingsByUserIdQueryHandlerTests.cs`
 - Default (fallback) constructor setup pattern: `.Setup(r => r.GetByLanguageAsync(It.IsAny<string>())).ReturnsAsync(new List<BuiltInPrompt>())`
 
+## Persistence Integration Tests: InMemory Pattern
+- `test/AppTrack.Persistance.IntegrationTests/` was empty until Apr 2026 — bootstrapped with a `.csproj` referencing `Microsoft.EntityFrameworkCore.InMemory` + Shouldly + xunit
+- Use a unique DB name per test method (pass `nameof(TestMethod)` to `UseInMemoryDatabase`) for full isolation — no teardown needed
+- Call `context.Database.EnsureCreated()` to apply `HasData` seeds from `IEntityTypeConfiguration` classes
+- `ProjectPortalConfiguration` seeds `ProjectPortal { Id = 1, Name = "Freelancermap", ... }` — available in every InMemory test after `EnsureCreated()`
+- Repository under test is instantiated directly with the test context: `new ScrapedProjectRepository(context)`
+- No Moq needed; exercise the real EF Core repository against real InMemory storage
+
+## ScrapedProjectRepository.AddNewForPortalAsync: Tested Behaviours
+- New projects are inserted
+- URL-based deduplication skips existing URLs for the same portalId
+- Deduplication is case-insensitive (HashSet with OrdinalIgnoreCase)
+- Cross-portal: same URL on a different portalId is NOT treated as duplicate
+- All-duplicate input triggers early return without inserting anything
+- `Description` (nvarchar(max)) is persisted correctly
+
+## Testing Infrastructure-Layer Classes (e.g. FreelancermapScraper)
+- `FreelancermapScraper` is in `AppTrack.Infrastructure` — requires adding a `<ProjectReference>` to Infrastructure in the unit test `.csproj`
+- Infrastructure uses `<FrameworkReference Include="Microsoft.AspNetCore.App" />` — transitive pull into a `Microsoft.NET.Sdk` test project is fine on net10.0
+- Use a `FakeHttpMessageHandler : HttpMessageHandler` (inner sealed class) that maps URL strings to response bodies via `Dictionary<string, string>`; unmapped URLs return 404 so `HttpClient.GetStringAsync` throws `HttpRequestException`
+- Construct scraper directly: `new FreelancermapScraper(new HttpClient(handler), NullLogger<FreelancermapScraper>.Instance)`
+- `NullLogger<T>.Instance` is from `Microsoft.Extensions.Logging.Abstractions` — no package reference needed, it is transitively available
+- Key scenarios: happy path, card missing title link (skipped), detail fetch 404 (empty description), detail page without `.ql-editor` (empty description), relative href resolved to absolute URL
+
 ## Key Rules
 - `TreatWarningsAsErrors = true` — zero warnings tolerated, build must be clean
 - NuGet versions are NOT in `.csproj` files — all managed in `Directory.Packages.props` at solution root
 - `UserId` is always set by backend from JWT; never validate it in command validators
+- Do NOT pass `null!` for non-nullable record/class members to avoid nullable warning; use `""` or a valid substitute instead

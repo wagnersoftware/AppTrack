@@ -10,7 +10,7 @@ public partial class CreateJobApplicationDialog
 {
     [Inject] private IJobApplicationService JobApplicationService { get; set; } = null!;
     [Inject] private IModelValidator<JobApplicationModel> ModelValidator { get; set; } = null!;
-    [Inject] private IErrorHandlingService ErrorHandlingService { get; set; } = null!;
+    [Inject] private ISnackbarService SnackbarService { get; set; } = null!;
 
     [CascadingParameter] private IMudDialogInstance MudDialog { get; set; } = null!;
 
@@ -79,7 +79,7 @@ public partial class CreateJobApplicationDialog
         var response = await JobApplicationService.CreateJobApplicationForUserAsync(_model);
         _isBusy = false;
 
-        if (!ErrorHandlingService.HandleResponse(response)) return;
+        if (!SnackbarService.HandleResponse(response)) return;
         if (response.Data is null) return;
 
         MudDialog.Close(DialogResult.Ok(response.Data));

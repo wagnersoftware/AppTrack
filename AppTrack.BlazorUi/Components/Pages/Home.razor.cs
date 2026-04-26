@@ -16,7 +16,7 @@ public partial class Home
     [Inject] private AuthenticationStateProvider AuthenticationStateProvider { get; set; } = null!;
     [Inject] private ISnackbar Snackbar { get; set; } = null!;
     [Inject] private IDialogService DialogService { get; set; } = null!;
-    [Inject] private IErrorHandlingService ErrorHandlingService { get; set; } = null!;
+    [Inject] private ISnackbarService SnackbarService { get; set; } = null!;
     [Inject] private ProfileSetupSessionState ProfileSetupSession { get; set; } = null!;
 
     private static readonly DialogOptions _dialogOptions = new()
@@ -125,12 +125,12 @@ public partial class Home
     {
         var namesResponse = await ApplicationTextService.GetPromptKeys();
 
-        if (!ErrorHandlingService.HandleResponse(namesResponse))
+        if (!SnackbarService.HandleResponse(namesResponse))
             return;
 
         if (namesResponse.Data is not { Count: > 0 })
         {
-            ErrorHandlingService.ShowError("No prompt configured");
+            SnackbarService.ShowError("No prompt configured");
             return;
         }
 
@@ -182,7 +182,7 @@ public partial class Home
 
         var response = await JobApplicationService.DeleteJobApplicationAsync(model.Id);
 
-        if (!ErrorHandlingService.HandleResponse(response)) return;
+        if (!SnackbarService.HandleResponse(response)) return;
         if (response.Data is null) return;
 
         _jobApplications.Remove(model);

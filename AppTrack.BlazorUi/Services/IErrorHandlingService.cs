@@ -2,7 +2,7 @@ using AppTrack.Frontend.ApiService.Base;
 
 namespace AppTrack.BlazorUi.Services;
 
-public interface IErrorHandlingService
+public interface ISnackbarService
 {
     void ShowError(string message);
     void ShowSuccess(string message);

@@ -26,6 +26,9 @@ public class AppTrackDatabaseContext : DbContext
 
     public DbSet<BuiltInPromptParameter> BuiltInPromptParameter { get; set; }
 
+    public DbSet<ProjectPortal> ProjectPortals { get; set; }
+    public DbSet<ScrapedProject> ScrapedProjects { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppTrackDatabaseContext).Assembly);

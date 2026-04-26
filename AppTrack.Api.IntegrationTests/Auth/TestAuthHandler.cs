@@ -20,6 +20,9 @@ public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
+        if (!Request.Headers.ContainsKey("Authorization"))
+            return Task.FromResult(AuthenticateResult.NoResult());
+
         var claims = new[]
         {
             new Claim(JwtRegisteredClaimNames.Sub, "test-user-id"),

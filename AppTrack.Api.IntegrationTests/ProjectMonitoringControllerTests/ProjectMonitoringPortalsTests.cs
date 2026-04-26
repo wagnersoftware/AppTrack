@@ -1,0 +1,39 @@
+using AppTrack.Api.IntegrationTests.Seeddata;
+using AppTrack.Application.Features.ProjectMonitoring.Dto;
+using Shouldly;
+using System.Net;
+using System.Net.Http.Json;
+
+namespace AppTrack.Api.IntegrationTests.ProjectMonitoringControllerTests;
+
+public class ProjectMonitoringPortalsTests : IClassFixture<FakeAuthWebApplicationFactory>
+{
+    private readonly FakeAuthWebApplicationFactory _factory;
+    private readonly HttpClient _client;
+
+    public ProjectMonitoringPortalsTests(FakeAuthWebApplicationFactory factory)
+    {
+        _factory = factory;
+        _client = factory.CreateAuthenticatedClient();
+    }
+
+    [Fact]
+    public async Task GetPortals_ShouldReturn200_WithAllSystemPortals()
+    {
+        var response = await _client.GetAsync("api/projectmonitoring/portals");
+
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var portals = await response.Content.ReadFromJsonAsync<List<ProjectPortalDto>>();
+        portals.ShouldNotBeNull();
+        portals.ShouldNotBeEmpty();
+        portals.ShouldContain(p => p.Name == "Freelancermap");
+    }
+
+    [Fact]
+    public async Task GetPortals_ShouldReturn401_WhenUnauthenticated()
+    {
+        var unauthClient = _factory.CreateClient();
+        var response = await unauthClient.GetAsync("api/projectmonitoring/portals");
+        response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+    }
+}

@@ -1,4 +1,5 @@
 ﻿using AppTrack.Application.Contracts.Persistance;
+using AppTrack.Application.Contracts.ProjectMonitoring;
 using AppTrack.Persistance.DatabaseContext;
 using AppTrack.Persistance.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -32,6 +33,8 @@ public static class PersistanceServiceRegistration
         services.AddScoped<IChatModelRepository, ChatModelRepository>();
         services.AddScoped<IBuiltInPromptRepository, BuiltInPromptRepository>();
         services.AddScoped<IFreelancerProfileRepository, FreelancerProfileRepository>();
+        services.AddScoped<IProjectPortalRepository, ProjectPortalRepository>();
+        services.AddScoped<IScrapedProjectRepository, ScrapedProjectRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         return services;

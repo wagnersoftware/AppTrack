@@ -92,4 +92,5 @@ internal static class SeedHelper
 
     internal static Task<(int chatModelId, int aiSettingsId)> CreateAiSettingsWithChatModelForTestUserAsync(IServiceProvider services) =>
         JobApplicationAiTextSeedsHelper.CreateAiSettingsWithChatModelAsync(services, TestAuthHandler.TestUserId);
+
 }

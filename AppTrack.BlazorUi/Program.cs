@@ -19,7 +19,7 @@ builder.Services.AddMudServices(config =>
 {
     config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomRight;
 });
-builder.Services.AddScoped<IErrorHandlingService, ErrorHandlingService>();
+builder.Services.AddScoped<ISnackbarService, SnackbarServiceService>();
 builder.Services.AddScoped<ProfileSetupSessionState>();
 
 builder.Services.AddMsalAuthentication(options =>

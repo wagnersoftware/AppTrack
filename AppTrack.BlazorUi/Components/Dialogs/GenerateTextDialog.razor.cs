@@ -10,7 +10,7 @@ namespace AppTrack.BlazorUi.Components.Dialogs;
 public partial class GenerateTextDialog : IDisposable
 {
     [Inject] private IApplicationTextService ApplicationTextService { get; set; } = null!;
-    [Inject] private IErrorHandlingService ErrorHandlingService { get; set; } = null!;
+    [Inject] private ISnackbarService SnackbarService { get; set; } = null!;
     [Inject] private IJSRuntime JS { get; set; } = null!;
 
     [CascadingParameter] private IMudDialogInstance MudDialog { get; set; } = null!;
@@ -33,7 +33,7 @@ public partial class GenerateTextDialog : IDisposable
         _selectedPromptKey = PromptKeys[0];
         var response = await ApplicationTextService.RenderPrompt(JobApplication.Id, _selectedPromptKey);
 
-        if (!ErrorHandlingService.HandleResponse(response) || response.Data is null)
+        if (!SnackbarService.HandleResponse(response) || response.Data is null)
         {
             MudDialog.Cancel();
             return;
@@ -53,7 +53,7 @@ public partial class GenerateTextDialog : IDisposable
         var response = await ApplicationTextService.RenderPrompt(JobApplication.Id, newName);
         _isReloadingPrompt = false;
 
-        if (!ErrorHandlingService.HandleResponse(response) || response.Data is null)
+        if (!SnackbarService.HandleResponse(response) || response.Data is null)
             return;
 
         _prompt = response.Data.Text;
@@ -73,7 +73,7 @@ public partial class GenerateTextDialog : IDisposable
             return;
         }
 
-        if (!ErrorHandlingService.HandleResponse(response) || response.Data is null)
+        if (!SnackbarService.HandleResponse(response) || response.Data is null)
         {
             _phase = Phase.PromptReady;
             return;
@@ -88,7 +88,7 @@ public partial class GenerateTextDialog : IDisposable
     private async Task CopyTextAsync()
     {
         await JS.InvokeVoidAsync("navigator.clipboard.writeText", _generatedText);
-        ErrorHandlingService.ShowSuccess("Copied to clipboard.");
+        SnackbarService.ShowSuccess("Copied to clipboard.");
     }
 
     private void SaveAndCloseAsync()
