@@ -124,6 +124,16 @@
 - `RssMonitoringSettingsRepository.UpsertAsync` updates Keywords, PollIntervalMinutes, AND NotificationEmail on existing record
 - Migration: `20260422091653_AddRssFeedMonitoring`
 
+## AppTrack.Functions Project (as of Apr 2026 - branch: feature/project-scraping)
+- `AppTrack.Functions/AppTrack.Functions.csproj` — OutputType: Exe, AzureFunctionsVersion: v4, refs Application + Infrastructure + Persistance
+- NuGet: `Microsoft.Azure.Functions.Worker` 2.52.0, `Microsoft.Azure.Functions.Worker.Sdk` 2.0.7, `Microsoft.Azure.Functions.Worker.Extensions.Timer` 4.3.1
+- `Program.cs`: `HostBuilder` + `ConfigureFunctionsWorkerDefaults()` + calls `AddApplicationServices`, `AddInfrastructureServices`, `AddPersistanceServices` then re-registers `IUserContext` as `NullUserContext` (override)
+- `NullUserContext` at `AppTrack.Functions/Identity/NullUserContext.cs` — no-op `IUserContext`; `IsAuthenticated` returns false, `GetCurrentUserId` throws. Safe because timer-trigger commands never implement `IUserScopedRequest`.
+- `ScrapePortalsFunction.cs` — `[TimerTrigger("%ScrapeSchedule%")]`; logs start + duration; dispatches `ScrapePortalsCommand` via `IMediator`
+- `local.settings.json` gitignored; `local.settings.json.example` committed; `ScrapeSchedule` default: `"0 */10 * * * *"` (every 10 min)
+- `BackgroundServices.ProjectMonitoringBackgroundService` unregistered from `AppTrack.Api/Program.cs` (file kept, `AddHostedService` call removed)
+- DI override pattern: call `services.AddScoped<IUserContext, NullUserContext>()` AFTER `AddInfrastructureServices` — last registration wins in ASP.NET Core DI
+
 ## CV Storage Feature (Infrastructure layer, branch: feature/profile-setup-wizard)
 - `AzureStorageSettings` at `AppTrack.Infrastructure/CvStorage/AzureStorageSettings.cs` — ConnectionString + ContainerName
 - `AzureBlobStorageService` implements `ICvStorageService` — creates `BlobServiceClient` per call (stateless, scoped DI)

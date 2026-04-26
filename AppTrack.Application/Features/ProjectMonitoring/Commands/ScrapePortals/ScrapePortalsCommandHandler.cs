@@ -30,7 +30,8 @@ public class ScrapePortalsCommandHandler : IRequestHandler<ScrapePortalsCommand,
             var scraper = _scraperFactory.GetScraper(portal.ScraperType);
             var scraped = await scraper.ScrapeAsync(portal.Url, cancellationToken);
 
-            var projects = scraped.Select(item => new ScrapedProject
+            //do not save scraped projects with empty descriptions, as they will never be matched to a user and will block a re-read with possible available descriptions for that project
+            var projects = scraped.Where(item => !string.IsNullOrEmpty(item.JobDescription)).Select(item => new ScrapedProject
             {
                 ProjectPortalId = portal.Id,
                 Title = item.Position,

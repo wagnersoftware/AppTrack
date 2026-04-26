@@ -45,12 +45,14 @@ public class FreelancermapScraper : IProjectScraper
 
             var descriptions = await Task.WhenAll(items.Select(item => FetchDescriptionAsync(item.Url, ct)));
 
-            return items.Select((item, i) => new ScrapedProjectData(
-                Position: item.Title,
-                Url: item.Url,
-                JobDescription: descriptions[i],
-                CompanyName: item.Company,
-                PortalName: "Freelancermap")).ToList();
+            return items
+                .Select((item, i) => new ScrapedProjectData(
+                    Position: item.Title,
+                    Url: item.Url,
+                    JobDescription: descriptions[i],
+                    CompanyName: item.Company,
+                    PortalName: "Freelancermap"))
+                .ToList();
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {

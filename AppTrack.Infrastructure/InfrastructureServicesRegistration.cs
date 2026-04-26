@@ -36,7 +36,8 @@ namespace AppTrack.Infrastructure
             services.AddSingleton<IPdfTextExtractor, PdfPigTextExtractor>();
 
             // Project scraping services
-            services.AddHttpClient<FreelancermapScraper>();
+            services.AddHttpClient<FreelancermapScraper>()
+                .AddStandardResilienceHandler();
             services.AddScoped<IProjectScraperFactory, ProjectScraperFactory>();
 
             return services;
