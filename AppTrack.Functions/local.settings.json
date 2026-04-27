@@ -7,6 +7,7 @@
     "ConnectionStrings__AppTrackConnectionString": "Server=(localdb)\\MSSQLLocalDB;Database=AppTrack_Local;Trusted_Connection=True;MultipleActiveResultSets=True;",
     "ServiceBusConnection": "<your-service-bus-connection-string>",
     "ScrapingCompletedQueueName": "scraping-completed",
-    "NotificationSchedule": "*/5 * * * *"
+    "NotificationSchedule": "*/5 * * * *",
+    "CleanupSchedule": "0 0 3 * * 0"
   }
 }

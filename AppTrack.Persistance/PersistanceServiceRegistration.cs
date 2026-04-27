@@ -39,6 +39,7 @@ public static class PersistanceServiceRegistration
         services.AddScoped<IProcessedProjectItemRepository, ProcessedProjectItemRepository>();
         services.AddScoped<IScrapedProjectRepository, ScrapedProjectRepository>();
         services.AddScoped<IUserProjectMatchRepository, UserProjectMatchRepository>();
+        services.AddScoped<IProjectDataCleanupRepository, ProjectDataCleanupRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         return services;

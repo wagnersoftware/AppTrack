@@ -12,13 +12,14 @@ HTTP requests involved in its core pipeline.
 **Persistence:** Azure SQL Server via EF Core 10
 **Email:** SendGrid via `IEmailSender`
 
-The pipeline has three stages that execute in sequence:
+The pipeline has three stages that execute in sequence, plus a periodic cleanup job:
 
 | Stage | Trigger | Function | Command |
 |---|---|---|---|
 | 1. Scrape | Timer (`ScrapeSchedule`) | `ScrapePortalsFunction` | `ScrapePortalsCommand` |
 | 2. Match | Service Bus queue message | `MatchProjectsFunction` | `MatchProjectsCommand` |
 | 3. Notify | Timer (`NotificationSchedule`) | `SendNotificationsFunction` | `SendProjectNotificationsCommand` |
+| 4. Cleanup | Timer (`CleanupSchedule`) | `CleanupFunction` | `CleanupProjectDataCommand` |
 
 ---
 
@@ -33,12 +34,14 @@ graph TD
         SPF[ScrapePortalsFunction]
         MPF[MatchProjectsFunction]
         SNF[SendNotificationsFunction]
+        CLF[CleanupFunction]
     end
 
     subgraph Application["AppTrack.Application (business logic)"]
         SCH[ScrapePortalsCommandHandler]
         MCH[MatchProjectsCommandHandler]
         NCH[SendProjectNotificationsCommandHandler]
+        CCH[CleanupProjectDataCommandHandler]
         Contracts[Contracts / Interfaces]
     end
 
@@ -55,6 +58,7 @@ graph TD
         PPI[ProcessedProjectItemRepository]
         PMS[ProjectMonitoringSettingsRepository]
         UPS[UserPortalSubscriptionRepository]
+        CLR[ProjectDataCleanupRepository]
     end
 
     subgraph Domain["AppTrack.Domain (entities)"]
@@ -64,10 +68,12 @@ graph TD
     SPF --> SCH
     MPF --> MCH
     SNF --> NCH
+    CLF --> CCH
 
     SCH --> Contracts
     MCH --> Contracts
     NCH --> Contracts
+    CCH --> Contracts
 
     Contracts -.->|implemented by| FMS
     Contracts -.->|implemented by| PSF
@@ -78,6 +84,7 @@ graph TD
     Contracts -.->|implemented by| PPI
     Contracts -.->|implemented by| PMS
     Contracts -.->|implemented by| UPS
+    Contracts -.->|implemented by| CLR
 
     Infrastructure --> Application
     Persistence --> Application
@@ -201,6 +208,7 @@ sequenceDiagram
 | `ScrapePortalsFunction` | `TimerTrigger(%ScrapeSchedule%)` | Dispatches `ScrapePortalsCommand`, then calls `IScrapingEventPublisher.PublishScrapingCompletedAsync` |
 | `MatchProjectsFunction` | `ServiceBusTrigger(%ScrapingCompletedQueueName%)` | Dispatches `MatchProjectsCommand` when a scraping-completed message arrives |
 | `SendNotificationsFunction` | `TimerTrigger(%NotificationSchedule%)` | Dispatches `SendProjectNotificationsCommand` on a frequent schedule |
+| `CleanupFunction` | `TimerTrigger(%CleanupSchedule%)` | Dispatches `CleanupProjectDataCommand` to delete data older than 60 days |
 
 ### Application Layer — Commands
 
@@ -218,6 +226,15 @@ sequenceDiagram
 - Wraps all writes for a single user in `IUnitOfWork.ExecuteInTransactionAsync`:
   - Matched projects create `UserProjectMatch` (IsNotified=false) and a `JobApplication` (Status=Discovered)
   - ALL new projects (matched or not) are added to `ProcessedProjectItem`
+
+**`CleanupProjectDataCommandHandler`**
+- Computes a cutoff of `DateTime.UtcNow - 60 days`
+- Calls `IProjectDataCleanupRepository.CleanupOlderThanAsync(cutoff, ct)`
+- Deletion order is fixed by the Restrict FK from `UserProjectMatch` → `ScrapedProject`:
+  1. `UserProjectMatches` where `ScrapedProject.CreationDate < cutoff`
+  2. `ProcessedProjectItems` where `ProcessedAt < cutoff`
+  3. `ScrapedProjects` where `CreationDate < cutoff`
+- Uses `ExecuteDeleteAsync` — no entity loading, single `DELETE` statement per table
 
 **`SendProjectNotificationsCommandHandler`**
 - Loads unnotified matches via `IUserProjectMatchRepository.GetUnnotifiedAsync` (pre-filtered to users with `NotifyByEmail=true` and a non-empty `NotificationEmail`)
@@ -241,6 +258,7 @@ sequenceDiagram
 | `ScrapedProjectRepository.GetUnprocessedForUserAsync` | Loads the user's `ProcessedProjectItems` URLs into a `HashSet`, then returns `ScrapedProjects` from the subscribed portals whose URL is not in that set. |
 | `UserProjectMatchRepository.GetUnnotifiedAsync` | Two-step query: first fetches eligible user IDs from `ProjectMonitoringSettings`; then loads `UserProjectMatches` with `IsNotified=false` for those users, eager-loading `ScrapedProject` and `ProjectPortal`. |
 | `UserProjectMatchRepository.MarkNotifiedAsync` | Uses `ExecuteUpdateAsync` for a single bulk `UPDATE` — no entity tracking overhead. |
+| `ProjectDataCleanupRepository.CleanupOlderThanAsync` | Deletes in FK-safe order: `UserProjectMatches` → `ProcessedProjectItems` → `ScrapedProjects`. Uses `ExecuteDeleteAsync` for each table. |
 
 ### Domain Entities
 
@@ -337,6 +355,14 @@ Scraping and matching are decoupled via Azure Service Bus rather than being call
 - **Independent scaling** — scraping and matching can be scaled or re-triggered independently.
 - **Observability** — the queue provides a natural checkpoint; a dead-letter queue captures unprocessable messages.
 
+### Data Retention via `CleanupFunction`
+
+`ScrapedProject`, `ProcessedProjectItem`, and `UserProjectMatch` records accumulate indefinitely without cleanup. A weekly `CleanupFunction` (Sunday 03:00 UTC) deletes all rows older than **60 days**.
+
+`JobApplication` records are explicitly excluded from cleanup — they belong to the user's job tracker and must persist regardless of age.
+
+The 60-day retention window is a constant (`RetentionDays`) in `CleanupProjectDataCommandHandler`. Projects older than 60 days are no longer relevant for active job searching, and their associated match/processed records have no further use once the notification cycle has completed.
+
 ### Notification Interval Enforcement in the Handler
 
 `SendNotificationsFunction` runs on a frequent schedule (e.g. every 5 minutes), but the handler enforces a per-user `NotificationIntervalMinutes` by comparing `LastNotifiedAt` to `DateTime.UtcNow`. This lets the function run frequently for responsiveness while preventing notification spam. The timer schedule controls the maximum resolution; user settings control actual frequency.
@@ -397,6 +423,7 @@ To run the full pipeline manually:
     "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
     "ScrapeSchedule": "0 */10 * * * *",
     "NotificationSchedule": "*/5 * * * *",
+    "CleanupSchedule": "0 0 3 * * 0",
     "ScrapingCompletedQueueName": "scraping-completed",
     "ServiceBusConnection": "<real-connection-string-or-placeholder>",
     "ConnectionStrings__AppTrackConnectionString": "Server=(localdb)\\MSSQLLocalDB;Database=AppTrack_Local;Trusted_Connection=True;MultipleActiveResultSets=True;",
@@ -416,6 +443,7 @@ To run the full pipeline manually:
 | `ScrapeSchedule` | `ScrapePortalsFunction` | NCRONTAB expression for scraping timer |
 | `NotificationSchedule` | `SendNotificationsFunction` | NCRONTAB expression for notification timer |
 | `ScrapingCompletedQueueName` | `MatchProjectsFunction` | Name of the Service Bus queue |
+| `CleanupSchedule` | `CleanupFunction` | NCRONTAB expression for cleanup timer (e.g. `0 0 3 * * 0` = weekly Sunday 03:00 UTC) |
 | `ServiceBusConnection` | `MatchProjectsFunction` trigger binding | Service Bus connection string (binding convention) |
 | `ServiceBus:ConnectionString` | `ServiceBusScrapingEventPublisher` | Service Bus connection string (configuration key) |
 | `ProjectScraping:TopicName` | `ServiceBusScrapingEventPublisher` | Queue/topic name for publishing; defaults to `project-scraping-events` |

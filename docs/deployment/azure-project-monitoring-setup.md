@@ -18,6 +18,10 @@ This guide covers all Azure resources required to run the project scraping, keyw
   SendNotificationsFunction
           │  reads IsNotified=false matches, sends email via SendGrid
           └─► marks IsNotified=true
+
+[Timer Trigger - weekly]
+  CleanupFunction
+          └─► deletes ScrapedProjects, ProcessedProjectItems, UserProjectMatches older than 60 days
 ```
 
 ## Prerequisites
@@ -140,6 +144,7 @@ az functionapp config appsettings set \
     "ScrapingCompletedQueueName=scraping-completed" \
     "ScrapeSchedule=0 0 6 * * *" \
     "NotificationSchedule=0 30 6 * * *" \
+    "CleanupSchedule=0 0 3 * * 0" \
     "EmailSettings__FromAddress=<your-verified-sender@domain.com>" \
     "EmailSettings__ApiKey=<sendgrid-api-key>"
 ```
@@ -150,6 +155,7 @@ az functionapp config appsettings set \
 |---|---|---|
 | `ScrapeSchedule` | `0 0 6 * * *` | Every day at 06:00 UTC |
 | `NotificationSchedule` | `0 30 6 * * *` | Every day at 06:30 UTC (30 min after scrape) |
+| `CleanupSchedule` | `0 0 3 * * 0` | Every Sunday at 03:00 UTC |
 
 > Set `NotificationSchedule` **after** `ScrapeSchedule` to give matching time to complete. 30 minutes is a safe buffer.
 
@@ -211,6 +217,7 @@ Expected output:
 ScrapePortalsFunction
 MatchProjectsFunction
 SendNotificationsFunction
+CleanupFunction
 ```
 
 ### Trigger scraping manually (one-time test)
@@ -265,5 +272,6 @@ az webapp log tail \
 | `ScrapingCompletedQueueName` | Fixed: `scraping-completed` | Must match queue name from Step 3b |
 | `ScrapeSchedule` | Your preference | NCRONTAB — when to scrape |
 | `NotificationSchedule` | Your preference | NCRONTAB — when to send emails |
+| `CleanupSchedule` | Your preference | NCRONTAB — when to run cleanup (e.g. weekly) |
 | `EmailSettings__FromAddress` | SendGrid | Verified sender address |
 | `EmailSettings__ApiKey` | SendGrid | API key |
