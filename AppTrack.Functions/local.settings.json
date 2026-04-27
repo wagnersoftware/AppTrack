@@ -4,6 +4,9 @@
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
     "ScrapeSchedule": "0 */10 * * * *",
-    "ConnectionStrings__AppTrackConnectionString": "Server=(localdb)\\MSSQLLocalDB;Database=AppTrack_Local;Trusted_Connection=True;MultipleActiveResultSets=True;"
+    "ConnectionStrings__AppTrackConnectionString": "Server=(localdb)\\MSSQLLocalDB;Database=AppTrack_Local;Trusted_Connection=True;MultipleActiveResultSets=True;",
+    "ServiceBusConnection": "<your-service-bus-connection-string>",
+    "ScrapingCompletedQueueName": "scraping-completed",
+    "NotificationSchedule": "*/5 * * * *"
   }
 }
