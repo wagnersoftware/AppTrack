@@ -7,4 +7,5 @@ public interface IScrapedProjectRepository : IGenericRepository<ScrapedProject>
 {
     Task<List<ScrapedProject>> GetByPortalIdsAsync(IEnumerable<int> portalIds);
     Task AddNewForPortalAsync(int portalId, IEnumerable<ScrapedProject> projects, CancellationToken ct);
+    Task<List<ScrapedProject>> GetUnprocessedForUserAsync(string userId, IEnumerable<string> processedUrls, CancellationToken ct);
 }
