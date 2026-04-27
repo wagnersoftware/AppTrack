@@ -19,7 +19,5 @@ public class ProjectMonitoringSettingsConfiguration : IEntityTypeConfiguration<P
                 v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions?)null) ?? new List<string>());
         builder.Property(x => x.NotificationEmail).IsRequired().HasMaxLength(500);
         builder.Property(x => x.NotificationIntervalMinutes).IsRequired().HasDefaultValue(60);
-        builder.Property(x => x.PollIntervalMinutes).IsRequired().HasDefaultValue(60);
-        builder.Property(x => x.LastPolledAt).HasColumnType("datetime2");
     }
 }

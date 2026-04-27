@@ -17,7 +17,7 @@ public class GetProjectMonitoringSettingsQueryHandler
     {
         var settings = await _repository.GetByUserIdAsync(request.UserId);
         return settings is null
-            ? new ProjectMonitoringSettingsDto([], 60, false, 60)
-            : new ProjectMonitoringSettingsDto(settings.Keywords, settings.NotificationIntervalMinutes, settings.NotifyByEmail, settings.PollIntervalMinutes);
+            ? new ProjectMonitoringSettingsDto([], 60, false)
+            : new ProjectMonitoringSettingsDto(settings.Keywords, settings.NotificationIntervalMinutes, settings.NotifyByEmail);
     }
 }

@@ -34,7 +34,6 @@ public sealed class UpdateProjectMonitoringSettingsCommandHandler
             NotificationEmail = request.NotificationEmail,
             Keywords = request.Keywords,
             NotificationIntervalMinutes = request.NotificationIntervalMinutes,
-            PollIntervalMinutes = request.PollIntervalMinutes,
             NotifyByEmail = request.NotifyByEmail
         });
 

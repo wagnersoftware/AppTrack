@@ -16,7 +16,5 @@ public class UpdateProjectMonitoringSettingsCommand : IRequest<Unit>, IUserScope
 
     public int NotificationIntervalMinutes { get; set; }
 
-    public int PollIntervalMinutes { get; set; }
-
     public bool NotifyByEmail { get; set; }
 }

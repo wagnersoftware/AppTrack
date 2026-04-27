@@ -25,7 +25,6 @@ public class ProjectMonitoringSettingsRepository : GenericRepository<ProjectMoni
         {
             existing.Keywords = settings.Keywords;
             existing.NotificationIntervalMinutes = settings.NotificationIntervalMinutes;
-            existing.PollIntervalMinutes = settings.PollIntervalMinutes;
             existing.NotificationEmail = settings.NotificationEmail;
             existing.NotifyByEmail = settings.NotifyByEmail;
         }
