@@ -5,29 +5,37 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AppTrack.Persistance.Repositories;
 
-public class UserProjectMatchRepository : GenericRepository<UserProjectMatch>, IUserProjectMatchRepository
+public class UserProjectMatchRepository : IUserProjectMatchRepository
 {
-    public UserProjectMatchRepository(AppTrackDatabaseContext dbContext) : base(dbContext) { }
+    private readonly AppTrackDatabaseContext _context;
 
-    public async Task<UserProjectMatch?> GetByUserAndProjectAsync(string userId, int scrapedProjectId, CancellationToken ct)
-        => await _context.UserProjectMatches.AsNoTracking()
-            .FirstOrDefaultAsync(m => m.UserId == userId && m.ScrapedProjectId == scrapedProjectId, ct);
+    public UserProjectMatchRepository(AppTrackDatabaseContext context)
+        => _context = context;
 
-    public async Task<List<UserProjectMatch>> GetUnnotifiedMatchesAsync(string userId, CancellationToken ct)
-        => await _context.UserProjectMatches.AsNoTracking()
-            .Where(m => m.UserId == userId && !m.IsNotified)
-            .Include(m => m.ScrapedProject)
+    public async Task AddRangeAsync(IEnumerable<UserProjectMatch> matches, CancellationToken ct)
+    {
+        await _context.UserProjectMatches.AddRangeAsync(matches, ct);
+        await _context.SaveChangesAsync(ct);
+    }
+
+    public async Task<List<UserProjectMatch>> GetUnnotifiedAsync(CancellationToken ct)
+    {
+        var eligibleUserIds = await _context.ProjectMonitoringSettings
+            .Where(s => s.NotifyByEmail && !string.IsNullOrEmpty(s.NotificationEmail))
+            .Select(s => s.UserId)
             .ToListAsync(ct);
 
-    public async Task MarkAsNotifiedAsync(string userId, int scrapedProjectId, CancellationToken ct)
+        return await _context.UserProjectMatches
+            .Include(m => m.ScrapedProject)
+                .ThenInclude(p => p.ProjectPortal)
+            .Where(m => !m.IsNotified && eligibleUserIds.Contains(m.UserId))
+            .ToListAsync(ct);
+    }
+
+    public async Task MarkNotifiedAsync(IEnumerable<int> matchIds, CancellationToken ct)
     {
-        var match = await _context.UserProjectMatches
-            .FirstOrDefaultAsync(m => m.UserId == userId && m.ScrapedProjectId == scrapedProjectId, ct);
-
-        if (match == null) return;
-
-        match.IsNotified = true;
-        _context.UserProjectMatches.Update(match);
-        await _context.SaveChangesAsync(ct);
+        await _context.UserProjectMatches
+            .Where(m => matchIds.Contains(m.Id))
+            .ExecuteUpdateAsync(s => s.SetProperty(m => m.IsNotified, true), ct);
     }
 }

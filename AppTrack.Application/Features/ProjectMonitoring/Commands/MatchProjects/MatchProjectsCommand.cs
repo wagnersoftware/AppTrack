@@ -3,7 +3,4 @@ using AppTrack.Application.Shared;
 
 namespace AppTrack.Application.Features.ProjectMonitoring.Commands.MatchProjects;
 
-public class MatchProjectsCommand : IRequest<Unit>
-{
-    public string UserId { get; set; } = string.Empty;
-}
+public class MatchProjectsCommand : IRequest<Unit>;

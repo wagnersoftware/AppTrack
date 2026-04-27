@@ -1,7 +1,9 @@
+using AppTrack.Application.Contracts.Mediator;
+using AppTrack.Application.Contracts.Persistance;
 using AppTrack.Application.Contracts.ProjectMonitoring;
 using AppTrack.Application.Features.ProjectMonitoring.Commands.MatchProjects;
 using AppTrack.Domain;
-using Microsoft.Extensions.Logging.Abstractions;
+using AppTrack.Domain.Enums;
 using Moq;
 using Shouldly;
 
@@ -9,242 +11,132 @@ namespace AppTrack.Application.UnitTests.Features.ProjectMonitoring.Commands;
 
 public class MatchProjectsCommandHandlerTests
 {
-    private readonly Mock<IProjectMonitoringSettingsRepository> _mockSettingsRepository;
-    private readonly Mock<IProcessedProjectItemRepository> _mockProcessedRepository;
-    private readonly Mock<IScrapedProjectRepository> _mockScrapedRepository;
-    private readonly Mock<IUserProjectMatchRepository> _mockMatchRepository;
+    private readonly Mock<IUserPortalSubscriptionRepository> _subscriptionRepo = new();
+    private readonly Mock<IProjectMonitoringSettingsRepository> _settingsRepo = new();
+    private readonly Mock<IScrapedProjectRepository> _scrapedProjectRepo = new();
+    private readonly Mock<IUserProjectMatchRepository> _matchRepo = new();
+    private readonly Mock<IJobApplicationRepository> _jobAppRepo = new();
+    private readonly Mock<IProcessedProjectItemRepository> _processedRepo = new();
+    private readonly Mock<IUnitOfWork> _unitOfWork = new();
 
     public MatchProjectsCommandHandlerTests()
     {
-        _mockSettingsRepository = new Mock<IProjectMonitoringSettingsRepository>();
-        _mockProcessedRepository = new Mock<IProcessedProjectItemRepository>();
-        _mockScrapedRepository = new Mock<IScrapedProjectRepository>();
-        _mockMatchRepository = new Mock<IUserProjectMatchRepository>();
+        _unitOfWork
+            .Setup(u => u.ExecuteInTransactionAsync(It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()))
+            .Returns<Func<CancellationToken, Task>, CancellationToken>(async (fn, ct) => await fn(ct));
     }
 
-    private MatchProjectsCommandHandler CreateHandler() =>
-        new(
-            _mockSettingsRepository.Object,
-            _mockProcessedRepository.Object,
-            _mockScrapedRepository.Object,
-            _mockMatchRepository.Object,
-            NullLogger<MatchProjectsCommandHandler>.Instance);
+    private MatchProjectsCommandHandler CreateHandler() => new(
+        _subscriptionRepo.Object,
+        _settingsRepo.Object,
+        _scrapedProjectRepo.Object,
+        _matchRepo.Object,
+        _jobAppRepo.Object,
+        _processedRepo.Object,
+        _unitOfWork.Object);
 
     [Fact]
-    public async Task Handle_NoSettingsFound_ShouldReturnUnit()
+    public async Task Handle_ShouldSkipUser_WhenNoSettings()
     {
-        var userId = "user-123";
-        var command = new MatchProjectsCommand { UserId = userId };
+        _subscriptionRepo.Setup(r => r.GetActiveSubscriptionsWithPortalsAsync())
+            .ReturnsAsync(new List<UserPortalSubscription> { new UserPortalSubscription { UserId = "u1", ProjectPortalId = 1 } });
+        _settingsRepo.Setup(r => r.GetByUserIdAsync("u1")).ReturnsAsync((ProjectMonitoringSettings?)null);
 
-        _mockSettingsRepository
-            .Setup(r => r.GetByUserIdAsync(userId))
-            .ReturnsAsync((AppTrack.Domain.ProjectMonitoringSettings?)null);
+        await CreateHandler().Handle(new MatchProjectsCommand(), CancellationToken.None);
 
-        await CreateHandler().Handle(command, CancellationToken.None);
-
-        _mockSettingsRepository.Verify(r => r.GetByUserIdAsync(userId), Times.Once);
-        _mockProcessedRepository.Verify(r => r.GetProcessedUrlsAsync(It.IsAny<string>(), It.IsAny<IEnumerable<string>>()), Times.Never);
+        _scrapedProjectRepo.Verify(r => r.GetUnprocessedForUserAsync(It.IsAny<string>(), It.IsAny<IEnumerable<int>>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
-    public async Task Handle_NoKeywords_ShouldReturnUnit()
+    public async Task Handle_ShouldSkipUser_WhenNoKeywords()
     {
-        var userId = "user-123";
-        var command = new MatchProjectsCommand { UserId = userId };
-        var settings = new AppTrack.Domain.ProjectMonitoringSettings
-        {
-            Id = 1,
-            UserId = userId,
-            Keywords = new List<string>(),
-            NotifyByEmail = true,
-            NotificationEmail = "test@example.com"
-        };
+        _subscriptionRepo.Setup(r => r.GetActiveSubscriptionsWithPortalsAsync())
+            .ReturnsAsync(new List<UserPortalSubscription> { new UserPortalSubscription { UserId = "u1", ProjectPortalId = 1 } });
+        _settingsRepo.Setup(r => r.GetByUserIdAsync("u1"))
+            .ReturnsAsync(new ProjectMonitoringSettings { UserId = "u1", Keywords = new List<string>() });
 
-        _mockSettingsRepository
-            .Setup(r => r.GetByUserIdAsync(userId))
-            .ReturnsAsync(settings);
+        await CreateHandler().Handle(new MatchProjectsCommand(), CancellationToken.None);
 
-        await CreateHandler().Handle(command, CancellationToken.None);
-
-        _mockProcessedRepository.Verify(r => r.GetProcessedUrlsAsync(It.IsAny<string>(), It.IsAny<IEnumerable<string>>()), Times.Never);
-        _mockScrapedRepository.Verify(r => r.GetUnprocessedForUserAsync(It.IsAny<string>(), It.IsAny<IEnumerable<string>>(), It.IsAny<CancellationToken>()), Times.Never);
+        _scrapedProjectRepo.Verify(r => r.GetUnprocessedForUserAsync(It.IsAny<string>(), It.IsAny<IEnumerable<int>>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
-    public async Task Handle_ProjectMatches_ShouldCreateMatch()
+    public async Task Handle_ShouldCreateMatchAndJobApplication_WhenKeywordMatches()
     {
-        var userId = "user-123";
-        var command = new MatchProjectsCommand { UserId = userId };
-        var settings = new AppTrack.Domain.ProjectMonitoringSettings
-        {
-            Id = 1,
-            UserId = userId,
-            Keywords = new List<string> { "csharp", "dotnet" },
-            NotifyByEmail = true,
-            NotificationEmail = "test@example.com"
-        };
+        var project = new ScrapedProject { Id = 10, Title = "Senior .NET Developer", Url = "https://x.de/1", CompanyName = "Acme" };
+        SetupSingleUserWithProject("u1", new List<string> { ".NET" }, project);
 
-        var project = new ScrapedProject
-        {
-            Id = 1,
-            ProjectPortalId = 1,
-            Title = "C# Developer",
-            Url = "https://example.com/project-1",
-            CompanyName = "Tech Corp",
-            Description = "We are looking for a .NET developer"
-        };
+        List<UserProjectMatch>? capturedMatches = null;
+        _matchRepo
+            .Setup(r => r.AddRangeAsync(It.IsAny<IEnumerable<UserProjectMatch>>(), It.IsAny<CancellationToken>()))
+            .Callback<IEnumerable<UserProjectMatch>, CancellationToken>((m, _) => capturedMatches = m.ToList())
+            .Returns(Task.CompletedTask);
+        _jobAppRepo.Setup(r => r.CreateAsync(It.IsAny<JobApplication>())).Returns(Task.CompletedTask);
+        _processedRepo.Setup(r => r.AddRangeAsync(It.IsAny<IEnumerable<ProcessedProjectItem>>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
-        _mockSettingsRepository
-            .Setup(r => r.GetByUserIdAsync(userId))
-            .ReturnsAsync(settings);
+        await CreateHandler().Handle(new MatchProjectsCommand(), CancellationToken.None);
 
-        _mockProcessedRepository
-            .Setup(r => r.GetProcessedUrlsAsync(userId, It.IsAny<IEnumerable<string>>()))
-            .ReturnsAsync(new HashSet<string>());
+        capturedMatches.ShouldNotBeNull();
+        capturedMatches.ShouldHaveSingleItem();
+        capturedMatches[0].UserId.ShouldBe("u1");
+        capturedMatches[0].ScrapedProjectId.ShouldBe(10);
+        capturedMatches[0].IsNotified.ShouldBeFalse();
 
-        _mockScrapedRepository
-            .Setup(r => r.GetUnprocessedForUserAsync(userId, It.IsAny<IEnumerable<string>>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<ScrapedProject> { project });
+        _jobAppRepo.Verify(r => r.CreateAsync(It.Is<JobApplication>(j =>
+            j.UserId == "u1" &&
+            j.Status == JobApplicationStatus.Discovered &&
+            j.URL == "https://x.de/1")), Times.Once);
+    }
 
-        _mockMatchRepository
-            .Setup(r => r.GetByUserAndProjectAsync(userId, project.Id, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((UserProjectMatch?)null);
+    [Fact]
+    public async Task Handle_ShouldNotCreateMatch_WhenNoKeywordMatches()
+    {
+        var project = new ScrapedProject { Id = 11, Title = "Java Developer", Url = "https://x.de/2", CompanyName = "Acme" };
+        SetupSingleUserWithProject("u1", new List<string> { ".NET" }, project);
+        _processedRepo.Setup(r => r.AddRangeAsync(It.IsAny<IEnumerable<ProcessedProjectItem>>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
-        _mockMatchRepository
-            .Setup(r => r.CreateAsync(It.IsAny<UserProjectMatch>()))
+        await CreateHandler().Handle(new MatchProjectsCommand(), CancellationToken.None);
+
+        _matchRepo.Verify(r => r.AddRangeAsync(It.IsAny<IEnumerable<UserProjectMatch>>(), It.IsAny<CancellationToken>()), Times.Never);
+        _jobAppRepo.Verify(r => r.CreateAsync(It.IsAny<JobApplication>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task Handle_ShouldMarkAllNewProjectsAsProcessed_IncludingNonMatches()
+    {
+        var matchingProject  = new ScrapedProject { Id = 1, Title = ".NET Dev", Url = "https://x.de/1", CompanyName = "A" };
+        var unmatchedProject = new ScrapedProject { Id = 2, Title = "Java Dev",  Url = "https://x.de/2", CompanyName = "B" };
+
+        _subscriptionRepo.Setup(r => r.GetActiveSubscriptionsWithPortalsAsync())
+            .ReturnsAsync(new List<UserPortalSubscription> { new UserPortalSubscription { UserId = "u1", ProjectPortalId = 1 } });
+        _settingsRepo.Setup(r => r.GetByUserIdAsync("u1"))
+            .ReturnsAsync(new ProjectMonitoringSettings { UserId = "u1", Keywords = new List<string> { ".NET" } });
+        _scrapedProjectRepo.Setup(r => r.GetUnprocessedForUserAsync("u1", It.IsAny<IEnumerable<int>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<ScrapedProject> { matchingProject, unmatchedProject });
+        _matchRepo.Setup(r => r.AddRangeAsync(It.IsAny<IEnumerable<UserProjectMatch>>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        _jobAppRepo.Setup(r => r.CreateAsync(It.IsAny<JobApplication>())).Returns(Task.CompletedTask);
+
+        List<ProcessedProjectItem>? capturedProcessed = null;
+        _processedRepo
+            .Setup(r => r.AddRangeAsync(It.IsAny<IEnumerable<ProcessedProjectItem>>(), It.IsAny<CancellationToken>()))
+            .Callback<IEnumerable<ProcessedProjectItem>, CancellationToken>((items, _) => capturedProcessed = items.ToList())
             .Returns(Task.CompletedTask);
 
-        await CreateHandler().Handle(command, CancellationToken.None);
+        await CreateHandler().Handle(new MatchProjectsCommand(), CancellationToken.None);
 
-        _mockMatchRepository.Verify(
-            r => r.CreateAsync(It.Is<UserProjectMatch>(m => m.UserId == userId && m.ScrapedProjectId == project.Id && !m.IsNotified)),
-            Times.Once);
+        capturedProcessed.ShouldNotBeNull();
+        capturedProcessed.Count.ShouldBe(2);
+        capturedProcessed.Select(p => p.ProjectItemUrl).ShouldContain("https://x.de/1");
+        capturedProcessed.Select(p => p.ProjectItemUrl).ShouldContain("https://x.de/2");
     }
 
-    [Fact]
-    public async Task Handle_ProjectDoesNotMatch_ShouldNotCreateMatch()
+    private void SetupSingleUserWithProject(string userId, List<string> keywords, ScrapedProject project)
     {
-        var userId = "user-123";
-        var command = new MatchProjectsCommand { UserId = userId };
-        var settings = new AppTrack.Domain.ProjectMonitoringSettings
-        {
-            Id = 1,
-            UserId = userId,
-            Keywords = new List<string> { "java", "python" },
-            NotifyByEmail = true,
-            NotificationEmail = "test@example.com"
-        };
-
-        var project = new ScrapedProject
-        {
-            Id = 1,
-            ProjectPortalId = 1,
-            Title = "C# Developer",
-            Url = "https://example.com/project-1",
-            CompanyName = "Tech Corp",
-            Description = "We are looking for a .NET developer"
-        };
-
-        _mockSettingsRepository
-            .Setup(r => r.GetByUserIdAsync(userId))
-            .ReturnsAsync(settings);
-
-        _mockProcessedRepository
-            .Setup(r => r.GetProcessedUrlsAsync(userId, It.IsAny<IEnumerable<string>>()))
-            .ReturnsAsync(new HashSet<string>());
-
-        _mockScrapedRepository
-            .Setup(r => r.GetUnprocessedForUserAsync(userId, It.IsAny<IEnumerable<string>>(), It.IsAny<CancellationToken>()))
+        _subscriptionRepo.Setup(r => r.GetActiveSubscriptionsWithPortalsAsync())
+            .ReturnsAsync(new List<UserPortalSubscription> { new UserPortalSubscription { UserId = userId, ProjectPortalId = 1 } });
+        _settingsRepo.Setup(r => r.GetByUserIdAsync(userId))
+            .ReturnsAsync(new ProjectMonitoringSettings { UserId = userId, Keywords = keywords });
+        _scrapedProjectRepo.Setup(r => r.GetUnprocessedForUserAsync(userId, It.IsAny<IEnumerable<int>>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<ScrapedProject> { project });
-
-        await CreateHandler().Handle(command, CancellationToken.None);
-
-        _mockMatchRepository.Verify(
-            r => r.CreateAsync(It.IsAny<UserProjectMatch>()),
-            Times.Never);
-    }
-
-    [Fact]
-    public async Task Handle_AllProcessedProjects_ShouldNotCreateMatch()
-    {
-        var userId = "user-123";
-        var command = new MatchProjectsCommand { UserId = userId };
-        var settings = new AppTrack.Domain.ProjectMonitoringSettings
-        {
-            Id = 1,
-            UserId = userId,
-            Keywords = new List<string> { "csharp" },
-            NotifyByEmail = true,
-            NotificationEmail = "test@example.com"
-        };
-
-        _mockSettingsRepository
-            .Setup(r => r.GetByUserIdAsync(userId))
-            .ReturnsAsync(settings);
-
-        _mockProcessedRepository
-            .Setup(r => r.GetProcessedUrlsAsync(userId, It.IsAny<IEnumerable<string>>()))
-            .ReturnsAsync(new HashSet<string> { "https://example.com/project-1" });
-
-        _mockScrapedRepository
-            .Setup(r => r.GetUnprocessedForUserAsync(userId, It.IsAny<IEnumerable<string>>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<ScrapedProject>());
-
-        await CreateHandler().Handle(command, CancellationToken.None);
-
-        _mockMatchRepository.Verify(
-            r => r.CreateAsync(It.IsAny<UserProjectMatch>()),
-            Times.Never);
-    }
-
-    [Fact]
-    public async Task Handle_KeywordMatching_ShouldBeCaseInsensitive()
-    {
-        var userId = "user-123";
-        var command = new MatchProjectsCommand { UserId = userId };
-        var settings = new AppTrack.Domain.ProjectMonitoringSettings
-        {
-            Id = 1,
-            UserId = userId,
-            Keywords = new List<string> { "CSHARP" },
-            NotifyByEmail = true,
-            NotificationEmail = "test@example.com"
-        };
-
-        var project = new ScrapedProject
-        {
-            Id = 1,
-            ProjectPortalId = 1,
-            Title = "c# developer",
-            Url = "https://example.com/project-1",
-            CompanyName = "Tech Corp",
-            Description = "We need a csharp expert"
-        };
-
-        _mockSettingsRepository
-            .Setup(r => r.GetByUserIdAsync(userId))
-            .ReturnsAsync(settings);
-
-        _mockProcessedRepository
-            .Setup(r => r.GetProcessedUrlsAsync(userId, It.IsAny<IEnumerable<string>>()))
-            .ReturnsAsync(new HashSet<string>());
-
-        _mockScrapedRepository
-            .Setup(r => r.GetUnprocessedForUserAsync(userId, It.IsAny<IEnumerable<string>>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<ScrapedProject> { project });
-
-        _mockMatchRepository
-            .Setup(r => r.GetByUserAndProjectAsync(userId, project.Id, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((UserProjectMatch?)null);
-
-        _mockMatchRepository
-            .Setup(r => r.CreateAsync(It.IsAny<UserProjectMatch>()))
-            .Returns(Task.CompletedTask);
-
-        await CreateHandler().Handle(command, CancellationToken.None);
-
-        _mockMatchRepository.Verify(
-            r => r.CreateAsync(It.Is<UserProjectMatch>(m => m.UserId == userId && m.ScrapedProjectId == project.Id)),
-            Times.Once);
     }
 }

@@ -32,13 +32,21 @@ public class ScrapedProjectRepository : GenericRepository<ScrapedProject>, IScra
         await _context.SaveChangesAsync(ct);
     }
 
-    public async Task<List<ScrapedProject>> GetUnprocessedForUserAsync(string userId, IEnumerable<string> processedUrls, CancellationToken ct)
+    public async Task<List<ScrapedProject>> GetUnprocessedForUserAsync(
+        string userId,
+        IEnumerable<int> portalIds,
+        CancellationToken ct)
     {
-        var processedUrlSet = processedUrls.ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var processedUrls = await _context.ProcessedProjectItems
+            .Where(p => p.UserId == userId)
+            .Select(p => p.ProjectItemUrl)
+            .ToHashSetAsync(StringComparer.OrdinalIgnoreCase, ct);
+
         return await _context.ScrapedProjects
             .AsNoTracking()
             .Include(p => p.ProjectPortal)
-            .Where(p => !processedUrlSet.Contains(p.Url))
+            .Where(p => portalIds.Contains(p.ProjectPortalId)
+                     && !processedUrls.Contains(p.Url))
             .ToListAsync(ct);
     }
 }
