@@ -27,7 +27,11 @@ public class AppTrackDatabaseContext : DbContext
     public DbSet<BuiltInPromptParameter> BuiltInPromptParameter { get; set; }
 
     public DbSet<ProjectPortal> ProjectPortals { get; set; }
+    public DbSet<UserPortalSubscription> UserPortalSubscriptions { get; set; }
+    public DbSet<ProjectMonitoringSettings> ProjectMonitoringSettings { get; set; }
+    public DbSet<ProcessedProjectItem> ProcessedProjectItems { get; set; }
     public DbSet<ScrapedProject> ScrapedProjects { get; set; }
+    public DbSet<UserProjectMatch> UserProjectMatches { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
