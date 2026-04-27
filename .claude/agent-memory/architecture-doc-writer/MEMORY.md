@@ -43,8 +43,19 @@
 - NuGet (inline versions in AppTrack.Api.csproj): Serilog.AspNetCore 8.0.3, Serilog.Sinks.File 6.0.0, Serilog.Sinks.ApplicationInsights 5.0.1
 - Key files: AppTrack.Api/Logging/CorrelationIdEnricher.cs, AppTrack.Api/Logging/PiiDestructuringPolicy.cs
 
+## Project Monitoring Architecture (verified Apr 2026)
+- Functions host: `AppTrack.Functions/Program.cs` — registers AddApplicationServices + AddInfrastructureServices + AddPersistanceServices + NullUserContext override
+- NullUserContext: IsAuthenticated=false, GetCurrentUserId throws — guards against IUserScopedRequest in timer functions
+- ServiceBusScrapingEventPublisher config keys: `ServiceBus:ConnectionString`, `ProjectScraping:TopicName` (defaults to "project-scraping-events") — does NOT swallow failures
+- MatchProjectsFunction binding uses `ServiceBusConnection` (no colon) — separate from publisher's `ServiceBus:ConnectionString`
+- ProcessedProjectItem: ALL new projects recorded (not just matches) — prevents retroactive re-evaluation
+- Keywords stored as JSON in nvarchar(max) via EF Core value conversion
+- ScrapedProjectDataValidator: static class in Application layer, called inside ScrapePortalsCommandHandler (not in handler validator pattern)
+- GetUnprocessedForUserAsync: loads user's ProcessedProjectItems URLs into HashSet in memory, then queries ScrapedProjects excluding those URLs (not a SQL LEFT JOIN)
+
 ## Docs Already Written
 - `docs/error-handling-architecture.md` — full error handling, all layers, EN language
 - `docs/mapping-architecture.md` — AutoMapper profiles
 - `docs/validation-architecture.md` — shared validation, FluentValidation
 - `docs/logging-architecture.md` — Serilog structured logging, enrichment, PII policy, sinks
+- `docs/deployment/project-monitoring-architecture.md` — scrape/match/notify pipeline, Azure Functions, Service Bus, design decisions

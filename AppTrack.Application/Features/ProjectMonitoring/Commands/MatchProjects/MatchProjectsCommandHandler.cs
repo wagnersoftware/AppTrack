@@ -55,7 +55,9 @@ public class MatchProjectsCommandHandler : IRequestHandler<MatchProjectsCommand,
                 continue;
 
             var matches = newProjects
-                .Where(p => settings.Keywords.Any(kw => p.Title.Contains(kw, StringComparison.OrdinalIgnoreCase)))
+                .Where(p => settings.Keywords.Any(kw =>
+                    p.Title.Contains(kw, StringComparison.OrdinalIgnoreCase) ||
+                    p.Description.Contains(kw, StringComparison.OrdinalIgnoreCase)))
                 .ToList();
 
             await _unitOfWork.ExecuteInTransactionAsync(async ct =>
@@ -78,7 +80,7 @@ public class MatchProjectsCommandHandler : IRequestHandler<MatchProjectsCommand,
                             Name = string.IsNullOrEmpty(match.CompanyName) ? match.Title : match.CompanyName,
                             Position = match.Title,
                             URL = match.Url,
-                            JobDescription = string.Empty,
+                            JobDescription = match.Description ?? string.Empty,
                             Location = string.Empty,
                             ContactPerson = string.Empty,
                             DurationInMonths = string.Empty,

@@ -63,7 +63,7 @@ public class MatchProjectsCommandHandlerTests
     [Fact]
     public async Task Handle_ShouldCreateMatchAndJobApplication_WhenKeywordMatches()
     {
-        var project = new ScrapedProject { Id = 10, Title = "Senior .NET Developer", Url = "https://x.de/1", CompanyName = "Acme" };
+        var project = new ScrapedProject { Id = 10, Title = "Senior .NET Developer", Url = "https://x.de/1", CompanyName = "Acme", Description = "Great project" };
         SetupSingleUserWithProject("u1", new List<string> { ".NET" }, project);
 
         List<UserProjectMatch>? capturedMatches = null;
@@ -85,13 +85,29 @@ public class MatchProjectsCommandHandlerTests
         _jobAppRepo.Verify(r => r.CreateAsync(It.Is<JobApplication>(j =>
             j.UserId == "u1" &&
             j.Status == JobApplicationStatus.Discovered &&
-            j.URL == "https://x.de/1")), Times.Once);
+            j.URL == "https://x.de/1" &&
+            j.JobDescription == "Great project")), Times.Once);
+    }
+
+    [Fact]
+    public async Task Handle_ShouldCreateMatch_WhenKeywordOnlyInDescription()
+    {
+        var project = new ScrapedProject { Id = 12, Title = "Freelance Developer", Url = "https://x.de/3", CompanyName = "Acme", Description = "Experience with .NET required" };
+        SetupSingleUserWithProject("u1", new List<string> { ".NET" }, project);
+        _matchRepo.Setup(r => r.AddRangeAsync(It.IsAny<IEnumerable<UserProjectMatch>>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        _jobAppRepo.Setup(r => r.CreateAsync(It.IsAny<JobApplication>())).Returns(Task.CompletedTask);
+        _processedRepo.Setup(r => r.AddRangeAsync(It.IsAny<IEnumerable<ProcessedProjectItem>>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+
+        await CreateHandler().Handle(new MatchProjectsCommand(), CancellationToken.None);
+
+        _matchRepo.Verify(r => r.AddRangeAsync(It.IsAny<IEnumerable<UserProjectMatch>>(), It.IsAny<CancellationToken>()), Times.Once);
+        _jobAppRepo.Verify(r => r.CreateAsync(It.IsAny<JobApplication>()), Times.Once);
     }
 
     [Fact]
     public async Task Handle_ShouldNotCreateMatch_WhenNoKeywordMatches()
     {
-        var project = new ScrapedProject { Id = 11, Title = "Java Developer", Url = "https://x.de/2", CompanyName = "Acme" };
+        var project = new ScrapedProject { Id = 11, Title = "Java Developer", Url = "https://x.de/2", CompanyName = "Acme", Description = "Spring Boot experience required" };
         SetupSingleUserWithProject("u1", new List<string> { ".NET" }, project);
         _processedRepo.Setup(r => r.AddRangeAsync(It.IsAny<IEnumerable<ProcessedProjectItem>>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 

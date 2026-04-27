@@ -124,15 +124,21 @@
 - `RssMonitoringSettingsRepository.UpsertAsync` updates Keywords, PollIntervalMinutes, AND NotificationEmail on existing record
 - Migration: `20260422091653_AddRssFeedMonitoring`
 
-## AppTrack.Functions Project (as of Apr 2026 - branch: feature/project-scraping)
+## AppTrack.Functions Project (updated Apr 2026 - branch: feature/project-monitoring-matching)
 - `AppTrack.Functions/AppTrack.Functions.csproj` — OutputType: Exe, AzureFunctionsVersion: v4, refs Application + Infrastructure + Persistance
-- NuGet: `Microsoft.Azure.Functions.Worker` 2.52.0, `Microsoft.Azure.Functions.Worker.Sdk` 2.0.7, `Microsoft.Azure.Functions.Worker.Extensions.Timer` 4.3.1
+- NuGet: `Microsoft.Azure.Functions.Worker` 2.52.0, `Microsoft.Azure.Functions.Worker.Sdk` 2.0.7, `Microsoft.Azure.Functions.Worker.Extensions.Timer` 4.3.1, `Microsoft.Azure.Functions.Worker.Extensions.ServiceBus` 5.24.0
 - `Program.cs`: `HostBuilder` + `ConfigureFunctionsWorkerDefaults()` + calls `AddApplicationServices`, `AddInfrastructureServices`, `AddPersistanceServices` then re-registers `IUserContext` as `NullUserContext` (override)
 - `NullUserContext` at `AppTrack.Functions/Identity/NullUserContext.cs` — no-op `IUserContext`; `IsAuthenticated` returns false, `GetCurrentUserId` throws. Safe because timer-trigger commands never implement `IUserScopedRequest`.
-- `ScrapePortalsFunction.cs` — `[TimerTrigger("%ScrapeSchedule%")]`; logs start + duration; dispatches `ScrapePortalsCommand` via `IMediator`
-- `local.settings.json` gitignored; `local.settings.json.example` committed; `ScrapeSchedule` default: `"0 */10 * * * *"` (every 10 min)
+- `ScrapePortalsFunction.cs` — `[TimerTrigger("%ScrapeSchedule%")]`; after scraping calls `IScrapingEventPublisher.PublishScrapingCompletedAsync([], ct)` (passes empty portalIds collection)
+- `MatchProjectsFunction.cs` — `[ServiceBusTrigger("%ScrapingCompletedQueueName%", Connection = "ServiceBusConnection")]`; dispatches `MatchProjectsCommand`
+- `SendNotificationsFunction.cs` — `[TimerTrigger("%NotificationSchedule%")]`; dispatches `SendProjectNotificationsCommand`
+- `local.settings.json` gitignored; `ScrapeSchedule` default: `"0 */10 * * * *"`, `ScrapingCompletedQueueName`: `"scraping-completed"`, `NotificationSchedule`: `"*/5 * * * *"`
 - `BackgroundServices.ProjectMonitoringBackgroundService` unregistered from `AppTrack.Api/Program.cs` (file kept, `AddHostedService` call removed)
 - DI override pattern: call `services.AddScoped<IUserContext, NullUserContext>()` AFTER `AddInfrastructureServices` — last registration wins in ASP.NET Core DI
+- ServiceBus extension version: `Microsoft.Azure.Functions.Worker.Extensions.ServiceBus` 4.3.1 does NOT exist on NuGet (NU1603 build error); 5.24.0 is the correct stable version
+- `FunctionMetadataProviderGenerator` NullReferenceException (CS8785): caused by old ServiceBus extension version (5.4.0 from 2022) incompatible with Worker.Sdk 2.x; fixed by upgrading to 5.24.0
+- `IScrapingEventPublisher.PublishScrapingCompletedAsync` actual signature: `(IEnumerable<int> portalIds, CancellationToken ct)` — two parameters (spec docs show incorrect one-param variant)
+- `ServiceBusScrapingEventPublisher` at `AppTrack.Infrastructure/Notifications/` — sends to **topic** `project-scraping-events` (not a queue); infra publishes JSON payload with portal IDs
 
 ## CV Storage Feature (Infrastructure layer, branch: feature/profile-setup-wizard)
 - `AzureStorageSettings` at `AppTrack.Infrastructure/CvStorage/AzureStorageSettings.cs` — ConnectionString + ContainerName
