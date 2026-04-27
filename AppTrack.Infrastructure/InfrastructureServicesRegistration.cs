@@ -41,13 +41,6 @@ namespace AppTrack.Infrastructure
                 .AddStandardResilienceHandler();
             services.AddScoped<IProjectScraperFactory, ProjectScraperFactory>();
 
-            // Project match notification
-            var notificationProvider = configuration["ProjectNotification:Provider"];
-            if (notificationProvider == "ServiceBus")
-                services.AddScoped<IProjectMatchNotifier, ServiceBusProjectNotifier>();
-            else
-                services.AddScoped<IProjectMatchNotifier, DirectEmailProjectNotifier>();
-
             // Scraping event publishing
             services.AddScoped<IScrapingEventPublisher, ServiceBusScrapingEventPublisher>();
 
