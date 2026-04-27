@@ -9,6 +9,5 @@ public class ScrapedProject : BaseEntity
     public string Url { get; set; } = string.Empty;
     public string CompanyName { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-    public DateTime ScrapedAt { get; set; }
     public ProjectPortal ProjectPortal { get; set; } = null!;
 }

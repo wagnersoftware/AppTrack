@@ -51,8 +51,7 @@ public class ScrapePortalsCommandHandler : IRequestHandler<ScrapePortalsCommand,
                     Title = item.Position,
                     Url = item.Url,
                     CompanyName = item.CompanyName,
-                    Description = item.JobDescription,
-                    ScrapedAt = DateTime.UtcNow
+                    Description = item.JobDescription
                 });
             }
 
