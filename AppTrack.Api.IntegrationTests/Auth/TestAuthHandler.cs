@@ -11,6 +11,7 @@ public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions
 {
     public const string AuthenticationScheme = "Test";
     public const string TestUserId = "test-user-id";
+    public const string TestUserEmail = "test@example.com";
 
     public TestAuthHandler(
         IOptionsMonitor<AuthenticationSchemeOptions> options,
@@ -27,7 +28,8 @@ public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions
         {
             new Claim(JwtRegisteredClaimNames.Sub, "test-user-id"),
             new Claim(ClaimTypes.Name, "Test User"),
-            new Claim(ClaimTypes.Role, "Admin")
+            new Claim(ClaimTypes.Role, "Admin"),
+            new Claim("email", TestUserEmail)
         };
 
         var identity = new ClaimsIdentity(claims, AuthenticationScheme);
