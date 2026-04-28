@@ -42,8 +42,7 @@ public class ScrapedProjectRepositoryTests
             Title = "Test Project",
             Url = url,
             CompanyName = "Test Corp",
-            Description = description,
-            ScrapedAt = DateTime.UtcNow
+            Description = description
         };
 
     // -----------------------------------------------------------------------

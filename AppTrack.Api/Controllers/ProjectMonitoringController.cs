@@ -39,7 +39,10 @@ public class ProjectMonitoringController : ControllerBase
     [ProducesResponseType(typeof(ProjectMonitoringSettingsDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<ProjectMonitoringSettingsDto>> GetSettings()
-        => Ok(await _mediator.Send(new GetProjectMonitoringSettingsQuery()));
+    {
+        var dto = await _mediator.Send(new GetProjectMonitoringSettingsQuery());
+        return Ok(dto with { NotificationEmail = User.FindFirst("email")?.Value ?? string.Empty });
+    }
 
     [HttpPut("settings")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]

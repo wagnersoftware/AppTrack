@@ -146,6 +146,71 @@ public class MatchProjectsCommandHandlerTests
         capturedProcessed.Select(p => p.ProjectItemUrl).ShouldContain("https://x.de/2");
     }
 
+    [Fact]
+    public async Task Handle_ShouldFallBackToProjectTitle_WhenCompanyNameIsEmpty()
+    {
+        // Arrange — project with empty CompanyName; Name should default to Title
+        var project = new ScrapedProject { Id = 20, Title = "Senior .NET Engineer", Url = "https://x.de/20", CompanyName = "", Description = ".NET required" };
+        SetupSingleUserWithProject("u1", new List<string> { ".NET" }, project);
+
+        List<JobApplication>? capturedApps = null;
+        _jobAppRepo
+            .Setup(r => r.CreateAsync(It.IsAny<JobApplication>()))
+            .Callback<JobApplication>(app =>
+            {
+                capturedApps ??= new List<JobApplication>();
+                capturedApps.Add(app);
+            })
+            .Returns(Task.CompletedTask);
+        _matchRepo.Setup(r => r.AddRangeAsync(It.IsAny<IEnumerable<UserProjectMatch>>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        _processedRepo.Setup(r => r.AddRangeAsync(It.IsAny<IEnumerable<ProcessedProjectItem>>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+
+        // Act
+        await CreateHandler().Handle(new MatchProjectsCommand(), CancellationToken.None);
+
+        // Assert — Name must equal the Title when CompanyName is empty
+        capturedApps.ShouldNotBeNull();
+        capturedApps!.ShouldHaveSingleItem();
+        capturedApps[0].Name.ShouldBe("Senior .NET Engineer");
+    }
+
+    [Fact]
+    public async Task Handle_ShouldProcessEachUserIndependently_WhenMultipleUsersHaveMatches()
+    {
+        // Arrange — two users, each subscribed to different portals, each with a matching project
+        var projectU1 = new ScrapedProject { Id = 30, Title = ".NET Developer", Url = "https://x.de/30", CompanyName = "Acme", Description = "desc" };
+        var projectU2 = new ScrapedProject { Id = 31, Title = "C# Engineer .NET", Url = "https://x.de/31", CompanyName = "Beta Corp", Description = "desc" };
+
+        _subscriptionRepo.Setup(r => r.GetActiveSubscriptionsWithPortalsAsync())
+            .ReturnsAsync(new List<UserPortalSubscription>
+            {
+                new UserPortalSubscription { UserId = "u1", ProjectPortalId = 1 },
+                new UserPortalSubscription { UserId = "u2", ProjectPortalId = 2 }
+            });
+
+        _settingsRepo.Setup(r => r.GetByUserIdAsync("u1"))
+            .ReturnsAsync(new ProjectMonitoringSettings { UserId = "u1", Keywords = new List<string> { ".NET" } });
+        _settingsRepo.Setup(r => r.GetByUserIdAsync("u2"))
+            .ReturnsAsync(new ProjectMonitoringSettings { UserId = "u2", Keywords = new List<string> { ".NET" } });
+
+        _scrapedProjectRepo.Setup(r => r.GetUnprocessedForUserAsync("u1", It.IsAny<IEnumerable<int>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<ScrapedProject> { projectU1 });
+        _scrapedProjectRepo.Setup(r => r.GetUnprocessedForUserAsync("u2", It.IsAny<IEnumerable<int>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<ScrapedProject> { projectU2 });
+
+        _matchRepo.Setup(r => r.AddRangeAsync(It.IsAny<IEnumerable<UserProjectMatch>>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        _jobAppRepo.Setup(r => r.CreateAsync(It.IsAny<JobApplication>())).Returns(Task.CompletedTask);
+        _processedRepo.Setup(r => r.AddRangeAsync(It.IsAny<IEnumerable<ProcessedProjectItem>>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+
+        // Act
+        await CreateHandler().Handle(new MatchProjectsCommand(), CancellationToken.None);
+
+        // Assert — each user gets their own job application created
+        _jobAppRepo.Verify(r => r.CreateAsync(It.Is<JobApplication>(j => j.UserId == "u1" && j.URL == "https://x.de/30")), Times.Once);
+        _jobAppRepo.Verify(r => r.CreateAsync(It.Is<JobApplication>(j => j.UserId == "u2" && j.URL == "https://x.de/31")), Times.Once);
+        _jobAppRepo.Verify(r => r.CreateAsync(It.IsAny<JobApplication>()), Times.Exactly(2));
+    }
+
     private void SetupSingleUserWithProject(string userId, List<string> keywords, ScrapedProject project)
     {
         _subscriptionRepo.Setup(r => r.GetActiveSubscriptionsWithPortalsAsync())

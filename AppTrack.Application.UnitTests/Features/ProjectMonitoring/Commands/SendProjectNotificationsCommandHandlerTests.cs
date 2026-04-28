@@ -134,4 +134,53 @@ public class SendProjectNotificationsCommandHandlerTests
         _matchRepo.Verify(r => r.MarkNotifiedAsync(It.IsAny<IEnumerable<int>>(), It.IsAny<CancellationToken>()), Times.Never);
         _settingsRepo.Verify(r => r.UpdateAsync(It.IsAny<ProjectMonitoringSettings>()), Times.Never);
     }
+
+    [Fact]
+    public async Task Handle_ShouldProcessEachUserIndependently_WhenMultipleUsersHaveUnnotifiedMatches()
+    {
+        // Arrange — two users, both with unnotified matches and notification intervals that have elapsed
+        var portal = new ProjectPortal { Name = "Freelancermap" };
+
+        var projectU1 = new ScrapedProject { Title = ".NET Dev", Url = "https://x.de/u1", ProjectPortal = portal };
+        var matchU1 = new UserProjectMatch { Id = 10, UserId = "u1", ScrapedProject = projectU1, IsNotified = false };
+
+        var projectU2 = new ScrapedProject { Title = "C# Engineer", Url = "https://x.de/u2", ProjectPortal = portal };
+        var matchU2 = new UserProjectMatch { Id = 11, UserId = "u2", ScrapedProject = projectU2, IsNotified = false };
+
+        _matchRepo.Setup(r => r.GetUnnotifiedAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<UserProjectMatch> { matchU1, matchU2 });
+
+        _settingsRepo.Setup(r => r.GetByUserIdAsync("u1"))
+            .ReturnsAsync(new ProjectMonitoringSettings
+            {
+                UserId = "u1",
+                NotificationEmail = "u1@example.com",
+                NotificationIntervalMinutes = 60,
+                LastNotifiedAt = null
+            });
+        _settingsRepo.Setup(r => r.GetByUserIdAsync("u2"))
+            .ReturnsAsync(new ProjectMonitoringSettings
+            {
+                UserId = "u2",
+                NotificationEmail = "u2@example.com",
+                NotificationIntervalMinutes = 60,
+                LastNotifiedAt = null
+            });
+
+        _emailSender.Setup(e => e.SendEmail(It.IsAny<EmailMessage>())).ReturnsAsync(true);
+        _matchRepo.Setup(r => r.MarkNotifiedAsync(It.IsAny<IEnumerable<int>>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        _settingsRepo.Setup(r => r.UpdateAsync(It.IsAny<ProjectMonitoringSettings>())).Returns(Task.CompletedTask);
+
+        // Act
+        await CreateHandler().Handle(new SendProjectNotificationsCommand(), CancellationToken.None);
+
+        // Assert — email sent to each user at their configured address
+        _emailSender.Verify(e => e.SendEmail(It.Is<EmailMessage>(m => m.To == "u1@example.com")), Times.Once);
+        _emailSender.Verify(e => e.SendEmail(It.Is<EmailMessage>(m => m.To == "u2@example.com")), Times.Once);
+        _emailSender.Verify(e => e.SendEmail(It.IsAny<EmailMessage>()), Times.Exactly(2));
+
+        // Assert — IsNotified set for both users' matches
+        _matchRepo.Verify(r => r.MarkNotifiedAsync(It.Is<IEnumerable<int>>(ids => ids.Contains(10)), It.IsAny<CancellationToken>()), Times.Once);
+        _matchRepo.Verify(r => r.MarkNotifiedAsync(It.Is<IEnumerable<int>>(ids => ids.Contains(11)), It.IsAny<CancellationToken>()), Times.Once);
+    }
 }

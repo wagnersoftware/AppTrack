@@ -78,6 +78,30 @@ public async Task Validate_ShouldHaveError_WhenXIsY()
 - `NullLogger<T>.Instance` is from `Microsoft.Extensions.Logging.Abstractions` — no package reference needed, it is transitively available
 - Key scenarios: happy path, card missing title link (skipped), detail fetch 404 (empty description), detail page without `.ql-editor` (empty description), relative href resolved to absolute URL
 
+## ScrapedProject Entity: No ScrapedAt Property
+- `ScrapedProject` domain entity does NOT have a `ScrapedAt` property (it was removed)
+- Do not set `ScrapedAt` in `MakeProject` helpers or anywhere else in tests
+
+## IUnitOfWork.ExecuteInTransactionAsync Mock Pattern
+- Use `.Returns((Func<CancellationToken, Task> action, CancellationToken ct) => action(ct))` so the callback actually executes
+- Constructor-level setup is fine: set it up in the test class constructor so all tests in the class benefit
+- Verify it was called with `Times.Once` to confirm transactional wrapping
+
+## Handler Tests: Injecting Real Validators (no mock needed)
+- When a handler takes `IValidator<TCommand>` and the validator has no dependencies, inject the real validator directly
+- Example: `new UpdateProjectMonitoringSettingsCommandHandler(_repo.Object, new UpdateProjectMonitoringSettingsCommandValidator())`
+- This is simpler than `Mock<IValidator<T>>` and exercises the real validation logic
+- Test `BadRequestException` thrown on invalid input using `await Should.ThrowAsync<BadRequestException>(() => handler.Handle(...))`
+
+## Unit Type in Test Assertions
+- `Unit` struct lives in `AppTrack.Application.Shared` — add `using AppTrack.Application.Shared;`
+- Assert: `result.ShouldBe(Unit.Value);`
+
+## [JsonIgnore] Fields on Commands
+- Fields decorated `[JsonIgnore]` (e.g., `UserId`, `NotificationEmail` on `UpdateProjectMonitoringSettingsCommand`) are set by the backend, not from JSON
+- In handler tests, set these fields directly on the command object — they flow through to the domain entity normally
+- The validator for `UpdateProjectMonitoringSettingsCommand` DOES validate `NotificationEmail` with `NotEmpty()` even though it is `[JsonIgnore]`
+
 ## Key Rules
 - `TreatWarningsAsErrors = true` — zero warnings tolerated, build must be clean
 - NuGet versions are NOT in `.csproj` files — all managed in `Directory.Packages.props` at solution root
