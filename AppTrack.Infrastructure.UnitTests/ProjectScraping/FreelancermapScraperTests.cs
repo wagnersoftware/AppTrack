@@ -10,6 +10,7 @@ public class FreelancermapScraperTests
     private sealed class FakeHttpMessageHandler : HttpMessageHandler
     {
         private readonly Dictionary<string, string> _responses;
+        public List<string> CapturedUserAgents { get; } = [];
 
         public FakeHttpMessageHandler(Dictionary<string, string> responses)
         {
@@ -20,6 +21,8 @@ public class FreelancermapScraperTests
             HttpRequestMessage request,
             CancellationToken cancellationToken)
         {
+            CapturedUserAgents.Add(request.Headers.UserAgent.ToString());
+
             var url = request.RequestUri!.ToString();
 
             if (_responses.TryGetValue(url, out var body))
@@ -34,11 +37,14 @@ public class FreelancermapScraperTests
         }
     }
 
-    private static FreelancermapScraper BuildScraper(Dictionary<string, string> responses)
+    private static FreelancermapScraper BuildScraper(
+        Dictionary<string, string> responses,
+        Func<int, CancellationToken, Task>? delayProvider = null)
     {
         var handler = new FakeHttpMessageHandler(responses);
         var httpClient = new HttpClient(handler);
-        return new FreelancermapScraper(httpClient, NullLogger<FreelancermapScraper>.Instance);
+        Func<int, CancellationToken, Task> delay = delayProvider ?? ((_, _) => Task.CompletedTask);
+        return new FreelancermapScraper(httpClient, NullLogger<FreelancermapScraper>.Instance, delay);
     }
 
     private static string ListingHtml(params string[] cardHtmlFragments)
@@ -173,5 +179,56 @@ public class FreelancermapScraperTests
         results.ShouldHaveSingleItem();
         results[0].Url.ShouldBe(expectedAbsoluteUrl);
         results[0].JobDescription.ShouldBe("Relative description.");
+    }
+
+    [Fact]
+    public async Task ScrapeAsync_SendsBrowserUserAgentOnAllRequests()
+    {
+        const string portalUrl = "https://www.freelancermap.de/projektboerse.html";
+        const string detailUrl = "https://www.freelancermap.de/projekte/ua-test";
+
+        var responses = new Dictionary<string, string>
+        {
+            [portalUrl] = ListingHtml(CardHtml(detailUrl, "UA Test Project", "Test Corp")),
+            [detailUrl] = DetailHtml("Some description.")
+        };
+
+        var handler = new FakeHttpMessageHandler(responses);
+        var scraper = new FreelancermapScraper(
+            new HttpClient(handler),
+            NullLogger<FreelancermapScraper>.Instance,
+            (_, _) => Task.CompletedTask);
+
+        await scraper.ScrapeAsync(portalUrl, CancellationToken.None);
+
+        handler.CapturedUserAgents.ShouldNotBeEmpty();
+        handler.CapturedUserAgents.ShouldAllBe(ua => ua.Contains("Mozilla"));
+    }
+
+    [Fact]
+    public async Task ScrapeAsync_WithMultipleDetailPages_DelaysBetweenFetches()
+    {
+        const string portalUrl = "https://www.freelancermap.de/projektboerse.html";
+        const string detailUrl1 = "https://www.freelancermap.de/projekte/seq-1";
+        const string detailUrl2 = "https://www.freelancermap.de/projekte/seq-2";
+        const string detailUrl3 = "https://www.freelancermap.de/projekte/seq-3";
+
+        var responses = new Dictionary<string, string>
+        {
+            [portalUrl] = ListingHtml(
+                CardHtml(detailUrl1, "Project 1", "Corp"),
+                CardHtml(detailUrl2, "Project 2", "Corp"),
+                CardHtml(detailUrl3, "Project 3", "Corp")),
+            [detailUrl1] = DetailHtml("Desc 1."),
+            [detailUrl2] = DetailHtml("Desc 2."),
+            [detailUrl3] = DetailHtml("Desc 3.")
+        };
+
+        var delayCallCount = 0;
+        var scraper = BuildScraper(responses, (_, _) => { delayCallCount++; return Task.CompletedTask; });
+
+        await scraper.ScrapeAsync(portalUrl, CancellationToken.None);
+
+        delayCallCount.ShouldBe(2); // 3 detail pages → 2 delays between them
     }
 }

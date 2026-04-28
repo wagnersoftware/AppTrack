@@ -7,13 +7,26 @@ namespace AppTrack.Infrastructure.ProjectScraping;
 
 public class FreelancermapScraper : IProjectScraper
 {
+    private const string UserAgent =
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
+
     private readonly HttpClient _httpClient;
     private readonly ILogger<FreelancermapScraper> _logger;
+    private readonly Func<int, CancellationToken, Task> _delayProvider;
 
-    public FreelancermapScraper(HttpClient httpClient, ILogger<FreelancermapScraper> logger)
+    public FreelancermapScraper(
+        HttpClient httpClient,
+        ILogger<FreelancermapScraper> logger,
+        Func<int, CancellationToken, Task>? delayProvider = null)
     {
+        _delayProvider = delayProvider ?? Task.Delay;
         _httpClient = httpClient;
         _logger = logger;
+
+        _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", UserAgent);
+        _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Accept-Language", "de-DE,de;q=0.9,en;q=0.8");
+        _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Accept",
+            "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
     }
 
     public async Task<List<ScrapedProjectData>> ScrapeAsync(string portalUrl, CancellationToken ct)
@@ -43,7 +56,13 @@ public class FreelancermapScraper : IProjectScraper
                 items.Add((title, url, company));
             }
 
-            var descriptions = await Task.WhenAll(items.Select(item => FetchDescriptionAsync(item.Url, ct)));
+            var descriptions = new List<string>(items.Count);
+            for (var i = 0; i < items.Count; i++)
+            {
+                if (i > 0)
+                    await _delayProvider(Random.Shared.Next(2000, 5000), ct);
+                descriptions.Add(await FetchDescriptionAsync(items[i].Url, ct));
+            }
 
             return items
                 .Select((item, i) => new ScrapedProjectData(

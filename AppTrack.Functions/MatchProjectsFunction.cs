@@ -1,6 +1,5 @@
 using AppTrack.Application.Contracts.Mediator;
 using AppTrack.Application.Features.ProjectMonitoring.Commands.MatchProjects;
-using Azure.Messaging.ServiceBus;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
@@ -15,10 +14,10 @@ public sealed class MatchProjectsFunction(IMediator mediator, ILogger<MatchProje
     [Function(nameof(MatchProjectsFunction))]
     public async Task Run(
         [ServiceBusTrigger("%ScrapingCompletedQueueName%", Connection = "ServiceBusConnection")]
-        ServiceBusReceivedMessage message,
+        string message,
         CancellationToken cancellationToken)
     {
-        logger.LogInformation("MatchProjectsFunction triggered by Service Bus message {MessageId}", message.MessageId);
+        logger.LogInformation("MatchProjectsFunction triggered.");
         await mediator.Send(new MatchProjectsCommand(), cancellationToken);
         logger.LogInformation("MatchProjectsFunction completed.");
     }

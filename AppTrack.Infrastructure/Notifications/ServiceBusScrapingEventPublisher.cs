@@ -1,4 +1,3 @@
-using System.Text.Json;
 using AppTrack.Application.Contracts.ProjectMonitoring;
 using Azure.Messaging.ServiceBus;
 using Microsoft.Extensions.Configuration;
@@ -19,15 +18,14 @@ public class ServiceBusScrapingEventPublisher : IScrapingEventPublisher
 
     public async Task PublishScrapingCompletedAsync(IEnumerable<int> portalIds, CancellationToken ct)
     {
-        var connectionString = _configuration["ServiceBus:ConnectionString"];
-        var topicName = _configuration["ProjectScraping:TopicName"] ?? "project-scraping-events";
+        var connectionString = _configuration["ServiceBusConnection"];
+        var queueName = _configuration["ScrapingCompletedQueueName"] ?? "scraping-completed";
 
         await using var client = new ServiceBusClient(connectionString);
-        var sender = client.CreateSender(topicName);
+        await using var sender = client.CreateSender(queueName);
 
-        var payload = JsonSerializer.Serialize(new { PortalIds = portalIds.ToList() });
-        await sender.SendMessageAsync(new ServiceBusMessage(payload), ct);
+        await sender.SendMessageAsync(new ServiceBusMessage("scraping-completed"), ct);
 
-        _logger.LogInformation("Published scraping completed event for portals {PortalIds}", string.Join(", ", portalIds));
+        _logger.LogInformation("Published scraping completed event to queue '{Queue}'", queueName);
     }
 }
