@@ -27,13 +27,33 @@ public class FreelancermapScraper : IProjectScraper
         _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Accept-Language", "de-DE,de;q=0.9,en;q=0.8");
         _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Accept",
             "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+        _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Accept-Encoding", "gzip, deflate, br");
+        _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("sec-ch-ua",
+            "\"Chromium\";v=\"124\", \"Google Chrome\";v=\"124\", \"Not-A.Brand\";v=\"99\"");
+        _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("sec-ch-ua-mobile", "?0");
+        _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("sec-ch-ua-platform", "\"Windows\"");
+        _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Upgrade-Insecure-Requests", "1");
+        _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("DNT", "1");
     }
 
-    public async Task<List<ScrapedProjectData>> ScrapeAsync(string portalUrl, CancellationToken ct)
+    public async Task<ScrapingResult> ScrapeAsync(string portalUrl, IReadOnlySet<string> knownUrls, CancellationToken ct)
     {
         try
         {
-            var html = await _httpClient.GetStringAsync(portalUrl, ct);
+            var portalUri = new Uri(portalUrl);
+            var warmUpUrl = $"{portalUri.Scheme}://{portalUri.Host}/";
+
+            // Warm-up: visit homepage first to establish session/cookies like a real browser.
+            // Failure is intentionally swallowed — warm-up is best-effort.
+            try { await SendGetAsync(warmUpUrl, referer: null, secFetchSite: "none", ct); }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                _logger.LogDebug(ex, "Warm-up request to {Url} failed (ignored)", warmUpUrl);
+            }
+
+            await _delayProvider(Random.Shared.Next(1000, 3000), ct);
+
+            var html = await SendGetAsync(portalUrl, referer: warmUpUrl, secFetchSite: "same-origin", ct);
             using var context = BrowsingContext.New(Configuration.Default);
             using var document = await context.OpenAsync(req => req.Content(html), ct);
 
@@ -56,35 +76,42 @@ public class FreelancermapScraper : IProjectScraper
                 items.Add((title, url, company));
             }
 
-            var descriptions = new List<string>(items.Count);
-            for (var i = 0; i < items.Count; i++)
-            {
-                if (i > 0)
-                    await _delayProvider(Random.Shared.Next(2000, 5000), ct);
-                descriptions.Add(await FetchDescriptionAsync(items[i].Url, ct));
-            }
+            var listingItemCount = items.Count;
+            var results = new List<ScrapedProjectData>();
+            var isFirstNewFetch = true;
 
-            return items
-                .Select((item, i) => new ScrapedProjectData(
+            foreach (var item in items)
+            {
+                if (knownUrls.Contains(item.Url))
+                    continue;
+
+                if (!isFirstNewFetch)
+                    await _delayProvider(Random.Shared.Next(5000, 12000), ct);
+                isFirstNewFetch = false;
+
+                var description = await FetchDescriptionAsync(item.Url, portalUrl, ct);
+                results.Add(new ScrapedProjectData(
                     Position: item.Title,
                     Url: item.Url,
-                    JobDescription: descriptions[i],
+                    JobDescription: description,
                     CompanyName: item.Company,
-                    PortalName: "Freelancermap"))
-                .ToList();
+                    PortalName: "Freelancermap"));
+            }
+
+            return ScrapingResult.Success(results, listingItemCount);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
             _logger.LogError(ex, "Error scraping Freelancermap at {Url}", portalUrl);
-            return [];
+            return ScrapingResult.Failure(ex.Message);
         }
     }
 
-    private async Task<string> FetchDescriptionAsync(string projectUrl, CancellationToken ct)
+    private async Task<string> FetchDescriptionAsync(string projectUrl, string listingUrl, CancellationToken ct)
     {
         try
         {
-            var html = await _httpClient.GetStringAsync(projectUrl, ct);
+            var html = await SendGetAsync(projectUrl, referer: listingUrl, secFetchSite: "same-origin", ct);
             using var ctx = BrowsingContext.New(Configuration.Default);
             using var doc = await ctx.OpenAsync(req => req.Content(html), ct);
             return doc.QuerySelector(".ql-editor")?.TextContent.Trim() ?? string.Empty;
@@ -94,5 +121,20 @@ public class FreelancermapScraper : IProjectScraper
             _logger.LogWarning(ex, "Failed to fetch description from {Url}", projectUrl);
             return string.Empty;
         }
+    }
+
+    private async Task<string> SendGetAsync(string url, string? referer, string secFetchSite, CancellationToken ct)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Get, url);
+        request.Headers.TryAddWithoutValidation("sec-fetch-dest", "document");
+        request.Headers.TryAddWithoutValidation("sec-fetch-mode", "navigate");
+        request.Headers.TryAddWithoutValidation("sec-fetch-site", secFetchSite);
+        request.Headers.TryAddWithoutValidation("sec-fetch-user", "?1");
+        if (referer is not null)
+            request.Headers.TryAddWithoutValidation("Referer", referer);
+
+        using var response = await _httpClient.SendAsync(request, ct);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadAsStringAsync(ct);
     }
 }

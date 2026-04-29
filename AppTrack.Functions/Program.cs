@@ -10,6 +10,8 @@ var host = new HostBuilder()
     .ConfigureFunctionsWorkerDefaults()
     .ConfigureServices((context, services) =>
     {
+        services.AddSingleton(TimeProvider.System);
+
         services.AddApplicationServices();
         services.AddInfrastructureServices(context.Configuration);
         services.AddPersistanceServices(context.Configuration);

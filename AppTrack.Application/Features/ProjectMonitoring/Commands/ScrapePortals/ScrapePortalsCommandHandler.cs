@@ -32,11 +32,22 @@ public class ScrapePortalsCommandHandler : IRequestHandler<ScrapePortalsCommand,
 
         foreach (var portal in portals)
         {
+            var knownUrls = await _scrapedProjectRepository.GetExistingUrlsForPortalAsync(portal.Id, cancellationToken);
             var scraper = _scraperFactory.GetScraper(portal.ScraperType);
-            var scraped = await scraper.ScrapeAsync(portal.Url, cancellationToken);
+            var result = await scraper.ScrapeAsync(portal.Url, knownUrls, cancellationToken);
+
+            if (!result.ListingSucceeded)
+            {
+                _logger.LogError("Failed to scrape portal {Portal}: {Error}", portal.Name, result.ErrorMessage);
+                continue;
+            }
+
+            _logger.LogInformation(
+                "Portal {Portal}: {Total} listings found, {New} new",
+                portal.Name, result.ListingItemCount, result.Items.Count);
 
             var projects = new List<ScrapedProject>();
-            foreach (var item in scraped)
+            foreach (var item in result.Items)
             {
                 var reason = ScrapedProjectDataValidator.Validate(item);
                 if (reason is not null)

@@ -32,6 +32,7 @@ public class AppTrackDatabaseContext : DbContext
     public DbSet<ProcessedProjectItem> ProcessedProjectItems { get; set; }
     public DbSet<ScrapedProject> ScrapedProjects { get; set; }
     public DbSet<UserProjectMatch> UserProjectMatches { get; set; }
+    public DbSet<ScrapingScheduleState> ScrapingScheduleStates { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

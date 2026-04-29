@@ -71,6 +71,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppTrack.Functions", "AppTr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppTrack.Infrastructure.UnitTests", "AppTrack.Infrastructure.UnitTests\AppTrack.Infrastructure.UnitTests.csproj", "{EB006EFE-6612-45A2-8E34-9AA6679A096C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppTrack.Functions.UnitTests", "AppTrack.Functions.UnitTests\AppTrack.Functions.UnitTests.csproj", "{F554B60B-5FE6-403D-B1D8-176F6BFEB0F3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -249,6 +251,18 @@ Global
 		{EB006EFE-6612-45A2-8E34-9AA6679A096C}.Release|x64.Build.0 = Release|Any CPU
 		{EB006EFE-6612-45A2-8E34-9AA6679A096C}.Release|x86.ActiveCfg = Release|Any CPU
 		{EB006EFE-6612-45A2-8E34-9AA6679A096C}.Release|x86.Build.0 = Release|Any CPU
+		{F554B60B-5FE6-403D-B1D8-176F6BFEB0F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F554B60B-5FE6-403D-B1D8-176F6BFEB0F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F554B60B-5FE6-403D-B1D8-176F6BFEB0F3}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F554B60B-5FE6-403D-B1D8-176F6BFEB0F3}.Debug|x64.Build.0 = Debug|Any CPU
+		{F554B60B-5FE6-403D-B1D8-176F6BFEB0F3}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F554B60B-5FE6-403D-B1D8-176F6BFEB0F3}.Debug|x86.Build.0 = Debug|Any CPU
+		{F554B60B-5FE6-403D-B1D8-176F6BFEB0F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F554B60B-5FE6-403D-B1D8-176F6BFEB0F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F554B60B-5FE6-403D-B1D8-176F6BFEB0F3}.Release|x64.ActiveCfg = Release|Any CPU
+		{F554B60B-5FE6-403D-B1D8-176F6BFEB0F3}.Release|x64.Build.0 = Release|Any CPU
+		{F554B60B-5FE6-403D-B1D8-176F6BFEB0F3}.Release|x86.ActiveCfg = Release|Any CPU
+		{F554B60B-5FE6-403D-B1D8-176F6BFEB0F3}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

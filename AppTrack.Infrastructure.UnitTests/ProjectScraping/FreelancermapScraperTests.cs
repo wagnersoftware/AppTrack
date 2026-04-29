@@ -47,6 +47,8 @@ public class FreelancermapScraperTests
         return new FreelancermapScraper(httpClient, NullLogger<FreelancermapScraper>.Instance, delay);
     }
 
+    private static readonly IReadOnlySet<string> NoKnownUrls = new HashSet<string>();
+
     private static string ListingHtml(params string[] cardHtmlFragments)
     {
         var cards = string.Join("\n", cardHtmlFragments);
@@ -78,7 +80,7 @@ public class FreelancermapScraperTests
             : $"""<html><body><div class="ql-editor">{qlEditorContent}</div></body></html>""";
 
     [Fact]
-    public async Task ScrapeAsync_HappyPath_ReturnsCorrectScrapedProjectData()
+    public async Task ScrapeAsync_HappyPath_ReturnsSuccessWithCorrectData()
     {
         const string portalUrl = "https://www.freelancermap.de/projektboerse.html";
         const string detailUrl1 = "https://www.freelancermap.de/projekte/dev-1";
@@ -93,16 +95,30 @@ public class FreelancermapScraperTests
             [detailUrl2] = DetailHtml("Design and implement cloud-native services.")
         };
 
-        var results = await BuildScraper(responses).ScrapeAsync(portalUrl, CancellationToken.None);
+        var result = await BuildScraper(responses).ScrapeAsync(portalUrl, NoKnownUrls, CancellationToken.None);
 
-        results.Count.ShouldBe(2);
-        results[0].Position.ShouldBe("Senior .NET Developer");
-        results[0].Url.ShouldBe(detailUrl1);
-        results[0].CompanyName.ShouldBe("Acme GmbH");
-        results[0].JobDescription.ShouldBe("Work on a greenfield .NET application.");
-        results[0].PortalName.ShouldBe("Freelancermap");
-        results[1].Position.ShouldBe("Cloud Architect");
-        results[1].JobDescription.ShouldBe("Design and implement cloud-native services.");
+        result.ListingSucceeded.ShouldBeTrue();
+        result.ListingItemCount.ShouldBe(2);
+        result.Items.Count.ShouldBe(2);
+        result.Items[0].Position.ShouldBe("Senior .NET Developer");
+        result.Items[0].Url.ShouldBe(detailUrl1);
+        result.Items[0].CompanyName.ShouldBe("Acme GmbH");
+        result.Items[0].JobDescription.ShouldBe("Work on a greenfield .NET application.");
+        result.Items[0].PortalName.ShouldBe("Freelancermap");
+        result.Items[1].Position.ShouldBe("Cloud Architect");
+        result.Items[1].JobDescription.ShouldBe("Design and implement cloud-native services.");
+    }
+
+    [Fact]
+    public async Task ScrapeAsync_ListingPageFails_ReturnsFailureResult()
+    {
+        const string portalUrl = "https://www.freelancermap.de/projektboerse.html";
+        // portalUrl not in responses → 404 → EnsureSuccessStatusCode throws
+        var result = await BuildScraper([]).ScrapeAsync(portalUrl, NoKnownUrls, CancellationToken.None);
+
+        result.ListingSucceeded.ShouldBeFalse();
+        result.Items.ShouldBeEmpty();
+        result.ErrorMessage.ShouldNotBeNullOrEmpty();
     }
 
     [Fact]
@@ -119,14 +135,16 @@ public class FreelancermapScraperTests
             [detailUrl] = DetailHtml("Real description.")
         };
 
-        var results = await BuildScraper(responses).ScrapeAsync(portalUrl, CancellationToken.None);
+        var result = await BuildScraper(responses).ScrapeAsync(portalUrl, NoKnownUrls, CancellationToken.None);
 
-        results.ShouldHaveSingleItem();
-        results[0].Position.ShouldBe("Valid Project");
+        result.ListingSucceeded.ShouldBeTrue();
+        result.ListingItemCount.ShouldBe(1); // only the card with a title link
+        result.Items.ShouldHaveSingleItem();
+        result.Items[0].Position.ShouldBe("Valid Project");
     }
 
     [Fact]
-    public async Task ScrapeAsync_DetailPageFetchFails_ReturnsProjectWithEmptyDescription()
+    public async Task ScrapeAsync_DetailPageFetchFails_ReturnsItemWithEmptyDescription()
     {
         const string portalUrl = "https://www.freelancermap.de/projektboerse.html";
         const string detailUrl = "https://www.freelancermap.de/projekte/failing";
@@ -137,10 +155,11 @@ public class FreelancermapScraperTests
             // detailUrl deliberately absent → 404 → empty description
         };
 
-        var results = await BuildScraper(responses).ScrapeAsync(portalUrl, CancellationToken.None);
+        var result = await BuildScraper(responses).ScrapeAsync(portalUrl, NoKnownUrls, CancellationToken.None);
 
-        results.ShouldHaveSingleItem();
-        results[0].JobDescription.ShouldBe(string.Empty);
+        result.ListingSucceeded.ShouldBeTrue();
+        result.Items.ShouldHaveSingleItem();
+        result.Items[0].JobDescription.ShouldBe(string.Empty);
     }
 
     [Fact]
@@ -155,10 +174,11 @@ public class FreelancermapScraperTests
             [detailUrl] = DetailHtml(null)
         };
 
-        var results = await BuildScraper(responses).ScrapeAsync(portalUrl, CancellationToken.None);
+        var result = await BuildScraper(responses).ScrapeAsync(portalUrl, NoKnownUrls, CancellationToken.None);
 
-        results.ShouldHaveSingleItem();
-        results[0].JobDescription.ShouldBe(string.Empty);
+        result.ListingSucceeded.ShouldBeTrue();
+        result.Items.ShouldHaveSingleItem();
+        result.Items[0].JobDescription.ShouldBe(string.Empty);
     }
 
     [Fact]
@@ -174,11 +194,12 @@ public class FreelancermapScraperTests
             [expectedAbsoluteUrl] = DetailHtml("Relative description.")
         };
 
-        var results = await BuildScraper(responses).ScrapeAsync(portalUrl, CancellationToken.None);
+        var result = await BuildScraper(responses).ScrapeAsync(portalUrl, NoKnownUrls, CancellationToken.None);
 
-        results.ShouldHaveSingleItem();
-        results[0].Url.ShouldBe(expectedAbsoluteUrl);
-        results[0].JobDescription.ShouldBe("Relative description.");
+        result.ListingSucceeded.ShouldBeTrue();
+        result.Items.ShouldHaveSingleItem();
+        result.Items[0].Url.ShouldBe(expectedAbsoluteUrl);
+        result.Items[0].JobDescription.ShouldBe("Relative description.");
     }
 
     [Fact]
@@ -199,7 +220,7 @@ public class FreelancermapScraperTests
             NullLogger<FreelancermapScraper>.Instance,
             (_, _) => Task.CompletedTask);
 
-        await scraper.ScrapeAsync(portalUrl, CancellationToken.None);
+        await scraper.ScrapeAsync(portalUrl, NoKnownUrls, CancellationToken.None);
 
         handler.CapturedUserAgents.ShouldNotBeEmpty();
         handler.CapturedUserAgents.ShouldAllBe(ua => ua.Contains("Mozilla"));
@@ -227,8 +248,154 @@ public class FreelancermapScraperTests
         var delayCallCount = 0;
         var scraper = BuildScraper(responses, (_, _) => { delayCallCount++; return Task.CompletedTask; });
 
-        await scraper.ScrapeAsync(portalUrl, CancellationToken.None);
+        await scraper.ScrapeAsync(portalUrl, NoKnownUrls, CancellationToken.None);
 
-        delayCallCount.ShouldBe(2); // 3 detail pages → 2 delays between them
+        // 1 warm-up delay + 2 delays between 3 detail pages = 3 total
+        delayCallCount.ShouldBe(3);
+    }
+
+    [Fact]
+    public async Task ScrapeAsync_KnownUrls_AreSkippedAndNotReturned()
+    {
+        const string portalUrl = "https://www.freelancermap.de/projektboerse.html";
+        const string knownUrl = "https://www.freelancermap.de/projekte/already-known";
+        const string newUrl = "https://www.freelancermap.de/projekte/brand-new";
+
+        var responses = new Dictionary<string, string>
+        {
+            [portalUrl] = ListingHtml(
+                CardHtml(knownUrl, "Known Project", "Old Corp"),
+                CardHtml(newUrl, "New Project", "New Corp")),
+            [newUrl] = DetailHtml("Fresh description.")
+            // knownUrl detail page intentionally absent — must not be requested
+        };
+
+        var requestedUrls = new List<string>();
+        var handler = new FakeHttpMessageHandler(responses);
+        var captureHandler = new CapturingHandler(handler, requestedUrls);
+        var scraper = new FreelancermapScraper(
+            new HttpClient(captureHandler),
+            NullLogger<FreelancermapScraper>.Instance,
+            (_, _) => Task.CompletedTask);
+
+        var knownUrls = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { knownUrl };
+        var result = await scraper.ScrapeAsync(portalUrl, knownUrls, CancellationToken.None);
+
+        result.ListingSucceeded.ShouldBeTrue();
+        result.ListingItemCount.ShouldBe(2); // both cards on listing
+        result.Items.ShouldHaveSingleItem();  // only the new one returned
+        result.Items[0].Position.ShouldBe("New Project");
+        result.Items[0].JobDescription.ShouldBe("Fresh description.");
+        requestedUrls.ShouldNotContain(knownUrl);
+    }
+
+    [Fact]
+    public async Task ScrapeAsync_WarmUpRequestFails_StillReturnsSuccessWithItems()
+    {
+        const string portalUrl = "https://www.freelancermap.de/projektboerse.html";
+        const string detailUrl = "https://www.freelancermap.de/projekte/warmup-test";
+        // The warm-up URL (https://www.freelancermap.de/) is absent → returns 404 → exception swallowed
+        // The listing URL and detail URL are present → scraping continues normally
+
+        var responses = new Dictionary<string, string>
+        {
+            [portalUrl] = ListingHtml(CardHtml(detailUrl, "WarmUp Project", "Test Corp")),
+            [detailUrl] = DetailHtml("Description after failed warm-up.")
+        };
+
+        var result = await BuildScraper(responses).ScrapeAsync(portalUrl, NoKnownUrls, CancellationToken.None);
+
+        result.ListingSucceeded.ShouldBeTrue();
+        result.Items.ShouldHaveSingleItem();
+        result.Items[0].Position.ShouldBe("WarmUp Project");
+        result.Items[0].JobDescription.ShouldBe("Description after failed warm-up.");
+    }
+
+    [Fact]
+    public async Task ScrapeAsync_AllItemsAreKnown_NoDetailFetchesOccur()
+    {
+        const string portalUrl = "https://www.freelancermap.de/projektboerse.html";
+        const string knownUrl1 = "https://www.freelancermap.de/projekte/known-1";
+        const string knownUrl2 = "https://www.freelancermap.de/projekte/known-2";
+
+        var responses = new Dictionary<string, string>
+        {
+            [portalUrl] = ListingHtml(
+                CardHtml(knownUrl1, "Known 1", "Corp A"),
+                CardHtml(knownUrl2, "Known 2", "Corp B"))
+            // Detail pages are intentionally absent — they must never be requested
+        };
+
+        var requestedUrls = new List<string>();
+        var handler = new FakeHttpMessageHandler(responses);
+        var captureHandler = new CapturingHandler(handler, requestedUrls);
+        var scraper = new FreelancermapScraper(
+            new HttpClient(captureHandler),
+            NullLogger<FreelancermapScraper>.Instance,
+            (_, _) => Task.CompletedTask);
+
+        var knownUrls = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { knownUrl1, knownUrl2 };
+        var result = await scraper.ScrapeAsync(portalUrl, knownUrls, CancellationToken.None);
+
+        result.ListingSucceeded.ShouldBeTrue();
+        result.ListingItemCount.ShouldBe(2);
+        result.Items.ShouldBeEmpty();
+        requestedUrls.ShouldNotContain(knownUrl1);
+        requestedUrls.ShouldNotContain(knownUrl2);
+    }
+
+    [Fact]
+    public async Task ScrapeAsync_SingleNewItem_OnlyWarmUpDelayFires()
+    {
+        // With only one new item, the "between detail pages" delay never fires —
+        // only the single warm-up delay (after visiting the homepage) should occur.
+        const string portalUrl = "https://www.freelancermap.de/projektboerse.html";
+        const string detailUrl = "https://www.freelancermap.de/projekte/only-one";
+
+        var responses = new Dictionary<string, string>
+        {
+            [portalUrl] = ListingHtml(CardHtml(detailUrl, "Only Project", "Solo Corp")),
+            [detailUrl] = DetailHtml("Solo description.")
+        };
+
+        var delayCallCount = 0;
+        var scraper = BuildScraper(responses, (_, _) => { delayCallCount++; return Task.CompletedTask; });
+
+        await scraper.ScrapeAsync(portalUrl, NoKnownUrls, CancellationToken.None);
+
+        // Only the warm-up delay (1), no between-page delays (0) = 1 total
+        delayCallCount.ShouldBe(1);
+    }
+
+    [Fact]
+    public async Task ScrapeAsync_AllItemsKnown_OnlyWarmUpDelayFires()
+    {
+        // When every listed item is already known, no detail pages are fetched,
+        // so only the warm-up delay should be invoked.
+        const string portalUrl = "https://www.freelancermap.de/projektboerse.html";
+        const string knownUrl = "https://www.freelancermap.de/projekte/existing";
+
+        var responses = new Dictionary<string, string>
+        {
+            [portalUrl] = ListingHtml(CardHtml(knownUrl, "Existing", "Old Corp"))
+        };
+
+        var delayCallCount = 0;
+        var knownUrls = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { knownUrl };
+        var scraper = BuildScraper(responses, (_, _) => { delayCallCount++; return Task.CompletedTask; });
+
+        await scraper.ScrapeAsync(portalUrl, knownUrls, CancellationToken.None);
+
+        // Only the warm-up delay (1) — no detail fetches
+        delayCallCount.ShouldBe(1);
+    }
+
+    private sealed class CapturingHandler(HttpMessageHandler inner, List<string> captured) : DelegatingHandler(inner)
+    {
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            captured.Add(request.RequestUri!.ToString());
+            return base.SendAsync(request, cancellationToken);
+        }
     }
 }

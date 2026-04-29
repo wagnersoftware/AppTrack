@@ -203,4 +203,74 @@ public class ScrapedProjectRepositoryTests
         var saved = await context.ScrapedProjects.AsNoTracking().SingleAsync();
         saved.Description.ShouldBe(expectedDescription);
     }
+
+    // -----------------------------------------------------------------------
+    // GetExistingUrlsForPortalAsync tests
+    // -----------------------------------------------------------------------
+
+    [Fact]
+    public async Task GetExistingUrlsForPortalAsync_WhenNoProjectsForPortal_ReturnsEmptySet()
+    {
+        // Arrange — fresh database, no scraped projects
+        await using var context = CreateContext(nameof(GetExistingUrlsForPortalAsync_WhenNoProjectsForPortal_ReturnsEmptySet));
+        var repo = CreateRepository(context);
+
+        // Act
+        var result = await repo.GetExistingUrlsForPortalAsync(1, CancellationToken.None);
+
+        // Assert
+        result.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task GetExistingUrlsForPortalAsync_ReturnsOnlyUrlsForRequestedPortal()
+    {
+        // Arrange — seed projects for two different portals
+        await using var context = CreateContext(nameof(GetExistingUrlsForPortalAsync_ReturnsOnlyUrlsForRequestedPortal));
+
+        // Add a second portal so FK constraint is satisfied
+        context.ProjectPortals.Add(new ProjectPortal
+        {
+            Id = 2,
+            Name = "OtherPortal",
+            Url = "https://other-portal.de",
+            ScraperType = AppTrack.Domain.Enums.ScraperType.FreelancerMap,
+            IsActive = true
+        });
+
+        context.ScrapedProjects.AddRange(
+            MakeProject(1, "https://freelancermap.de/projekte/portal1-a"),
+            MakeProject(1, "https://freelancermap.de/projekte/portal1-b"),
+            MakeProject(2, "https://freelancermap.de/projekte/portal2-a")
+        );
+        await context.SaveChangesAsync();
+
+        var repo = CreateRepository(context);
+
+        // Act — query for portal 1 only
+        var result = await repo.GetExistingUrlsForPortalAsync(1, CancellationToken.None);
+
+        // Assert — only portal 1 URLs returned
+        result.Count.ShouldBe(2);
+        result.ShouldContain("https://freelancermap.de/projekte/portal1-a");
+        result.ShouldContain("https://freelancermap.de/projekte/portal1-b");
+        result.ShouldNotContain("https://freelancermap.de/projekte/portal2-a");
+    }
+
+    [Fact]
+    public async Task GetExistingUrlsForPortalAsync_ReturnsCaseInsensitiveHashSet()
+    {
+        // Arrange — seed one project with a lower-case URL
+        await using var context = CreateContext(nameof(GetExistingUrlsForPortalAsync_ReturnsCaseInsensitiveHashSet));
+        context.ScrapedProjects.Add(MakeProject(1, "https://freelancermap.de/projekte/case-test"));
+        await context.SaveChangesAsync();
+
+        var repo = CreateRepository(context);
+
+        // Act
+        var result = await repo.GetExistingUrlsForPortalAsync(1, CancellationToken.None);
+
+        // Assert — the returned set uses OrdinalIgnoreCase
+        result.ShouldContain("https://FREELANCERMAP.DE/Projekte/Case-Test");
+    }
 }

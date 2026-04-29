@@ -5,6 +5,7 @@ namespace AppTrack.Application.Contracts.ProjectMonitoring;
 
 public interface IScrapedProjectRepository : IGenericRepository<ScrapedProject>
 {
+    Task<IReadOnlySet<string>> GetExistingUrlsForPortalAsync(int portalId, CancellationToken ct);
     Task<List<ScrapedProject>> GetByPortalIdsAsync(IEnumerable<int> portalIds);
     Task AddNewForPortalAsync(int portalId, IEnumerable<ScrapedProject> projects, CancellationToken ct);
     // Returns ScrapedProjects for the given portal IDs that have no ProcessedProjectItem
