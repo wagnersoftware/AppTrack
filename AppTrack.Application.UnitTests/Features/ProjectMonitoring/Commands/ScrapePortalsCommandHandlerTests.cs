@@ -270,6 +270,36 @@ public class ScrapePortalsCommandHandlerTests
     }
 
     [Fact]
+    public async Task Handle_ShouldMapDetailFieldsFromScrapedProjectData()
+    {
+        var portal = new ProjectPortal { Id = 1, Url = "https://freelancermap.de", ScraperType = ScraperType.FreelancerMap, IsActive = true };
+        _mockPortalRepo.Setup(r => r.GetAllActiveAsync()).ReturnsAsync([portal]);
+        _mockScraper.Setup(s => s.ScrapeAsync(portal.Url, It.IsAny<IReadOnlySet<string>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(ScrapingResult.Success([
+                new ScrapedProjectData(
+                    "Senior Dev", "https://freelancermap.de/projekte/1", "Great project", "Tech GmbH", "Freelancermap",
+                    Location: "Berlin",
+                    DurationInMonths: "6",
+                    StartDateText: "ab sofort",
+                    ContactPerson: "Max Mustermann")
+            ], 1));
+
+        IEnumerable<ScrapedProject>? capturedProjects = null;
+        _mockScrapedProjectRepo
+            .Setup(r => r.AddNewForPortalAsync(portal.Id, It.IsAny<IEnumerable<ScrapedProject>>(), It.IsAny<CancellationToken>()))
+            .Callback<int, IEnumerable<ScrapedProject>, CancellationToken>((_, projects, _) => capturedProjects = projects.ToList())
+            .Returns(Task.CompletedTask);
+
+        await CreateHandler().Handle(new ScrapePortalsCommand(), CancellationToken.None);
+
+        var project = capturedProjects!.Single();
+        project.Location.ShouldBe("Berlin");
+        project.DurationInMonths.ShouldBe("6");
+        project.StartDateText.ShouldBe("ab sofort");
+        project.ContactPerson.ShouldBe("Max Mustermann");
+    }
+
+    [Fact]
     public async Task Handle_ShouldPassKnownUrlsFromRepository_ToScraper()
     {
         var portal = new ProjectPortal { Id = 7, Url = "https://freelancermap.de", ScraperType = ScraperType.FreelancerMap, IsActive = true };

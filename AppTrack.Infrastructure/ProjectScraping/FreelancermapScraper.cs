@@ -27,7 +27,6 @@ public class FreelancermapScraper : IProjectScraper
         _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Accept-Language", "de-DE,de;q=0.9,en;q=0.8");
         _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Accept",
             "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
-        _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Accept-Encoding", "gzip, deflate, br");
         _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("sec-ch-ua",
             "\"Chromium\";v=\"124\", \"Google Chrome\";v=\"124\", \"Not-A.Brand\";v=\"99\"");
         _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("sec-ch-ua-mobile", "?0");
@@ -89,13 +88,17 @@ public class FreelancermapScraper : IProjectScraper
                     await _delayProvider(Random.Shared.Next(5000, 12000), ct);
                 isFirstNewFetch = false;
 
-                var description = await FetchDescriptionAsync(item.Url, portalUrl, ct);
+                var detail = await FetchDetailDataAsync(item.Url, portalUrl, ct);
                 results.Add(new ScrapedProjectData(
                     Position: item.Title,
                     Url: item.Url,
-                    JobDescription: description,
+                    JobDescription: detail.Description,
                     CompanyName: item.Company,
-                    PortalName: "Freelancermap"));
+                    PortalName: "Freelancermap",
+                    Location: detail.Location,
+                    DurationInMonths: detail.DurationInMonths,
+                    StartDateText: detail.StartDateText,
+                    ContactPerson: detail.ContactPerson));
             }
 
             return ScrapingResult.Success(results, listingItemCount);
@@ -107,20 +110,47 @@ public class FreelancermapScraper : IProjectScraper
         }
     }
 
-    private async Task<string> FetchDescriptionAsync(string projectUrl, string listingUrl, CancellationToken ct)
+    private async Task<DetailPageData> FetchDetailDataAsync(string projectUrl, string listingUrl, CancellationToken ct)
     {
         try
         {
             var html = await SendGetAsync(projectUrl, referer: listingUrl, secFetchSite: "same-origin", ct);
             using var ctx = BrowsingContext.New(Configuration.Default);
             using var doc = await ctx.OpenAsync(req => req.Content(html), ct);
-            return doc.QuerySelector(".ql-editor")?.TextContent.Trim() ?? string.Empty;
+
+            var description = doc.QuerySelector(".ql-editor")?.TextContent.Trim() ?? string.Empty;
+            var location = ExtractLocation(doc);
+            var duration = ExtractDurationInMonths(doc);
+            var startDateText = doc.QuerySelector("[data-testid='beginningText'] .mg-r-display-s")?.TextContent.Trim() ?? string.Empty;
+            var contactPerson = ExtractContactPerson(doc);
+
+            return new DetailPageData(description, location, duration, startDateText, contactPerson);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
-            _logger.LogWarning(ex, "Failed to fetch description from {Url}", projectUrl);
-            return string.Empty;
+            _logger.LogWarning(ex, "Failed to fetch detail data from {Url}", projectUrl);
+            return new DetailPageData(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
         }
+    }
+
+    private static string ExtractLocation(AngleSharp.Dom.IDocument doc)
+    {
+        var parts = doc.QuerySelectorAll("[data-testid='city'] a.city")
+            .Select(a => a.TextContent.Trim().TrimEnd(',').Trim())
+            .Where(t => !string.IsNullOrEmpty(t))
+            .ToList();
+        return parts.Count > 0 ? string.Join(", ", parts) : string.Empty;
+    }
+
+    private static string ExtractContactPerson(AngleSharp.Dom.IDocument doc)
+        => doc.QuerySelector(".project-info-name")?.TextContent.Trim() ?? string.Empty;
+
+    private static string ExtractDurationInMonths(AngleSharp.Dom.IDocument doc)
+    {
+        var text = doc.QuerySelector("[data-testid='duration'] .mg-r-display-s")?.TextContent.Trim() ?? string.Empty;
+        // "1 Monate+" → "1", "6 Monate" → "6"
+        var digits = new string(text.TakeWhile(c => char.IsDigit(c) || c == ' ').ToArray()).Trim();
+        return digits.Split(' ')[0];
     }
 
     private async Task<string> SendGetAsync(string url, string? referer, string secFetchSite, CancellationToken ct)

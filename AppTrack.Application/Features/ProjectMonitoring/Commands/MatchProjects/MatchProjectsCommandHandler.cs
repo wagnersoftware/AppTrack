@@ -4,6 +4,7 @@ using AppTrack.Application.Contracts.ProjectMonitoring;
 using AppTrack.Application.Shared;
 using AppTrack.Domain;
 using AppTrack.Domain.Enums;
+using System.Globalization;
 
 namespace AppTrack.Application.Features.ProjectMonitoring.Commands.MatchProjects;
 
@@ -56,8 +57,8 @@ public class MatchProjectsCommandHandler : IRequestHandler<MatchProjectsCommand,
 
             var matches = newProjects
                 .Where(p => settings.Keywords.Any(kw =>
-                    p.Title.Contains(kw, StringComparison.OrdinalIgnoreCase) ||
-                    p.Description.Contains(kw, StringComparison.OrdinalIgnoreCase)))
+                    ContainsKeywordAsTerm(p.Title, kw) ||
+                    ContainsKeywordAsTerm(p.Description, kw)))
                 .ToList();
 
             await _unitOfWork.ExecuteInTransactionAsync(async ct =>
@@ -81,10 +82,10 @@ public class MatchProjectsCommandHandler : IRequestHandler<MatchProjectsCommand,
                             Position = match.Title,
                             URL = match.Url,
                             JobDescription = match.Description ?? string.Empty,
-                            Location = string.Empty,
-                            ContactPerson = string.Empty,
-                            DurationInMonths = string.Empty,
-                            StartDate = DateTime.UtcNow,
+                            Location = string.IsNullOrEmpty(match.Location) ? "Unknown" : match.Location,
+                            ContactPerson = string.IsNullOrEmpty(match.ContactPerson) ? "Unknown" : match.ContactPerson,
+                            DurationInMonths = match.DurationInMonths,
+                            StartDate = ParseStartDate(match.StartDateText),
                             Status = JobApplicationStatus.Discovered
                         });
                     }
@@ -101,5 +102,27 @@ public class MatchProjectsCommandHandler : IRequestHandler<MatchProjectsCommand,
         }
 
         return Unit.Value;
+    }
+
+    private static bool ContainsKeywordAsTerm(string text, string keyword)
+    {
+        var idx = text.IndexOf(keyword, StringComparison.OrdinalIgnoreCase);
+        while (idx >= 0)
+        {
+            var beforeOk = idx == 0 || !char.IsLetterOrDigit(text[idx - 1]);
+            var afterOk = idx + keyword.Length >= text.Length || !char.IsLetterOrDigit(text[idx + keyword.Length]);
+            if (beforeOk && afterOk) return true;
+            idx = text.IndexOf(keyword, idx + 1, StringComparison.OrdinalIgnoreCase);
+        }
+        return false;
+    }
+
+    private static DateTime ParseStartDate(string? text)
+    {
+        if (DateTime.TryParseExact(text, ["dd.MM.yyyy", "MM/yyyy", "MM.yyyy"],
+                CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsed))
+            return parsed;
+
+        return DateTime.UtcNow.Date;
     }
 }

@@ -211,6 +211,118 @@ public class MatchProjectsCommandHandlerTests
         _jobAppRepo.Verify(r => r.CreateAsync(It.IsAny<JobApplication>()), Times.Exactly(2));
     }
 
+    // -----------------------------------------------------------------------
+    // Detail field mapping
+    // -----------------------------------------------------------------------
+
+    [Fact]
+    public async Task Handle_ShouldMapLocationFromScrapedProject()
+    {
+        var project = new ScrapedProject { Id = 50, Title = ".NET Dev", Url = "https://x.de/50", CompanyName = "A", Description = ".NET", Location = "Berlin" };
+        SetupSingleUserWithProject("u1", [".NET"], project);
+
+        var app = await CaptureCreatedJobApplication();
+
+        app.Location.ShouldBe("Berlin");
+    }
+
+    [Fact]
+    public async Task Handle_ShouldFallbackToUnknown_WhenLocationIsEmpty()
+    {
+        var project = new ScrapedProject { Id = 51, Title = ".NET Dev", Url = "https://x.de/51", CompanyName = "A", Description = ".NET", Location = "" };
+        SetupSingleUserWithProject("u1", [".NET"], project);
+
+        var app = await CaptureCreatedJobApplication();
+
+        app.Location.ShouldBe("Unknown");
+    }
+
+    [Fact]
+    public async Task Handle_ShouldMapContactPersonFromScrapedProject()
+    {
+        var project = new ScrapedProject { Id = 52, Title = ".NET Dev", Url = "https://x.de/52", CompanyName = "A", Description = ".NET", ContactPerson = "Max Mustermann" };
+        SetupSingleUserWithProject("u1", [".NET"], project);
+
+        var app = await CaptureCreatedJobApplication();
+
+        app.ContactPerson.ShouldBe("Max Mustermann");
+    }
+
+    [Fact]
+    public async Task Handle_ShouldFallbackToUnknown_WhenContactPersonIsEmpty()
+    {
+        var project = new ScrapedProject { Id = 53, Title = ".NET Dev", Url = "https://x.de/53", CompanyName = "A", Description = ".NET", ContactPerson = "" };
+        SetupSingleUserWithProject("u1", [".NET"], project);
+
+        var app = await CaptureCreatedJobApplication();
+
+        app.ContactPerson.ShouldBe("Unknown");
+    }
+
+    [Fact]
+    public async Task Handle_ShouldMapDurationInMonthsFromScrapedProject()
+    {
+        var project = new ScrapedProject { Id = 54, Title = ".NET Dev", Url = "https://x.de/54", CompanyName = "A", Description = ".NET", DurationInMonths = "6" };
+        SetupSingleUserWithProject("u1", [".NET"], project);
+
+        var app = await CaptureCreatedJobApplication();
+
+        app.DurationInMonths.ShouldBe("6");
+    }
+
+    [Fact]
+    public async Task Handle_ShouldParseStartDate_WhenValidGermanDate()
+    {
+        var project = new ScrapedProject { Id = 55, Title = ".NET Dev", Url = "https://x.de/55", CompanyName = "A", Description = ".NET", StartDateText = "01.06.2026" };
+        SetupSingleUserWithProject("u1", [".NET"], project);
+
+        var app = await CaptureCreatedJobApplication();
+
+        app.StartDate.ShouldBe(new DateTime(2026, 6, 1, 0, 0, 0, DateTimeKind.Utc));
+    }
+
+    [Fact]
+    public async Task Handle_ShouldFallbackToToday_WhenStartDateTextIsUnparseable()
+    {
+        var project = new ScrapedProject { Id = 56, Title = ".NET Dev", Url = "https://x.de/56", CompanyName = "A", Description = ".NET", StartDateText = "ab sofort" };
+        SetupSingleUserWithProject("u1", [".NET"], project);
+
+        var before = DateTime.UtcNow.Date;
+        var app = await CaptureCreatedJobApplication();
+        var after = DateTime.UtcNow.Date;
+
+        app.StartDate.ShouldBeInRange(before, after);
+    }
+
+    [Fact]
+    public async Task Handle_ShouldFallbackToToday_WhenStartDateTextIsEmpty()
+    {
+        var project = new ScrapedProject { Id = 57, Title = ".NET Dev", Url = "https://x.de/57", CompanyName = "A", Description = ".NET", StartDateText = "" };
+        SetupSingleUserWithProject("u1", [".NET"], project);
+
+        var before = DateTime.UtcNow.Date;
+        var app = await CaptureCreatedJobApplication();
+        var after = DateTime.UtcNow.Date;
+
+        app.StartDate.ShouldBeInRange(before, after);
+    }
+
+    private async Task<JobApplication> CaptureCreatedJobApplication()
+    {
+        JobApplication? captured = null;
+        _jobAppRepo
+            .Setup(r => r.CreateAsync(It.IsAny<JobApplication>()))
+            .Callback<JobApplication>(a => captured = a)
+            .Returns(Task.CompletedTask);
+        _matchRepo.Setup(r => r.AddRangeAsync(It.IsAny<IEnumerable<UserProjectMatch>>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        _processedRepo.Setup(r => r.AddRangeAsync(It.IsAny<IEnumerable<ProcessedProjectItem>>(), It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+
+        await CreateHandler().Handle(new MatchProjectsCommand(), CancellationToken.None);
+
+        captured.ShouldNotBeNull();
+        return captured!;
+    }
+
     private void SetupSingleUserWithProject(string userId, List<string> keywords, ScrapedProject project)
     {
         _subscriptionRepo.Setup(r => r.GetActiveSubscriptionsWithPortalsAsync())

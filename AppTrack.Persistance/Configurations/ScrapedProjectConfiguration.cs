@@ -13,6 +13,10 @@ public class ScrapedProjectConfiguration : IEntityTypeConfiguration<ScrapedProje
         builder.Property(x => x.Url).IsRequired().HasMaxLength(2000);
         builder.Property(x => x.CompanyName).HasMaxLength(300);
         builder.Property(x => x.Description).HasColumnType("nvarchar(max)");
+        builder.Property(x => x.Location).HasMaxLength(300);
+        builder.Property(x => x.DurationInMonths).HasMaxLength(20);
+        builder.Property(x => x.StartDateText).HasMaxLength(100);
+        builder.Property(x => x.ContactPerson).HasMaxLength(200);
         builder.HasIndex(x => new { x.ProjectPortalId, x.Url }).IsUnique();
         builder.HasOne(x => x.ProjectPortal)
             .WithMany()

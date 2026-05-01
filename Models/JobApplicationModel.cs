@@ -33,7 +33,8 @@ public class JobApplicationModel : ModelBase, IJobApplicationValidatable
     {
         New,
         WaitingForFeedback,
-        Rejected
+        Rejected,
+        Discovered
     }
 
     public DateTime StartDateAsDateTime

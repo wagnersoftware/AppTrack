@@ -38,6 +38,10 @@ namespace AppTrack.Infrastructure
 
             // Project scraping services
             services.AddHttpClient<FreelancermapScraper>()
+                .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+                {
+                    AutomaticDecompression = System.Net.DecompressionMethods.All
+                })
                 .AddStandardResilienceHandler();
             services.AddScoped<IProjectScraperFactory, ProjectScraperFactory>();
 

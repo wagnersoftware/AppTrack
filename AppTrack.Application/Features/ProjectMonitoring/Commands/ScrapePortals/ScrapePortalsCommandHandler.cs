@@ -62,7 +62,11 @@ public class ScrapePortalsCommandHandler : IRequestHandler<ScrapePortalsCommand,
                     Title = item.Position,
                     Url = item.Url,
                     CompanyName = item.CompanyName,
-                    Description = item.JobDescription
+                    Description = item.JobDescription,
+                    Location = item.Location,
+                    DurationInMonths = item.DurationInMonths,
+                    StartDateText = item.StartDateText,
+                    ContactPerson = item.ContactPerson
                 });
             }
 

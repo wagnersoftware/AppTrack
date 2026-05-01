@@ -79,6 +79,53 @@ public class FreelancermapScraperTests
             ? "<html><body><p>No editor here</p></body></html>"
             : $"""<html><body><div class="ql-editor">{qlEditorContent}</div></body></html>""";
 
+    private static string DetailHtmlFull(
+        string description,
+        string location = "",
+        string duration = "",
+        string startDateText = "",
+        string contactPerson = "")
+    {
+        var locationHtml = string.IsNullOrEmpty(location) ? "" : $"""
+            <div class="project-info-list">
+              <div data-testid="city" class="align-items-center">
+                <a class="city">{location}</a>
+              </div>
+            </div>
+            """;
+
+        var durationHtml = string.IsNullOrEmpty(duration) ? "" : $"""
+            <div data-testid="duration" class="align-items-center">
+              <span class="mg-r-display-s">{duration}</span>
+            </div>
+            """;
+
+        var startDateHtml = string.IsNullOrEmpty(startDateText) ? "" : $"""
+            <div data-testid="beginningText" class="align-items-center">
+              <span class="mg-r-display-s">{startDateText}</span>
+            </div>
+            """;
+
+        var contactHtml = string.IsNullOrEmpty(contactPerson) ? "" : $"""
+            <div class="project-info-title">
+              <div>
+                <span class="project-body-info-title">Ansprechpartner: </span>
+                <span class="project-info-name">{contactPerson}</span>
+              </div>
+            </div>
+            """;
+
+        return $"""
+            <html><body>
+              <div class="ql-editor">{description}</div>
+              {locationHtml}
+              {durationHtml}
+              {startDateHtml}
+              {contactHtml}
+            </body></html>
+            """;
+    }
+
     [Fact]
     public async Task ScrapeAsync_HappyPath_ReturnsSuccessWithCorrectData()
     {
@@ -388,6 +435,103 @@ public class FreelancermapScraperTests
 
         // Only the warm-up delay (1) — no detail fetches
         delayCallCount.ShouldBe(1);
+    }
+
+    // -----------------------------------------------------------------------
+    // Detail-page field extraction
+    // -----------------------------------------------------------------------
+
+    [Fact]
+    public async Task ScrapeAsync_ExtractsLocationFromDetailPage()
+    {
+        const string portalUrl = "https://www.freelancermap.de/projekte";
+        const string detailUrl = "https://www.freelancermap.de/projekte/loc-test";
+
+        var responses = new Dictionary<string, string>
+        {
+            [portalUrl] = ListingHtml(CardHtml(detailUrl, "Location Project", "Corp")),
+            [detailUrl] = DetailHtmlFull("Some description.", location: "Berlin, Deutschland")
+        };
+
+        var result = await BuildScraper(responses).ScrapeAsync(portalUrl, NoKnownUrls, CancellationToken.None);
+
+        result.Items.ShouldHaveSingleItem();
+        result.Items[0].Location.ShouldBe("Berlin, Deutschland");
+    }
+
+    [Fact]
+    public async Task ScrapeAsync_ExtractsDurationInMonthsFromDetailPage()
+    {
+        const string portalUrl = "https://www.freelancermap.de/projekte";
+        const string detailUrl = "https://www.freelancermap.de/projekte/dur-test";
+
+        var responses = new Dictionary<string, string>
+        {
+            [portalUrl] = ListingHtml(CardHtml(detailUrl, "Duration Project", "Corp")),
+            [detailUrl] = DetailHtmlFull("Some description.", duration: "6 Monate+")
+        };
+
+        var result = await BuildScraper(responses).ScrapeAsync(portalUrl, NoKnownUrls, CancellationToken.None);
+
+        result.Items.ShouldHaveSingleItem();
+        result.Items[0].DurationInMonths.ShouldBe("6");
+    }
+
+    [Fact]
+    public async Task ScrapeAsync_ExtractsStartDateTextFromDetailPage()
+    {
+        const string portalUrl = "https://www.freelancermap.de/projekte";
+        const string detailUrl = "https://www.freelancermap.de/projekte/date-test";
+
+        var responses = new Dictionary<string, string>
+        {
+            [portalUrl] = ListingHtml(CardHtml(detailUrl, "Date Project", "Corp")),
+            [detailUrl] = DetailHtmlFull("Some description.", startDateText: "ab sofort")
+        };
+
+        var result = await BuildScraper(responses).ScrapeAsync(portalUrl, NoKnownUrls, CancellationToken.None);
+
+        result.Items.ShouldHaveSingleItem();
+        result.Items[0].StartDateText.ShouldBe("ab sofort");
+    }
+
+    [Fact]
+    public async Task ScrapeAsync_ExtractsContactPersonFromDetailPage()
+    {
+        const string portalUrl = "https://www.freelancermap.de/projekte";
+        const string detailUrl = "https://www.freelancermap.de/projekte/contact-test";
+
+        var responses = new Dictionary<string, string>
+        {
+            [portalUrl] = ListingHtml(CardHtml(detailUrl, "Contact Project", "Corp")),
+            [detailUrl] = DetailHtmlFull("Some description.", contactPerson: "Thomas Parsons")
+        };
+
+        var result = await BuildScraper(responses).ScrapeAsync(portalUrl, NoKnownUrls, CancellationToken.None);
+
+        result.Items.ShouldHaveSingleItem();
+        result.Items[0].ContactPerson.ShouldBe("Thomas Parsons");
+    }
+
+    [Fact]
+    public async Task ScrapeAsync_WhenDetailFieldsAbsent_ReturnsEmptyStrings()
+    {
+        const string portalUrl = "https://www.freelancermap.de/projekte";
+        const string detailUrl = "https://www.freelancermap.de/projekte/minimal";
+
+        var responses = new Dictionary<string, string>
+        {
+            [portalUrl] = ListingHtml(CardHtml(detailUrl, "Minimal Project", "Corp")),
+            [detailUrl] = DetailHtmlFull("Only description here.")
+        };
+
+        var result = await BuildScraper(responses).ScrapeAsync(portalUrl, NoKnownUrls, CancellationToken.None);
+
+        result.Items.ShouldHaveSingleItem();
+        result.Items[0].Location.ShouldBe(string.Empty);
+        result.Items[0].DurationInMonths.ShouldBe(string.Empty);
+        result.Items[0].StartDateText.ShouldBe(string.Empty);
+        result.Items[0].ContactPerson.ShouldBe(string.Empty);
     }
 
     private sealed class CapturingHandler(HttpMessageHandler inner, List<string> captured) : DelegatingHandler(inner)
