@@ -100,6 +100,8 @@ services.AddApplicationServices()
 services.AddInfrastructureServices(configuration)
 services.AddPersistanceServices(configuration)
 services.AddScoped<IUserContext, NullUserContext>()   // overrides HttpContextUserContext
+services.AddSingleton<TimeProvider>(TimeProvider.System)
+// IScrapingScheduleRepository is registered by AddPersistanceServices
 ```
 
 `NullUserContext` replaces the HTTP-context-based implementation because timer-triggered
@@ -136,7 +138,9 @@ sequenceDiagram
     participant ES as IEmailSender<br/>(SendGrid)
 
     %% Stage 1: Scrape
-    Timer1->>SPF: TimerTrigger fires
+    Timer1->>SPF: TimerTrigger fires (every 15 min)
+    Note over SPF: Gate 1 — operating window check<br/>(09:00–17:00 CET; skip if outside)
+    Note over SPF: Gate 2 — randomised interval check<br/>(IScrapingScheduleRepository.GetNextRunAfterAsync;<br/>skip if UtcNow < NextRunAfter)
     SPF->>SCH: Send(ScrapePortalsCommand)
     SCH->>PSF: GetScraper(portal.ScraperType)
     PSF-->>SCH: FreelancermapScraper
@@ -152,6 +156,7 @@ sequenceDiagram
     SPF->>SBP: PublishScrapingCompletedAsync([], ct)
     SBP->>SB: SendMessageAsync (JSON payload)
     SB-->>SPF: acknowledged
+    Note over SPF: On success: SetNextRunAfterAsync(UtcNow + 90–150 min)<br/>On error (caught): LogError + SetNextRunAfterAsync(UtcNow + 30 min)
 
     %% Stage 2: Match
     SB->>MPF: ServiceBusTrigger delivers message
@@ -205,10 +210,45 @@ sequenceDiagram
 
 | Class | Trigger | Responsibility |
 |---|---|---|
-| `ScrapePortalsFunction` | `TimerTrigger(%ScrapeSchedule%)` | Dispatches `ScrapePortalsCommand`, then calls `IScrapingEventPublisher.PublishScrapingCompletedAsync` |
-| `MatchProjectsFunction` | `ServiceBusTrigger(%ScrapingCompletedQueueName%)` | Dispatches `MatchProjectsCommand` when a scraping-completed message arrives |
-| `SendNotificationsFunction` | `TimerTrigger(%NotificationSchedule%)` | Dispatches `SendProjectNotificationsCommand` on a frequent schedule |
-| `CleanupFunction` | `TimerTrigger(%CleanupSchedule%)` | Dispatches `CleanupProjectDataCommand` to delete data older than 60 days |
+| `ScrapePortalsFunction` | `TimerTrigger(%ScrapeSchedule%)` | Gate-checks time window and randomised interval, dispatches `ScrapePortalsCommand`, publishes to Service Bus. Has explicit error handling — see below. |
+| `MatchProjectsFunction` | `ServiceBusTrigger(%ScrapingCompletedQueueName%)` | Dispatches `MatchProjectsCommand` when a scraping-completed message arrives. No explicit error handling — relies on Service Bus retry/dead-letter. |
+| `SendNotificationsFunction` | `TimerTrigger(%NotificationSchedule%)` | Dispatches `SendProjectNotificationsCommand` on a frequent schedule. No explicit error handling — relies on Azure Functions retry policy. |
+| `CleanupFunction` | `TimerTrigger(%CleanupSchedule%)` | Dispatches `CleanupProjectDataCommand` to delete data older than 60 days. No explicit error handling — relies on Azure Functions retry policy. |
+
+#### `ScrapePortalsFunction` — Gate Logic and Error Handling
+
+The timer fires every 15 minutes (`ScrapeSchedule`), but the function applies two self-gates before running:
+
+1. **Operating-window gate**: Converts UTC to CET/CEST and skips execution outside 09:00–17:00. This avoids scraping overnight when portals are unlikely to have new listings and reduces noise in portal logs.
+2. **Randomised-interval gate**: Reads `NextRunAfter` from `IScrapingScheduleRepository`. If the current time is before that timestamp, the function returns early. On each successful run, `NextRunAfter` is set to `UtcNow + random(90–150 minutes)`, capped to the next 09:00 window if the candidate falls outside operating hours.
+
+Error handling in the function body:
+
+```csharp
+try
+{
+    await mediator.Send(new ScrapePortalsCommand(), cancellationToken);
+    await scrapingEventPublisher.PublishScrapingCompletedAsync([], cancellationToken);
+}
+catch (Exception ex) when (ex is not OperationCanceledException)
+{
+    scrapingException = ex;
+    logger.LogError(ex, "ScrapePortalsFunction encountered an unexpected error.");
+}
+
+// Always update the schedule — even on failure — to avoid rapid retries on every 15-min tick.
+var nextRunUtc = scrapingException is null
+    ? CalculateNextRunUtc(nowUtc)          // random 90–150 min, window-aware
+    : nowUtc.AddMinutes(30);               // fixed 30-min back-off after failure
+
+await scheduleRepository.SetNextRunAfterAsync(nextRunUtc, cancellationToken);
+```
+
+Key properties of this approach:
+- **Exceptions are not rethrown.** The Azure Functions runtime never sees a failure, so there is no automatic retry by the host. The 30-minute back-off is enforced by the schedule gate instead.
+- **`OperationCanceledException` is not caught.** Cancellation (e.g. host shutdown) propagates normally and does not write a 30-minute delay to the schedule.
+- **Schedule is always written.** Even if `SetNextRunAfterAsync` itself fails, the exception would propagate to the host. This is intentional — a broken schedule repository is a hard failure that should surface, not be silently swallowed.
+- **Service Bus publish failure** is caught alongside scraping failures. If `PublishScrapingCompletedAsync` throws, the function enters the 30-minute back-off, and `MatchProjectsFunction` is not triggered for this cycle.
 
 ### Application Layer — Commands
 
@@ -366,6 +406,17 @@ The 60-day retention window is a constant (`RetentionDays`) in `CleanupProjectDa
 ### Notification Interval Enforcement in the Handler
 
 `SendNotificationsFunction` runs on a frequent schedule (e.g. every 5 minutes), but the handler enforces a per-user `NotificationIntervalMinutes` by comparing `LastNotifiedAt` to `DateTime.UtcNow`. This lets the function run frequently for responsiveness while preventing notification spam. The timer schedule controls the maximum resolution; user settings control actual frequency.
+
+### Error Handling Strategy per Function
+
+The four functions use different error handling strategies based on their trigger type and failure consequences:
+
+| Function | Strategy | Reason |
+|---|---|---|
+| `ScrapePortalsFunction` | Catch, log, 30-min back-off via schedule gate | Timer re-fires every 15 min; without a back-off the function would retry every tick after a failure. Exceptions are not rethrown, so the host does not apply its own retry. |
+| `MatchProjectsFunction` | No catch — exception propagates | Service Bus handles redelivery. If the function throws, the message is retried up to the queue's `MaxDeliveryCount`, then moved to the dead-letter queue. This is the correct model for queue-triggered work. |
+| `SendNotificationsFunction` | No catch — exception propagates | Timer-triggered; the Azure Functions runtime applies its configured retry policy on failure. Notification skips are non-critical — the next timer tick will retry. |
+| `CleanupFunction` | No catch — exception propagates | Weekly timer; a failed cleanup will simply be retried on the next weekly tick. Runtime retry policy applies. |
 
 ### `NullUserContext` in the Functions Host
 
