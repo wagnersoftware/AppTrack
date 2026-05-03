@@ -235,7 +235,7 @@ az functionapp config appsettings set \
 
 ### Option A — GitHub Actions (recommended)
 
-The workflow file `.github/workflows/apptrack-functions.yml` is already committed. It deploys automatically on every push to `main` using OIDC (Workload Identity Federation) — no stored secrets needed.
+The workflow file `.github/workflows/apptrack-functions.yml` is already committed to the repository. Once the setup below is complete, every push to `main` automatically builds and deploys `AppTrack.Functions` to `func-apptrack-prod` — no manual steps needed.
 
 #### 5a — Create App Registration for OIDC
 
