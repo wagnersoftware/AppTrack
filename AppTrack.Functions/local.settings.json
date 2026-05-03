@@ -6,6 +6,7 @@
     "ScrapeSchedule": "0 */15 * * * *",
     "ConnectionStrings__AppTrackConnectionString": "Server=(localdb)\\MSSQLLocalDB;Database=AppTrack_Local;Trusted_Connection=True;MultipleActiveResultSets=True;",
     "ServiceBusConnection": "Endpoint=sb://localhost;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;",
+    "ServiceBusConnection__fullyQualifiedNamespace": "",
     "ScrapingCompletedQueueName": "scraping-completed",
     "NotificationSchedule": "*/5 * * * *",
     "CleanupSchedule": "0 0 3 * * 0"

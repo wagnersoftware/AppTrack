@@ -1,4 +1,5 @@
 using AppTrack.Application.Contracts.ProjectMonitoring;
+using Azure.Identity;
 using Azure.Messaging.ServiceBus;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -18,10 +19,10 @@ public class ServiceBusScrapingEventPublisher : IScrapingEventPublisher
 
     public async Task PublishScrapingCompletedAsync(IEnumerable<int> portalIds, CancellationToken ct)
     {
-        var connectionString = _configuration["ServiceBusConnection"];
+        var fullyQualifiedNamespace = _configuration["ServiceBusConnection__fullyQualifiedNamespace"];
         var queueName = _configuration["ScrapingCompletedQueueName"] ?? "scraping-completed";
 
-        await using var client = new ServiceBusClient(connectionString);
+        await using var client = new ServiceBusClient(fullyQualifiedNamespace, new DefaultAzureCredential());
         await using var sender = client.CreateSender(queueName);
 
         await sender.SendMessageAsync(new ServiceBusMessage("scraping-completed"), ct);
