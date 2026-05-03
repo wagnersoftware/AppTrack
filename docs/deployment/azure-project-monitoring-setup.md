@@ -16,8 +16,8 @@ This guide covers all Azure resources required to run the project scraping, keyw
           │
 [Timer Trigger]
   SendNotificationsFunction
-          │  reads IsNotified=false matches, sends email via SendGrid
-          └─► marks IsNotified=true via Azure Communication Services Email
+          │  reads IsNotified=false matches, sends email via Azure Communication Services
+          └─► marks IsNotified=true
 
 [Timer Trigger - weekly]
   CleanupFunction
@@ -28,10 +28,11 @@ This guide covers all Azure resources required to run the project scraping, keyw
 
 - Azure CLI installed (`az --version`)
 - Logged in: `az login`
-- Azure subscription available
+- Resource group `rg-apptrack` already exists
+- Existing **Azure Storage Account** in `rg-apptrack` (used for the Function App)
 - Existing **Azure SQL Database** and **Azure App Service** for the AppTrack API (migrations run automatically on API startup)
 
----
+Retrieve the storage account connection string for later use:
 
 ## Step 1: Resource Group
 
@@ -62,46 +63,46 @@ Save the connection string — needed later:
 
 ```bash
 az storage account show-connection-string \
-  --name stapptrackprod \
-  --resource-group rg-apptrack-prod \
+  --name <storage-account-name> \
+  --resource-group rg-apptrack \
   --query connectionString -o tsv
 ```
 
 ---
 
-## Step 3: Azure Service Bus
+## Step 1: Azure Service Bus
 
-### 3a — Namespace
+### 1a — Namespace
 
 ```bash
 az servicebus namespace create \
   --name sb-apptrack-prod \
-  --resource-group rg-apptrack-prod \
+  --resource-group rg-apptrack \
   --location germanywestcentral \
   --sku Basic
 ```
 
 > **SKU note:** Basic supports queues. If you ever need topics/subscriptions, upgrade to Standard.
 
-### 3b — Queue
+### 1b — Queue
 
 ```bash
 az servicebus queue create \
   --name scraping-completed \
   --namespace-name sb-apptrack-prod \
-  --resource-group rg-apptrack-prod \
+  --resource-group rg-apptrack \
   --max-delivery-count 3 \
   --default-message-time-to-live P1D
 ```
 
 > `--max-delivery-count 3` — after 3 failed deliveries the message goes to the dead-letter queue instead of retrying indefinitely.
 
-### 3c — Connection String
+### 1c — Connection String
 
 ```bash
 az servicebus namespace authorization-rule keys list \
   --namespace-name sb-apptrack-prod \
-  --resource-group rg-apptrack-prod \
+  --resource-group rg-apptrack \
   --name RootManageSharedAccessKey \
   --query primaryConnectionString -o tsv
 ```
@@ -110,21 +111,21 @@ Save this value — it becomes `ServiceBusConnection` in the Function App settin
 
 ---
 
-## Step 4: Azure Communication Services Email
+## Step 2: Azure Communication Services Email
 
-### 4a — Create ACS Resource
+### 2a — Create ACS Resource
 
 ```bash
 az communication create \
   --name acs-apptrack-prod \
-  --resource-group rg-apptrack-prod \
+  --resource-group rg-apptrack \
   --location global \
   --data-location germanywestcentral
 ```
 
 > `--location global` is required for ACS resources (control plane is global); `--data-location` sets where data is stored at rest.
 
-### 4b — Add an Email Domain
+### 2b — Add an Email Domain
 
 Use an Azure-managed domain (easiest, no DNS setup):
 
@@ -132,7 +133,7 @@ Use an Azure-managed domain (easiest, no DNS setup):
 az communication email domain create \
   --name AzureManagedDomain \
   --email-service-name acs-apptrack-prod \
-  --resource-group rg-apptrack-prod \
+  --resource-group rg-apptrack \
   --location global \
   --domain-management AzureManaged
 ```
@@ -141,21 +142,21 @@ This provisions a `<guid>.azurecomm.net` domain with a ready-to-use sender addre
 
 To use a **custom domain** instead, replace `--domain-management AzureManaged` with `CustomerManaged` and verify ownership via DNS TXT record (see [ACS docs](https://learn.microsoft.com/azure/communication-services/quickstarts/email/add-custom-verified-email-domain)).
 
-### 4c — Link Domain to ACS Resource
+### 2c — Link Domain to ACS Resource
 
 ```bash
 az communication email domain link \
   --name acs-apptrack-prod \
-  --resource-group rg-apptrack-prod \
-  --linked-domains "/subscriptions/<subscription-id>/resourceGroups/rg-apptrack-prod/providers/Microsoft.Communication/emailServices/acs-apptrack-prod/domains/AzureManagedDomain"
+  --resource-group rg-apptrack \
+  --linked-domains "/subscriptions/<subscription-id>/resourceGroups/rg-apptrack/providers/Microsoft.Communication/emailServices/acs-apptrack-prod/domains/AzureManagedDomain"
 ```
 
-### 4d — Get Endpoint URL
+### 2d — Get Endpoint URL
 
 ```bash
 az communication show \
   --name acs-apptrack-prod \
-  --resource-group rg-apptrack-prod \
+  --resource-group rg-apptrack \
   --query "properties.hostName" -o tsv
 ```
 
@@ -165,13 +166,13 @@ The result will look like `acs-apptrack-prod.communication.azure.com`. Prefix it
 
 ---
 
-## Step 5: Function App
+## Step 3: Function App
 
 ```bash
 az functionapp create \
   --name func-apptrack-prod \
-  --resource-group rg-apptrack-prod \
-  --storage-account stapptrackprod \
+  --resource-group rg-apptrack \
+  --storage-account <storage-account-name> \
   --consumption-plan-location germanywestcentral \
   --runtime dotnet-isolated \
   --runtime-version 10 \
@@ -181,27 +182,27 @@ az functionapp create \
 
 > The Consumption Plan means you pay per execution — ideal for periodic scraping jobs.
 
-### 5b — Enable System-Assigned Managed Identity
+### 3b — Enable System-Assigned Managed Identity
 
 ```bash
 az functionapp identity assign \
   --name func-apptrack-prod \
-  --resource-group rg-apptrack-prod
+  --resource-group rg-apptrack
 ```
 
 Note the `principalId` from the output — needed in the next step.
 
-### 5c — Grant ACS Email Permission
+### 3c — Grant ACS Email Permission
 
 Assign the `Contributor` role on the ACS resource to the Function App's managed identity:
 
 ```bash
 az role assignment create \
-  --assignee <principalId-from-5b> \
+  --assignee <principalId-from-3b> \
   --role "Contributor" \
   --scope $(az communication show \
       --name acs-apptrack-prod \
-      --resource-group rg-apptrack-prod \
+      --resource-group rg-apptrack \
       --query id -o tsv)
 ```
 
@@ -209,23 +210,23 @@ az role assignment create \
 
 ---
 
-## Step 6: Configure Application Settings
+## Step 4: Configure Application Settings
 
 These settings replace `local.settings.json` in production. Set them all at once:
 
 ```bash
 az functionapp config appsettings set \
   --name func-apptrack-prod \
-  --resource-group rg-apptrack-prod \
+  --resource-group rg-apptrack \
   --settings \
-    "AzureWebJobsStorage=<storage-connection-string-from-step-2>" \
+    "AzureWebJobsStorage=<storage-connection-string-from-prerequisites>" \
     "ConnectionStrings__AppTrackConnectionString=<azure-sql-connection-string>" \
-    "ServiceBusConnection=<service-bus-connection-string-from-step-3c>" \
+    "ServiceBusConnection=<service-bus-connection-string-from-step-1c>" \
     "ScrapingCompletedQueueName=scraping-completed" \
     "ScrapeSchedule=0 0 6 * * *" \
     "NotificationSchedule=0 30 6 * * *" \
     "CleanupSchedule=0 0 3 * * 0" \
-    "EmailSettings__Endpoint=https://<acs-hostname-from-step-4d>" \
+    "EmailSettings__Endpoint=https://<acs-hostname-from-step-2d>" \
     "EmailSettings__FromAddress=<sender@your-acs-domain.azurecomm.net>"
 ```
 
@@ -247,7 +248,7 @@ Server=tcp:<server>.database.windows.net,1433;Initial Catalog=AppTrack;Persist S
 
 ---
 
-## Step 7: Deploy the Functions
+## Step 5: Deploy the Functions
 
 ### Option A — GitHub Actions (recommended)
 
@@ -275,20 +276,20 @@ cd publish && zip -r ../functions.zip . && cd ..
 
 az functionapp deployment source config-zip \
   --name func-apptrack-prod \
-  --resource-group rg-apptrack-prod \
+  --resource-group rg-apptrack \
   --src functions.zip
 ```
 
 ---
 
-## Step 8: Verify
+## Step 6: Verify
 
 ### Check Functions are registered
 
 ```bash
 az functionapp function list \
   --name func-apptrack-prod \
-  --resource-group rg-apptrack-prod \
+  --resource-group rg-apptrack \
   --query "[].name" -o tsv
 ```
 
@@ -314,7 +315,7 @@ Get the master key:
 ```bash
 az functionapp keys list \
   --name func-apptrack-prod \
-  --resource-group rg-apptrack-prod \
+  --resource-group rg-apptrack \
   --query "masterKey" -o tsv
 ```
 
@@ -326,7 +327,7 @@ After triggering scraping, verify a message arrived in the queue:
 az servicebus queue show \
   --name scraping-completed \
   --namespace-name sb-apptrack-prod \
-  --resource-group rg-apptrack-prod \
+  --resource-group rg-apptrack \
   --query "countDetails" -o table
 ```
 
@@ -337,7 +338,7 @@ az servicebus queue show \
 ```bash
 az webapp log tail \
   --name func-apptrack-prod \
-  --resource-group rg-apptrack-prod
+  --resource-group rg-apptrack
 ```
 
 ---
@@ -346,12 +347,12 @@ az webapp log tail \
 
 | Setting | Source | Description |
 |---|---|---|
-| `AzureWebJobsStorage` | Step 2 | Storage Account connection string |
+| `AzureWebJobsStorage` | Prerequisites | Storage Account connection string |
 | `ConnectionStrings__AppTrackConnectionString` | Existing Azure SQL | Main database |
-| `ServiceBusConnection` | Step 3c | Service Bus connection string |
-| `ScrapingCompletedQueueName` | Fixed: `scraping-completed` | Must match queue name from Step 3b |
+| `ServiceBusConnection` | Step 1c | Service Bus connection string |
+| `ScrapingCompletedQueueName` | Fixed: `scraping-completed` | Must match queue name from Step 1b |
 | `ScrapeSchedule` | Your preference | NCRONTAB — when to scrape |
 | `NotificationSchedule` | Your preference | NCRONTAB — when to send emails |
 | `CleanupSchedule` | Your preference | NCRONTAB — when to run cleanup (e.g. weekly) |
-| `EmailSettings__Endpoint` | Step 4d | ACS resource endpoint URL |
-| `EmailSettings__FromAddress` | Step 4b/4c | Sender address from ACS domain |
+| `EmailSettings__Endpoint` | Step 2d | ACS resource endpoint URL |
+| `EmailSettings__FromAddress` | Step 2b/2c | Sender address from ACS domain |
