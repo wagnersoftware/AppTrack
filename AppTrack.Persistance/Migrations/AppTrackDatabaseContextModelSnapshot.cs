@@ -418,6 +418,88 @@ namespace AppTrack.Persistance.Migrations
                     b.ToTable("JobApplicationDefaults");
                 });
 
+            modelBuilder.Entity("AppTrack.Domain.ProcessedProjectItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ProcessedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ProjectItemUrl")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "ProjectItemUrl")
+                        .IsUnique();
+
+                    b.ToTable("ProcessedProjectItems", (string)null);
+                });
+
+            modelBuilder.Entity("AppTrack.Domain.ProjectMonitoringSettings", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Keywords")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastNotifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NotificationEmail")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("NotificationIntervalMinutes")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(60);
+
+                    b.Property<bool>("NotifyByEmail")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("ProjectMonitoringSettings", (string)null);
+                });
+
             modelBuilder.Entity("AppTrack.Domain.ProjectPortal", b =>
                 {
                     b.Property<int>("Id")
@@ -461,7 +543,7 @@ namespace AppTrack.Persistance.Migrations
                             IsActive = true,
                             Name = "Freelancermap",
                             ScraperType = "FreelancerMap",
-                            Url = "https://www.freelancermap.de/projekte"
+                            Url = "https://www.freelancermap.de/projekte?countries%5B%5D=1&sort=1&pagenr=1"
                         });
                 });
 
@@ -546,6 +628,11 @@ namespace AppTrack.Persistance.Migrations
                         .HasMaxLength(300)
                         .HasColumnType("nvarchar(300)");
 
+                    b.Property<string>("ContactPerson")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
                     b.Property<DateTime?>("CreationDate")
                         .HasColumnType("datetime2");
 
@@ -553,14 +640,26 @@ namespace AppTrack.Persistance.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("DurationInMonths")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
                     b.Property<DateTime?>("ModifiedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("ProjectPortalId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("ScrapedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("StartDateText")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -578,6 +677,89 @@ namespace AppTrack.Persistance.Migrations
                         .IsUnique();
 
                     b.ToTable("ScrapedProjects", (string)null);
+                });
+
+            modelBuilder.Entity("AppTrack.Domain.ScrapingScheduleState", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("NextRunAfterUtc")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ScrapingScheduleStates");
+                });
+
+            modelBuilder.Entity("AppTrack.Domain.UserPortalSubscription", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ProjectPortalId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectPortalId");
+
+                    b.HasIndex("UserId", "ProjectPortalId")
+                        .IsUnique();
+
+                    b.ToTable("UserPortalSubscriptions", (string)null);
+                });
+
+            modelBuilder.Entity("AppTrack.Domain.UserProjectMatch", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsNotified")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ScrapedProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ScrapedProjectId");
+
+                    b.HasIndex("UserId", "ScrapedProjectId")
+                        .IsUnique();
+
+                    b.ToTable("UserProjectMatches", (string)null);
                 });
 
             modelBuilder.Entity("AppTrack.Domain.BuiltInPromptParameter", b =>
@@ -633,6 +815,28 @@ namespace AppTrack.Persistance.Migrations
                         .IsRequired();
 
                     b.Navigation("ProjectPortal");
+                });
+
+            modelBuilder.Entity("AppTrack.Domain.UserPortalSubscription", b =>
+                {
+                    b.HasOne("AppTrack.Domain.ProjectPortal", "ProjectPortal")
+                        .WithMany()
+                        .HasForeignKey("ProjectPortalId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ProjectPortal");
+                });
+
+            modelBuilder.Entity("AppTrack.Domain.UserProjectMatch", b =>
+                {
+                    b.HasOne("AppTrack.Domain.ScrapedProject", "ScrapedProject")
+                        .WithMany()
+                        .HasForeignKey("ScrapedProjectId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ScrapedProject");
                 });
 
             modelBuilder.Entity("AppTrack.Domain.AiSettings", b =>

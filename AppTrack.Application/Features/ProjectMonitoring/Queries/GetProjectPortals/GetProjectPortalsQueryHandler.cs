@@ -7,17 +7,28 @@ namespace AppTrack.Application.Features.ProjectMonitoring.Queries.GetProjectPort
 public class GetProjectPortalsQueryHandler : IRequestHandler<GetProjectPortalsQuery, List<ProjectPortalDto>>
 {
     private readonly IProjectPortalRepository _portalRepository;
+    private readonly IUserPortalSubscriptionRepository _subscriptionRepository;
 
-    public GetProjectPortalsQueryHandler(IProjectPortalRepository portalRepository)
+    public GetProjectPortalsQueryHandler(
+        IProjectPortalRepository portalRepository,
+        IUserPortalSubscriptionRepository subscriptionRepository)
     {
         _portalRepository = portalRepository;
+        _subscriptionRepository = subscriptionRepository;
     }
 
     public async Task<List<ProjectPortalDto>> Handle(GetProjectPortalsQuery request, CancellationToken cancellationToken)
     {
         var portals = await _portalRepository.GetAllActiveAsync();
+        var subscriptions = await _subscriptionRepository.GetByUserIdAsync(request.UserId);
+
+        var subscribedPortalIds = subscriptions
+            .Where(s => s.IsActive)
+            .Select(s => s.ProjectPortalId)
+            .ToHashSet();
+
         return portals
-            .Select(p => new ProjectPortalDto(p.Id, p.Name, p.Url))
+            .Select(p => new ProjectPortalDto(p.Id, p.Name, p.Url, subscribedPortalIds.Contains(p.Id)))
             .ToList();
     }
 }

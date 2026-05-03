@@ -3,6 +3,8 @@ using AppTrack.Application.Contracts;
 using AppTrack.Functions.Identity;
 using AppTrack.Infrastructure;
 using AppTrack.Persistance;
+using AppTrack.Persistance.DatabaseContext;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -10,6 +12,8 @@ var host = new HostBuilder()
     .ConfigureFunctionsWorkerDefaults()
     .ConfigureServices((context, services) =>
     {
+        services.AddSingleton(TimeProvider.System);
+
         services.AddApplicationServices();
         services.AddInfrastructureServices(context.Configuration);
         services.AddPersistanceServices(context.Configuration);
@@ -20,5 +24,11 @@ var host = new HostBuilder()
         services.AddScoped<IUserContext, NullUserContext>();
     })
     .Build();
+
+using (var scope = host.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppTrackDatabaseContext>();
+    await db.Database.MigrateAsync();
+}
 
 await host.RunAsync();

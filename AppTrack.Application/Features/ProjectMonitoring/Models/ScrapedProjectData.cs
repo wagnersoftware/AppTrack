@@ -5,4 +5,8 @@ public record ScrapedProjectData(
     string Url,
     string JobDescription,
     string CompanyName,
-    string PortalName);
+    string PortalName,
+    string Location = "",
+    string DurationInMonths = "",
+    string StartDateText = "",
+    string ContactPerson = "");

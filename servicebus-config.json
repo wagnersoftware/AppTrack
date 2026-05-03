@@ -1,0 +1,27 @@
+{
+  "UserConfig": {
+    "Namespaces": [
+      {
+        "Name": "sbemulatorns",
+        "Queues": [
+          {
+            "Name": "scraping-completed",
+            "Properties": {
+              "LockDuration": "PT1M",
+              "MaxSizeInMegabytes": 1024,
+              "RequiresDuplicateDetection": false,
+              "RequiresSession": false,
+              "DefaultMessageTimeToLive": "PT1H",
+              "DeadLetteringOnMessageExpiration": false,
+              "MaxDeliveryCount": 10,
+              "EnableBatchedOperations": true
+            }
+          }
+        ]
+      }
+    ],
+    "Logging": {
+      "Type": "File"
+    }
+  }
+}

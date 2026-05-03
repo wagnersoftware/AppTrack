@@ -78,6 +78,70 @@ public async Task Validate_ShouldHaveError_WhenXIsY()
 - `NullLogger<T>.Instance` is from `Microsoft.Extensions.Logging.Abstractions` — no package reference needed, it is transitively available
 - Key scenarios: happy path, card missing title link (skipped), detail fetch 404 (empty description), detail page without `.ql-editor` (empty description), relative href resolved to absolute URL
 
+## ScrapedProject Entity: No ScrapedAt Property
+- `ScrapedProject` domain entity does NOT have a `ScrapedAt` property (it was removed)
+- Do not set `ScrapedAt` in `MakeProject` helpers or anywhere else in tests
+
+## IUnitOfWork.ExecuteInTransactionAsync Mock Pattern
+- Use `.Returns((Func<CancellationToken, Task> action, CancellationToken ct) => action(ct))` so the callback actually executes
+- Constructor-level setup is fine: set it up in the test class constructor so all tests in the class benefit
+- Verify it was called with `Times.Once` to confirm transactional wrapping
+
+## Handler Tests: Injecting Real Validators (no mock needed)
+- When a handler takes `IValidator<TCommand>` and the validator has no dependencies, inject the real validator directly
+- Example: `new UpdateProjectMonitoringSettingsCommandHandler(_repo.Object, new UpdateProjectMonitoringSettingsCommandValidator())`
+- This is simpler than `Mock<IValidator<T>>` and exercises the real validation logic
+- Test `BadRequestException` thrown on invalid input using `await Should.ThrowAsync<BadRequestException>(() => handler.Handle(...))`
+
+## Unit Type in Test Assertions
+- `Unit` struct lives in `AppTrack.Application.Shared` — add `using AppTrack.Application.Shared;`
+- Assert: `result.ShouldBe(Unit.Value);`
+
+## [JsonIgnore] Fields on Commands
+- Fields decorated `[JsonIgnore]` (e.g., `UserId`, `NotificationEmail` on `UpdateProjectMonitoringSettingsCommand`) are set by the backend, not from JSON
+- In handler tests, set these fields directly on the command object — they flow through to the domain entity normally
+- The validator for `UpdateProjectMonitoringSettingsCommand` DOES validate `NotificationEmail` with `NotEmpty()` even though it is `[JsonIgnore]`
+
+## Two Persistence Integration Test Projects (both exist)
+- Root-level: `AppTrack.Persistance.IntegrationTests/` — in solution, has `AppTrackDatabaseContextTests`, seed tests
+- `test/AppTrack.Persistance.IntegrationTests/` — NOT in solution, has `Repositories/` subfolder with repository integration tests
+- New repository tests go in `test/AppTrack.Persistance.IntegrationTests/Repositories/`
+- Run: `dotnet test test/AppTrack.Persistance.IntegrationTests/AppTrack.Persistance.IntegrationTests.csproj`
+
+## ScrapingScheduleRepository: Singleton Row Pattern
+- Always reads/writes `Id = 1` (private `SingletonId = 1`)
+- `GetNextRunAfterAsync` returns `null` when no row exists (normal first-run state)
+- `SetNextRunAfterAsync` inserts if missing, updates if present — upsert pattern
+- Round-trip test: `SetNextRunAfterAsync` then `GetNextRunAfterAsync` confirms persistence
+
+## ScrapedProjectRepository.GetExistingUrlsForPortalAsync: Tested Behaviours
+- Empty set returned when no projects exist for the portal
+- Only returns URLs for the specified portalId (not other portals)
+- Returns a case-insensitive `HashSet<string>` (OrdinalIgnoreCase) — test by checking lookup with different casing
+
+## ScrapePortalsFunction: Time-Window Unit Testing Limitation
+- `ScrapePortalsFunction.Run` uses `DateTime.UtcNow` directly (not injectable `TimeProvider`)
+- Operating window: 09:00–17:00 CET. Tests that require the function body to execute are time-sensitive
+- Use `[Trait("Category", "BusinessHoursDependent")]` to mark time-sensitive tests
+- Deterministic tests: verify mediator NOT called when `GetNextRunAfterAsync` returns far-future time (skips regardless of gate that fires)
+- New test project: `AppTrack.Functions.UnitTests/` — references `AppTrack.Functions` directly
+- `TimerInfo` has a parameterless constructor — use `new TimerInfo()` in test setup; `Run()` does not use the timer parameter
+
+## AppTrack.Functions.UnitTests: Project Setup
+- Location: `AppTrack.Functions.UnitTests/` at repo root (added to `AppTrack.sln`)
+- References `AppTrack.Functions.csproj` which has `OutputType=Exe` — referencing Exe projects is fine for testing
+- No extra packages needed; Moq + xunit + Shouldly follow same pattern as other test projects
+
+## ScrapingResult Factory Methods: Key Contracts
+- `Success(items, listingItemCount)`: `ListingSucceeded=true`, `ErrorMessage=null`, items/count set independently
+- `Failure(errorMessage)`: `ListingSucceeded=false`, `Items=[]`, `ListingItemCount=0`, `ErrorMessage` set
+- `listingItemCount` counts total listed items, `items.Count` may be less (known URLs filtered before detail fetch)
+
+## FreelancermapScraper: Warm-Up and Delay Behaviour
+- Warm-up GET to `scheme://host/` fires before listing fetch; failure is swallowed (not a `ScrapingResult.Failure`)
+- Delay count: 1 warm-up delay + (N-1) between-detail delays for N new items (first detail has no preceding delay)
+- All-known-URL input: only warm-up delay fires (no detail fetches, no between-page delays)
+
 ## Key Rules
 - `TreatWarningsAsErrors = true` — zero warnings tolerated, build must be clean
 - NuGet versions are NOT in `.csproj` files — all managed in `Directory.Packages.props` at solution root

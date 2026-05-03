@@ -4,5 +4,5 @@ namespace AppTrack.Application.Contracts.ProjectMonitoring;
 
 public interface IProjectScraper
 {
-    Task<List<ScrapedProjectData>> ScrapeAsync(string portalUrl, CancellationToken ct);
+    Task<ScrapingResult> ScrapeAsync(string portalUrl, IReadOnlySet<string> knownUrls, CancellationToken ct);
 }

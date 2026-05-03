@@ -22,7 +22,7 @@ public class ProjectPortalConfiguration : IEntityTypeConfiguration<ProjectPortal
             {
                 Id = 1,
                 Name = "Freelancermap",
-                Url = "https://www.freelancermap.de/projekte",
+                Url = "https://www.freelancermap.de/projekte?countries%5B%5D=1&sort=1&pagenr=1",
                 ScraperType = ScraperType.FreelancerMap,
                 IsActive = true
             });

@@ -10,6 +10,7 @@ using AppTrack.Infrastructure.AiTextGeneration;
 using AppTrack.Infrastructure.CvStorage;
 using AppTrack.Infrastructure.EmailService;
 using AppTrack.Infrastructure.Identity;
+using AppTrack.Infrastructure.Notifications;
 using AppTrack.Infrastructure.ProjectScraping;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,8 +38,15 @@ namespace AppTrack.Infrastructure
 
             // Project scraping services
             services.AddHttpClient<FreelancermapScraper>()
+                .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+                {
+                    AutomaticDecompression = System.Net.DecompressionMethods.All
+                })
                 .AddStandardResilienceHandler();
             services.AddScoped<IProjectScraperFactory, ProjectScraperFactory>();
+
+            // Scraping event publishing
+            services.AddScoped<IScrapingEventPublisher, ServiceBusScrapingEventPublisher>();
 
             return services;
         }
