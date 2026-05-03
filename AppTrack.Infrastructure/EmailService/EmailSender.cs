@@ -1,8 +1,10 @@
-﻿using AppTrack.Application.Contracts.Email;
+using AppTrack.Application.Contracts.Email;
 using AppTrack.Application.Models.Email;
+using Azure;
+using Azure.Communication.Email;
+using Azure.Identity;
 using Microsoft.Extensions.Options;
-using SendGrid;
-using SendGrid.Helpers.Mail;
+using AcsEmailMessage = Azure.Communication.Email.EmailMessage;
 
 namespace AppTrack.Infrastructure.EmailService;
 
@@ -15,20 +17,15 @@ public class EmailSender : IEmailSender
         EmailSettings = emailSettings.Value;
     }
 
-    public async Task<bool> SendEmail(EmailMessage email)
+    public async Task<bool> SendEmail(Application.Models.Email.EmailMessage email)
     {
-        var client = new SendGridClient(EmailSettings.ApiKey);
-        var to = new EmailAddress(email.To);
-
-        var from = new EmailAddress
-        {
-            Email = EmailSettings.FromAddress,
-            Name = EmailSettings.FromName
-        };
-
-        var message = MailHelper.CreateSingleEmail(from, to, email.Subject, email.Body, email.Body);
-        var response = await client.SendEmailAsync(message);
-
-        return response.IsSuccessStatusCode;
+        var client = new EmailClient(new Uri(EmailSettings.Endpoint), new DefaultAzureCredential());
+        var message = new AcsEmailMessage(
+            senderAddress: EmailSettings.FromAddress,
+            content: new EmailContent(email.Subject) { Html = email.Body },
+            recipients: new EmailRecipients([new EmailAddress(email.To)])
+        );
+        var operation = await client.SendAsync(WaitUntil.Completed, message);
+        return operation.Value.Status == EmailSendStatus.Succeeded;
     }
 }

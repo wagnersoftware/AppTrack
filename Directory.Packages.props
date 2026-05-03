@@ -63,7 +63,7 @@
     <PackageVersion Include="MudBlazor" Version="9.1.0" />
     <PackageVersion Include="PdfPig" Version="0.1.9" />
     <PackageVersion Include="Scrutor" Version="6.1.0" />
-    <PackageVersion Include="SendGrid" Version="9.29.3" />
+    <PackageVersion Include="Azure.Communication.Email" Version="1.0.1" />
     <!-- WPF -->
     <PackageVersion Include="Meziantou.Framework.Win32.CredentialManager" Version="1.7.6" />
     <PackageVersion Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />

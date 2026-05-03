@@ -17,7 +17,7 @@ This guide covers all Azure resources required to run the project scraping, keyw
 [Timer Trigger]
   SendNotificationsFunction
           │  reads IsNotified=false matches, sends email via SendGrid
-          └─► marks IsNotified=true
+          └─► marks IsNotified=true via Azure Communication Services Email
 
 [Timer Trigger - weekly]
   CleanupFunction
@@ -29,7 +29,6 @@ This guide covers all Azure resources required to run the project scraping, keyw
 - Azure CLI installed (`az --version`)
 - Logged in: `az login`
 - Azure subscription available
-- SendGrid account with a verified sender address (already used by the API)
 - Existing **Azure SQL Database** and **Azure App Service** for the AppTrack API (migrations run automatically on API startup)
 
 ---
@@ -111,7 +110,62 @@ Save this value — it becomes `ServiceBusConnection` in the Function App settin
 
 ---
 
-## Step 4: Function App
+## Step 4: Azure Communication Services Email
+
+### 4a — Create ACS Resource
+
+```bash
+az communication create \
+  --name acs-apptrack-prod \
+  --resource-group rg-apptrack-prod \
+  --location global \
+  --data-location germanywestcentral
+```
+
+> `--location global` is required for ACS resources (control plane is global); `--data-location` sets where data is stored at rest.
+
+### 4b — Add an Email Domain
+
+Use an Azure-managed domain (easiest, no DNS setup):
+
+```bash
+az communication email domain create \
+  --name AzureManagedDomain \
+  --email-service-name acs-apptrack-prod \
+  --resource-group rg-apptrack-prod \
+  --location global \
+  --domain-management AzureManaged
+```
+
+This provisions a `<guid>.azurecomm.net` domain with a ready-to-use sender address.
+
+To use a **custom domain** instead, replace `--domain-management AzureManaged` with `CustomerManaged` and verify ownership via DNS TXT record (see [ACS docs](https://learn.microsoft.com/azure/communication-services/quickstarts/email/add-custom-verified-email-domain)).
+
+### 4c — Link Domain to ACS Resource
+
+```bash
+az communication email domain link \
+  --name acs-apptrack-prod \
+  --resource-group rg-apptrack-prod \
+  --linked-domains "/subscriptions/<subscription-id>/resourceGroups/rg-apptrack-prod/providers/Microsoft.Communication/emailServices/acs-apptrack-prod/domains/AzureManagedDomain"
+```
+
+### 4d — Get Endpoint URL
+
+```bash
+az communication show \
+  --name acs-apptrack-prod \
+  --resource-group rg-apptrack-prod \
+  --query "properties.hostName" -o tsv
+```
+
+The result will look like `acs-apptrack-prod.communication.azure.com`. Prefix it with `https://` — this becomes `EmailSettings__Endpoint` in the Function App settings.
+
+> The sender address for the Azure-managed domain follows the pattern: `DoNotReply@<guid>.azurecomm.net`. You can also create a custom sender username.
+
+---
+
+## Step 5: Function App
 
 ```bash
 az functionapp create \
@@ -127,9 +181,35 @@ az functionapp create \
 
 > The Consumption Plan means you pay per execution — ideal for periodic scraping jobs.
 
+### 5b — Enable System-Assigned Managed Identity
+
+```bash
+az functionapp identity assign \
+  --name func-apptrack-prod \
+  --resource-group rg-apptrack-prod
+```
+
+Note the `principalId` from the output — needed in the next step.
+
+### 5c — Grant ACS Email Permission
+
+Assign the `Contributor` role on the ACS resource to the Function App's managed identity:
+
+```bash
+az role assignment create \
+  --assignee <principalId-from-5b> \
+  --role "Contributor" \
+  --scope $(az communication show \
+      --name acs-apptrack-prod \
+      --resource-group rg-apptrack-prod \
+      --query id -o tsv)
+```
+
+> `DefaultAzureCredential` in the application code will automatically pick up this identity at runtime — no secrets or keys needed.
+
 ---
 
-## Step 5: Configure Application Settings
+## Step 6: Configure Application Settings
 
 These settings replace `local.settings.json` in production. Set them all at once:
 
@@ -145,8 +225,8 @@ az functionapp config appsettings set \
     "ScrapeSchedule=0 0 6 * * *" \
     "NotificationSchedule=0 30 6 * * *" \
     "CleanupSchedule=0 0 3 * * 0" \
-    "EmailSettings__FromAddress=<your-verified-sender@domain.com>" \
-    "EmailSettings__ApiKey=<sendgrid-api-key>"
+    "EmailSettings__Endpoint=https://<acs-hostname-from-step-4d>" \
+    "EmailSettings__FromAddress=<sender@your-acs-domain.azurecomm.net>"
 ```
 
 ### Schedule Reference (NCRONTAB)
@@ -167,7 +247,7 @@ Server=tcp:<server>.database.windows.net,1433;Initial Catalog=AppTrack;Persist S
 
 ---
 
-## Step 6: Deploy the Functions
+## Step 7: Deploy the Functions
 
 ### Option A — GitHub Actions (recommended)
 
@@ -201,7 +281,7 @@ az functionapp deployment source config-zip \
 
 ---
 
-## Step 7: Verify
+## Step 8: Verify
 
 ### Check Functions are registered
 
@@ -273,5 +353,5 @@ az webapp log tail \
 | `ScrapeSchedule` | Your preference | NCRONTAB — when to scrape |
 | `NotificationSchedule` | Your preference | NCRONTAB — when to send emails |
 | `CleanupSchedule` | Your preference | NCRONTAB — when to run cleanup (e.g. weekly) |
-| `EmailSettings__FromAddress` | SendGrid | Verified sender address |
-| `EmailSettings__ApiKey` | SendGrid | API key |
+| `EmailSettings__Endpoint` | Step 4d | ACS resource endpoint URL |
+| `EmailSettings__FromAddress` | Step 4b/4c | Sender address from ACS domain |
